@@ -7,6 +7,7 @@ from pathlib import Path
 import os
 import dj_database_url
 
+
 # -------------------------------------------------
 # BASE DIRECTORY
 # -------------------------------------------------
@@ -92,13 +93,27 @@ WSGI_APPLICATION = 'Kiosk.wsgi.application'
 
 # -------------------------------------------------
 # DATABASE
-# -------------------------------------------------
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+
+
+# DATABASE CONFIGURATION - MUST BE EXACTLY THIS
+if os.environ.get('DATABASE_URL'):
+    print(f"✅ Found DATABASE_URL: {os.environ.get('DATABASE_URL')[:30]}...")  # Debug print
+    DATABASES = {
+        'default': dj_database_url.config(
+            conn_max_age=600,
+            ssl_require=True
+        )
     }
-}
+else:
+    print("⚠️  No DATABASE_URL found, using SQLite")
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+
+print(f"🔌 Using database engine: {DATABASES['default']['ENGINE']}")
 
 
 # -------------------------------------------------
