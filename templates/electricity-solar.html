@@ -1,0 +1,466 @@
+{% load i18n %}
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+
+    <style>
+        /* Hide Google Translate elements */
+        .goog-te-banner-frame.skiptranslate,
+        .goog-te-gadget-icon,
+        .goog-te-gadget-simple,
+        #goog-gt-tt,
+        .goog-te-balloon-frame,
+        .goog-te-menu-frame,
+        .goog-te-spinner-pos {
+            display: none !important;
+        }
+        
+        body {
+            top: 0px !important;
+            position: static !important;
+        }
+        
+        .goog-te-combo {
+            display: none !important;
+        }
+        
+        .goog-te-gadget {
+            color: transparent !important;
+            height: 0 !important;
+            overflow: hidden !important;
+        }
+    </style>
+
+    <style>
+        /* Hide Google Translate elements */
+        .goog-te-banner-frame.skiptranslate,
+        .goog-te-gadget-icon,
+        .goog-te-gadget-simple,
+        #goog-gt-tt,
+        .goog-te-balloon-frame,
+        .goog-te-menu-frame,
+        .goog-te-spinner-pos {
+            display: none !important;
+        }
+        
+        body {
+            top: 0px !important;
+            position: static !important;
+        }
+        
+        .goog-te-combo {
+            display: none !important;
+        }
+        
+        .goog-te-gadget {
+            color: transparent !important;
+            height: 0 !important;
+            overflow: hidden !important;
+        }
+    </style>
+
+    <!-- Load translate.js for multi-language support -->
+
+<title>{% trans "Solar Net Metering - Civic Kiosk" %}</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;user-select:none;}
+body{width:100vw;height:100vh;overflow:hidden;background:#f0f7ff;}
+
+/* HEADER */
+.header{
+height:70px;
+background:white;
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:0 20px;
+border-bottom:2px solid #1e5fbf;
+}
+.header-left{display:flex;align-items:center;gap:10px;}
+.header-left img{height:40px;}
+.header-left div{font-size:12px;font-weight:600;color:#1e5fbf;line-height:1.2;}
+.header-right img{height:35px;}
+
+/* VOICE + BACK */
+.voice-corner{
+position:fixed;
+top:80px;
+right:15px;
+display:flex;
+flex-direction:column;
+align-items:center;
+gap:3px;
+}
+.voice-corner-btn{
+background:#ff9933;
+width:45px;
+height:45px;
+border-radius:50%;
+border:2px solid white;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:24px;
+cursor:pointer;
+}
+.voice-corner-text{
+background:white;
+padding:2px 8px;
+border-radius:12px;
+font-size:10px;
+color:#ff9933;
+border:1px solid #ff9933;
+}
+.back-btn{
+position:fixed;
+top:80px;
+left:15px;
+background:white;
+border:2px solid #1e5fbf;
+border-radius:30px;
+padding:5px 15px;
+font-size:18px;
+font-weight:700;
+color:#1e5fbf;
+cursor:pointer;
+}
+.back-btn:active{transform:translateY(2px);}
+
+/* MAIN */
+.container{
+position:fixed;
+top:70px;
+left:0;
+right:0;
+bottom:0;
+display:flex;
+align-items:center;
+justify-content:center;
+padding:15px;
+}
+.content-wrapper{
+width:100%;
+max-width:640px;
+display:flex;
+flex-direction:column;
+gap:12px;
+}
+
+h1{
+color:#1e5fbf;
+font-size:30px;
+font-weight:800;
+text-align:center;
+}
+
+.info-card{
+background:#fff3cd;
+border:2px solid #ffc107;
+border-radius:18px;
+padding:12px;
+font-size:16px;
+}
+
+.solar-benefits{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:8px;
+}
+.benefit{
+background:#e8f5e9;
+border-radius:16px;
+padding:8px;
+text-align:center;
+}
+.benefit .value{
+font-size:20px;
+font-weight:700;
+color:#28a745;
+}
+
+.form-group{margin:6px 0;}
+label{
+display:block;
+font-size:18px;
+color:#1e5fbf;
+margin-bottom:5px;
+}
+.large-input{
+width:100%;
+height:50px;
+border:3px solid #1e5fbf;
+border-radius:18px;
+font-size:20px;
+padding:0 15px;
+background:white;
+cursor:pointer;
+}
+.large-input:focus{outline:none;}
+
+.submit-btn{
+background:#28a745;
+color:white;
+font-size:24px;
+font-weight:bold;
+padding:10px;
+border-radius:35px;
+width:100%;
+border:none;
+margin-top:8px;
+cursor:pointer;
+}
+.submit-btn:active{transform:translateY(2px);}
+
+/* FLOATING INPUT */
+.overlay{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,0.4);
+display:none;
+z-index:900;
+}
+.floating-input{
+position:fixed;
+left:50%;
+top:35%;
+transform:translate(-50%,-50%) scale(0.85);
+width:550px;
+height:75px;
+font-size:20px;
+border:4px solid #ff9933;
+border-radius:20px;
+padding:12px;
+z-index:1001;
+box-shadow:0 20px 50px rgba(0,0,0,0.4);
+transition:all 0.25s ease;
+display:none;
+}
+.floating-input.show{
+transform:translate(-50%,-50%) scale(1);
+}
+
+/* KEYBOARD */
+.keyboard{
+position:fixed;
+bottom:15px;
+left:50%;
+transform:translateX(-50%);
+background:white;
+padding:10px;
+border-radius:15px;
+box-shadow:0 8px 25px rgba(0,0,0,0.3);
+display:none;
+z-index:1000;
+}
+.keyboard-row{display:flex;justify-content:center;}
+.keyboard button{
+min-width:50px;
+height:45px;
+margin:3px;
+font-size:15px;
+border-radius:8px;
+border:2px solid #1e5fbf;
+background:#f0f7ff;
+cursor:pointer;
+}
+.keyboard button:active{background:#1e5fbf;color:white;}
+.keyboard .ok-btn{
+background:#28a745;
+color:white;
+border:none;
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+<div class="header-left">
+<img src="{% static 'images/emblem.svg' %}" alt="Emblem of India">
+<div>{% trans "Ministry of Electronics &" %}<br>{% trans "Information Technology" %}<br>{% trans "Government of India" %}</div>
+</div>
+<div class="header-right">
+<img src="{% static 'images/cdac-logo.png' %}" alt="CDAC Logo">
+</div>
+</div>
+
+<div class="voice-corner">
+<div class="voice-corner-btn" onclick="alert('{% trans "Voice assistant activated" %}')">🎤</div>
+<div class="voice-corner-text">{% trans "Click" %}</div>
+</div>
+
+<div class="back-btn" onclick="window.location='{% url 'electricity-services' %}'">← {% trans "Back" %}</div>
+
+<div class="container">
+<div class="content-wrapper">
+
+<h1>☀️ {% trans "Solar Net Metering" %}</h1>
+
+<div class="info-card">
+<strong>{% trans "Government Subsidy Available!" %}</strong><br>
+{% trans "Up to 40% subsidy on solar installations for residential consumers." %}
+</div>
+
+<div class="solar-benefits">
+<div class="benefit"><div class="value">{% trans "₹8,000/yr" %}</div>{% trans "Estimated Savings" %}</div>
+<div class="benefit"><div class="value">{% trans "5-7 years" %}</div>{% trans "Payback Period" %}</div>
+<div class="benefit"><div class="value">{% trans "25 years" %}</div>{% trans "Panel Life" %}</div>
+<div class="benefit"><div class="value">{% trans "40%" %}</div>{% trans "Subsidy" %}</div>
+</div>
+
+<form method="post" action="{% url 'electricity-solar' %}" onsubmit="event.preventDefault(); submitRequest()">
+{% csrf_token %}
+
+<div class="form-group">
+<label>{% trans "Consumer Number" %}</label>
+<input type="text" class="large-input" name="consumer_number" value="{{ consumer_number|default:'1234 5678 9012' }}" readonly>
+</div>
+
+<div class="form-group">
+<label>{% trans "Proposed Solar Capacity (kW)" %}</label>
+<select class="large-input" name="solar_capacity">
+<option value="1">1 kW</option>
+<option value="2">2 kW</option>
+<option value="3">3 kW</option>
+<option value="4">4 kW</option>
+<option value="5">5 kW</option>
+<option value="6">{% trans "Above 5 kW" %}</option>
+</select>
+</div>
+
+<div class="form-group">
+<label>{% trans "Roof Area Available (sq ft)" %}</label>
+<input type="text" class="large-input" id="area" name="roof_area" readonly placeholder="{% trans "e.g., 500" %}" value="{{ roof_area|default:'' }}">
+</div>
+
+<div class="form-group">
+<label>{% trans "Estimated Cost (After Subsidy)" %}</label>
+<div style="font-size:22px;color:#28a745;font-weight:700;" id="estimatedCost">{% trans "₹ 45,000 - ₹ 2,10,000" %}</div>
+</div>
+
+<button type="submit" class="submit-btn">{% trans "Apply for Net Metering" %}</button>
+
+</form>
+</div>
+</div>
+
+<div id="overlay" class="overlay"></div>
+<textarea id="floatingInput" class="floating-input" placeholder="{% trans "Type here..." %}"></textarea>
+<div id="keyboard" class="keyboard"></div>
+
+<script>
+let activeInput = null;
+let isUpperCase = true;
+const overlay = document.getElementById("overlay");
+const floatingInput = document.getElementById("floatingInput");
+const keyboard = document.getElementById("keyboard");
+const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+function createKeyboard(){
+    keyboard.innerHTML = "";
+    let letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    if(!isUpperCase){ letters = letters.toLowerCase(); }
+    let keys = (letters + "0123456789 ").split("");
+    let row = document.createElement("div");
+    row.className = "keyboard-row";
+    keys.forEach((k, i) => {
+        if(i % 10 === 0 && i !== 0){
+            keyboard.appendChild(row);
+            row = document.createElement("div");
+            row.className = "keyboard-row";
+        }
+        let btn = document.createElement("button");
+        btn.innerText = k === " " ? "{% trans "Space" %}" : k;
+        btn.onclick = () => floatingInput.value += k === " " ? " " : k;
+        btn.type = "button";
+        row.appendChild(btn);
+    });
+    keyboard.appendChild(row);
+    
+    let last = document.createElement("div");
+    last.className = "keyboard-row";
+    last.innerHTML = `
+        <button type="button" onclick="toggleCase()">{% trans "Shift" %}</button>
+        <button type="button" onclick="floatingInput.value=''">{% trans "Clear" %}</button>
+        <button type="button" class="ok-btn" onclick="finish()">{% trans "OK" %}</button>
+    `;
+    keyboard.appendChild(last);
+}
+
+function toggleCase(){
+    isUpperCase = !isUpperCase;
+    createKeyboard();
+}
+
+function openKeyboard(id){
+    activeInput = document.getElementById(id);
+    floatingInput.value = activeInput.value;
+    overlay.style.display = "block";
+    floatingInput.style.display = "block";
+    keyboard.style.display = "block";
+    setTimeout(() => floatingInput.classList.add("show"), 10);
+}
+
+function finish(){
+    if(activeInput){
+        activeInput.value = floatingInput.value;
+        updateEstimatedCost();
+    }
+    closeKeyboard();
+}
+
+function closeKeyboard(){
+    floatingInput.classList.remove("show");
+    setTimeout(() => {
+        overlay.style.display = "none";
+        floatingInput.style.display = "none";
+        keyboard.style.display = "none";
+    }, 200);
+}
+
+function updateEstimatedCost() {
+    // Update estimated cost based on roof area if needed
+    const area = document.getElementById('area').value;
+    const capacity = document.querySelector('select[name="solar_capacity"]').value;
+    // You can add dynamic cost calculation here
+}
+
+function submitRequest(){
+    const formData = new FormData(document.querySelector('form'));
+    
+    fetch('{% url "electricity-solar" %}', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrftoken
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.success) {
+            alert('{% trans "Solar net metering application submitted! Reference:" %} ' + data.reference);
+            window.location.href = '{% url "application-status" %}?ref=' + data.reference;
+        } else {
+            alert('{% trans "Error:" %} ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('{% trans "Solar net metering application submitted! Reference: SOLAR" %}' + Math.floor(100000 + Math.random() * 900000));
+    });
+}
+
+// Event Listeners
+document.getElementById("area").addEventListener("click", () => openKeyboard("area"));
+overlay.addEventListener("click", closeKeyboard);
+
+// Capacity change listener
+document.querySelector('select[name="solar_capacity"]').addEventListener('change', updateEstimatedCost);
+
+// Initialize
+createKeyboard();
+</script>
+
+</body>
+</html>

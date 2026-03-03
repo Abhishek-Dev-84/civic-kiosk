@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+{% load i18n %}
+{% load static %}
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>{% trans "Civic Kiosk - Under Development" %}</title>
+
+
+<link href="https://fonts.googleapis.com/css?family=Poppins:400,600" rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins', sans-serif;
+}
+
+body{
+height:100vh;
+display:flex;
+flex-direction:column;
+background:linear-gradient(135deg,#e3f2fd,#ffffff);
+overflow:hidden;
+}
+
+/* ================= HEADER ================= */
+
+.header{
+height:70px;
+background:white;
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:0 25px;
+border-bottom:3px solid #1e5fbf;
+flex-shrink:0;
+}
+
+.header-left{
+display:flex;
+align-items:center;
+gap:10px;
+}
+
+.header-left img{
+height:40px;
+}
+
+.header-left div{
+font-size:12px;
+font-weight:600;
+color:#1e5fbf;
+line-height:1.2;
+}
+
+.header-right img{
+height:35px;
+}
+
+/* ================= MAIN ================= */
+
+.main{
+flex:1;
+display:flex;
+align-items:center;
+justify-content:center;
+flex-direction:column;
+text-align:center;
+}
+
+/* ================= DIGITAL RING ================= */
+
+.system-ring{
+position:relative;
+width:150px;
+height:150px;
+margin-bottom:35px;
+}
+
+.ring{
+position:absolute;
+width:100%;
+height:100%;
+border-radius:50%;
+border:6px solid transparent;
+border-top:6px solid #1e5fbf;
+border-bottom:6px solid #1e5fbf;
+animation:rotate 2s linear infinite;
+}
+
+.ring2{
+width:110px;
+height:110px;
+top:20px;
+left:20px;
+border-top:6px solid #00bcd4;
+border-bottom:6px solid #00bcd4;
+animation:rotateReverse 3s linear infinite;
+}
+
+.center-icon{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+font-size:40px;
+color:#1e5fbf;
+font-weight:600;
+}
+
+@keyframes rotate{
+from{transform:rotate(0deg);}
+to{transform:rotate(360deg);}
+}
+
+@keyframes rotateReverse{
+from{transform:rotate(360deg);}
+to{transform:rotate(0deg);}
+}
+
+/* ================= TEXT ================= */
+
+h1{
+font-size:34px;
+color:#1e5fbf;
+margin-bottom:15px;
+}
+
+p{
+font-size:18px;
+color:#555;
+margin-bottom:30px;
+max-width:600px;
+}
+
+/* ================= BUTTON ================= */
+
+.btn{
+padding:14px 40px;
+border-radius:30px;
+background:#1e5fbf;
+color:white;
+font-size:18px;
+font-weight:600;
+text-decoration:none;
+transition:0.3s;
+box-shadow:0 6px 15px rgba(0,0,0,0.2);
+display:inline-block;
+}
+
+.btn:hover{
+background:#0a3d7a;
+transform:scale(1.07);
+}
+
+/* ================= MESSAGE STYLES (ADDED WITHOUT CHANGING STRUCTURE) ================= */
+.messages{
+position:fixed;
+top:80px;
+left:50%;
+transform:translateX(-50%);
+z-index:1000;
+width:90%;
+max-width:600px;
+}
+
+.message{
+padding:12px 20px;
+border-radius:10px;
+margin-bottom:10px;
+text-align:center;
+font-weight:500;
+box-shadow:0 4px 12px rgba(0,0,0,0.15);
+animation:slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown{
+from{
+opacity:0;
+transform:translateY(-20px);
+}
+to{
+opacity:1;
+transform:translateY(0);
+}
+}
+
+.message.success{
+background:#d4edda;
+color:#155724;
+border:1px solid #c3e6cb;
+}
+
+.message.error{
+background:#f8d7da;
+color:#721c24;
+border:1px solid #f5c6cb;
+}
+
+.message.info{
+background:#d1ecf1;
+color:#0c5460;
+border:1px solid #bee5eb;
+}
+
+.message.warning{
+background:#fff3cd;
+color:#856404;
+border:1px solid #ffeeba;
+}
+
+/* ================= FOOTER ================= */
+
+.footer-note{
+position:absolute;
+bottom:15px;
+width:100%;
+text-align:center;
+font-size:13px;
+color:#777;
+}
+
+</style>
+
+</head>
+<body>
+
+<div class="header">
+<div class="header-left">
+<img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India">
+<div>
+{% trans "Ministry of Electronics &" %}<br>
+{% trans "Information Technology" %}<br>
+{% trans "Government of India" %}
+</div>
+</div>
+<div class="header-right">
+<img src="https://www.cdac.in/img/cdac-logo.png" alt="CDAC Logo">
+</div>
+</div>
+
+<!-- ================= MESSAGES DISPLAY (ADDED WITHOUT CHANGING STRUCTURE) ================= -->
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+    <div class="message {{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="main">
+
+<div class="system-ring">
+<div class="ring"></div>
+<div class="ring ring2"></div>
+<div class="center-icon">⚙</div>
+</div>
+
+<h1>{% block title %}{% trans "Module Under Development" %}{% endblock %}</h1>
+
+<p>
+{% block message %}
+{% trans "This digital service module is currently being configured and deployed." %}<br>
+{% trans "Please check back soon for activation." %}
+{% endblock %}
+</p>
+
+<a href="{% url 'menu' %}" class="btn">{% trans "Back to Home" %}</a>
+
+</div>
+
+<div class="footer-note">
+{% trans "Digital Civic Services Portal | Development Mode |" %} {% now "Y-m-d H:i" %}
+</div>
+
+<script>
+// Auto-hide messages after 5 seconds
+setTimeout(function() {
+    document.querySelectorAll('.message').forEach(function(message) {
+        message.style.display = 'none';
+    });
+}, 5000);
+</script>
+
+</body>
+</html>

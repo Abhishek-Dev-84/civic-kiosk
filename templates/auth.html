@@ -1,0 +1,726 @@
+{% load i18n %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <style>
+        /* Hide Google Translate elements */
+        .goog-te-banner-frame.skiptranslate,
+        .goog-te-gadget-icon,
+        .goog-te-gadget-simple,
+        #goog-gt-tt,
+        .goog-te-balloon-frame,
+        .goog-te-menu-frame,
+        .goog-te-spinner-pos {
+            display: none !important;
+        }
+        
+        body {
+            top: 0px !important;
+            position: static !important;
+        }
+        
+        .goog-te-combo {
+            display: none !important;
+        }
+        
+        .goog-te-gadget {
+            color: transparent !important;
+            height: 0 !important;
+            overflow: hidden !important;
+        }
+    </style>
+
+    <style>
+        /* Hide Google Translate elements */
+        .goog-te-banner-frame.skiptranslate,
+        .goog-te-gadget-icon,
+        .goog-te-gadget-simple,
+        #goog-gt-tt,
+        .goog-te-balloon-frame,
+        .goog-te-menu-frame,
+        .goog-te-spinner-pos {
+            display: none !important;
+        }
+        
+        body {
+            top: 0px !important;
+            position: static !important;
+        }
+        
+        .goog-te-combo {
+            display: none !important;
+        }
+        
+        .goog-te-gadget {
+            color: transparent !important;
+            height: 0 !important;
+            overflow: hidden !important;
+        }
+
+        /* Timeout warning popup */
+        .timeout-warning {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border: 4px solid #ff9933;
+            border-radius: 40px;
+            padding: 30px;
+            text-align: center;
+            z-index: 2000;
+            display: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .timeout-warning p {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .timeout-warning button {
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            padding: 15px 30px;
+            font-size: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            margin: 10px;
+            min-width: 150px;
+        }
+
+        .timeout-warning .logout-btn {
+            background: #dc3545;
+        }
+        
+        .timeout-warning button:active {
+            transform: translateY(3px);
+        }
+    </style>
+
+    <meta charset="UTF-8">
+    <title>{% trans "Civic Services Kiosk - Aadhaar Entry" %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* RESET - Full screen kiosk mode */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            user-select: none;
+        }
+
+        body {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background: #f0f7ff;
+        }
+
+        /* HEADER */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 70px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            border-bottom: 2px solid #1e5fbf;
+            z-index: 1000;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-left img {
+            height: 35px;
+        }
+
+        .header-left div {
+            font-size: 12px;
+            font-weight: 600;
+            color: #1e5fbf;
+            line-height: 1.1;
+        }
+
+        .header-right img {
+            height: 30px;
+        }
+
+        /* Voice button */
+        .voice-corner {
+            position: fixed;
+            top: 80px;
+            right: 15px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .voice-corner-btn {
+            background: #ff9933;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .voice-corner-btn.listening {
+            background: #4CAF50;
+        }
+
+        .voice-corner-text {
+            background: white;
+            padding: 2px 8px;
+            border-radius: 15px;
+            font-size: 10px;
+            font-weight: 600;
+            color: #ff9933;
+            border: 1px solid #ff9933;
+        }
+
+        /* Back button */
+        .back-btn {
+            position: fixed;
+            top: 80px;
+            left: 15px;
+            background: white;
+            border: 2px solid #1e5fbf;
+            border-radius: 30px;
+            padding: 5px 15px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            color: #1e5fbf;
+            box-shadow: 0 3px 0 #0a3d7a;
+            z-index: 1000;
+        }
+
+        .back-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #0a3d7a;
+        }
+
+        /* Main container */
+        .kiosk-container {
+            position: fixed;
+            top: 70px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            padding: 15px 20px 20px 20px;
+            overflow: hidden;
+        }
+
+        .content-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Title */
+        h1 {
+            color: #1e5fbf;
+            font-size: 32px;
+            font-weight: 800;
+            text-align: center;
+            margin: 10px 0 15px 0;
+        }
+
+        /* Aadhaar boxes */
+        .aadhaar-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin: 20px 0 45px 0;
+            flex-wrap: nowrap;
+        }
+
+        .aadhaar-box {
+            width: 50px;
+            height: 60px;
+            border: 3px solid #1e5fbf;
+            border-radius: 10px;
+            font-size: 32px;
+            font-weight: 800;
+            text-align: center;
+            line-height: 60px;
+            background: white;
+            color: #1e5fbf;
+            box-shadow: 0 4px 0 #0a3d7a;
+            flex-shrink: 0;
+        }
+
+        .aadhaar-box.filled {
+            background: #e3f2fd;
+        }
+
+        .aadhaar-box.highlight {
+            border-color: #ff9933;
+            border-width: 4px;
+            box-shadow: 0 4px 0 #cc6600;
+        }
+
+        /* Keypad */
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 8px;
+        }
+
+        .key {
+            background: white;
+            border: 3px solid #1e5fbf;
+            border-radius: 20px;
+            padding: 18px 5px;
+            font-size: 40px;
+            font-weight: 800;
+            cursor: pointer;
+            color: #1e5fbf;
+            box-shadow: 0 5px 0 #0a3d7a;
+            text-align: center;
+            min-height: 85px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .key:active {
+            transform: translateY(5px);
+            box-shadow: 0 1px 0 #0a3d7a;
+        }
+
+        .key.special {
+            background: #ff9933;
+            color: white;
+            border-color: #cc6600;
+            box-shadow: 0 5px 0 #b35900;
+        }
+
+        /* Proceed button */
+        .btn-proceed {
+            background: #28a745;
+            border: none;
+            color: white;
+            font-size: 32px;
+            font-weight: 800;
+            padding: 14px;
+            border-radius: 40px;
+            cursor: pointer;
+            box-shadow: 0 5px 0 #1e7e34;
+            border: 2px solid white;
+            width: 100%;
+            margin: 8px 0 5px 0;
+        }
+
+        .btn-proceed:active {
+            transform: translateY(5px);
+            box-shadow: 0 1px 0 #1e7e34;
+        }
+
+        /* Status */
+        .error {
+            color: #dc3545;
+            font-size: 18px;
+            text-align: center;
+            font-weight: 700;
+            background: #ffe6e6;
+            padding: 8px;
+            border-radius: 25px;
+            border: 1px solid #dc3545;
+            margin: 5px 0;
+        }
+
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #1e5fbf;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            animation: spin 1s linear infinite;
+            margin: 5px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Label */
+        .label {
+            color: #1e5fbf;
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+            margin: 5px 0 10px 0;
+        }
+
+        /* Django messages styling */
+        .messages {
+            margin-bottom: 15px;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 18px;
+            text-align: center;
+            font-weight: 700;
+            background: #ffe6e6;
+            padding: 8px;
+            border-radius: 25px;
+            border: 1px solid #dc3545;
+        }
+
+        .success-message {
+            color: #28a745;
+            font-size: 18px;
+            text-align: center;
+            font-weight: 700;
+            background: #e8f5e9;
+            padding: 8px;
+            border-radius: 25px;
+            border: 1px solid #28a745;
+        }
+    </style>
+</head>
+<body>
+    <!-- Timeout Warning Popup -->
+    <div id="timeoutWarning" class="timeout-warning">
+        <p>⏰ {% trans "Session about to expire!" %}</p>
+        <button onclick="extendSession()">{% trans "Continue" %}</button>
+        <button class="logout-btn" onclick="window.location='{% url 'index' %}'">{% trans "Logout" %}</button>
+    </div>
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-left">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India">
+            <div>
+                {% trans "Ministry of Electronics &" %}<br>
+                {% trans "Information Technology" %}<br>
+                {% trans "Government of India" %}
+            </div>
+        </div>
+        <div class="header-right">
+            <img src="https://www.cdac.in/img/cdac-logo.png" alt="CDAC Logo">
+        </div>
+    </div>
+
+    <!-- Voice Button -->
+    <div class="voice-corner">
+        <div class="voice-corner-btn" id="voiceBtn" onclick="toggleVoiceInput()">
+            🎤
+        </div>
+        <div class="voice-corner-text" id="voiceStatus">{% trans "Click" %}</div>
+    </div>
+
+    <!-- Back Button -->
+    <div class="back-btn" onclick="goBack()">← {% trans "Back" %}</div>
+
+    <!-- Main Container -->
+    <div class="kiosk-container">
+        <div class="content-wrapper">
+            <!-- Django Messages -->
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <div class="{% if message.tags == 'error' %}error-message{% else %}success-message{% endif %}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Title -->
+            <h1>🔐 {% trans "Enter Aadhaar" %}</h1>
+
+            <!-- Label -->
+            <div class="label">{% trans "12-digit Aadhaar Number" %}</div>
+
+            <!-- Aadhaar boxes -->
+            <div class="aadhaar-row" id="aadhaarRow"></div>
+
+            <!-- Keypad -->
+            <div class="keypad">
+                <div class="key" onclick="pressKey(1)">1</div>
+                <div class="key" onclick="pressKey(2)">2</div>
+                <div class="key" onclick="pressKey(3)">3</div>
+                <div class="key" onclick="pressKey(4)">4</div>
+                <div class="key" onclick="pressKey(5)">5</div>
+                <div class="key" onclick="pressKey(6)">6</div>
+                <div class="key" onclick="pressKey(7)">7</div>
+                <div class="key" onclick="pressKey(8)">8</div>
+                <div class="key" onclick="pressKey(9)">9</div>
+                <div class="key special" onclick="backspace()">⌫</div>
+                <div class="key" onclick="pressKey(0)">0</div>
+                <div class="key special" onclick="clearAll()">C</div>
+            </div>
+            
+            <!-- Proceed Button -->
+            <button class="btn-proceed" onclick="proceedToOTP()" id="proceedBtn">
+                {% trans "Proceed" %} →
+            </button>
+
+            <!-- Status -->
+            <div id="loader" class="loader hidden"></div>
+            <p id="error" class="error hidden"></p>
+            
+            <!-- CSRF Token for Django forms (hidden) -->
+            {% csrf_token %}
+        </div>
+    </div>
+
+    <script>
+        let aadhaarBoxes = [];
+        let aadhaarPos = 0;
+        let recognition = null;
+        let isListening = false;
+        let sessionTimer;
+        const SESSION_DURATION = 120000; // 2 minutes
+
+        // Session management functions
+        function startSessionTimer() {
+            if (sessionTimer) {
+                clearTimeout(sessionTimer);
+            }
+            
+            sessionTimer = setTimeout(() => {
+                document.getElementById('timeoutWarning').style.display = "block";
+            }, SESSION_DURATION);
+        }
+
+        function extendSession() {
+            document.getElementById('timeoutWarning').style.display = "none";
+            startSessionTimer();
+        }
+
+        function resetSessionTimer() {
+            startSessionTimer();
+        }
+
+        // Create 12 Aadhaar boxes
+        const aadhaarRow = document.getElementById('aadhaarRow');
+        for(let i = 0; i < 12; i++) {
+            let box = document.createElement('div');
+            box.className = 'aadhaar-box';
+            box.id = `aadhaar_${i}`;
+            aadhaarRow.appendChild(box);
+            aadhaarBoxes.push(box);
+        }
+
+        function highlightCurrentBox() {
+            aadhaarBoxes.forEach((box, index) => {
+                if(index === aadhaarPos) {
+                    box.classList.add('highlight');
+                } else {
+                    box.classList.remove('highlight');
+                }
+            });
+        }
+
+        function goBack() {
+            resetSessionTimer();
+            window.location.href = '{% url "index" %}';
+        }
+
+        function pressKey(n) {
+            resetSessionTimer();
+            if(aadhaarPos < 12) {
+                aadhaarBoxes[aadhaarPos].textContent = n;
+                aadhaarBoxes[aadhaarPos].classList.add('filled');
+                aadhaarPos++;
+                highlightCurrentBox();
+            }
+        }
+        
+        function backspace() {
+            resetSessionTimer();
+            if(aadhaarPos > 0) {
+                aadhaarPos--;
+                aadhaarBoxes[aadhaarPos].textContent = '';
+                aadhaarBoxes[aadhaarPos].classList.remove('filled');
+                highlightCurrentBox();
+            }
+        }
+        
+        function clearAll() {
+            resetSessionTimer();
+            aadhaarBoxes.forEach(box => {
+                box.textContent = '';
+                box.classList.remove('filled');
+            });
+            aadhaarPos = 0;
+            highlightCurrentBox();
+        }
+
+        function getAadhaarNumber() {
+            let aadhaar = '';
+            aadhaarBoxes.forEach(box => {
+                aadhaar += box.textContent;
+            });
+            return aadhaar;
+        }
+
+        function proceedToOTP() {
+            resetSessionTimer();
+            
+            if(aadhaarPos !== 12) {
+                document.getElementById("error").innerText = "{% trans "Please enter 12 digits" %}";
+                document.getElementById("error").classList.remove("hidden");
+                
+                setTimeout(() => {
+                    document.getElementById("error").classList.add("hidden");
+                }, 3000);
+                return;
+            }
+
+            document.getElementById("error").classList.add("hidden");
+            
+            const aadhaarNumber = getAadhaarNumber();
+            
+            // Show loader
+            document.getElementById("loader").classList.remove("hidden");
+            
+            // Create form and submit to Django
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '{% url "auth" %}';
+            
+            // Add CSRF token
+            const csrf = document.createElement('input');
+            csrf.type = 'hidden';
+            csrf.name = 'csrfmiddlewaretoken';
+            csrf.value = '{{ csrf_token }}';
+            form.appendChild(csrf);
+            
+            // Add Aadhaar number
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'aadhaar_number';
+            input.value = aadhaarNumber;
+            form.appendChild(input);
+            
+            // Submit form
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        function toggleVoiceInput() {
+            resetSessionTimer();
+            if(isListening) {
+                stopVoiceInput();
+            } else {
+                startVoiceInput();
+            }
+        }
+
+        function startVoiceInput() {
+            if ('webkitSpeechRecognition' in window) {
+                if (!recognition) {
+                    recognition = new webkitSpeechRecognition();
+                    recognition.continuous = false;
+                    recognition.interimResults = false;
+                    recognition.lang = 'hi-IN';
+                    
+                    recognition.onstart = function() {
+                        isListening = true;
+                        document.getElementById('voiceBtn').classList.add('listening');
+                        document.getElementById('voiceStatus').innerHTML = '{% trans "Listen" %}';
+                        resetSessionTimer();
+                    };
+                    
+                    recognition.onresult = function(event) {
+                        resetSessionTimer();
+                        const spokenText = event.results[0][0].transcript;
+                        const digits = spokenText.replace(/\D/g, '');
+                        
+                        document.getElementById('voiceStatus').innerHTML = digits;
+                        
+                        if (digits.length === 12) {
+                            clearAll();
+                            for (let i = 0; i < 12; i++) {
+                                aadhaarBoxes[i].textContent = digits[i];
+                                aadhaarBoxes[i].classList.add('filled');
+                            }
+                            aadhaarPos = 12;
+                            document.getElementById('voiceStatus').innerHTML = '✅';
+                            
+                            setTimeout(() => {
+                                proceedToOTP();
+                            }, 1000);
+                        }
+                        
+                        setTimeout(() => {
+                            document.getElementById('voiceStatus').innerHTML = '{% trans "Click" %}';
+                        }, 2000);
+                    };
+                    
+                    recognition.onend = function() {
+                        isListening = false;
+                        document.getElementById('voiceBtn').classList.remove('listening');
+                        resetSessionTimer();
+                    };
+                }
+                
+                recognition.start();
+            }
+        }
+
+        function stopVoiceInput() {
+            if(recognition) {
+                recognition.stop();
+            }
+            resetSessionTimer();
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            highlightCurrentBox();
+            startSessionTimer();
+            
+            document.addEventListener('click', resetSessionTimer);
+            document.addEventListener('keypress', resetSessionTimer);
+            document.addEventListener('touchstart', resetSessionTimer);
+        });
+
+        window.addEventListener('beforeunload', function() {
+            if (sessionTimer) {
+                clearTimeout(sessionTimer);
+            }
+        });
+    </script>
+</body>
+</html>

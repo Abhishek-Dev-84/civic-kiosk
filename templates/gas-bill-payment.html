@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+{% load i18n %}
+{% load static %}
+<html>
+<head>
+    
+    <style>
+        /* Hide Google Translate elements */
+        .goog-te-banner-frame.skiptranslate,
+        .goog-te-gadget-icon,
+        .goog-te-gadget-simple,
+        #goog-gt-tt,
+        .goog-te-balloon-frame,
+        .goog-te-menu-frame,
+        .goog-te-spinner-pos {
+            display: none !important;
+        }
+        
+        body {
+            top: 0px !important;
+            position: static !important;
+        }
+        
+        .goog-te-combo {
+            display: none !important;
+        }
+        
+        .goog-te-gadget {
+            color: transparent !important;
+            height: 0 !important;
+            overflow: hidden !important;
+        }
+    </style>
+
+    <style>
+        /* Hide Google Translate elements */
+        .goog-te-banner-frame.skiptranslate,
+        .goog-te-gadget-icon,
+        .goog-te-gadget-simple,
+        #goog-gt-tt,
+        .goog-te-balloon-frame,
+        .goog-te-menu-frame,
+        .goog-te-spinner-pos {
+            display: none !important;
+        }
+        
+        body {
+            top: 0px !important;
+            position: static !important;
+        }
+        
+        .goog-te-combo {
+            display: none !important;
+        }
+        
+        .goog-te-gadget {
+            color: transparent !important;
+            height: 0 !important;
+            overflow: hidden !important;
+        }
+    </style>
+
+    <title>{% trans "Gas Bill Payment - Civic Kiosk" %}</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif; user-select:none; }
+        body { width:100vw; height:100vh; overflow:hidden; background:#f0f7ff; }
+        .header { height:70px; background:white; display:flex; align-items:center; justify-content:space-between; padding:0 20px; border-bottom:2px solid #1e5fbf; }
+        .header-left { display:flex; align-items:center; gap:10px; }
+        .header-left img { height:40px; }
+        .header-left div { font-size:12px; font-weight:600; color:#1e5fbf; line-height:1.2; }
+        .header-right img { height:35px; }
+        .voice-corner { position:fixed; top:80px; right:15px; z-index:1000; display:flex; flex-direction:column; align-items:center; gap:3px; }
+        .voice-corner-btn { background:#ff9933; width:45px; height:45px; border-radius:50%; border:2px solid white; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:24px; box-shadow:0 2px 5px rgba(0,0,0,0.2); }
+        .voice-corner-text { background:white; padding:2px 8px; border-radius:12px; font-size:10px; color:#ff9933; border:1px solid #ff9933; }
+        .back-btn { position:fixed; top:80px; left:15px; background:white; border:2px solid #1e5fbf; border-radius:30px; padding:5px 15px; font-size:18px; font-weight:700; cursor:pointer; color:#1e5fbf; box-shadow:0 3px 0 #0a3d7a; z-index:1000; }
+        .back-btn:active { transform:translateY(3px); box-shadow:0 1px 0 #0a3d7a; }
+        .container { position:fixed; top:70px; left:0; right:0; bottom:0; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:10px; overflow:hidden; }
+        .content-wrapper { width:100%; max-width:600px; }
+        h1 { color:#1e5fbf; font-size:36px; font-weight:800; text-align:center; margin-bottom:20px; }
+        .bill-card { background:white; border:3px solid #1e5fbf; border-radius:30px; padding:30px; font-size:22px; box-shadow:0 6px 0 #0a3d7a; margin:20px 0; }
+        .bill-row { display:flex; justify-content:space-between; margin:10px 0; padding:5px 0; border-bottom:1px solid #e0e0e0; }
+        .bill-amount { font-size:48px; color:#28a745; font-weight:800; margin:20px 0; text-align:center; }
+        .pay-btn { background:#28a745; color:white; font-size:36px; padding:15px; border-radius:50px; width:100%; border:none; box-shadow:0 6px 0 #1e7e34; cursor:pointer; margin-top:20px; }
+        .pay-btn:active { transform:translateY(6px); box-shadow:0 1px 0 #1e7e34; }
+        .due-date { color:#dc3545; font-weight:600; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg">
+            <div>{% trans "Ministry of Electronics &" %}<br>{% trans "Information Technology" %}<br>{% trans "Government of India" %}</div>
+        </div>
+        <div class="header-right">
+            <img src="https://www.cdac.in/img/cdac-logo.png">
+        </div>
+    </div>
+
+    <div class="voice-corner">
+        <div class="voice-corner-btn" onclick="alert('{% trans "Voice assistant activated" %}')">🎤</div>
+        <div class="voice-corner-text">{% trans "Click" %}</div>
+    </div>
+
+    <!-- ✅ Django URL -->
+    <div class="back-btn" onclick="window.location='{% url 'gas-services' %}'">← {% trans "Back" %}</div>
+
+    <div class="container">
+        <div class="content-wrapper">
+            <h1>🧾 {% trans "Gas Bill Payment" %}</h1>
+
+            <!-- ✅ Converted to Django POST form -->
+            <form method="POST" action="{% url 'gas-bill-payment' %}">
+                {% csrf_token %}
+
+                <div class="bill-card">
+                    <div class="bill-row">
+                        <span>{% trans "Consumer Number:" %}</span>
+                        <span><strong>1234 5678 9012</strong></span>
+                        <input type="hidden" name="consumer_number" value="123456789012">
+                    </div>
+
+                    <div class="bill-row">
+                        <span>{% trans "Bill Number:" %}</span>
+                        <span><strong>GAS/2026/0215</strong></span>
+                        <input type="hidden" name="bill_number" value="GAS/2026/0215">
+                    </div>
+
+                    <div class="bill-row">
+                        <span>{% trans "Bill Date:" %}</span>
+                        <span><strong>15 Feb 2026</strong></span>
+                    </div>
+
+                    <div class="bill-row">
+                        <span>{% trans "Due Date:" %}</span>
+                        <span class="due-date"><strong>05 Mar 2026</strong></span>
+                    </div>
+
+                    <div class="bill-row">
+                        <span>{% trans "Period:" %}</span>
+                        <span><strong>{% trans "Jan 2026" %}</strong></span>
+                    </div>
+
+                    <div class="bill-amount">₹ 856.00</div>
+                    <input type="hidden" name="amount" value="856.00">
+
+                    <button type="submit" class="pay-btn">{% trans "Pay Now" %}</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+</body>
+</html>

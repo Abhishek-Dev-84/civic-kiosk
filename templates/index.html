@@ -1,0 +1,280 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <style>
+      /* Hide Google Translate elements */
+      .goog-te-banner-frame.skiptranslate,
+      .goog-te-gadget-icon,
+      .goog-te-gadget-simple,
+      #goog-gt-tt,
+      .goog-te-balloon-frame,
+      .goog-te-menu-frame,
+      .goog-te-spinner-pos {
+        display: none !important;
+      }
+      
+      body {
+        top: 0px !important;
+        position: static !important;
+      }
+      
+      .goog-te-combo {
+        display: none !important;
+      }
+      
+      .goog-te-gadget {
+        color: transparent !important;
+        height: 0 !important;
+        overflow: hidden !important;
+      }
+    </style>
+
+    <meta charset="UTF-8" />
+    <title>Civic Services Kiosk - Language</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      .lang-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 25px;
+        margin: 30px 0;
+      }
+      
+      .lang-btn {
+        background: white;
+        border: 4px solid #1e5fbf;
+        border-radius: 40px;
+        padding: 35px 20px;
+        font-size: 42px;
+        font-weight: 800;
+        text-align: center;
+        cursor: pointer;
+        color: #1e5fbf;
+        box-shadow: 0 8px 0 #0a3d7a;
+        min-height: 160px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      .lang-btn:active {
+        transform: translateY(8px);
+        box-shadow: 0 2px 0 #0a3d7a;
+      }
+      
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        user-select: none;
+      }
+      
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #f0f7ff;
+      }
+      
+      .header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 70px;
+        background: white;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 20px;
+        border-bottom: 3px solid #1e5fbf;
+        z-index: 1000;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+      
+      .header-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      
+      .header-left img {
+        height: 42px;
+      }
+      
+      .header-left div {
+        font-size: 13px;
+        font-weight: 600;
+        color: #1e5fbf;
+        line-height: 1.2;
+      }
+      
+      .header-right img {
+        height: 38px;
+      }
+      
+      .voice-corner {
+        position: fixed;
+        top: 80px;
+        right: 15px;
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+      }
+      
+      .voice-corner-btn {
+        background: #ff9933;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        border: 3px solid white;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 26px;
+      }
+      
+      .voice-corner-text {
+        background: white;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+        color: #ff9933;
+        border: 1px solid #ff9933;
+      }
+      
+      .kiosk-container {
+        position: fixed;
+        top: 70px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 15px;
+      }
+      
+      .content-wrapper {
+        width: 100%;
+        max-width: 700px;
+      }
+      
+      h1 {
+        color: #1e5fbf;
+        font-size: 36px;
+        font-weight: 800;
+        text-align: center;
+      }
+      
+      .timeout-warning {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        border: 4px solid #ff9933;
+        border-radius: 40px;
+        padding: 30px;
+        text-align: center;
+        z-index: 2000;
+        display: none;
+      }
+      
+      .timeout-warning button {
+        background: #28a745;
+        color: white;
+        border: none;
+        border-radius: 40px;
+        padding: 15px 30px;
+        font-size: 20px;
+        font-weight: 700;
+        cursor: pointer;
+        margin: 10px;
+      }
+      
+      .timeout-warning .logout-btn {
+        background: #dc3545;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <div class="header-left">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" />
+        <div>
+          'Ministry of Electronics &<br />Information Technology<br />Government of India
+        </div>
+      </div>
+      <div class="header-right">
+        <img src="https://www.cdac.in/img/cdac-logo.png" />
+      </div>
+    </div>
+
+    <div class="voice-corner">
+      <div class="voice-corner-btn">🎤</div>
+      <div class="voice-corner-text">Click</div>
+    </div>
+
+    <div id="timeoutWarning" class="timeout-warning">
+      <p>⏰Session about to expire</p>
+      <button onclick="extendSession()">Continue</button>
+      <button class="logout-btn" onclick="window.location='{% url 'index' %}'">Logout</button>
+    </div>
+
+    <div class="kiosk-container">
+      <div class="content-wrapper">
+        <h1>भाषा चुनें<br />Select Language</h1>
+        <div class="lang-grid">
+          <div class="lang-btn" onclick="setLanguage('en')">English</div>
+          <div class="lang-btn" onclick="setLanguage('hi')">हिंदी</div>
+          <div class="lang-btn" onclick="setLanguage('or')">ଓଡ଼ିଆ</div>
+          <div class="lang-btn" onclick="setLanguage('bn')">বাংলা</div>
+          <div class="lang-btn" onclick="setLanguage('ta')">தமிழ்</div>
+          <div class="lang-btn" onclick="setLanguage('te')">తెలుగు</div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let sessionTimer
+      const SESSION_DURATION = 120000
+      
+      function startSessionTimer() {
+        sessionTimer = setTimeout(() => {
+          document.getElementById('timeoutWarning').style.display = 'block'
+        }, SESSION_DURATION)
+      }
+      
+      function extendSession() {
+        document.getElementById('timeoutWarning').style.display = 'none'
+        clearTimeout(sessionTimer)
+        startSessionTimer()
+      }
+      
+      function setLanguage(langCode) {
+        // Set language cookie
+        document.cookie = 'django_language=' + langCode + '; path=/'
+      
+        // Clear any existing session data that might cause redirect loops
+        // This helps break any stuck redirect loops
+        if (sessionStorage) {
+          sessionStorage.clear()
+        }
+      
+        // Redirect directly to auth WITHOUT any next parameter
+        window.location.href = '/' + langCode + '/auth/'
+      }
+      
+      document.addEventListener('DOMContentLoaded', startSessionTimer)
+    </script>
+  </body>
+</html>

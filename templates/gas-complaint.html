@@ -1,0 +1,487 @@
+{% load i18n %}
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+<title>{% trans "Gas Complaint - Civic Kiosk" %}</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;user-select:none;}
+body{width:100vw;height:100vh;overflow:hidden;background:#f0f7ff;}
+
+/* HEADER */
+.header{
+height:75px;
+background:white;
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:0 25px;
+border-bottom:3px solid #1e5fbf;
+}
+.header-left{display:flex;align-items:center;gap:12px;}
+.header-left img{height:45px;}
+.header-left div{font-size:13px;font-weight:600;color:#1e5fbf;line-height:1.2;}
+.header-right img{height:40px;}
+
+/* VOICE + BACK */
+.voice-corner{
+position:fixed;
+top:90px;
+right:20px;
+display:flex;
+flex-direction:column;
+align-items:center;
+gap:4px;
+z-index:1000;
+}
+.voice-corner-btn{
+background:#ff9933;
+width:55px;
+height:55px;
+border-radius:50%;
+border:3px solid white;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:26px;
+cursor:pointer;
+}
+.voice-corner-btn:hover{background:#ffaa44;}
+.voice-corner-text{
+background:white;
+padding:4px 10px;
+border-radius:15px;
+font-size:12px;
+color:#ff9933;
+border:1px solid #ff9933;
+}
+.back-btn{
+position:fixed;
+top:90px;
+left:20px;
+background:white;
+border:3px solid #1e5fbf;
+border-radius:35px;
+padding:8px 20px;
+font-size:20px;
+font-weight:700;
+color:#1e5fbf;
+text-decoration:none;
+z-index:1000;
+display:inline-block;
+}
+.back-btn:hover{background:#1e5fbf;color:white;}
+.back-btn:active{transform:translateY(2px);}
+
+/* MAIN */
+.container{
+position:fixed;
+top:75px;
+left:0;
+right:0;
+bottom:0;
+display:flex;
+align-items:center;
+justify-content:center;
+padding:20px;
+overflow-y:auto;
+}
+.content-wrapper{
+width:100%;
+max-width:750px;
+display:flex;
+flex-direction:column;
+gap:14px;
+padding:20px 0;
+}
+
+/* Message styles */
+.messages{width:100%;margin-bottom:15px;}
+.message{padding:12px;border-radius:12px;margin-bottom:8px;text-align:center;font-size:16px;}
+.message.success{background:#d4edda;color:#155724;border:1px solid #c3e6cb;}
+.message.error{background:#f8d7da;color:#721c24;border:1px solid #f5c6cb;}
+.message.info{background:#d1ecf1;color:#0c5460;border:1px solid #bee5eb;}
+
+h1{
+color:#1e5fbf;
+font-size:38px;
+font-weight:800;
+text-align:center;
+}
+
+/* FORM */
+.form-group{margin:8px 0;}
+label{
+display:block;
+font-size:22px;
+color:#1e5fbf;
+margin-bottom:6px;
+}
+.large-input{
+width:100%;
+height:65px;
+border:3px solid #1e5fbf;
+border-radius:22px;
+font-size:24px;
+padding:0 20px;
+background:white;
+cursor:pointer;
+}
+.large-input:focus{outline:none;border-color:#ff9933;}
+.large-input[readonly]{background:#f9f9f9;}
+
+textarea.large-input{
+height:130px;
+padding:15px;
+resize:none;
+cursor:pointer;
+font-family:'Segoe UI',sans-serif;
+}
+
+.submit-btn{
+background:#28a745;
+color:white;
+font-size:30px;
+padding:14px;
+border-radius:45px;
+width:100%;
+border:none;
+margin-top:12px;
+cursor:pointer;
+box-shadow:0 5px 0 #1e7e34;
+transition:all 0.1s;
+}
+.submit-btn:active{transform:translateY(5px);box-shadow:0 1px 0 #1e7e34;}
+.submit-btn:hover{background:#2fcB4f;}
+
+/* Complaint grid bigger */
+.complaint-type{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:12px;
+}
+.type-btn{
+background:white;
+border:3px solid #1e5fbf;
+border-radius:35px;
+padding:16px;
+font-size:20px;
+text-align:center;
+cursor:pointer;
+transition:all 0.2s;
+}
+.type-btn:hover{background:#e3f2fd;}
+.type-btn.selected{
+background:#1e5fbf;
+color:white;
+}
+
+/* Loading indicator */
+.loading{
+display:none;
+position:fixed;
+top:0;
+left:0;
+right:0;
+bottom:0;
+background:rgba(0,0,0,0.5);
+z-index:2000;
+justify-content:center;
+align-items:center;
+color:white;
+font-size:24px;
+}
+.loading.show{display:flex;}
+.spinner{
+border:4px solid rgba(255,255,255,0.3);
+border-radius:50%;
+border-top:4px solid white;
+width:50px;
+height:50px;
+animation:spin 1s linear infinite;
+margin-right:10px;
+}
+@keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
+
+/* FLOATING INPUT BIGGER */
+.overlay{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,0.4);
+backdrop-filter:blur(3px);
+display:none;
+z-index:900;
+}
+.floating-input{
+position:fixed;
+left:50%;
+top:35%;
+transform:translate(-50%,-50%) scale(0.85);
+width:650px;
+height:100px;
+font-size:22px;
+border:5px solid #ff9933;
+border-radius:25px;
+padding:15px;
+z-index:1001;
+box-shadow:0 25px 60px rgba(0,0,0,0.4);
+transition:all 0.25s ease;
+display:none;
+}
+.floating-input.show{
+transform:translate(-50%,-50%) scale(1);
+}
+.floating-input:focus{outline:none;}
+
+/* KEYBOARD BIGGER */
+.keyboard{
+position:fixed;
+bottom:20px;
+left:50%;
+transform:translateX(-50%);
+background:white;
+padding:15px;
+border-radius:20px;
+box-shadow:0 10px 30px rgba(0,0,0,0.3);
+display:none;
+z-index:1000;
+}
+.keyboard-row{display:flex;justify-content:center;}
+.keyboard button{
+min-width:55px;
+height:50px;
+margin:4px;
+font-size:16px;
+border-radius:10px;
+border:2px solid #1e5fbf;
+background:#f0f7ff;
+cursor:pointer;
+transition:all 0.2s;
+}
+.keyboard button:hover{background:#1e5fbf;color:white;}
+.keyboard .ok-btn{
+background:#28a745;
+color:white;
+border:none;
+}
+.keyboard .ok-btn:hover{background:#218838;}
+
+@media (max-width:768px){
+.complaint-type{grid-template-columns:1fr;}
+.floating-input{width:90%;}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+<div class="header-left">
+<img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India">
+<div>{% trans "Ministry of Electronics &" %}<br>{% trans "Information Technology" %}<br>{% trans "Government of India" %}</div>
+</div>
+<div class="header-right">
+<img src="https://www.cdac.in/img/cdac-logo.png" alt="CDAC Logo">
+</div>
+</div>
+
+<div class="voice-corner">
+<div class="voice-corner-btn" onclick="alert('{% trans "Voice assistant activated" %}')">🎤</div>
+<div class="voice-corner-text">{% trans "Click" %}</div>
+</div>
+
+<a href="{% url 'gas-services' %}" class="back-btn">← {% trans "Back" %}</a>
+
+<div class="container">
+<div class="content-wrapper">
+
+<!-- Display Django messages -->
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+    <div class="message {{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<h1>⚠️ {% trans "Lodge Complaint" %}</h1>
+
+<!-- Django form for complaint submission -->
+<form id="complaintForm" method="post" action="{% url 'gas-complaint' %}">
+    {% csrf_token %}
+    <input type="hidden" name="consumer_number" id="consumerNumber" value="{{ request.POST.consumer_number|default:'123456789012' }}">
+    <input type="hidden" name="complaint_type" id="complaintType" value="{% if request.POST.complaint_type %}{{ request.POST.complaint_type }}{% else %}Leakage{% endif %}">
+    <input type="hidden" name="description" id="descriptionField" value="{{ request.POST.description }}">
+</form>
+
+<div class="form-group">
+<label>{% trans "Consumer Number" %}</label>
+<input class="large-input" id="consumerDisplay" value="{% if request.POST.consumer_number %}{{ request.POST.consumer_number|slice:":4" }} {{ request.POST.consumer_number|slice:"4:8" }} {{ request.POST.consumer_number|slice:"8:12" }}{% else %}1234 5678 9012{% endif %}" readonly>
+</div>
+
+<div class="form-group">
+<label>{% trans "Complaint Type" %}</label>
+<div class="complaint-type">
+<div class="type-btn {% if request.POST.complaint_type == 'Leakage' or not request.POST.complaint_type %}selected{% endif %}" onclick="selectType(this,'Leakage')">{% trans "Gas Leakage" %}</div>
+<div class="type-btn {% if request.POST.complaint_type == 'Cylinder' %}selected{% endif %}" onclick="selectType(this,'Cylinder')">{% trans "Cylinder Issue" %}</div>
+<div class="type-btn {% if request.POST.complaint_type == 'Regulator' %}selected{% endif %}" onclick="selectType(this,'Regulator')">{% trans "Regulator Fault" %}</div>
+<div class="type-btn {% if request.POST.complaint_type == 'Billing' %}selected{% endif %}" onclick="selectType(this,'Billing')">{% trans "Billing Issue" %}</div>
+<div class="type-btn {% if request.POST.complaint_type == 'Delivery' %}selected{% endif %}" onclick="selectType(this,'Delivery')">{% trans "Delivery Delay" %}</div>
+<div class="type-btn {% if request.POST.complaint_type == 'Other' %}selected{% endif %}" onclick="selectType(this,'Other')">{% trans "Other" %}</div>
+</div>
+</div>
+
+<div class="form-group">
+<label>{% trans "Description" %}</label>
+<textarea class="large-input" id="description" readonly placeholder="{% trans "Describe your complaint in detail" %}">{% if request.POST.description %}{{ request.POST.description }}{% endif %}</textarea>
+</div>
+
+<button class="submit-btn" onclick="submitComplaint()">{% trans "Submit Complaint" %}</button>
+
+</div>
+</div>
+
+<!-- Loading indicator -->
+<div id="loadingIndicator" class="loading">
+    <div class="spinner"></div>
+    <div>{% trans "Submitting..." %}</div>
+</div>
+
+<div id="overlay" class="overlay"></div>
+<textarea id="floatingInput" class="floating-input" placeholder="{% trans "Type your complaint here..." %}"></textarea>
+<div id="keyboard" class="keyboard"></div>
+
+<script>
+let selectedType='{% if request.POST.complaint_type %}{{ request.POST.complaint_type }}{% else %}Leakage{% endif %}';
+let activeInput=null;
+let isUpperCase=true;
+
+function selectType(element,type){
+document.querySelectorAll('.type-btn').forEach(btn=>btn.classList.remove('selected'));
+element.classList.add('selected');
+selectedType=type;
+document.getElementById('complaintType').value = type;
+}
+
+const overlay=document.getElementById("overlay");
+const floatingInput=document.getElementById("floatingInput");
+const keyboard=document.getElementById("keyboard");
+const loadingIndicator = document.getElementById("loadingIndicator");
+
+function createKeyboard(){
+keyboard.innerHTML="";
+let letters="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+if(!isUpperCase){letters=letters.toLowerCase();}
+let keys=(letters+"0123456789 .,!?-").split("");
+
+let row=document.createElement("div");
+row.className="keyboard-row";
+keys.forEach((k,i)=>{
+if(i%10===0 && i!==0){
+keyboard.appendChild(row);
+row=document.createElement("div");
+row.className="keyboard-row";
+}
+let btn=document.createElement("button");
+btn.innerText=k===" "?"{% trans "Space" %}":k;
+btn.type="button";
+btn.onclick=()=>floatingInput.value+=k;
+row.appendChild(btn);
+});
+keyboard.appendChild(row);
+
+let last=document.createElement("div");
+last.className="keyboard-row";
+last.innerHTML=`
+<button type="button" onclick="toggleCase()">⇧ {% trans "Shift" %}</button>
+<button type="button" onclick="floatingInput.value=floatingInput.value.slice(0,-1)">⌫ {% trans "Back" %}</button>
+<button type="button" onclick="floatingInput.value=''">{% trans "Clear" %}</button>
+<button type="button" class="ok-btn" onclick="finish()">✓ {% trans "OK" %}</button>
+`;
+keyboard.appendChild(last);
+}
+
+function toggleCase(){isUpperCase=!isUpperCase;createKeyboard();}
+
+function openKeyboard(id){
+activeInput=document.getElementById(id);
+floatingInput.value=activeInput.value;
+overlay.style.display="block";
+floatingInput.style.display="block";
+keyboard.style.display="block";
+setTimeout(()=>{
+floatingInput.classList.add("show");
+floatingInput.focus();
+},10);
+}
+
+function finish(){
+if(activeInput){
+activeInput.value=floatingInput.value;
+document.getElementById('descriptionField').value = floatingInput.value;
+}
+closeKeyboard();
+}
+
+function closeKeyboard(){
+floatingInput.classList.remove("show");
+setTimeout(()=>{
+overlay.style.display="none";
+floatingInput.style.display="none";
+keyboard.style.display="none";
+},200);
+}
+
+// Handle Enter key on floating input (Shift+Enter for new line, Enter for done)
+floatingInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        finish();
+    }
+});
+
+document.getElementById("description").addEventListener("click",()=>openKeyboard("description"));
+overlay.addEventListener("click",closeKeyboard);
+
+createKeyboard();
+
+function submitComplaint(){
+const desc = document.getElementById('description').value;
+const complaintType = document.getElementById('complaintType').value;
+
+if(!desc || desc.trim() === ''){
+alert('{% trans "Please describe your complaint" %}');
+return;
+}
+
+if(desc.length < 10){
+alert('{% trans "Please provide a more detailed description (minimum 10 characters)" %}');
+return;
+}
+
+// Show loading
+loadingIndicator.classList.add('show');
+
+// Submit form
+setTimeout(() => {
+    document.getElementById('complaintForm').submit();
+}, 500);
+}
+
+// Auto-hide messages after 5 seconds
+setTimeout(function() {
+    document.querySelectorAll('.message').forEach(function(message) {
+        message.style.display = 'none';
+    });
+}, 5000);
+
+// Prevent form submission on Enter key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+    }
+});
+</script>
+
+</body>
+</html>

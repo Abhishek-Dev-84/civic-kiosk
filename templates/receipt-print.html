@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+{% load i18n %}
+{% load static %}
+<html>
+<head>
+    <title>{% trans "Payment Receipt - Civic Kiosk" %}</title>
+    
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif; user-select:none; }
+        body { width:100vw; height:100vh; overflow:hidden; background:#f0f7ff; }
+        .header { height:70px; background:white; display:flex; align-items:center; justify-content:space-between; padding:0 20px; border-bottom:2px solid #1e5fbf; }
+        .header-left { display:flex; align-items:center; gap:10px; }
+        .header-left img { height:40px; }
+        .header-left div { font-size:12px; font-weight:600; color:#1e5fbf; line-height:1.2; }
+        .header-right img { height:35px; }
+        .voice-corner { position:fixed; top:80px; right:15px; z-index:1000; display:flex; flex-direction:column; align-items:center; gap:3px; }
+        .voice-corner-btn { background:#ff9933; width:45px; height:45px; border-radius:50%; border:2px solid white; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:24px; box-shadow:0 2px 5px rgba(0,0,0,0.2); }
+        .voice-corner-text { background:white; padding:2px 8px; border-radius:12px; font-size:10px; color:#ff9933; border:1px solid #ff9933; }
+        .back-btn { position:fixed; top:80px; left:15px; background:white; border:2px solid #1e5fbf; border-radius:30px; padding:5px 15px; font-size:18px; font-weight:700; cursor:pointer; color:#1e5fbf; box-shadow:0 3px 0 #0a3d7a; z-index:1000; }
+        .back-btn:active { transform:translateY(3px); box-shadow:0 1px 0 #0a3d7a; }
+        .container { position:fixed; top:70px; left:0; right:0; bottom:0; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:10px; overflow:hidden; }
+        .content-wrapper { width:100%; max-width:500px; }
+        h1 { color:#1e5fbf; font-size:36px; font-weight:800; text-align:center; margin-bottom:20px; }
+        .receipt-card { background:white; border:3px solid #1e5fbf; border-radius:30px; padding:30px; box-shadow:0 8px 0 #0a3d7a; position:relative; }
+        .receipt-header { text-align:center; border-bottom:2px dashed #1e5fbf; padding-bottom:15px; margin-bottom:15px; }
+        .receipt-title { font-size:28px; font-weight:800; color:#1e5fbf; }
+        .receipt-subtitle { font-size:14px; color:#666; }
+        .receipt-body { margin:20px 0; }
+        .receipt-row { display:flex; justify-content:space-between; margin:10px 0; padding:5px 0; border-bottom:1px solid #e0e0e0; font-size:18px; }
+        .receipt-row.total { font-size:24px; font-weight:700; color:#28a745; border-bottom:none; margin-top:15px; }
+        .receipt-footer { text-align:center; margin-top:20px; padding-top:15px; border-top:2px dashed #1e5fbf; font-size:14px; color:#666; }
+        .qr-small { width:80px; height:80px; background:#f0f0f0; margin:10px auto; display:flex; align-items:center; justify-content:center; border:1px solid #1e5fbf; }
+        .action-buttons { display:flex; gap:15px; margin-top:25px; }
+        .print-btn { background:#ff9933; color:white; font-size:28px; padding:12px; border-radius:40px; flex:1; border:none; box-shadow:0 5px 0 #b35900; cursor:pointer; }
+        .print-btn:active { transform:translateY(5px); box-shadow:0 1px 0 #b35900; }
+        .home-btn { background:#1e5fbf; color:white; font-size:28px; padding:12px; border-radius:40px; flex:1; border:none; box-shadow:0 5px 0 #0a3d7a; cursor:pointer; }
+        .home-btn:active { transform:translateY(5px); box-shadow:0 1px 0 #0a3d7a; }
+        .messages { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); z-index: 2000; width: 90%; max-width: 500px; }
+        .message { padding: 10px; border-radius: 5px; margin-bottom: 5px; }
+        .message.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .message.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India">
+            <div>{% trans "Ministry of Electronics &" %}<br>{% trans "Information Technology" %}<br>{% trans "Government of India" %}</div>
+        </div>
+        <div class="header-right">
+            <img src="https://www.cdac.in/img/cdac-logo.png" alt="CDAC Logo">
+        </div>
+    </div>
+    
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <div class="voice-corner">
+        <div class="voice-corner-btn" onclick="alert('{% trans "Voice assistant activated" %}')">🎤</div>
+        <div class="voice-corner-text">{% trans "Click" %}</div>
+    </div>
+    <div class="back-btn" onclick="window.location='{% url 'payment-history' %}'">← {% trans "Back" %}</div>
+    <div class="container">
+        <div class="content-wrapper">
+            <h1>🧾 {% trans "Payment Receipt" %}</h1>
+            <div class="receipt-card" id="receipt">
+                <div class="receipt-header">
+                    <div class="receipt-title">{% trans "CIVIC KIOSK" %}</div>
+                    <div class="receipt-subtitle">{% trans "Government of India" %}</div>
+                    <div class="receipt-subtitle">{% trans "Payment Receipt" %}</div>
+                </div>
+                <div class="receipt-body">
+                    <div class="receipt-row">
+                        <span>{% trans "Receipt No:" %}</span>
+                        <span><strong id="receiptNo">{{ receipt.receipt_no|default:'RCPT123456' }}</strong></span>
+                    </div>
+                    <div class="receipt-row">
+                        <span>{% trans "Date & Time:" %}</span>
+                        <span><strong>{{ receipt.datetime|default:'25 Feb 2026, 10:30 AM' }}</strong></span>
+                    </div>
+                    <div class="receipt-row">
+                        <span>{% trans "Service:" %}</span>
+                        <span><strong>{{ receipt.service|default:'⚡ Electricity Bill' }}</strong></span>
+                    </div>
+                    <div class="receipt-row">
+                        <span>{% trans "Consumer No:" %}</span>
+                        <span><strong>{{ receipt.consumer_no|default:'1234 5678 9012' }}</strong></span>
+                    </div>
+                    <div class="receipt-row">
+                        <span>{% trans "Bill Period:" %}</span>
+                        <span><strong>{{ receipt.bill_period|default:'Jan 2026' }}</strong></span>
+                    </div>
+                    <div class="receipt-row">
+                        <span>{% trans "Payment Mode:" %}</span>
+                        <span><strong>{{ receipt.payment_mode|default:'UPI' }}</strong></span>
+                    </div>
+                    <div class="receipt-row">
+                        <span>{% trans "Transaction ID:" %}</span>
+                        <span><strong>{{ receipt.transaction_id|default:'TXN2502251030' }}</strong></span>
+                    </div>
+                    <div class="receipt-row total">
+                        <span>{% trans "Total Amount:" %}</span>
+                        <span>{% trans "₹" %}{{ receipt.amount|default:'1,250.00' }}</span>
+                    </div>
+                </div>
+                <div class="receipt-footer">
+                    <div class="qr-small">
+                        {% if receipt.qr_code %}
+                            <img src="{{ receipt.qr_code.url }}" alt="QR Code" style="width:100%; height:100%;">
+                        {% else %}
+                            🔳 {% trans "QR Code" %}
+                        {% endif %}
+                    </div>
+                    <div>{% trans "Scan to verify receipt" %}</div>
+                    <div style="margin-top:10px;">{% trans "Thank you for using Civic Kiosk" %}</div>
+                    <div>{% trans "This is a computer generated receipt" %}</div>
+                </div>
+            </div>
+            <div class="action-buttons">
+                <form method="POST" action="{% url 'receipt-print' %}" style="flex:1; display: flex;">
+                    {% csrf_token %}
+                    <input type="hidden" name="receipt_id" value="{{ receipt.id|default:'' }}">
+                    <button type="submit" name="print_receipt" class="print-btn" style="width:100%;">🖨️ {% trans "Print" %}</button>
+                </form>
+                <button class="home-btn" onclick="window.location='{% url 'menu' %}'">🏠 {% trans "Home" %}</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Auto-hide messages after 5 seconds
+        setTimeout(function() {
+            const messages = document.querySelectorAll('.message');
+            messages.forEach(function(message) {
+                message.style.display = 'none';
+            });
+        }, 5000);
+        
+        // Initialize receipt data from Django context
+        document.addEventListener('DOMContentLoaded', function() {
+            // The receipt data is already rendered by Django
+            // This function can be used for any additional JavaScript initialization
+            console.log('Receipt page loaded');
+        });
+        
+        // Keep the original print function for compatibility
+        function printReceipt() {
+            {% if receipt.id %}
+                // Submit the print form
+                document.querySelector('form button[name="print_receipt"]').click();
+            {% else %}
+                alert('{% trans "Printing receipt..." %}');
+                // In real implementation: window.print()
+            {% endif %}
+        }
+    </script>
+</body>
+</html>

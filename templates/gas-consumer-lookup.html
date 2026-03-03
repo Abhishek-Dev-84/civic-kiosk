@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+{% load i18n %}
+{% load static %}
+<html>
+<head>
+    <title>{% trans "Consumer Lookup - Civic Kiosk" %}</title>
+    
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif; user-select:none; }
+        body { width:100vw; height:100vh; overflow:hidden; background:#f0f7ff; }
+        .header { height:70px; background:white; display:flex; align-items:center; justify-content:space-between; padding:0 20px; border-bottom:2px solid #1e5fbf; }
+        .header-left { display:flex; align-items:center; gap:10px; }
+        .header-left img { height:40px; }
+        .header-left div { font-size:12px; font-weight:600; color:#1e5fbf; line-height:1.2; }
+        .header-right img { height:35px; }
+        .voice-corner { position:fixed; top:80px; right:15px; z-index:1000; display:flex; flex-direction:column; align-items:center; gap:3px; }
+        .voice-corner-btn { background:#ff9933; width:45px; height:45px; border-radius:50%; border:2px solid white; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:24px; box-shadow:0 2px 5px rgba(0,0,0,0.2); }
+        .voice-corner-text { background:white; padding:2px 8px; border-radius:12px; font-size:10px; color:#ff9933; border:1px solid #ff9933; }
+        .back-btn { position:fixed; top:80px; left:15px; background:white; border:2px solid #1e5fbf; border-radius:30px; padding:5px 15px; font-size:18px; font-weight:700; cursor:pointer; color:#1e5fbf; box-shadow:0 3px 0 #0a3d7a; z-index:1000; }
+        .back-btn:active { transform:translateY(3px); box-shadow:0 1px 0 #0a3d7a; }
+        .container { position:fixed; top:70px; left:0; right:0; bottom:0; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:10px; overflow:hidden; }
+        .content-wrapper { width:100%; max-width:600px; }
+        h1 { color:#1e5fbf; font-size:36px; font-weight:800; text-align:center; margin-bottom:20px; }
+        .aadhaar-row { display:flex; justify-content:center; align-items:center; gap:5px; flex-wrap:nowrap; margin:20px 0; }
+        .aadhaar-box { width:45px; height:50px; border:3px solid #1e5fbf; border-radius:10px; font-size:28px; font-weight:800; text-align:center; line-height:50px; background:white; color:#1e5fbf; box-shadow:0 4px 0 #0a3d7a; }
+        .aadhaar-box.filled { background:#e3f2fd; }
+        .keypad { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:15px 0; }
+        .key { background:white; border:3px solid #1e5fbf; border-radius:20px; padding:15px 5px; font-size:36px; font-weight:800; cursor:pointer; color:#1e5fbf; box-shadow:0 5px 0 #0a3d7a; text-align:center; min-height:70px; }
+        .key:active { transform:translateY(5px); box-shadow:0 1px 0 #0a3d7a; }
+        .key.special { background:#ff9933; color:white; border-color:#cc6600; box-shadow:0 5px 0 #b35900; }
+        .lookup-btn { background:#28a745; color:white; font-size:32px; padding:12px; border-radius:40px; width:100%; border:none; box-shadow:0 5px 0 #1e7e34; cursor:pointer; margin:10px 0; }
+        .lookup-btn:active { transform:translateY(5px); box-shadow:0 1px 0 #1e7e34; }
+        .result-card { background:white; border:3px solid #1e5fbf; border-radius:30px; padding:20px; margin-top:20px; }
+        .result-row { display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #e0e0e0; font-size:20px; }
+        .hidden { display:none; }
+        .messages { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); z-index: 2000; width: 90%; max-width: 600px; }
+        .message { padding: 10px; border-radius: 5px; margin-bottom: 5px; }
+        .message.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .message.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .message.info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .status-active { color: #28a745; font-weight: 700; }
+        .status-inactive { color: #dc3545; font-weight: 700; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India">
+            <div>{% trans "Ministry of Electronics &" %}<br>{% trans "Information Technology" %}<br>{% trans "Government of India" %}</div>
+        </div>
+        <div class="header-right">
+            <img src="https://www.cdac.in/img/cdac-logo.png" alt="CDAC Logo">
+        </div>
+    </div>
+    
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <div class="voice-corner">
+        <div class="voice-corner-btn" onclick="alert('{% trans "Voice assistant activated" %}')">🎤</div>
+        <div class="voice-corner-text">{% trans "Click" %}</div>
+    </div>
+    <div class="back-btn" onclick="window.location='{% url 'gas-services' %}'">← {% trans "Back" %}</div>
+    <div class="container">
+        <div class="content-wrapper">
+            <h1>🔍 {% trans "Consumer Lookup" %}</h1>
+            
+            <form method="POST" action="{% url 'gas-consumer-lookup' %}" id="lookupForm">
+                {% csrf_token %}
+                <div style="font-size:20px; text-align:center; color:#1e5fbf;">{% trans "Enter Aadhaar Number" %}</div>
+                <div class="aadhaar-row" id="aadhaarRow"></div>
+                <input type="hidden" name="aadhaar_number" id="aadhaarInput" value="">
+                
+                <div class="keypad">
+                    <div class="key" onclick="pressKey(1)">1</div>
+                    <div class="key" onclick="pressKey(2)">2</div>
+                    <div class="key" onclick="pressKey(3)">3</div>
+                    <div class="key" onclick="pressKey(4)">4</div>
+                    <div class="key" onclick="pressKey(5)">5</div>
+                    <div class="key" onclick="pressKey(6)">6</div>
+                    <div class="key" onclick="pressKey(7)">7</div>
+                    <div class="key" onclick="pressKey(8)">8</div>
+                    <div class="key" onclick="pressKey(9)">9</div>
+                    <div class="key special" onclick="backspace()">⌫</div>
+                    <div class="key" onclick="pressKey(0)">0</div>
+                    <div class="key special" onclick="clearAll()">C</div>
+                </div>
+                
+                <button type="submit" class="lookup-btn" name="lookup_consumer">{% trans "Lookup Consumer" %}</button>
+            </form>
+            
+            <div id="resultCard" class="result-card {% if not show_result %}hidden{% endif %}">
+                <div class="result-row">
+                    <span>{% trans "Consumer No:" %}</span>
+                    <span><strong>{{ consumer.consumer_no|default:'1234 5678 9012' }}</strong></span>
+                </div>
+                <div class="result-row">
+                    <span>{% trans "Name:" %}</span>
+                    <span><strong>{{ consumer.name|default:'Rajesh Kumar' }}</strong></span>
+                </div>
+                <div class="result-row">
+                    <span>{% trans "Address:" %}</span>
+                    <span><strong>{{ consumer.address|default:'123, Gandhi Nagar' }}</strong></span>
+                </div>
+                <div class="result-row">
+                    <span>{% trans "Distributor:" %}</span>
+                    <span><strong>{{ consumer.distributor|default:'HP Gas - Indane' }}</strong></span>
+                </div>
+                <div class="result-row">
+                    <span>{% trans "Status:" %}</span>
+                    {% if consumer.status == 'Active' %}
+                    <span class="status-active"><strong>{{ consumer.status|default:'Active' }}</strong></span>
+                    {% else %}
+                    <span class="status-inactive"><strong>{{ consumer.status|default:'Inactive' }}</strong></span>
+                    {% endif %}
+                </div>
+                {% if consumer.last_booking %}
+                <div class="result-row">
+                    <span>{% trans "Last Booking:" %}</span>
+                    <span><strong>{{ consumer.last_booking }}</strong></span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let aadhaarBoxes = [], aadhaarPos = 0;
+        const row = document.getElementById('aadhaarRow');
+        const aadhaarInput = document.getElementById('aadhaarInput');
+        
+        // Create 12 Aadhaar boxes
+        for(let i=0;i<12;i++) { 
+            let box = document.createElement('div'); 
+            box.className = 'aadhaar-box'; 
+            row.appendChild(box); 
+            aadhaarBoxes.push(box); 
+        }
+        
+        // Pre-fill if editing existing Aadhaar
+        {% if aadhaar_number %}
+        const existingAadhaar = '{{ aadhaar_number }}';
+        if(existingAadhaar && existingAadhaar.length === 12) {
+            for(let i=0; i<12; i++) {
+                aadhaarBoxes[i].textContent = existingAadhaar[i];
+                aadhaarBoxes[i].classList.add('filled');
+                aadhaarPos++;
+            }
+            updateAadhaarInput();
+        }
+        {% endif %}
+        
+        function pressKey(n) { 
+            if(aadhaarPos<12) { 
+                aadhaarBoxes[aadhaarPos].textContent = n; 
+                aadhaarBoxes[aadhaarPos].classList.add('filled'); 
+                aadhaarPos++; 
+                updateAadhaarInput();
+            } 
+        }
+        
+        function backspace() { 
+            if(aadhaarPos>0) { 
+                aadhaarPos--; 
+                aadhaarBoxes[aadhaarPos].textContent = ''; 
+                aadhaarBoxes[aadhaarPos].classList.remove('filled'); 
+                updateAadhaarInput();
+            } 
+        }
+        
+        function clearAll() { 
+            aadhaarBoxes.forEach(b=>{b.textContent='';b.classList.remove('filled');}); 
+            aadhaarPos = 0; 
+            updateAadhaarInput();
+        }
+        
+        function updateAadhaarInput() {
+            let aadhaar = '';
+            aadhaarBoxes.forEach(box => aadhaar += box.textContent || '');
+            aadhaarInput.value = aadhaar;
+        }
+        
+        function lookupConsumer() {
+            if(aadhaarPos !== 12) {
+                alert('{% trans "Please enter complete 12-digit Aadhaar" %}');
+                return false;
+            }
+            return true;
+        }
+        
+        // Form validation
+        document.getElementById('lookupForm').addEventListener('submit', function(e) {
+            if(!lookupConsumer()) {
+                e.preventDefault();
+            }
+        });
+        
+        // Auto-hide messages after 5 seconds
+        setTimeout(function() {
+            const messages = document.querySelectorAll('.message');
+            messages.forEach(function(message) {
+                message.style.display = 'none';
+            });
+        }, 5000);
+    </script>
+</body>
+</html>

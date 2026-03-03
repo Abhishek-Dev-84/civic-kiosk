@@ -1,0 +1,516 @@
+{% load i18n %}
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+<title>{% trans "Name Transfer - Civic Kiosk" %}</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;user-select:none;}
+body{width:100vw;height:100vh;overflow:hidden;background:#f0f7ff;}
+
+/* HEADER */
+.header{
+height:70px;
+background:white;
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:0 20px;
+border-bottom:2px solid #1e5fbf;
+}
+.header-left{display:flex;align-items:center;gap:10px;}
+.header-left img{height:40px;}
+.header-left div{font-size:12px;font-weight:600;color:#1e5fbf;line-height:1.2;}
+.header-right img{height:35px;}
+
+/* VOICE + BACK */
+.voice-corner{
+position:fixed;
+top:80px;
+right:15px;
+display:flex;
+flex-direction:column;
+align-items:center;
+gap:3px;
+z-index:1000;
+}
+.voice-corner-btn{
+background:#ff9933;
+width:45px;
+height:45px;
+border-radius:50%;
+border:2px solid white;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:24px;
+cursor:pointer;
+}
+.voice-corner-btn:hover{background:#ffaa44;}
+.voice-corner-text{
+background:white;
+padding:2px 8px;
+border-radius:12px;
+font-size:10px;
+color:#ff9933;
+border:1px solid #ff9933;
+}
+
+.back-btn{
+position:fixed;
+top:80px;
+left:15px;
+background:white;
+border:2px solid #1e5fbf;
+border-radius:30px;
+padding:5px 15px;
+font-size:18px;
+font-weight:700;
+color:#1e5fbf;
+text-decoration:none;
+z-index:1000;
+display:inline-block;
+}
+.back-btn:hover{background:#1e5fbf;color:white;}
+.back-btn:active{transform:translateY(2px);}
+
+/* MAIN CONTAINER */
+.container{
+position:fixed;
+top:70px;
+left:0;
+right:0;
+bottom:0;
+display:flex;
+align-items:center;
+justify-content:center;
+padding:15px;
+overflow-y:auto;
+}
+.content-wrapper{
+width:100%;
+max-width:620px;
+display:flex;
+flex-direction:column;
+gap:15px;
+padding:20px 0;
+}
+
+/* Message styles */
+.messages{width:100%;margin-bottom:10px;}
+.message{padding:10px;border-radius:10px;margin-bottom:5px;text-align:center;}
+.message.success{background:#d4edda;color:#155724;border:1px solid #c3e6cb;}
+.message.error{background:#f8d7da;color:#721c24;border:1px solid #f5c6cb;}
+.message.info{background:#d1ecf1;color:#0c5460;border:1px solid #bee5eb;}
+
+/* TITLE */
+h1{
+color:#1e5fbf;
+font-size:34px;
+font-weight:800;
+text-align:center;
+}
+
+/* INFO */
+.info-card{
+background:#e3f2fd;
+border:2px solid #1e5fbf;
+border-radius:20px;
+padding:15px;
+font-size:18px;
+box-shadow:0 4px 0 #0a3d7a;
+}
+
+.document-note{
+background:#fff3cd;
+border:1px solid #ffc107;
+border-radius:20px;
+padding:12px;
+font-size:16px;
+}
+
+/* FORM */
+.form-group{margin:10px 0;}
+label{
+display:block;
+font-size:20px;
+color:#1e5fbf;
+margin-bottom:6px;
+}
+.large-input{
+width:100%;
+height:58px;
+border:3px solid #1e5fbf;
+border-radius:20px;
+font-size:24px;
+padding:0 15px;
+background:white;
+cursor:pointer;
+}
+.large-input:focus{outline:none;border-color:#ff9933;}
+.large-input[readonly]{background:#f9f9f9;}
+
+select.large-input{
+appearance:none;
+background-image:url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+background-repeat:no-repeat;
+background-position:right 15px center;
+background-size:20px;
+padding-right:45px;
+}
+
+.submit-btn{
+background:#28a745;
+color:white;
+font-size:28px;
+padding:12px;
+border-radius:40px;
+width:100%;
+border:none;
+margin-top:10px;
+cursor:pointer;
+box-shadow:0 4px 0 #1e7e34;
+transition:all 0.1s;
+}
+.submit-btn:active{transform:translateY(4px);box-shadow:0 1px 0 #1e7e34;}
+.submit-btn:hover{background:#2fcB4f;}
+
+/* Loading indicator */
+.loading{
+display:none;
+position:fixed;
+top:0;
+left:0;
+right:0;
+bottom:0;
+background:rgba(0,0,0,0.5);
+z-index:2000;
+justify-content:center;
+align-items:center;
+color:white;
+font-size:24px;
+}
+.loading.show{display:flex;}
+.spinner{
+border:4px solid rgba(255,255,255,0.3);
+border-radius:50%;
+border-top:4px solid white;
+width:50px;
+height:50px;
+animation:spin 1s linear infinite;
+margin-right:10px;
+}
+@keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
+
+/* FLOATING INPUT (FIXED HEIGHT SMALLER) */
+.overlay{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,0.4);
+backdrop-filter:blur(3px);
+display:none;
+z-index:900;
+}
+
+.floating-input{
+position:fixed;
+left:50%;
+top:35%;
+transform:translate(-50%,-50%) scale(0.8);
+width:600px;
+height:85px;
+font-size:22px;
+border:4px solid #ff9933;
+border-radius:25px;
+padding:15px;
+z-index:1001;
+box-shadow:0 20px 50px rgba(0,0,0,0.4);
+transition:all 0.25s ease;
+display:none;
+}
+.floating-input.show{
+transform:translate(-50%,-50%) scale(1);
+}
+.floating-input:focus{outline:none;}
+
+/* KEYBOARD */
+.keyboard{
+position:fixed;
+bottom:20px;
+left:50%;
+transform:translateX(-50%);
+background:white;
+padding:12px;
+border-radius:18px;
+box-shadow:0 8px 25px rgba(0,0,0,0.3);
+display:none;
+z-index:1000;
+}
+.keyboard-row{display:flex;justify-content:center;}
+.keyboard button{
+min-width:55px;
+height:50px;
+margin:4px;
+font-size:16px;
+border-radius:10px;
+border:2px solid #1e5fbf;
+background:#f0f7ff;
+cursor:pointer;
+transition:all 0.2s;
+}
+.keyboard button:hover{background:#1e5fbf;color:white;}
+.keyboard .ok-btn{
+background:#28a745;
+color:white;
+border:none;
+}
+.keyboard .ok-btn:hover{background:#218838;}
+
+</style>
+</head>
+<body>
+
+<div class="header">
+<div class="header-left">
+<img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India">
+<div>{% trans "Ministry of Electronics &" %}<br>{% trans "Information Technology" %}<br>{% trans "Government of India" %}</div>
+</div>
+<div class="header-right">
+<img src="https://www.cdac.in/img/cdac-logo.png" alt="CDAC Logo">
+</div>
+</div>
+
+<div class="voice-corner">
+<div class="voice-corner-btn" onclick="alert('{% trans "Voice assistant activated" %}')">🎤</div>
+<div class="voice-corner-text">{% trans "Click" %}</div>
+</div>
+
+<a href="{% url 'electricity-services' %}" class="back-btn">← {% trans "Back" %}</a>
+
+<div class="container">
+<div class="content-wrapper">
+
+<!-- Display Django messages -->
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+    <div class="message {{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<h1>📝 {% trans "Name Transfer" %}</h1>
+
+<div class="info-card">
+<div>{% trans "Current Owner:" %} <strong>{% if current_owner %}{{ current_owner }}{% else %}Rajesh Kumar{% endif %}</strong></div>
+<div>{% trans "Consumer No:" %} <strong>{% if consumer_number %}{{ consumer_number|slice:":4" }} {{ consumer_number|slice:"4:8" }} {{ consumer_number|slice:"8:12" }}{% else %}1234 5678 9012{% endif %}</strong></div>
+<div>{% trans "Address:" %} <strong>{% if address %}{{ address }}{% else %}123, Gandhi Nagar{% endif %}</strong></div>
+</div>
+
+<div class="document-note">
+📄 {% trans "Required Documents: Sale Deed, NOC, ID Proof, Address Proof" %}
+</div>
+
+<!-- Django form for name transfer request -->
+<form id="transferForm" method="post" action="{% url 'electricity-name-transfer' %}">
+    {% csrf_token %}
+    <input type="hidden" name="consumer_number" id="consumerNumber" value="{% if consumer_number %}{{ consumer_number }}{% else %}123456789012{% endif %}">
+    <input type="hidden" name="new_owner_name" id="newOwnerName" value="{{ request.POST.new_owner_name }}">
+    <input type="hidden" name="new_owner_aadhaar" id="newOwnerAadhaar" value="{{ request.POST.new_owner_aadhaar }}">
+    <input type="hidden" name="relationship" id="relationshipValue" value="{% if request.POST.relationship %}{{ request.POST.relationship }}{% else %}Purchaser{% endif %}">
+</form>
+
+<div class="form-group">
+<label>{% trans "New Owner Name" %} *</label>
+<input class="large-input" id="newName" readonly placeholder="{% trans "Enter new owner name" %}" 
+       value="{{ request.POST.new_owner_name }}">
+</div>
+
+<div class="form-group">
+<label>{% trans "New Owner Aadhaar" %} *</label>
+<input class="large-input" id="aadhaar" readonly placeholder="{% trans "12 digit Aadhaar" %}" maxlength="12"
+       value="{{ request.POST.new_owner_aadhaar }}">
+</div>
+
+<div class="form-group">
+<label>{% trans "Relationship" %}</label>
+<select class="large-input" id="relationship" onchange="updateRelationship()">
+    <option value="Purchaser" {% if request.POST.relationship == 'Purchaser' or not request.POST.relationship %}selected{% endif %}>{% trans "Purchaser" %}</option>
+    <option value="Family Member" {% if request.POST.relationship == 'Family Member' %}selected{% endif %}>{% trans "Family Member" %}</option>
+    <option value="Legal Heir" {% if request.POST.relationship == 'Legal Heir' %}selected{% endif %}>{% trans "Legal Heir" %}</option>
+    <option value="Other" {% if request.POST.relationship == 'Other' %}selected{% endif %}>{% trans "Other" %}</option>
+</select>
+</div>
+
+<button class="submit-btn" onclick="submitRequest()">{% trans "Submit Transfer Request" %}</button>
+
+</div>
+</div>
+
+<!-- Loading indicator -->
+<div id="loadingIndicator" class="loading">
+    <div class="spinner"></div>
+    <div>{% trans "Processing..." %}</div>
+</div>
+
+<div id="overlay" class="overlay"></div>
+<textarea id="floatingInput" class="floating-input" placeholder="{% trans "Type here..." %}"></textarea>
+<div id="keyboard" class="keyboard"></div>
+
+<script>
+let activeInput=null;
+let isUpperCase=true;
+
+const overlay=document.getElementById("overlay");
+const floatingInput=document.getElementById("floatingInput");
+const keyboard=document.getElementById("keyboard");
+const loadingIndicator = document.getElementById("loadingIndicator");
+
+function createKeyboard(){
+keyboard.innerHTML="";
+let letters="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+if(!isUpperCase){letters=letters.toLowerCase();}
+let keys=(letters+"0123456789 .-").split("");
+
+let row=document.createElement("div");
+row.className="keyboard-row";
+
+keys.forEach((k,i)=>{
+if(i%10===0 && i!==0){
+keyboard.appendChild(row);
+row=document.createElement("div");
+row.className="keyboard-row";
+}
+let btn=document.createElement("button");
+btn.innerText=k===" "?"{% trans "Space" %}":k;
+btn.type="button";
+btn.onclick=()=>floatingInput.value+=k;
+row.appendChild(btn);
+});
+keyboard.appendChild(row);
+
+let last=document.createElement("div");
+last.className="keyboard-row";
+last.innerHTML=`
+<button type="button" onclick="toggleCase()">⇧ {% trans "Shift" %}</button>
+<button type="button" onclick="floatingInput.value=floatingInput.value.slice(0,-1)">⌫ {% trans "Back" %}</button>
+<button type="button" onclick="floatingInput.value=''">{% trans "Clear" %}</button>
+<button type="button" class="ok-btn" onclick="finish()">✓ {% trans "OK" %}</button>
+`;
+keyboard.appendChild(last);
+}
+
+function toggleCase(){
+isUpperCase=!isUpperCase;
+createKeyboard();
+}
+
+function openKeyboard(id){
+activeInput=document.getElementById(id);
+floatingInput.value=activeInput.value;
+overlay.style.display="block";
+floatingInput.style.display="block";
+keyboard.style.display="block";
+setTimeout(()=>{
+floatingInput.classList.add("show");
+floatingInput.focus();
+},10);
+}
+
+function finish(){
+if(activeInput){
+activeInput.value=floatingInput.value;
+// Update hidden field based on which input was active
+if(activeInput.id === 'newName') {
+    document.getElementById('newOwnerName').value = floatingInput.value;
+} else if(activeInput.id === 'aadhaar') {
+    document.getElementById('newOwnerAadhaar').value = floatingInput.value;
+}
+}
+closeKeyboard();
+}
+
+function closeKeyboard(){
+floatingInput.classList.remove("show");
+setTimeout(()=>{
+overlay.style.display="none";
+floatingInput.style.display="none";
+keyboard.style.display="none";
+},200);
+}
+
+// Handle Enter key on floating input
+floatingInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        finish();
+    }
+});
+
+document.getElementById("newName").addEventListener("click",()=>openKeyboard("newName"));
+document.getElementById("aadhaar").addEventListener("click",()=>openKeyboard("aadhaar"));
+overlay.addEventListener("click",closeKeyboard);
+
+createKeyboard();
+
+function updateRelationship() {
+    const relationship = document.getElementById('relationship').value;
+    document.getElementById('relationshipValue').value = relationship;
+}
+
+function submitRequest(){
+const newName = document.getElementById('newName').value;
+const aadhaar = document.getElementById('aadhaar').value;
+
+if(!newName){
+alert('{% trans "Please enter new owner name" %}');
+return;
+}
+
+if(!aadhaar){
+alert('{% trans "Please enter new owner Aadhaar number" %}');
+return;
+}
+
+// Validate Aadhaar (12 digits)
+const aadhaarClean = aadhaar.replace(/\s/g, '');
+if(!/^\d{12}$/.test(aadhaarClean)){
+alert('{% trans "Please enter a valid 12-digit Aadhaar number" %}');
+return;
+}
+
+// Update relationship
+updateRelationship();
+
+// Show loading
+loadingIndicator.classList.add('show');
+
+// Submit form
+setTimeout(() => {
+    document.getElementById('transferForm').submit();
+}, 500);
+}
+
+// Auto-hide messages after 5 seconds
+setTimeout(function() {
+    document.querySelectorAll('.message').forEach(function(message) {
+        message.style.display = 'none';
+    });
+}, 5000);
+
+// Prevent form submission on Enter key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+    }
+});
+
+// Format Aadhaar if needed
+function formatAadhaar(aadhaar) {
+    return aadhaar.replace(/\s/g, '').replace(/(\d{4})/g, '$1 ').trim();
+}
+</script>
+
+</body>
+</html>

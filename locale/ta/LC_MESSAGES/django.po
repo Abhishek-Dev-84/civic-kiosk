@@ -1,0 +1,2270 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-01 01:02+0530\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: ta\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: .\templates\404.html:7
+msgid "Civic Kiosk - 404"
+msgstr "சிவிக் கியோஸ்க் - 404"
+
+#: .\templates\404.html:196 .\templates\application-status.html:236
+#: .\templates\auth.html:432 .\templates\birth-certificate.html:325
+#: .\templates\building-plan.html:281 .\templates\death-certificate.html:285
+#: .\templates\document-upload-camera.html:43
+#: .\templates\document-upload-pen.html:58
+#: .\templates\document-upload-qr.html:69
+#: .\templates\electricity-bill-payment.html:354
+#: .\templates\electricity-complaint.html:154
+#: .\templates\electricity-duplicate-bill.html:142
+#: .\templates\electricity-load-enhancement.html:145
+#: .\templates\electricity-meter-replacement.html:101
+#: .\templates\electricity-name-transfer.html:277
+#: .\templates\electricity-new-connection.html:267
+#: .\templates\electricity-services.html:74
+#: .\templates\electricity-solar.html:281
+#: .\templates\gas-bill-payment.html:103
+#: .\templates\gas-booking-status.html:293 .\templates\gas-complaint.html:281
+#: .\templates\gas-consumer-lookup.html:48
+#: .\templates\gas-cylinder-booking.html:245
+#: .\templates\gas-new-connection.html:147 .\templates\gas-services.html:37
+#: .\templates\gas-subsidy.html:45 .\templates\grievance.html:155
+#: .\templates\index.html:215 .\templates\marriage-registration.html:79
+#: .\templates\menu.html:635 .\templates\municipal-services.html:37
+#: .\templates\otp.html:413 .\templates\payment-history.html:49
+#: .\templates\professional-tax.html:44 .\templates\property-tax.html:44
+#: .\templates\receipt-print.html:47 .\templates\trade-license.html:40
+#: .\templates\under-development.html:234 .\templates\water-bill.html:46
+msgid "Ministry of Electronics &"
+msgstr "மின்னணுவியல் மற்றும் தகவல் தொழில்நுட்ப அமைச்சகம்"
+
+#: .\templates\404.html:197 .\templates\application-status.html:237
+#: .\templates\auth.html:433 .\templates\birth-certificate.html:325
+#: .\templates\building-plan.html:281 .\templates\death-certificate.html:285
+#: .\templates\document-upload-camera.html:43
+#: .\templates\document-upload-pen.html:58
+#: .\templates\document-upload-qr.html:69
+#: .\templates\electricity-bill-payment.html:354
+#: .\templates\electricity-complaint.html:154
+#: .\templates\electricity-duplicate-bill.html:142
+#: .\templates\electricity-load-enhancement.html:145
+#: .\templates\electricity-meter-replacement.html:101
+#: .\templates\electricity-name-transfer.html:277
+#: .\templates\electricity-new-connection.html:267
+#: .\templates\electricity-services.html:74
+#: .\templates\electricity-solar.html:281
+#: .\templates\gas-bill-payment.html:103
+#: .\templates\gas-booking-status.html:293 .\templates\gas-complaint.html:281
+#: .\templates\gas-consumer-lookup.html:48
+#: .\templates\gas-cylinder-booking.html:246
+#: .\templates\gas-new-connection.html:147 .\templates\gas-services.html:37
+#: .\templates\gas-subsidy.html:45 .\templates\grievance.html:155
+#: .\templates\index.html:215 .\templates\marriage-registration.html:79
+#: .\templates\menu.html:636 .\templates\municipal-services.html:37
+#: .\templates\otp.html:414 .\templates\payment-history.html:49
+#: .\templates\professional-tax.html:44 .\templates\property-tax.html:44
+#: .\templates\receipt-print.html:47 .\templates\trade-license.html:40
+#: .\templates\under-development.html:235 .\templates\water-bill.html:46
+msgid "Information Technology"
+msgstr "தகவல் தொழில்நுட்பம்"
+
+#: .\templates\404.html:198 .\templates\application-status.html:238
+#: .\templates\auth.html:434 .\templates\birth-certificate.html:325
+#: .\templates\building-plan.html:281 .\templates\death-certificate.html:285
+#: .\templates\document-upload-camera.html:43
+#: .\templates\document-upload-pen.html:58
+#: .\templates\document-upload-qr.html:69
+#: .\templates\electricity-bill-payment.html:354
+#: .\templates\electricity-complaint.html:154
+#: .\templates\electricity-duplicate-bill.html:142
+#: .\templates\electricity-load-enhancement.html:145
+#: .\templates\electricity-meter-replacement.html:101
+#: .\templates\electricity-name-transfer.html:277
+#: .\templates\electricity-new-connection.html:267
+#: .\templates\electricity-services.html:74
+#: .\templates\electricity-solar.html:281
+#: .\templates\gas-bill-payment.html:103
+#: .\templates\gas-booking-status.html:293 .\templates\gas-complaint.html:281
+#: .\templates\gas-consumer-lookup.html:48
+#: .\templates\gas-cylinder-booking.html:247
+#: .\templates\gas-new-connection.html:147 .\templates\gas-services.html:37
+#: .\templates\gas-subsidy.html:45 .\templates\grievance.html:155
+#: .\templates\index.html:215 .\templates\marriage-registration.html:79
+#: .\templates\menu.html:637 .\templates\municipal-services.html:37
+#: .\templates\otp.html:415 .\templates\payment-history.html:49
+#: .\templates\professional-tax.html:44 .\templates\property-tax.html:44
+#: .\templates\receipt-print.html:47 .\templates\receipt-print.html:75
+#: .\templates\trade-license.html:40 .\templates\under-development.html:236
+#: .\templates\water-bill.html:46
+msgid "Government of India"
+msgstr "இந்திய அரசு"
+
+#: .\templates\404.html:227
+msgid "Looks like you're lost"
+msgstr "நீங்கள் வழி தவறியது போல் தெரிகிறது"
+
+#: .\templates\404.html:228
+msgid "The page you are looking for is not available!"
+msgstr "நீங்கள் தேடும் பக்கம் கிடைக்கவில்லை!"
+
+#: .\templates\404.html:234
+msgid "The requested URL was not found on this server."
+msgstr "கோரப்பட்ட URL இந்த சேவையகத்தில் கிடைக்கவில்லை."
+
+#: .\templates\404.html:239
+msgid "Go To Home"
+msgstr "முகப்புக்குச் செல்லவும்"
+
+#: .\templates\404.html:249
+msgid "Digital Civic Services Portal"
+msgstr "டிஜிட்டல் சிவிக் சேவைகள் போர்டல்"
+
+#: .\templates\404.html:250
+msgid "Error Code"
+msgstr "பிழைக் குறியீடு"
+
+#: .\templates\application-status.html:7
+msgid "Application Status - Civic Services Kiosk"
+msgstr "விண்ணப்ப நிலை - சிவிக் சேவைகள் கியோஸ்க்"
+
+#: .\templates\application-status.html:247
+#: .\templates\document-upload-camera.html:50
+#: .\templates\document-upload-pen.html:66
+#: .\templates\document-upload-qr.html:77
+#: .\templates\electricity-bill-payment.html:362
+#: .\templates\electricity-complaint.html:162
+#: .\templates\electricity-duplicate-bill.html:150
+#: .\templates\electricity-load-enhancement.html:153
+#: .\templates\electricity-meter-replacement.html:109
+#: .\templates\electricity-name-transfer.html:285
+#: .\templates\electricity-new-connection.html:275
+#: .\templates\electricity-services.html:82
+#: .\templates\electricity-solar.html:289
+#: .\templates\gas-bill-payment.html:111
+#: .\templates\gas-booking-status.html:301 .\templates\gas-complaint.html:289
+#: .\templates\gas-consumer-lookup.html:66
+#: .\templates\gas-cylinder-booking.html:267
+#: .\templates\gas-new-connection.html:166 .\templates\gas-services.html:55
+#: .\templates\gas-subsidy.html:63 .\templates\grievance.html:174
+#: .\templates\municipal-services.html:55 .\templates\payment-history.html:67
+#: .\templates\professional-tax.html:62 .\templates\property-tax.html:62
+#: .\templates\receipt-print.html:65 .\templates\trade-license.html:58
+#: .\templates\water-bill.html:64
+msgid "Voice assistant activated"
+msgstr "குரல் உதவியாளர் செயல்படுத்தப்பட்டது"
+
+#: .\templates\application-status.html:248 .\templates\auth.html:447
+#: .\templates\auth.html:687 .\templates\birth-certificate.html:334
+#: .\templates\building-plan.html:290 .\templates\death-certificate.html:294
+#: .\templates\document-upload-camera.html:51
+#: .\templates\document-upload-pen.html:67
+#: .\templates\document-upload-qr.html:78
+#: .\templates\electricity-bill-payment.html:363
+#: .\templates\electricity-complaint.html:163
+#: .\templates\electricity-duplicate-bill.html:151
+#: .\templates\electricity-load-enhancement.html:154
+#: .\templates\electricity-meter-replacement.html:110
+#: .\templates\electricity-name-transfer.html:286
+#: .\templates\electricity-new-connection.html:276
+#: .\templates\electricity-services.html:83
+#: .\templates\electricity-solar.html:290
+#: .\templates\gas-bill-payment.html:112
+#: .\templates\gas-booking-status.html:302 .\templates\gas-complaint.html:290
+#: .\templates\gas-consumer-lookup.html:67
+#: .\templates\gas-cylinder-booking.html:268
+#: .\templates\gas-new-connection.html:167 .\templates\gas-services.html:56
+#: .\templates\gas-subsidy.html:64 .\templates\grievance.html:175
+#: .\templates\index.html:224 .\templates\menu.html:647
+#: .\templates\menu.html:823 .\templates\municipal-services.html:56
+#: .\templates\otp.html:425 .\templates\payment-history.html:68
+#: .\templates\professional-tax.html:63 .\templates\property-tax.html:63
+#: .\templates\receipt-print.html:66 .\templates\trade-license.html:59
+#: .\templates\water-bill.html:65
+msgid "Click"
+msgstr "கிளிக் செய்யவும்"
+
+#: .\templates\application-status.html:251 .\templates\auth.html:451
+#: .\templates\birth-certificate.html:337 .\templates\building-plan.html:293
+#: .\templates\death-certificate.html:297
+#: .\templates\document-upload-camera.html:53
+#: .\templates\document-upload-pen.html:70
+#: .\templates\document-upload-qr.html:81
+#: .\templates\electricity-bill-payment.html:366
+#: .\templates\electricity-complaint.html:166
+#: .\templates\electricity-complaint.html:289
+#: .\templates\electricity-duplicate-bill.html:154
+#: .\templates\electricity-duplicate-bill.html:286
+#: .\templates\electricity-load-enhancement.html:157
+#: .\templates\electricity-meter-replacement.html:113
+#: .\templates\electricity-name-transfer.html:289
+#: .\templates\electricity-name-transfer.html:397
+#: .\templates\electricity-new-connection.html:279
+#: .\templates\electricity-new-connection.html:391
+#: .\templates\electricity-services.html:86
+#: .\templates\electricity-solar.html:293
+#: .\templates\gas-bill-payment.html:116
+#: .\templates\gas-booking-status.html:305
+#: .\templates\gas-booking-status.html:441 .\templates\gas-complaint.html:293
+#: .\templates\gas-complaint.html:397 .\templates\gas-consumer-lookup.html:69
+#: .\templates\gas-cylinder-booking.html:271
+#: .\templates\gas-new-connection.html:170 .\templates\gas-services.html:58
+#: .\templates\gas-subsidy.html:66 .\templates\grievance.html:178
+#: .\templates\marriage-registration.html:98 .\templates\menu.html:651
+#: .\templates\municipal-services.html:58 .\templates\otp.html:428
+#: .\templates\payment-history.html:70 .\templates\professional-tax.html:65
+#: .\templates\property-tax.html:65 .\templates\receipt-print.html:68
+#: .\templates\trade-license.html:61 .\templates\water-bill.html:67
+msgid "Back"
+msgstr "பின்"
+
+#: .\templates\application-status.html:256
+msgid "Status Portal"
+msgstr "நிலை போர்டல்"
+
+#: .\templates\application-status.html:259
+msgid "Application Status"
+msgstr "விண்ணப்ப நிலை"
+
+#: .\templates\application-status.html:262 .\templates\payment-history.html:73
+msgid "Payment History"
+msgstr "கட்டண வரலாறு"
+
+#: .\templates\application-status.html:269
+msgid "Application & Complaint Status"
+msgstr "விண்ணப்பம் மற்றும் புகார் நிலை"
+
+#: .\templates\application-status.html:274
+msgid "Application Tracking"
+msgstr "விண்ணப்ப கண்காணிப்பு"
+
+#: .\templates\application-status.html:277
+msgid "Application ID:"
+msgstr "விண்ணப்ப ஐடி:"
+
+#: .\templates\application-status.html:282
+msgid "Department:"
+msgstr "துறை:"
+
+#: .\templates\application-status.html:287
+msgid "Submitted Date:"
+msgstr "சமர்ப்பிக்கப்பட்ட தேதி:"
+
+#: .\templates\application-status.html:292
+msgid "Current Stage:"
+msgstr "தற்போதைய நிலை:"
+
+#: .\templates\application-status.html:297
+msgid "Assigned Officer:"
+msgstr "நியமிக்கப்பட்ட அலுவலர்:"
+
+#: .\templates\application-status.html:302
+msgid "Expected Completion:"
+msgstr "எதிர்பார்க்கப்படும் நிறைவு:"
+
+#: .\templates\application-status.html:309
+msgid "Complaint Tracking"
+msgstr "புகார் கண்காணிப்பு"
+
+#: .\templates\application-status.html:312
+msgid "Complaint ID:"
+msgstr "புகார் ஐடி:"
+
+#: .\templates\application-status.html:317
+#: .\templates\gas-consumer-lookup.html:116
+msgid "Status:"
+msgstr "நிலை:"
+
+#: .\templates\application-status.html:322
+msgid "Work Completed:"
+msgstr "பணி முடிந்தது:"
+
+#: .\templates\application-status.html:327
+msgid "Officer Remark:"
+msgstr "அலுவலர் குறிப்பு:"
+
+#: .\templates\application-status.html:332
+msgid "Deadline:"
+msgstr "கடைசி நாள்:"
+
+#: .\templates\application-status.html:340
+msgid "No Active Applications"
+msgstr "செயலில் உள்ள விண்ணப்பங்கள் இல்லை"
+
+#: .\templates\application-status.html:342
+msgid "You don't have any active applications or complaints."
+msgstr "உங்களிடம் செயலில் உள்ள விண்ணப்பங்கள் அல்லது புகார்கள் எதுவும் இல்லை."
+
+#: .\templates\application-status.html:345
+msgid "Back to Menu"
+msgstr "மெனுவிற்குத் திரும்பு"
+
+#: .\templates\auth.html:108
+msgid "Civic Services Kiosk - Aadhaar Entry"
+msgstr "சிவிக் சேவைகள் கியோஸ்க் - ஆதார் உள்ளீடு"
+
+#: .\templates\auth.html:422 .\templates\index.html:228
+msgid "Session about to expire!"
+msgstr "அமர்வு காலாவதியாக உள்ளது!"
+
+#: .\templates\auth.html:423 .\templates\index.html:229
+msgid "Continue"
+msgstr "தொடரவும்"
+
+#: .\templates\auth.html:424 .\templates\index.html:230
+#: .\templates\menu.html:657
+msgid "Logout"
+msgstr "வெளியேறு"
+
+#: .\templates\auth.html:468
+msgid "Enter Aadhaar"
+msgstr "ஆதாரை உள்ளிடவும்"
+
+#: .\templates\auth.html:471
+msgid "12-digit Aadhaar Number"
+msgstr "12-இலக்க ஆதார் எண்"
+
+#: .\templates\auth.html:494
+msgid "Proceed"
+msgstr "தொடரவும்"
+
+#: .\templates\auth.html:601
+msgid "Please enter 12 digits"
+msgstr "தயவுசெய்து 12 இலக்கங்களை உள்ளிடவும்"
+
+#: .\templates\auth.html:661
+msgid "Listen"
+msgstr "கேளுங்கள்"
+
+#: .\templates\birth-certificate.html:7
+msgid "Birth Certificate - Civic Kiosk"
+msgstr "பிறப்புச் சான்றிதழ் - சிவிக் கியோஸ்க்"
+
+#: .\templates\birth-certificate.html:351
+#: .\templates\municipal-services.html:66 .\templates\payment-history.html:99
+msgid "Birth Certificate"
+msgstr "பிறப்புச் சான்றிதழ்"
+
+#: .\templates\birth-certificate.html:352
+msgid "Apply within 21 days of birth for free registration"
+msgstr "இலவச பதிவுக்காக பிறந்த 21 நாட்களுக்குள் விண்ணப்பிக்கவும்"
+
+#: .\templates\birth-certificate.html:359
+msgid "Child's Full Name"
+msgstr "குழந்தையின் முழுப்பெயர்"
+
+#: .\templates\birth-certificate.html:361
+msgid "Enter child's name"
+msgstr "குழந்தையின் பெயரை உள்ளிடவும்"
+
+#: .\templates\birth-certificate.html:365
+#: .\templates\marriage-registration.html:117
+#: .\templates\marriage-registration.html:138
+msgid "Date of Birth"
+msgstr "பிறந்த தேதி"
+
+#: .\templates\birth-certificate.html:371
+#: .\templates\death-certificate.html:335
+msgid "Gender"
+msgstr "பாலினம்"
+
+#: .\templates\birth-certificate.html:375
+#: .\templates\death-certificate.html:337
+msgid "Male"
+msgstr "ஆண்"
+
+#: .\templates\birth-certificate.html:379
+#: .\templates\death-certificate.html:338
+msgid "Female"
+msgstr "பெண்"
+
+#: .\templates\birth-certificate.html:383
+#: .\templates\death-certificate.html:339
+#: .\templates\electricity-complaint.html:203
+#: .\templates\electricity-load-enhancement.html:205
+#: .\templates\electricity-meter-replacement.html:152
+#: .\templates\electricity-name-transfer.html:342
+#: .\templates\gas-complaint.html:330 .\templates\grievance.html:196
+#: .\templates\marriage-registration.html:171
+#: .\templates\trade-license.html:80
+msgid "Other"
+msgstr "மற்றவை"
+
+#: .\templates\birth-certificate.html:389
+msgid "Place of Birth"
+msgstr "பிறந்த இடம்"
+
+#: .\templates\birth-certificate.html:391
+msgid "Hospital/Clinic name or Address"
+msgstr "மருத்துவமனை/மருந்தகத்தின் பெயர் அல்லது முகவரி"
+
+#: .\templates\birth-certificate.html:395
+#: .\templates\marriage-registration.html:125
+#: .\templates\marriage-registration.html:146
+msgid "Father's Name"
+msgstr "தந்தையின் பெயர்"
+
+#: .\templates\birth-certificate.html:397
+msgid "Enter father's full name"
+msgstr "தந்தையின் முழுப்பெயரை உள்ளிடவும்"
+
+#: .\templates\birth-certificate.html:401
+msgid "Mother's Name"
+msgstr "தாயின் பெயர்"
+
+#: .\templates\birth-certificate.html:403
+msgid "Enter mother's full name"
+msgstr "தாயின் முழுப்பெயரை உள்ளிடவும்"
+
+#: .\templates\birth-certificate.html:407
+msgid "Permanent Address"
+msgstr "நிரந்தர முகவரி"
+
+#: .\templates\birth-certificate.html:409
+msgid "Enter permanent address"
+msgstr "நிரந்தர முகவரியை உள்ளிடவும்"
+
+#: .\templates\birth-certificate.html:412
+#: .\templates\death-certificate.html:367
+#: .\templates\electricity-new-connection.html:340
+#: .\templates\gas-new-connection.html:207
+msgid "Submit Application"
+msgstr "விண்ணப்பத்தை சமர்ப்பிக்கவும்"
+
+#: .\templates\birth-certificate.html:419 .\templates\building-plan.html:367
+#: .\templates\death-certificate.html:373
+#: .\templates\electricity-name-transfer.html:358
+#: .\templates\electricity-new-connection.html:352
+#: .\templates\electricity-solar.html:349
+msgid "Type here..."
+msgstr "இங்கே தட்டச்சு செய்யவும்..."
+
+#: .\templates\birth-certificate.html:458 .\templates\building-plan.html:401
+#: .\templates\death-certificate.html:407
+#: .\templates\electricity-bill-payment.html:442
+#: .\templates\electricity-complaint.html:290
+#: .\templates\electricity-duplicate-bill.html:287
+#: .\templates\electricity-load-enhancement.html:277
+#: .\templates\electricity-name-transfer.html:398
+#: .\templates\electricity-new-connection.html:392
+#: .\templates\electricity-solar.html:385
+#: .\templates\gas-booking-status.html:442 .\templates\gas-complaint.html:398
+#: .\templates\gas-new-connection.html:255 .\templates\grievance.html:267
+#: .\templates\marriage-registration.html:229
+msgid "Clear"
+msgstr "அழி"
+
+#: .\templates\birth-certificate.html:459 .\templates\building-plan.html:403
+#: .\templates\death-certificate.html:409
+#: .\templates\electricity-complaint.html:278
+#: .\templates\electricity-name-transfer.html:386
+#: .\templates\electricity-new-connection.html:380
+#: .\templates\electricity-solar.html:374 .\templates\gas-complaint.html:386
+#: .\templates\gas-new-connection.html:254 .\templates\grievance.html:266
+#: .\templates\marriage-registration.html:228
+msgid "Space"
+msgstr "இடைவெளி"
+
+#: .\templates\birth-certificate.html:461 .\templates\building-plan.html:404
+#: .\templates\death-certificate.html:410
+#: .\templates\electricity-bill-payment.html:444
+#: .\templates\electricity-complaint.html:291
+#: .\templates\electricity-duplicate-bill.html:288
+#: .\templates\electricity-load-enhancement.html:289
+#: .\templates\electricity-name-transfer.html:399
+#: .\templates\electricity-new-connection.html:393
+#: .\templates\electricity-solar.html:386
+#: .\templates\gas-booking-status.html:443 .\templates\gas-complaint.html:399
+#: .\templates\gas-new-connection.html:256 .\templates\grievance.html:268
+#: .\templates\marriage-registration.html:230
+msgid "OK"
+msgstr "சரி"
+
+#: .\templates\building-plan.html:6
+msgid "Building Plan Approval - Civic Kiosk"
+msgstr "கட்டிடத் திட்ட ஒப்புதல் - சிவிக் கியோஸ்க்"
+
+#: .\templates\building-plan.html:299
+msgid "Building Plan Approval"
+msgstr "கட்டிடத் திட்ட ஒப்புதல்"
+
+#: .\templates\building-plan.html:311 .\templates\trade-license.html:84
+msgid "Owner Name"
+msgstr "உரிமையாளரின் பெயர்"
+
+#: .\templates\building-plan.html:317
+msgid "Property Address"
+msgstr "சொத்தின் முகவரி"
+
+#: .\templates\building-plan.html:323
+msgid "Survey/Khasra Number"
+msgstr "கணக்கெடுப்பு/கஸ்ரா எண்"
+
+#: .\templates\building-plan.html:329
+msgid "Plot Area (sq m)"
+msgstr "மனை பரப்பளவு (ச.மீ)"
+
+#: .\templates\building-plan.html:335
+msgid "Building Type"
+msgstr "கட்டிட வகை"
+
+#: .\templates\building-plan.html:337
+#: .\templates\electricity-new-connection.html:321
+msgid "Residential"
+msgstr "குடியிருப்பு"
+
+#: .\templates\building-plan.html:338
+#: .\templates\electricity-new-connection.html:322
+#: .\templates\gas-cylinder-booking.html:321
+msgid "Commercial"
+msgstr "வணிக"
+
+#: .\templates\building-plan.html:339
+msgid "Mixed Use"
+msgstr "கலப்பு பயன்பாடு"
+
+#: .\templates\building-plan.html:340
+#: .\templates\electricity-new-connection.html:323
+msgid "Industrial"
+msgstr "தொழில்துறை"
+
+#: .\templates\building-plan.html:345
+msgid "Number of Floors"
+msgstr "மாடிகளின் எண்ணிக்கை"
+
+#: .\templates\building-plan.html:351
+msgid "Upload Building Plan (PDF/DWG - Max 25MB)"
+msgstr "கட்டிடத் திட்டத்தைப் பதிவேற்றவும் (PDF/DWG - அதிகபட்சம் 25MB)"
+
+#: .\templates\building-plan.html:355 .\templates\building-plan.html:453
+msgid "Selected:"
+msgstr "தேர்ந்தெடுக்கப்பட்டது:"
+
+#: .\templates\building-plan.html:361
+msgid "Submit for Approval"
+msgstr "ஒப்புதலுக்கு சமர்ப்பிக்கவும்"
+
+#: .\templates\death-certificate.html:6
+msgid "Death Certificate - Civic Kiosk"
+msgstr "இறப்புச் சான்றிதழ் - சிவிக் கியோஸ்க்"
+
+#: .\templates\death-certificate.html:303
+#: .\templates\municipal-services.html:67 .\templates\payment-history.html:100
+msgid "Death Certificate"
+msgstr "இறப்புச் சான்றிதழ்"
+
+#: .\templates\death-certificate.html:314
+msgid "Register within 21 days of death"
+msgstr "இறந்த 21 நாட்களுக்குள் பதிவு செய்யவும்"
+
+#: .\templates\death-certificate.html:317
+msgid "Deceased Full Name"
+msgstr "இறந்தவரின் முழுப்பெயர்"
+
+#: .\templates\death-certificate.html:323
+msgid "Date of Death"
+msgstr "இறந்த தேதி"
+
+#: .\templates\death-certificate.html:329
+msgid "Place of Death"
+msgstr "இறந்த இடம்"
+
+#: .\templates\death-certificate.html:344
+msgid "Father's/Spouse Name"
+msgstr "தந்தை/மனைவியின் பெயர்"
+
+#: .\templates\death-certificate.html:350
+msgid "Informant Name"
+msgstr "தகவல் அளிப்பவர் பெயர்"
+
+#: .\templates\death-certificate.html:356
+msgid "Informant Aadhaar"
+msgstr "தகவல் அளிப்பவரின் ஆதார்"
+
+#: .\templates\death-certificate.html:362
+msgid "Cause of Death"
+msgstr "இறப்புக்கான காரணம்"
+
+#: .\templates\document-upload-camera.html:5
+msgid "Camera Upload - Civic Kiosk"
+msgstr "கேமரா பதிவேற்றம் - சிவிக் கியோஸ்க்"
+
+#: .\templates\document-upload-camera.html:56
+msgid "Camera Upload"
+msgstr "கேமரா பதிவேற்றம்"
+
+#: .\templates\document-upload-camera.html:61
+msgid "Capture"
+msgstr "பிடி"
+
+#: .\templates\document-upload-camera.html:62
+msgid "Switch"
+msgstr "மாற்று"
+
+#: .\templates\document-upload-camera.html:66
+msgid "Captured Images"
+msgstr "பிடிக்கப்பட்ட படங்கள்"
+
+#: .\templates\document-upload-camera.html:68
+msgid "Upload All"
+msgstr "அனைத்தையும் பதிவேற்றவும்"
+
+#: .\templates\document-upload-camera.html:102
+msgid "Camera access denied or not available"
+msgstr "கேமரா அணுகல் மறுக்கப்பட்டது அல்லது கிடைக்கவில்லை"
+
+#: .\templates\document-upload-camera.html:171
+msgid "Please capture at least one image"
+msgstr "தயவுசெய்து குறைந்தது ஒரு படத்தையாவது பிடிக்கவும்"
+
+#: .\templates\document-upload-camera.html:175
+msgid "Uploading"
+msgstr "பதிவேற்றுகிறது"
+
+#: .\templates\document-upload-camera.html:175
+msgid "images..."
+msgstr "படங்கள்..."
+
+#: .\templates\document-upload-camera.html:177
+msgid "Images uploaded successfully!"
+msgstr "படங்கள் வெற்றிகரமாக பதிவேற்றப்பட்டன!"
+
+#: .\templates\document-upload-pen.html:6
+msgid "Pen Drive Upload - Civic Kiosk"
+msgstr "பென் டிரைவ் பதிவேற்றம் - சிவிக் கியோஸ்க்"
+
+#: .\templates\document-upload-pen.html:84
+msgid "Pen Drive Upload"
+msgstr "பென் டிரைவ் பதிவேற்றம்"
+
+#: .\templates\document-upload-pen.html:96
+msgid "Insert Pen Drive to Continue"
+msgstr "தொடர பென் டிரைவை செருகவும்"
+
+#: .\templates\document-upload-pen.html:97
+msgid "No drive detected"
+msgstr "எந்த டிரைவும் கண்டறியப்படவில்லை"
+
+#: .\templates\document-upload-pen.html:102
+msgid "Select Files from Computer"
+msgstr "கணினியிலிருந்து கோப்புகளைத் தேர்ந்தெடுக்கவும்"
+
+#: .\templates\document-upload-pen.html:111
+msgid "files selected"
+msgstr "கோப்புகள் தேர்ந்தெடுக்கப்பட்டன"
+
+#: .\templates\document-upload-pen.html:115
+msgid "Upload Documents"
+msgstr "ஆவணங்களைப் பதிவேற்றவும்"
+
+#: .\templates\document-upload-pen.html:116
+msgid "Supported: PDF, JPG, PNG (Max 10 files, 25MB each)"
+msgstr "ஆதரிக்கப்படுபவை: PDF, JPG, PNG (அதிகபட்சம் 10 கோப்புகள், ஒவ்வொன்றும் 25MB)"
+
+#: .\templates\document-upload-pen.html:123
+msgid "Uploading..."
+msgstr "பதிவேற்றுகிறது..."
+
+#: .\templates\document-upload-pen.html:134
+msgid "Pen drive detected:"
+msgstr "பென் டிரைவ் கண்டறியப்பட்டது:"
+
+#: .\templates\document-upload-pen.html:177
+msgid "Maximum"
+msgstr "அதிகபட்சம்"
+
+#: .\templates\document-upload-pen.html:177
+msgid "files allowed. You selected"
+msgstr "கோப்புகள் அனுமதிக்கப்பட்டன. நீங்கள் தேர்ந்தெடுத்தீர்கள்"
+
+#: .\templates\document-upload-pen.html:177
+msgid "files."
+msgstr "கோப்புகள்."
+
+#: .\templates\document-upload-pen.html:187
+msgid "Some files exceed"
+msgstr "சில கோப்புகள் மீறுகின்றன"
+
+#: .\templates\document-upload-pen.html:187
+msgid "limit:"
+msgstr "வரம்பு:"
+
+#: .\templates\document-upload-pen.html:196
+msgid "Selected Files:"
+msgstr "தேர்ந்தெடுக்கப்பட்ட கோப்புகள்:"
+
+#: .\templates\document-upload-pen.html:235
+msgid "Please select files to upload"
+msgstr "பதிவேற்ற கோப்புகளைத் தேர்ந்தெடுக்கவும்"
+
+#: .\templates\document-upload-pen.html:257
+msgid "files uploaded successfully!"
+msgstr "கோப்புகள் வெற்றிகரமாக பதிவேற்றப்பட்டன!"
+
+#: .\templates\document-upload-qr.html:6
+msgid "QR Upload - Civic Kiosk"
+msgstr "QR பதிவேற்றம் - சிவிக் கியோஸ்க்"
+
+#: .\templates\document-upload-qr.html:95
+msgid "QR Code Upload"
+msgstr "QR குறியீடு பதிவேற்றம்"
+
+#: .\templates\document-upload-qr.html:110
+msgid "Refresh QR Code"
+msgstr "QR குறியீட்டைப் புதுப்பிக்கவும்"
+
+#: .\templates\document-upload-qr.html:112
+msgid "Scan QR code with your phone"
+msgstr "உங்கள் மொபைலில் QR குறியீட்டை ஸ்கேன் செய்யவும்"
+
+#: .\templates\document-upload-qr.html:115
+msgid "Open DigiLocker or any scanner app"
+msgstr "DigiLocker அல்லது ஏதேனும் ஸ்கேனர் பயன்பாட்டைத் திறக்கவும்"
+
+#: .\templates\document-upload-qr.html:116
+msgid "Scan this QR code"
+msgstr "இந்த QR குறியீட்டை ஸ்கேன் செய்யவும்"
+
+#: .\templates\document-upload-qr.html:117
+msgid "Upload documents from your phone"
+msgstr "உங்கள் மொபைலில் இருந்து ஆவணங்களைப் பதிவேற்றவும்"
+
+#: .\templates\document-upload-qr.html:118
+msgid "Documents will appear here automatically"
+msgstr "ஆவணங்கள் தானாகவே இங்கே தோன்றும்"
+
+#: .\templates\document-upload-qr.html:121
+#: .\templates\document-upload-qr.html:217
+msgid "Waiting for upload..."
+msgstr "பதிவேற்றத்திற்காக காத்திருக்கிறது..."
+
+#: .\templates\document-upload-qr.html:125
+msgid "Received Documents:"
+msgstr "பெறப்பட்ட ஆவணங்கள்:"
+
+#: .\templates\document-upload-qr.html:129
+msgid "Continue to Menu"
+msgstr "மெனுவிற்குத் தொடரவும்"
+
+#: .\templates\document-upload-qr.html:136
+#: .\templates\electricity-bill-payment.html:411
+#: .\templates\electricity-duplicate-bill.html:243
+#: .\templates\electricity-load-enhancement.html:222
+#: .\templates\electricity-meter-replacement.html:200
+#: .\templates\electricity-name-transfer.html:354
+#: .\templates\electricity-new-connection.html:348
+msgid "Processing..."
+msgstr "செயலாக்குகிறது..."
+
+#: .\templates\document-upload-qr.html:182
+msgid "documents received successfully via QR scan!"
+msgstr "QR ஸ்கேன் மூலம் ஆவணங்கள் வெற்றிகரமாகப் பெறப்பட்டன!"
+
+#: .\templates\electricity-bill-payment.html:6
+msgid "Electricity Bill Payment - Civic Kiosk"
+msgstr "மின்சார பில் கட்டணம் - சிவிக் கியோஸ்க்"
+
+#: .\templates\electricity-bill-payment.html:380
+#: .\templates\payment-history.html:93
+msgid "Electricity Bill"
+msgstr "மின்சார பில்"
+
+#: .\templates\electricity-bill-payment.html:393
+#: .\templates\water-bill.html:77
+msgid "Fetch Bill"
+msgstr "பில்லைப் பெறு"
+
+#: .\templates\electricity-bill-payment.html:396
+#: .\templates\electricity-load-enhancement.html:188
+#: .\templates\electricity-name-transfer.html:307
+#: .\templates\gas-consumer-lookup.html:100
+#: .\templates\gas-cylinder-booking.html:283 .\templates\gas-subsidy.html:81
+#: .\templates\receipt-print.html:92 .\templates\water-bill.html:82
+msgid "Consumer No:"
+msgstr "நுகர்வோர் எண்:"
+
+#: .\templates\electricity-bill-payment.html:397
+#: .\templates\gas-bill-payment.html:134 .\templates\water-bill.html:90
+msgid "Bill Number:"
+msgstr "பில் எண்:"
+
+#: .\templates\electricity-bill-payment.html:398
+#: .\templates\electricity-duplicate-bill.html:188
+#: .\templates\electricity-duplicate-bill.html:200
+#: .\templates\electricity-duplicate-bill.html:210
+#: .\templates\electricity-duplicate-bill.html:220
+#: .\templates\gas-bill-payment.html:140 .\templates\water-bill.html:94
+msgid "Bill Date:"
+msgstr "பில் தேதி:"
+
+#: .\templates\electricity-bill-payment.html:399
+#: .\templates\electricity-duplicate-bill.html:189
+#: .\templates\electricity-duplicate-bill.html:201
+#: .\templates\electricity-duplicate-bill.html:211
+#: .\templates\electricity-duplicate-bill.html:221
+#: .\templates\gas-bill-payment.html:145 .\templates\professional-tax.html:96
+#: .\templates\property-tax.html:100 .\templates\water-bill.html:98
+msgid "Due Date:"
+msgstr "கடைசி தேதி:"
+
+#: .\templates\electricity-bill-payment.html:400
+#: .\templates\water-bill.html:102
+msgid "Units Consumed:"
+msgstr "நுகரப்பட்ட அலகுகள்:"
+
+#: .\templates\electricity-bill-payment.html:402
+#: .\templates\gas-bill-payment.html:157 .\templates\professional-tax.html:113
+#: .\templates\property-tax.html:109 .\templates\water-bill.html:111
+msgid "Pay Now"
+msgstr "இப்போது செலுத்து"
+
+#: .\templates\electricity-bill-payment.html:415
+msgid "Enter consumer number"
+msgstr "நுகர்வோர் எண்ணை உள்ளிடவும்"
+
+#: .\templates\electricity-bill-payment.html:499
+#: .\templates\electricity-complaint.html:249
+#: .\templates\electricity-duplicate-bill.html:343
+msgid "Please enter a valid consumer number (minimum 6 digits)"
+msgstr "செல்லுபடியாகும் நுகர்வோர் எண்ணை உள்ளிடவும் (குறைந்தது 6 இலக்கங்கள்)"
+
+#: .\templates\electricity-bill-payment.html:544
+msgid "Pay"
+msgstr "செலுத்து"
+
+#: .\templates\electricity-complaint.html:6
+msgid "Electricity Complaint - Civic Kiosk"
+msgstr "மின்சார புகார் - சிவிக் கியோஸ்க்"
+
+#: .\templates\electricity-complaint.html:180
+#: .\templates\gas-complaint.html:307
+msgid "Lodge Complaint"
+msgstr "புகார் செய்யவும்"
+
+#: .\templates\electricity-complaint.html:191
+#: .\templates\electricity-meter-replacement.html:140
+#: .\templates\electricity-solar.html:316 .\templates\gas-complaint.html:318
+msgid "Consumer Number"
+msgstr "நுகர்வோர் எண்"
+
+#: .\templates\electricity-complaint.html:196
+#: .\templates\gas-complaint.html:323
+msgid "Complaint Type"
+msgstr "புகார் வகை"
+
+#: .\templates\electricity-complaint.html:198
+msgid "No Power"
+msgstr "மின்சாரம் இல்லை"
+
+#: .\templates\electricity-complaint.html:199
+msgid "Voltage Issue"
+msgstr "மின்னழுத்த பிரச்சினை"
+
+#: .\templates\electricity-complaint.html:200
+msgid "Meter Problem"
+msgstr "மீட்டர் பிரச்சினை"
+
+#: .\templates\electricity-complaint.html:201
+#: .\templates\gas-complaint.html:328
+msgid "Billing Issue"
+msgstr "பில்லிங் பிரச்சினை"
+
+#: .\templates\electricity-complaint.html:202
+msgid "Pole/Wire Issue"
+msgstr "கம்பம்/கம்பி பிரச்சினை"
+
+#: .\templates\electricity-complaint.html:208
+#: .\templates\gas-complaint.html:335
+msgid "Description"
+msgstr "விளக்கம்"
+
+#: .\templates\electricity-complaint.html:209
+msgid "Describe your complaint in detail..."
+msgstr "உங்கள் புகாரை விரிவாக விவரிக்கவும்..."
+
+#: .\templates\electricity-complaint.html:212
+#: .\templates\gas-complaint.html:339
+msgid "Submit Complaint"
+msgstr "புகாரை சமர்ப்பிக்கவும்"
+
+#: .\templates\electricity-complaint.html:220
+#: .\templates\gas-complaint.html:347
+msgid "Submitting..."
+msgstr "சமர்ப்பிக்கிறது..."
+
+#: .\templates\electricity-complaint.html:224
+#: .\templates\gas-complaint.html:351
+msgid "Type your complaint here..."
+msgstr "உங்கள் புகாரை இங்கே தட்டச்சு செய்யவும்..."
+
+#: .\templates\electricity-complaint.html:242
+msgid "Enter Consumer Number:"
+msgstr "நுகர்வோர் எண்ணை உள்ளிடவும்:"
+
+#: .\templates\electricity-complaint.html:288
+#: .\templates\electricity-duplicate-bill.html:285
+#: .\templates\electricity-name-transfer.html:396
+#: .\templates\electricity-new-connection.html:390
+#: .\templates\electricity-solar.html:384
+#: .\templates\gas-booking-status.html:440 .\templates\gas-complaint.html:396
+#: .\templates\gas-new-connection.html:253 .\templates\grievance.html:265
+msgid "Shift"
+msgstr "ஷிப்ட்"
+
+#: .\templates\electricity-complaint.html:349
+#: .\templates\gas-complaint.html:453
+msgid "Please describe your complaint"
+msgstr "உங்கள் புகாரை விவரிக்கவும்"
+
+#: .\templates\electricity-complaint.html:354
+msgid "Please enter a valid consumer number"
+msgstr "செல்லுபடியாகும் நுகர்வோர் எண்ணை உள்ளிடவும்"
+
+#: .\templates\electricity-duplicate-bill.html:6
+msgid "Duplicate Bill - Civic Kiosk"
+msgstr "நகல் பில் - சிவிக் கியோஸ்க்"
+
+#: .\templates\electricity-duplicate-bill.html:168
+#: .\templates\electricity-services.html:110
+msgid "Duplicate Bill"
+msgstr "நகல் பில்"
+
+#: .\templates\electricity-duplicate-bill.html:177
+#: .\templates\gas-subsidy.html:74 .\templates\water-bill.html:75
+msgid "Enter Consumer No."
+msgstr "நுகர்வோர் எண்ணை உள்ளிடவும்"
+
+#: .\templates\electricity-duplicate-bill.html:179
+#: .\templates\gas-booking-status.html:330
+#: .\templates\professional-tax.html:74
+msgid "Search"
+msgstr "தேடு"
+
+#: .\templates\electricity-duplicate-bill.html:192
+#: .\templates\electricity-duplicate-bill.html:204
+#: .\templates\electricity-duplicate-bill.html:214
+#: .\templates\electricity-duplicate-bill.html:224
+msgid "Download"
+msgstr "பதிவிறக்கு"
+
+#: .\templates\electricity-duplicate-bill.html:199
+#: .\templates\electricity-duplicate-bill.html:204
+msgid "February 2026"
+msgstr "பிப்ரவரி 2026"
+
+#: .\templates\electricity-duplicate-bill.html:209
+#: .\templates\electricity-duplicate-bill.html:214
+msgid "January 2026"
+msgstr "ஜனவரி 2026"
+
+#: .\templates\electricity-duplicate-bill.html:219
+#: .\templates\electricity-duplicate-bill.html:224
+msgid "December 2025"
+msgstr "டிசம்பர் 2025"
+
+#: .\templates\electricity-duplicate-bill.html:247
+msgid "Enter Consumer Number"
+msgstr "நுகர்வோர் எண்ணை உள்ளிடவும்"
+
+#: .\templates\electricity-duplicate-bill.html:367
+msgid "Downloading bill for"
+msgstr "பில் பதிவிறக்குகிறது"
+
+#: .\templates\electricity-load-enhancement.html:6
+msgid "Load Enhancement - Civic Kiosk"
+msgstr "சுமை மேம்பாடு - சிவிக் கியோஸ்க்"
+
+#: .\templates\electricity-load-enhancement.html:171
+#: .\templates\electricity-services.html:106
+msgid "Load Enhancement"
+msgstr "சுமை மேம்பாடு"
+
+#: .\templates\electricity-load-enhancement.html:184
+msgid "Current Load:"
+msgstr "தற்போதைய சுமை:"
+
+#: .\templates\electricity-load-enhancement.html:194
+msgid "Requested Load (kW)"
+msgstr "கோரப்பட்ட சுமை (கிலோவாட்)"
+
+#: .\templates\electricity-load-enhancement.html:195
+msgid "Enter new load (e.g., 5, 7.5)"
+msgstr "புதிய சுமையை உள்ளிடவும் (எ.கா., 5, 7.5)"
+
+#: .\templates\electricity-load-enhancement.html:200
+msgid "Reason for Enhancement"
+msgstr "மேம்பாட்டுக்கான காரணம்"
+
+#: .\templates\electricity-load-enhancement.html:202
+msgid "New Appliances"
+msgstr "புதிய உபகரணங்கள்"
+
+#: .\templates\electricity-load-enhancement.html:203
+msgid "Home Extension"
+msgstr "வீட்டு நீட்டிப்பு"
+
+#: .\templates\electricity-load-enhancement.html:204
+msgid "Commercial Activity"
+msgstr "வணிக நடவடிக்கை"
+
+#: .\templates\electricity-load-enhancement.html:210
+msgid "Estimated Cost"
+msgstr "மதிப்பிடப்பட்ட செலவு"
+
+#: .\templates\electricity-load-enhancement.html:211
+#: .\templates\electricity-load-enhancement.html:343
+#: .\templates\electricity-load-enhancement.html:345
+#: .\templates\electricity-meter-replacement.html:188
+msgid "Taxes"
+msgstr "வரிகள்"
+
+#: .\templates\electricity-load-enhancement.html:214
+msgid "Submit Request"
+msgstr "கோரிக்கையை சமர்ப்பிக்கவும்"
+
+#: .\templates\electricity-load-enhancement.html:226
+msgid "Enter load in kW"
+msgstr "கிலோவாட்டில் சுமையை உள்ளிடவும்"
+
+#: .\templates\electricity-load-enhancement.html:343
+msgid "Minimum charges"
+msgstr "குறைந்தபட்ச கட்டணங்கள்"
+
+#: .\templates\electricity-load-enhancement.html:372
+msgid "Please enter requested load"
+msgstr "தயவுசெய்து கோரப்பட்ட சுமையை உள்ளிடவும்"
+
+#: .\templates\electricity-load-enhancement.html:379
+#: .\templates\electricity-new-connection.html:485
+msgid "Please enter a valid load value (positive number)"
+msgstr "செல்லுபடியாகும் சுமை மதிப்பை உள்ளிடவும் (நேர்மறை எண்)"
+
+#: .\templates\electricity-load-enhancement.html:385
+msgid "Requested load must be greater than current load"
+msgstr "கோரப்பட்ட சுமை தற்போதைய சுமையை விட அதிகமாக இருக்க வேண்டும்"
+
+#: .\templates\electricity-load-enhancement.html:390
+msgid ""
+"Maximum load enhancement is 50 kW. Please contact commercial office for "
+"higher loads."
+msgstr "அதிகபட்ச சுமை மேம்பாடு 50 கிலோவாட் ஆகும். அதிக சுமைகளுக்கு வணிக அலுவலகத்தைத் தொடர்பு கொள்ளவும்."
+
+#: .\templates\electricity-meter-replacement.html:6
+msgid "Meter Replacement - Civic Kiosk"
+msgstr "மீட்டர் மாற்றீடு - சிவிக் கியோஸ்க்"
+
+#: .\templates\electricity-meter-replacement.html:127
+#: .\templates\electricity-services.html:108
+msgid "Meter Replacement"
+msgstr "மீட்டர் மாற்றீடு"
+
+#: .\templates\electricity-meter-replacement.html:145
+msgid "Reason for Replacement"
+msgstr "மாற்றீட்டுக்கான காரணம்"
+
+#: .\templates\electricity-meter-replacement.html:147
+msgid "Meter faulty/not working"
+msgstr "மீட்டர் கோளாறு/வேலை செய்யவில்லை"
+
+#: .\templates\electricity-meter-replacement.html:148
+msgid "Meter damaged"
+msgstr "மீட்டர் சேதமடைந்தது"
+
+#: .\templates\electricity-meter-replacement.html:149
+msgid "Upgrade to smart meter"
+msgstr "ஸ்மார்ட் மீட்டருக்கு மேம்படுத்தவும்"
+
+#: .\templates\electricity-meter-replacement.html:150
+msgid "Meter showing error"
+msgstr "மீட்டரில் பிழை காட்டுகிறது"
+
+#: .\templates\electricity-meter-replacement.html:151
+msgid "Meter stolen"
+msgstr "மீட்டர் திருடப்பட்டது"
+
+#: .\templates\electricity-meter-replacement.html:157
+msgid "Select Meter Type"
+msgstr "மீட்டர் வகையைத் தேர்ந்தெடுக்கவும்"
+
+#: .\templates\electricity-meter-replacement.html:160
+msgid "Single Phase"
+msgstr "சிங்கிள் பேஸ்"
+
+#: .\templates\electricity-meter-replacement.html:164
+msgid "Three Phase"
+msgstr "த்ரீ பேஸ்"
+
+#: .\templates\electricity-meter-replacement.html:168
+msgid "Smart Meter"
+msgstr "ஸ்மார்ட் மீட்டர்"
+
+#: .\templates\electricity-meter-replacement.html:172
+msgid "CT Meter"
+msgstr "CT மீட்டர்"
+
+#: .\templates\electricity-meter-replacement.html:179
+msgid "Preferred Date"
+msgstr "விருப்பமான தேதி"
+
+#: .\templates\electricity-meter-replacement.html:186
+msgid "Estimated Total"
+msgstr "மதிப்பிடப்பட்ட மொத்தம்"
+
+#: .\templates\electricity-meter-replacement.html:192
+msgid "Request Replacement"
+msgstr "மாற்றீட்டைக் கோருங்கள்"
+
+#: .\templates\electricity-meter-replacement.html:242
+msgid "Please select a preferred date"
+msgstr "விருப்பமான தேதியைத் தேர்ந்தெடுக்கவும்"
+
+#: .\templates\electricity-meter-replacement.html:252
+msgid "Preferred date cannot be in the past"
+msgstr "விருப்பமான தேதி கடந்த காலத்தில் இருக்க முடியாது"
+
+#: .\templates\electricity-name-transfer.html:6
+msgid "Name Transfer - Civic Kiosk"
+msgstr "பெயர் மாற்றம் - சிவிக் கியோஸ்க்"
+
+#: .\templates\electricity-name-transfer.html:303
+#: .\templates\electricity-services.html:107
+msgid "Name Transfer"
+msgstr "பெயர் மாற்றம்"
+
+#: .\templates\electricity-name-transfer.html:306
+msgid "Current Owner:"
+msgstr "தற்போதைய உரிமையாளர்:"
+
+#: .\templates\electricity-name-transfer.html:308
+#: .\templates\gas-consumer-lookup.html:108
+msgid "Address:"
+msgstr "முகவரி:"
+
+#: .\templates\electricity-name-transfer.html:312
+msgid "Required Documents: Sale Deed, NOC, ID Proof, Address Proof"
+msgstr "தேவையான ஆவணங்கள்: விற்பனைப் பத்திரம், NOC, அடையாளச் சான்று, முகவரிச் சான்று"
+
+#: .\templates\electricity-name-transfer.html:325
+msgid "New Owner Name"
+msgstr "புதிய உரிமையாளரின் பெயர்"
+
+#: .\templates\electricity-name-transfer.html:326
+msgid "Enter new owner name"
+msgstr "புதிய உரிமையாளரின் பெயரை உள்ளிடவும்"
+
+#: .\templates\electricity-name-transfer.html:331
+msgid "New Owner Aadhaar"
+msgstr "புதிய உரிமையாளரின் ஆதார்"
+
+#: .\templates\electricity-name-transfer.html:332
+msgid "12 digit Aadhaar"
+msgstr "12 இலக்க ஆதார்"
+
+#: .\templates\electricity-name-transfer.html:337
+msgid "Relationship"
+msgstr "உறவு"
+
+#: .\templates\electricity-name-transfer.html:339
+msgid "Purchaser"
+msgstr "வாங்குபவர்"
+
+#: .\templates\electricity-name-transfer.html:340
+msgid "Family Member"
+msgstr "குடும்ப உறுப்பினர்"
+
+#: .\templates\electricity-name-transfer.html:341
+msgid "Legal Heir"
+msgstr "சட்ட வாரிசு"
+
+#: .\templates\electricity-name-transfer.html:346
+msgid "Submit Transfer Request"
+msgstr "மாற்றக் கோரிக்கையை சமர்ப்பிக்கவும்"
+
+#: .\templates\electricity-name-transfer.html:467
+msgid "Please enter new owner name"
+msgstr "புதிய உரிமையாளரின் பெயரை உள்ளிடவும்"
+
+#: .\templates\electricity-name-transfer.html:472
+msgid "Please enter new owner Aadhaar number"
+msgstr "புதிய உரிமையாளரின் ஆதார் எண்ணை உள்ளிடவும்"
+
+#: .\templates\electricity-name-transfer.html:479
+msgid "Please enter a valid 12-digit Aadhaar number"
+msgstr "செல்லுபடியாகும் 12-இலக்க ஆதார் எண்ணை உள்ளிடவும்"
+
+#: .\templates\electricity-new-connection.html:6
+msgid "New Electricity Connection - Civic Kiosk"
+msgstr "புதிய மின்சார இணைப்பு - சிவிக் கியோஸ்க்"
+
+#: .\templates\electricity-new-connection.html:293
+msgid "New Electricity Connection"
+msgstr "புதிய மின்சார இணைப்பு"
+
+#: .\templates\electricity-new-connection.html:294
+#: .\templates\gas-new-connection.html:176
+msgid "Your data is secure"
+msgstr "உங்கள் தரவு பாதுகாப்பானது"
+
+#: .\templates\electricity-new-connection.html:307
+#: .\templates\gas-new-connection.html:182
+#: .\templates\marriage-registration.html:113
+#: .\templates\marriage-registration.html:134
+msgid "Full Name"
+msgstr "முழுப்பெயர்"
+
+#: .\templates\electricity-new-connection.html:308
+msgid "Enter your full name"
+msgstr "உங்கள் முழுப்பெயரை உள்ளிடவும்"
+
+#: .\templates\electricity-new-connection.html:313
+#: .\templates\gas-new-connection.html:187
+msgid "Address"
+msgstr "முகவரி"
+
+#: .\templates\electricity-new-connection.html:314
+#: .\templates\trade-license.html:89
+msgid "Enter complete address"
+msgstr "முழுமையான முகவரியை உள்ளிடவும்"
+
+#: .\templates\electricity-new-connection.html:319
+msgid "Property Type"
+msgstr "சொத்து வகை"
+
+#: .\templates\electricity-new-connection.html:324
+msgid "Agricultural"
+msgstr "விவசாய"
+
+#: .\templates\electricity-new-connection.html:329
+msgid "Load Required (kW)"
+msgstr "தேவையான சுமை (கிலோவாட்)"
+
+#: .\templates\electricity-new-connection.html:330
+msgid "e.g., 5"
+msgstr "எ.கா., 5"
+
+#: .\templates\electricity-new-connection.html:335
+#: .\templates\gas-new-connection.html:192 .\templates\grievance.html:207
+msgid "Mobile Number"
+msgstr "மொபைல் எண்"
+
+#: .\templates\electricity-new-connection.html:336
+msgid "10 digit mobile"
+msgstr "10 இலக்க மொபைல்"
+
+#: .\templates\electricity-new-connection.html:469
+msgid "Please enter your full name"
+msgstr "உங்கள் முழுப்பெயரை உள்ளிடவும்"
+
+#: .\templates\electricity-new-connection.html:474
+msgid "Please enter your address"
+msgstr "உங்கள் முகவரியை உள்ளிடவும்"
+
+#: .\templates\electricity-new-connection.html:479
+msgid "Please enter load required"
+msgstr "தேவையான சுமையை உள்ளிடவும்"
+
+#: .\templates\electricity-new-connection.html:490
+msgid "Please enter mobile number"
+msgstr "மொபைல் எண்ணை உள்ளிடவும்"
+
+#: .\templates\electricity-new-connection.html:496
+msgid "Please enter a valid 10-digit mobile number"
+msgstr "செல்லுபடியாகும் 10-இலக்க மொபைல் எண்ணை உள்ளிடவும்"
+
+#: .\templates\electricity-services.html:4
+msgid "Electricity Services - Civic Kiosk"
+msgstr "மின்சார சேவைகள் - சிவிக் கியோஸ்க்"
+
+#: .\templates\electricity-services.html:100
+msgid "Electricity Services"
+msgstr "மின்சார சேவைகள்"
+
+#: .\templates\electricity-services.html:103 .\templates\gas-services.html:65
+msgid "Bill Payment"
+msgstr "பில் கட்டணம்"
+
+#: .\templates\electricity-services.html:104 .\templates\gas-services.html:63
+msgid "New Connection"
+msgstr "புதிய இணைப்பு"
+
+#: .\templates\electricity-services.html:105 .\templates\gas-services.html:66
+msgid "Complaint"
+msgstr "புகார்"
+
+#: .\templates\electricity-services.html:109
+#: .\templates\electricity-solar.html:298
+msgid "Solar Net Metering"
+msgstr "சோலார் நெட் மீட்டரிங்"
+
+#: .\templates\electricity-solar.html:65
+msgid "Solar Net Metering - Civic Kiosk"
+msgstr "சோலார் நெட் மீட்டரிங் - சிவிக் கியோஸ்க்"
+
+#: .\templates\electricity-solar.html:301
+msgid "Government Subsidy Available!"
+msgstr "அரசு மானியம் கிடைக்கிறது!"
+
+#: .\templates\electricity-solar.html:302
+#, python-format
+msgid "Up to 40%% subsidy on solar installations for residential consumers."
+msgstr "குடியிருப்பு நுகர்வோருக்கு சோலார் நிறுவல்களில் 40%% வரை மானியம்."
+
+#: .\templates\electricity-solar.html:306
+msgid "₹8,000/yr"
+msgstr "₹8,000/ஆண்டு"
+
+#: .\templates\electricity-solar.html:306
+msgid "Estimated Savings"
+msgstr "மதிப்பிடப்பட்ட சேமிப்பு"
+
+#: .\templates\electricity-solar.html:307
+msgid "5-7 years"
+msgstr "5-7 ஆண்டுகள்"
+
+#: .\templates\electricity-solar.html:307
+msgid "Payback Period"
+msgstr "திரும்பப் பெறும் காலம்"
+
+#: .\templates\electricity-solar.html:308
+msgid "25 years"
+msgstr "25 ஆண்டுகள்"
+
+#: .\templates\electricity-solar.html:308
+msgid "Panel Life"
+msgstr "பேனல் ஆயுள்"
+
+#: .\templates\electricity-solar.html:309
+#, python-format
+msgid "40%%"
+msgstr "40%%"
+
+#: .\templates\electricity-solar.html:309 .\templates\gas-services.html:64
+msgid "Subsidy"
+msgstr "மானியம்"
+
+#: .\templates\electricity-solar.html:321
+msgid "Proposed Solar Capacity (kW)"
+msgstr "முன்மொழியப்பட்ட சோலார் திறன் (கிலோவாட்)"
+
+#: .\templates\electricity-solar.html:328
+msgid "Above 5 kW"
+msgstr "5 கிலோவாட்டுக்கு மேல்"
+
+#: .\templates\electricity-solar.html:333
+msgid "Roof Area Available (sq ft)"
+msgstr "கிடைக்கும் கூரை பகுதி (ச.அடி)"
+
+#: .\templates\electricity-solar.html:334
+msgid "e.g., 500"
+msgstr "எ.கா., 500"
+
+#: .\templates\electricity-solar.html:338
+msgid "Estimated Cost (After Subsidy)"
+msgstr "மதிப்பிடப்பட்ட செலவு (மானியத்திற்குப் பிறகு)"
+
+#: .\templates\electricity-solar.html:339
+msgid "₹ 45,000 - ₹ 2,10,000"
+msgstr "₹ 45,000 - ₹ 2,10,000"
+
+#: .\templates\electricity-solar.html:342
+msgid "Apply for Net Metering"
+msgstr "நெட் மீட்டரிங்கிற்கு விண்ணப்பிக்கவும்"
+
+#: .\templates\electricity-solar.html:442
+msgid "Solar net metering application submitted! Reference:"
+msgstr "சோலார் நெட் மீட்டரிங் விண்ணப்பம் சமர்ப்பிக்கப்பட்டது! குறிப்பு:"
+
+#: .\templates\electricity-solar.html:445
+msgid "Error:"
+msgstr "பிழை:"
+
+#: .\templates\electricity-solar.html:450
+msgid "Solar net metering application submitted! Reference: SOLAR"
+msgstr "சோலார் நெட் மீட்டரிங் விண்ணப்பம் சமர்ப்பிக்கப்பட்டது! குறிப்பு: SOLAR"
+
+#: .\templates\gas-bill-payment.html:73
+msgid "Gas Bill Payment - Civic Kiosk"
+msgstr "எரிவாயு பில் கட்டணம் - சிவிக் கியோஸ்க்"
+
+#: .\templates\gas-bill-payment.html:120
+msgid "Gas Bill Payment"
+msgstr "எரிவாயு பில் கட்டணம்"
+
+#: .\templates\gas-bill-payment.html:128
+msgid "Consumer Number:"
+msgstr "நுகர்வோர் எண்:"
+
+#: .\templates\gas-bill-payment.html:150
+msgid "Period:"
+msgstr "காலம்:"
+
+#: .\templates\gas-bill-payment.html:151
+msgid "Jan 2026"
+msgstr "ஜன 2026"
+
+#: .\templates\gas-booking-status.html:6
+msgid "Gas Booking Status - Civic Kiosk"
+msgstr "எரிவாயு பதிவு நிலை - சிவிக் கியோஸ்க்"
+
+#: .\templates\gas-booking-status.html:319 .\templates\gas-services.html:68
+msgid "Booking Status"
+msgstr "பதிவு நிலை"
+
+#: .\templates\gas-booking-status.html:328
+msgid "Enter Reference No. (e.g., CYL251234)"
+msgstr "குறிப்பு எண்ணை உள்ளிடவும் (எ.கா., CYL251234)"
+
+#: .\templates\gas-booking-status.html:335
+msgid "Booking #"
+msgstr "பதிவு #"
+
+#: .\templates\gas-booking-status.html:340
+#: .\templates\gas-booking-status.html:375
+msgid "Booked"
+msgstr "பதிவு செய்யப்பட்டது"
+
+#: .\templates\gas-booking-status.html:344
+#: .\templates\gas-booking-status.html:376
+msgid "Processed"
+msgstr "செயலாக்கப்பட்டது"
+
+#: .\templates\gas-booking-status.html:348
+#: .\templates\gas-booking-status.html:377
+msgid "Out for Delivery"
+msgstr "டெலிவரிக்கு வெளியே"
+
+#: .\templates\gas-booking-status.html:352
+#: .\templates\gas-booking-status.html:378
+msgid "Delivered"
+msgstr "டெலிவர் செய்யப்பட்டது"
+
+#: .\templates\gas-booking-status.html:357
+#: .\templates\gas-booking-status.html:382
+msgid "Booked on:"
+msgstr "பதிவு செய்யப்பட்ட தேதி:"
+
+#: .\templates\gas-booking-status.html:358
+#: .\templates\gas-booking-status.html:383
+msgid "Expected delivery:"
+msgstr "எதிர்பார்க்கப்படும் டெலிவரி:"
+
+#: .\templates\gas-booking-status.html:360
+#: .\templates\gas-booking-status.html:384
+msgid "Delivery person:"
+msgstr "டெலிவரி நபர்:"
+
+#: .\templates\gas-booking-status.html:363
+msgid "Delivered on:"
+msgstr "டெலிவர் செய்யப்பட்ட தேதி:"
+
+#: .\templates\gas-booking-status.html:372
+msgid "Booking #CYL251234"
+msgstr "பதிவு #CYL251234"
+
+#: .\templates\gas-booking-status.html:383
+msgid "Today (25 Feb) by 6 PM"
+msgstr "இன்று (25 பிப்) மாலை 6 மணிக்குள்"
+
+#: .\templates\gas-booking-status.html:388
+msgid "Domestic Cylinder"
+msgstr "வீட்டு உபயோக சிலிண்டர்"
+
+#: .\templates\gas-booking-status.html:399
+msgid "Searching..."
+msgstr "தேடுகிறது..."
+
+#: .\templates\gas-booking-status.html:403
+msgid "Enter reference number"
+msgstr "குறிப்பு எண்ணை உள்ளிடவும்"
+
+#: .\templates\gas-booking-status.html:495
+msgid "Please enter reference number"
+msgstr "குறிப்பு எண்ணை உள்ளிடவும்"
+
+#: .\templates\gas-complaint.html:6
+msgid "Gas Complaint - Civic Kiosk"
+msgstr "எரிவாயு புகார் - சிவிக் கியோஸ்க்"
+
+#: .\templates\gas-complaint.html:325
+msgid "Gas Leakage"
+msgstr "எரிவாயு கசிவு"
+
+#: .\templates\gas-complaint.html:326
+msgid "Cylinder Issue"
+msgstr "சிலிண்டர் பிரச்சினை"
+
+#: .\templates\gas-complaint.html:327
+msgid "Regulator Fault"
+msgstr "ரெகுலேட்டர் கோளாறு"
+
+#: .\templates\gas-complaint.html:329
+msgid "Delivery Delay"
+msgstr "டெலிவரி தாமதம்"
+
+#: .\templates\gas-complaint.html:336
+msgid "Describe your complaint in detail"
+msgstr "உங்கள் புகாரை விரிவாக விவரிக்கவும்"
+
+#: .\templates\gas-complaint.html:458
+msgid "Please provide a more detailed description (minimum 10 characters)"
+msgstr "மேலும் விரிவான விளக்கத்தை வழங்கவும் (குறைந்தது 10 எழுத்துகள்)"
+
+#: .\templates\gas-consumer-lookup.html:4
+msgid "Consumer Lookup - Civic Kiosk"
+msgstr "நுகர்வோர் தேடல் - சிவிக் கியோஸ்க்"
+
+#: .\templates\gas-consumer-lookup.html:72 .\templates\gas-services.html:69
+msgid "Consumer Lookup"
+msgstr "நுகர்வோர் தேடல்"
+
+#: .\templates\gas-consumer-lookup.html:76
+msgid "Enter Aadhaar Number"
+msgstr "ஆதார் எண்ணை உள்ளிடவும்"
+
+#: .\templates\gas-consumer-lookup.html:95
+msgid "Lookup Consumer"
+msgstr "நுகர்வோரைத் தேடு"
+
+#: .\templates\gas-consumer-lookup.html:104
+#: .\templates\professional-tax.html:84 .\templates\water-bill.html:86
+msgid "Name:"
+msgstr "பெயர்:"
+
+#: .\templates\gas-consumer-lookup.html:112
+msgid "Distributor:"
+msgstr "விநியோகஸ்தர்:"
+
+#: .\templates\gas-consumer-lookup.html:125
+msgid "Last Booking:"
+msgstr "கடைசி பதிவு:"
+
+#: .\templates\gas-consumer-lookup.html:191
+msgid "Please enter complete 12-digit Aadhaar"
+msgstr "முழுமையான 12-இலக்க ஆதாரை உள்ளிடவும்"
+
+#: .\templates\gas-cylinder-booking.html:4
+msgid "Cylinder Booking - Civic Kiosk"
+msgstr "சிலிண்டர் பதிவு - சிவிக் கியோஸ்க்"
+
+#: .\templates\gas-cylinder-booking.html:276
+msgid "Book Cylinder"
+msgstr "சிலிண்டரைப் பதிவு செய்யவும்"
+
+#: .\templates\gas-cylinder-booking.html:287 .\templates\gas-subsidy.html:85
+msgid "Subsidy Status:"
+msgstr "மானிய நிலை:"
+
+#: .\templates\gas-cylinder-booking.html:289 .\templates\gas-subsidy.html:87
+msgid "Active"
+msgstr "செயலில்"
+
+#: .\templates\gas-cylinder-booking.html:289 .\templates\gas-subsidy.html:89
+msgid "Inactive"
+msgstr "செயலற்றது"
+
+#: .\templates\gas-cylinder-booking.html:294
+msgid "Remaining Subsidies:"
+msgstr "மீதமுள்ள மானியங்கள்:"
+
+#: .\templates\gas-cylinder-booking.html:295
+msgid "cylinders"
+msgstr "சிலிண்டர்கள்"
+
+#: .\templates\gas-cylinder-booking.html:300
+msgid "Select Cylinder Type"
+msgstr "சிலிண்டர் வகையைத் தேர்ந்தெடுக்கவும்"
+
+#: .\templates\gas-cylinder-booking.html:308
+#: .\templates\gas-cylinder-booking.html:314
+msgid "Subsidized"
+msgstr "மானியம் பெற்ற"
+
+#: .\templates\gas-cylinder-booking.html:313
+#: .\templates\gas-cylinder-booking.html:317
+msgid "Domestic"
+msgstr "வீட்டு உபயோக"
+
+#: .\templates\gas-cylinder-booking.html:330
+msgid "Book Now"
+msgstr "இப்போது பதிவு செய்யவும்"
+
+#: .\templates\gas-cylinder-booking.html:347
+msgid "Book"
+msgstr "பதிவு செய்"
+
+#: .\templates\gas-cylinder-booking.html:347
+msgid "cylinder for ₹"
+msgstr "₹-க்கு சிலிண்டர்"
+
+#: .\templates\gas-new-connection.html:4
+msgid "New Gas Connection - Civic Kiosk"
+msgstr "புதிய எரிவாயு இணைப்பு - சிவிக் கியோஸ்க்"
+
+#: .\templates\gas-new-connection.html:175
+msgid "New Gas Connection"
+msgstr "புதிய எரிவாயு இணைப்பு"
+
+#: .\templates\gas-new-connection.html:183
+msgid "Enter Full Name"
+msgstr "முழுப்பெயரை உள்ளிடவும்"
+
+#: .\templates\gas-new-connection.html:188
+msgid "Enter Address"
+msgstr "முகவரியை உள்ளிடவும்"
+
+#: .\templates\gas-new-connection.html:193
+msgid "Enter Mobile Number"
+msgstr "மொபைல் எண்ணை உள்ளிடவும்"
+
+#: .\templates\gas-new-connection.html:193 .\templates\grievance.html:208
+msgid "Please enter 10-digit mobile number"
+msgstr "10-இலக்க மொபைல் எண்ணை உள்ளிடவும்"
+
+#: .\templates\gas-new-connection.html:197
+msgid "Document Type"
+msgstr "ஆவண வகை"
+
+#: .\templates\gas-new-connection.html:199
+msgid "Select Document Type"
+msgstr "ஆவண வகையைத் தேர்ந்தெடுக்கவும்"
+
+#: .\templates\gas-new-connection.html:200
+msgid "Aadhaar Card"
+msgstr "ஆதார் அட்டை"
+
+#: .\templates\gas-new-connection.html:201
+msgid "Voter ID"
+msgstr "வாக்காளர் அடையாள அட்டை"
+
+#: .\templates\gas-new-connection.html:202
+msgid "Passport"
+msgstr "கடவுச்சீட்டு"
+
+#: .\templates\gas-new-connection.html:203
+msgid "Driving License"
+msgstr "ஓட்டுநர் உரிமம்"
+
+#: .\templates\gas-new-connection.html:305 .\templates\grievance.html:322
+msgid "Please fill all required fields"
+msgstr "தேவையான அனைத்து புலங்களையும் நிரப்பவும்"
+
+#: .\templates\gas-services.html:4
+msgid "Gas Services - Civic Kiosk"
+msgstr "எரிவாயு சேவைகள் - சிவிக் கியோஸ்க்"
+
+#: .\templates\gas-services.html:61
+msgid "Gas Services"
+msgstr "எரிவாயு சேவைகள்"
+
+#: .\templates\gas-services.html:67
+msgid "Cylinder Booking"
+msgstr "சிலிண்டர் பதிவு"
+
+#: .\templates\gas-services.html:80
+msgid "Active Consumer:"
+msgstr "செயலில் உள்ள நுகர்வோர்:"
+
+#: .\templates\gas-subsidy.html:4
+msgid "Gas Subsidy - Civic Kiosk"
+msgstr "எரிவாயு மானியம் - சிவிக் கியோஸ்க்"
+
+#: .\templates\gas-subsidy.html:69
+msgid "Subsidy Management"
+msgstr "மானிய மேலாண்மை"
+
+#: .\templates\gas-subsidy.html:76
+msgid "Check Subsidy"
+msgstr "மானியத்தைச் சரிபார்க்கவும்"
+
+#: .\templates\gas-subsidy.html:93
+msgid "Subsidy Amount:"
+msgstr "மானியத் தொகை:"
+
+#: .\templates\gas-subsidy.html:94 .\templates\gas-subsidy.html:111
+#: .\templates\professional-tax.html:101 .\templates\professional-tax.html:105
+#: .\templates\professional-tax.html:107 .\templates\property-tax.html:103
+#: .\templates\receipt-print.html:109 .\templates\trade-license.html:98
+#: .\templates\trade-license.html:107 .\templates\water-bill.html:105
+msgid "₹"
+msgstr "₹"
+
+#: .\templates\gas-subsidy.html:94
+msgid "per cylinder"
+msgstr "ஒரு சிலிண்டருக்கு"
+
+#: .\templates\gas-subsidy.html:97
+msgid "Cylinders/Year:"
+msgstr "சிலிண்டர்கள்/ஆண்டு:"
+
+#: .\templates\gas-subsidy.html:98
+msgid "remaining"
+msgstr "மீதமுள்ள"
+
+#: .\templates\gas-subsidy.html:101
+msgid "Next Eligibility:"
+msgstr "அடுத்த தகுதி:"
+
+#: .\templates\gas-subsidy.html:105
+msgid "Bank Account:"
+msgstr "வங்கிக் கணக்கு:"
+
+#: .\templates\gas-subsidy.html:110
+msgid "Last Subsidy:"
+msgstr "கடைசி மானியம்:"
+
+#: .\templates\gas-subsidy.html:111
+msgid "on"
+msgstr "அன்று"
+
+#: .\templates\gas-subsidy.html:116
+msgid "Last updated:"
+msgstr "கடைசியாகப் புதுப்பிக்கப்பட்டது:"
+
+#: .\templates\gas-subsidy.html:134 .\templates\water-bill.html:122
+msgid "Please enter consumer number"
+msgstr "நுகர்வோர் எண்ணை உள்ளிடவும்"
+
+#: .\templates\grievance.html:4
+msgid "Grievance - Civic Kiosk"
+msgstr "மனு - சிவிக் கியோஸ்க்"
+
+#: .\templates\grievance.html:183
+msgid "Lodge Grievance"
+msgstr "மனு செய்யவும்"
+
+#: .\templates\grievance.html:189
+msgid "Department"
+msgstr "துறை"
+
+#: .\templates\grievance.html:191 .\templates\payment-history.html:81
+msgid "Water"
+msgstr "நீர்"
+
+#: .\templates\grievance.html:192
+msgid "Sewage"
+msgstr "கழிவுநீர்"
+
+#: .\templates\grievance.html:193
+msgid "Roads"
+msgstr "சாலைகள்"
+
+#: .\templates\grievance.html:194
+msgid "Street Light"
+msgstr "தெரு விளக்கு"
+
+#: .\templates\grievance.html:195
+msgid "Garbage"
+msgstr "குப்பை"
+
+#: .\templates\grievance.html:202
+msgid "Your Name"
+msgstr "உங்கள் பெயர்"
+
+#: .\templates\grievance.html:212
+msgid "Address/Location"
+msgstr "முகவரி/இருப்பிடம்"
+
+#: .\templates\grievance.html:217
+msgid "Grievance Description"
+msgstr "மனு விளக்கம்"
+
+#: .\templates\grievance.html:221
+msgid "Submit Grievance"
+msgstr "மனுவை சமர்ப்பிக்கவும்"
+
+#: .\templates\index.html:36
+msgid "Civic Services Kiosk - Language"
+msgstr "சிவிக் சேவைகள் கியோஸ்க் - மொழி"
+
+#: .\templates\index.html:235
+msgid "भाषा चुनें"
+msgstr "भाषा चुनें"
+
+#: .\templates\index.html:235
+msgid "Select Language"
+msgstr "மொழியைத் தேர்ந்தெடுக்கவும்"
+
+#: .\templates\index.html:237
+msgid "English"
+msgstr "ஆங்கிலம்"
+
+#: .\templates\index.html:238
+msgid "हिंदी"
+msgstr "हिंदी"
+
+#: .\templates\index.html:239
+msgid "ଓଡ଼ିଆ"
+msgstr "ଓଡ଼ିଆ"
+
+#: .\templates\index.html:240
+msgid "বাংলা"
+msgstr "বাংলা"
+
+#: .\templates\index.html:241
+msgid "தமிழ்"
+msgstr "தமிழ்"
+
+#: .\templates\index.html:242
+msgid "తెలుగు"
+msgstr "తెలుగు"
+
+#: .\templates\marriage-registration.html:4
+msgid "Marriage Registration - Kiosk"
+msgstr "திருமணப் பதிவு - கியோஸ்க்"
+
+#: .\templates\marriage-registration.html:103
+#: .\templates\municipal-services.html:68 .\templates\payment-history.html:101
+msgid "Marriage Registration"
+msgstr "திருமணப் பதிவு"
+
+#: .\templates\marriage-registration.html:111
+msgid "Groom Details"
+msgstr "மணமகன் விவரங்கள்"
+
+#: .\templates\marriage-registration.html:121
+#: .\templates\marriage-registration.html:142
+msgid "Aadhaar"
+msgstr "ஆதார்"
+
+#: .\templates\marriage-registration.html:122
+#: .\templates\marriage-registration.html:143
+msgid "Please enter 12-digit Aadhaar number"
+msgstr "12-இலக்க ஆதார் எண்ணை உள்ளிடவும்"
+
+#: .\templates\marriage-registration.html:132
+msgid "Bride Details"
+msgstr "மணமகள் விவரங்கள்"
+
+#: .\templates\marriage-registration.html:153
+msgid "Marriage Details"
+msgstr "திருமண விவரங்கள்"
+
+#: .\templates\marriage-registration.html:156
+msgid "Date"
+msgstr "தேதி"
+
+#: .\templates\marriage-registration.html:160
+msgid "Place"
+msgstr "இடம்"
+
+#: .\templates\marriage-registration.html:164
+msgid "Type"
+msgstr "வகை"
+
+#: .\templates\marriage-registration.html:166
+msgid "Select Type"
+msgstr "வகையைத் தேர்ந்தெடுக்கவும்"
+
+#: .\templates\marriage-registration.html:167
+msgid "Hindu Marriage Act"
+msgstr "இந்து திருமணச் சட்டம்"
+
+#: .\templates\marriage-registration.html:168
+msgid "Special Marriage Act"
+msgstr "சிறப்பு திருமணச் சட்டம்"
+
+#: .\templates\marriage-registration.html:169
+msgid "Muslim Personal Law"
+msgstr "முஸ்லிம் தனிநபர் சட்டம்"
+
+#: .\templates\marriage-registration.html:170
+msgid "Christian Marriage Act"
+msgstr "கிறிஸ்தவ திருமணச் சட்டம்"
+
+#: .\templates\marriage-registration.html:177
+msgid "Witness 1 Name"
+msgstr "சாட்சி 1 பெயர்"
+
+#: .\templates\marriage-registration.html:181
+msgid "Witness 2 Name"
+msgstr "சாட்சி 2 பெயர்"
+
+#: .\templates\marriage-registration.html:189
+msgid "Register Marriage"
+msgstr "திருமணத்தைப் பதிவு செய்யவும்"
+
+#: .\templates\menu.html:64
+msgid "Civic Services Kiosk - Main Menu"
+msgstr "சிவிக் சேவைகள் கியோஸ்க் - முதன்மை மெனு"
+
+#: .\templates\menu.html:655
+msgid "Session about to expire"
+msgstr "அமர்வு காலாவதியாக உள்ளது"
+
+#: .\templates\menu.html:656
+msgid "Continue Session"
+msgstr "அமர்வைத் தொடரவும்"
+
+#: .\templates\menu.html:673
+msgid "सेवाएं / Services"
+msgstr "सेवाएं / சேவைகள்"
+
+#: .\templates\menu.html:674
+msgid "आपका आधार सुरक्षित रूप से कनेक्ट है"
+msgstr "உங்கள் ஆதார் பாதுகாப்பாக இணைக்கப்பட்டுள்ளது"
+
+#: .\templates\menu.html:679 .\templates\payment-history.html:79
+msgid "Gas"
+msgstr "எரிவாயு"
+
+#: .\templates\menu.html:684 .\templates\payment-history.html:80
+msgid "Electricity"
+msgstr "மின்சாரம்"
+
+#: .\templates\menu.html:689 .\templates\payment-history.html:82
+msgid "Municipal"
+msgstr "நகராட்சி"
+
+#: .\templates\menu.html:694
+msgid "Transport"
+msgstr "போக்குவரத்து"
+
+#: .\templates\menu.html:699
+msgid "Revenue"
+msgstr "வருவாய்"
+
+#: .\templates\menu.html:704
+msgid "Status"
+msgstr "நிலை"
+
+#: .\templates\menu.html:819
+msgid "Listening..."
+msgstr "கேட்கிறது..."
+
+#: .\templates\municipal-services.html:4
+msgid "Municipal Services - Civic Kiosk"
+msgstr "நகராட்சி சேவைகள் - சிவிக் கியோஸ்க்"
+
+#: .\templates\municipal-services.html:61
+msgid "Municipal Services"
+msgstr "நகராட்சி சேவைகள்"
+
+#: .\templates\municipal-services.html:63 .\templates\payment-history.html:96
+#: .\templates\property-tax.html:68
+msgid "Property Tax"
+msgstr "சொத்து வரி"
+
+#: .\templates\municipal-services.html:64 .\templates\payment-history.html:95
+#: .\templates\water-bill.html:70
+msgid "Water Bill"
+msgstr "நீர் கட்டணம்"
+
+#: .\templates\municipal-services.html:65 .\templates\payment-history.html:98
+#: .\templates\trade-license.html:64
+msgid "Trade License"
+msgstr "வர்த்தக உரிமம்"
+
+#: .\templates\municipal-services.html:69
+msgid "Building Plan"
+msgstr "கட்டிடத் திட்டம்"
+
+#: .\templates\municipal-services.html:70
+msgid "Grievance"
+msgstr "மனு"
+
+#: .\templates\municipal-services.html:71 .\templates\payment-history.html:97
+#: .\templates\professional-tax.html:68
+msgid "Professional Tax"
+msgstr "தொழில் வரி"
+
+#: .\templates\otp.html:34
+msgid "Civic Services Kiosk - OTP Verification"
+msgstr "சிவிக் சேவைகள் கியோஸ்க் - OTP சரிபார்ப்பு"
+
+#: .\templates\otp.html:443
+msgid "Verify OTP for"
+msgstr "க்கான OTP-ஐ சரிபார்க்கவும்"
+
+#: .\templates\otp.html:447
+msgid "Sending OTP..."
+msgstr "OTP அனுப்பப்படுகிறது..."
+
+#: .\templates\otp.html:462
+msgid "Enter 6-digit OTP"
+msgstr "6-இலக்க OTP-ஐ உள்ளிடவும்"
+
+#: .\templates\otp.html:488
+msgid "Verify"
+msgstr "சரிபார்"
+
+#: .\templates\otp.html:494
+msgid "Resend OTP"
+msgstr "OTP-ஐ மீண்டும் அனுப்பு"
+
+#: .\templates\otp.html:643
+msgid "Please enter 6-digit OTP"
+msgstr "6-இலக்க OTP-ஐ உள்ளிடவும்"
+
+#: .\templates\otp.html:673
+msgid "OTP expired. Please request a new one."
+msgstr "OTP காலாவதியானது. புதியதைக் கோரவும்."
+
+#: .\templates\payment-history.html:4
+msgid "Payment History - Civic Kiosk"
+msgstr "கட்டண வரலாறு - சிவிக் கியோஸ்க்"
+
+#: .\templates\payment-history.html:78
+msgid "All Services"
+msgstr "அனைத்து சேவைகள்"
+
+#: .\templates\payment-history.html:94
+msgid "Gas Bill"
+msgstr "எரிவாயு பில்"
+
+#: .\templates\payment-history.html:105
+msgid "Ref:"
+msgstr "குறிப்பு:"
+
+#: .\templates\payment-history.html:115
+msgid "No payment history found"
+msgstr "கட்டண வரலாறு எதுவும் கிடைக்கவில்லை"
+
+#: .\templates\professional-tax.html:4
+msgid "Professional Tax - Civic Kiosk"
+msgstr "தொழில் வரி - சிவிக் கியோஸ்க்"
+
+#: .\templates\professional-tax.html:73
+msgid "Enter PTIN"
+msgstr "PTIN-ஐ உள்ளிடவும்"
+
+#: .\templates\professional-tax.html:80
+msgid "PTIN:"
+msgstr "PTIN:"
+
+#: .\templates\professional-tax.html:88
+msgid "Profession:"
+msgstr "தொழில்:"
+
+#: .\templates\professional-tax.html:92 .\templates\property-tax.html:96
+msgid "Assessment Year:"
+msgstr "மதிப்பீட்டு ஆண்டு:"
+
+#: .\templates\professional-tax.html:100
+msgid "Half-yearly Tax:"
+msgstr "அரையாண்டு வரி:"
+
+#: .\templates\professional-tax.html:104
+msgid "Penalty (if any):"
+msgstr "அபராதம் (ஏதேனும் இருந்தால்):"
+
+#: .\templates\professional-tax.html:132
+msgid "Please enter PTIN"
+msgstr "PTIN-ஐ உள்ளிடவும்"
+
+#: .\templates\professional-tax.html:140 .\templates\property-tax.html:136
+#: .\templates\water-bill.html:131
+msgid "Pay ₹"
+msgstr "₹ செலுத்து"
+
+#: .\templates\property-tax.html:4
+msgid "Property Tax - Civic Kiosk"
+msgstr "சொத்து வரி - சிவிக் கியோஸ்க்"
+
+#: .\templates\property-tax.html:73
+msgid "Enter Property ID"
+msgstr "சொத்து ஐடியை உள்ளிடவும்"
+
+#: .\templates\property-tax.html:75
+msgid "Fetch Tax Details"
+msgstr "வரி விவரங்களைப் பெறுக"
+
+#: .\templates\property-tax.html:80
+msgid "Property ID:"
+msgstr "சொத்து ஐடி:"
+
+#: .\templates\property-tax.html:84
+msgid "Owner Name:"
+msgstr "உரிமையாளரின் பெயர்:"
+
+#: .\templates\property-tax.html:88
+msgid "Property Type:"
+msgstr "சொத்து வகை:"
+
+#: .\templates\property-tax.html:92
+msgid "Area (sq ft):"
+msgstr "பரப்பளவு (ச.அடி):"
+
+#: .\templates\property-tax.html:128
+msgid "Please enter property ID"
+msgstr "சொத்து ஐடியை உள்ளிடவும்"
+
+#: .\templates\receipt-print.html:4
+msgid "Payment Receipt - Civic Kiosk"
+msgstr "கட்டண ரசீது - சிவிக் கியோஸ்க்"
+
+#: .\templates\receipt-print.html:71 .\templates\receipt-print.html:76
+msgid "Payment Receipt"
+msgstr "கட்டண ரசீது"
+
+#: .\templates\receipt-print.html:74
+msgid "CIVIC KIOSK"
+msgstr "சிவிக் கியோஸ்க்"
+
+#: .\templates\receipt-print.html:80
+msgid "Receipt No:"
+msgstr "ரசீது எண்:"
+
+#: .\templates\receipt-print.html:84
+msgid "Date & Time:"
+msgstr "தேதி & நேரம்:"
+
+#: .\templates\receipt-print.html:88
+msgid "Service:"
+msgstr "சேவை:"
+
+#: .\templates\receipt-print.html:96
+msgid "Bill Period:"
+msgstr "பில் காலம்:"
+
+#: .\templates\receipt-print.html:100
+msgid "Payment Mode:"
+msgstr "கட்டண முறை:"
+
+#: .\templates\receipt-print.html:104
+msgid "Transaction ID:"
+msgstr "பரிவர்த்தனை ஐடி:"
+
+#: .\templates\receipt-print.html:108
+msgid "Total Amount:"
+msgstr "மொத்த தொகை:"
+
+#: .\templates\receipt-print.html:117
+msgid "QR Code"
+msgstr "QR குறியீடு"
+
+#: .\templates\receipt-print.html:120
+msgid "Scan to verify receipt"
+msgstr "ரசீதை சரிபார்க்க ஸ்கேன் செய்யவும்"
+
+#: .\templates\receipt-print.html:121
+msgid "Thank you for using Civic Kiosk"
+msgstr "சிவிக் கியோஸ்க் பயன்படுத்தியதற்கு நன்றி"
+
+#: .\templates\receipt-print.html:122
+msgid "This is a computer generated receipt"
+msgstr "இது கணினியால் உருவாக்கப்பட்ட ரசீது"
+
+#: .\templates\receipt-print.html:129
+msgid "Print"
+msgstr "அச்சிடு"
+
+#: .\templates\receipt-print.html:131
+msgid "Home"
+msgstr "முகப்பு"
+
+#: .\templates\receipt-print.html:158
+msgid "Printing receipt..."
+msgstr "ரசீது அச்சிடப்படுகிறது..."
+
+#: .\templates\trade-license.html:4
+msgid "Trade License - Civic Kiosk"
+msgstr "வர்த்தக உரிமம் - சிவிக் கியோஸ்க்"
+
+#: .\templates\trade-license.html:68
+msgid "Business Name"
+msgstr "வணிகப் பெயர்"
+
+#: .\templates\trade-license.html:69
+msgid "Enter business name"
+msgstr "வணிகப் பெயரை உள்ளிடவும்"
+
+#: .\templates\trade-license.html:72
+msgid "Business Type"
+msgstr "வணிக வகை"
+
+#: .\templates\trade-license.html:74
+msgid "Select Business Type"
+msgstr "வணிக வகையைத் தேர்ந்தெடுக்கவும்"
+
+#: .\templates\trade-license.html:75
+msgid "Retail Shop"
+msgstr "சில்லறைக் கடை"
+
+#: .\templates\trade-license.html:76
+msgid "Restaurant"
+msgstr "உணவகம்"
+
+#: .\templates\trade-license.html:77
+msgid "Manufacturing"
+msgstr "உற்பத்தி"
+
+#: .\templates\trade-license.html:78
+msgid "Service Provider"
+msgstr "சேவை வழங்குநர்"
+
+#: .\templates\trade-license.html:79
+msgid "Warehouse"
+msgstr "கிடங்கு"
+
+#: .\templates\trade-license.html:85
+msgid "Enter owner name"
+msgstr "உரிமையாளரின் பெயரை உள்ளிடவும்"
+
+#: .\templates\trade-license.html:88
+msgid "Business Address"
+msgstr "வணிக முகவரி"
+
+#: .\templates\trade-license.html:92
+msgid "GST Number (if applicable)"
+msgstr "GST எண் (பொருந்தினால்)"
+
+#: .\templates\trade-license.html:93
+msgid "Enter GST number"
+msgstr "GST எண்ணை உள்ளிடவும்"
+
+#: .\templates\trade-license.html:97
+msgid "Application Fee:"
+msgstr "விண்ணப்பக் கட்டணம்:"
+
+#: .\templates\trade-license.html:101
+msgid "License Fee (Annual):"
+msgstr "உரிமக் கட்டணம் (ஆண்டு):"
+
+#: .\templates\trade-license.html:106
+msgid "Estimated Total:"
+msgstr "மதிப்பிடப்பட்ட மொத்தம்:"
+
+#: .\templates\trade-license.html:111
+msgid "Apply for License"
+msgstr "உரிமத்திற்கு விண்ணப்பிக்கவும்"
+
+#: .\templates\under-development.html:5
+msgid "Civic Kiosk - Under Development"
+msgstr "சிவிக் கியோஸ்க் - உருவாக்கத்தில்"
+
+#: .\templates\under-development.html:261
+msgid "Module Under Development"
+msgstr "தொகுதி உருவாக்கத்தில்"
+
+#: .\templates\under-development.html:265
+msgid "This digital service module is currently being configured and deployed."
+msgstr "இந்த டிஜிட்டல் சேவை தொகுதி தற்போது கட்டமைக்கப்பட்டு பயன்படுத்தப்படுகிறது."
+
+#: .\templates\under-development.html:266
+msgid "Please check back soon for activation."
+msgstr "செயல்படுத்தப்படுவதற்கு விரைவில் மீண்டும் சரிபார்க்கவும்."
+
+#: .\templates\under-development.html:270
+msgid "Back to Home"
+msgstr "முகப்புக்குத் திரும்பு"
+
+#: .\templates\under-development.html:275
+msgid "Digital Civic Services Portal | Development Mode |"
+msgstr "டிஜிட்டல் சிவிக் சேவைகள் போர்டல் | மேம்பாட்டு முறை |"
+
+#: .\templates\water-bill.html:4
+msgid "Water Bill - Civic Kiosk"
+msgstr "நீர் கட்டணம் - சிவிக் கியோஸ்க்"

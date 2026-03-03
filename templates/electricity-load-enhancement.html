@@ -1,0 +1,428 @@
+{% load i18n %}
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+<title>{% trans "Load Enhancement - Civic Kiosk" %}</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;user-select:none;}
+body{width:100vw;height:100vh;overflow:hidden;background:#f0f7ff;}
+
+.header{height:70px;background:white;display:flex;align-items:center;justify-content:space-between;padding:0 20px;border-bottom:2px solid #1e5fbf;}
+.header-left{display:flex;align-items:center;gap:10px;}
+.header-left img{height:40px;}
+.header-left div{font-size:12px;font-weight:600;color:#1e5fbf;line-height:1.2;}
+.header-right img{height:35px;}
+
+.voice-corner{position:fixed;top:80px;right:15px;display:flex;flex-direction:column;align-items:center;gap:3px;z-index:1000;}
+.voice-corner-btn{background:#ff9933;width:45px;height:45px;border-radius:50%;border:2px solid white;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;}
+.voice-corner-btn:hover{background:#ffaa44;}
+.voice-corner-text{background:white;padding:2px 8px;border-radius:12px;font-size:10px;color:#ff9933;border:1px solid #ff9933;}
+
+.back-btn{position:fixed;top:80px;left:15px;background:white;border:2px solid #1e5fbf;border-radius:30px;padding:5px 15px;font-size:18px;font-weight:700;color:#1e5fbf;text-decoration:none;z-index:1000;display:inline-block;}
+.back-btn:hover{background:#1e5fbf;color:white;}
+.back-btn:active{transform:translateY(2px);}
+
+.container{position:fixed;top:70px;left:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px;overflow-y:auto;}
+.content-wrapper{width:100%;max-width:600px;display:flex;flex-direction:column;gap:15px;padding:20px 0;}
+
+/* Message styles */
+.messages{width:100%;margin-bottom:15px;}
+.message{padding:10px;border-radius:10px;margin-bottom:5px;text-align:center;}
+.message.success{background:#d4edda;color:#155724;border:1px solid #c3e6cb;}
+.message.error{background:#f8d7da;color:#721c24;border:1px solid #f5c6cb;}
+.message.info{background:#d1ecf1;color:#0c5460;border:1px solid #bee5eb;}
+
+h1{color:#1e5fbf;font-size:36px;font-weight:800;text-align:center;margin:0;}
+
+.form-group{margin:15px 0;}
+label{display:block;font-size:22px;color:#1e5fbf;margin-bottom:5px;}
+
+.large-input{width:100%;height:60px;border:3px solid #1e5fbf;border-radius:20px;font-size:26px;padding:0 15px;background:white;cursor:pointer;}
+.large-input:focus{outline:none;border-color:#ff9933;}
+.large-input[readonly]{background:#f9f9f9;cursor:pointer;}
+
+select.large-input{
+appearance:none;
+background-image:url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+background-repeat:no-repeat;
+background-position:right 15px center;
+background-size:20px;
+padding-right:45px;
+}
+
+.info-card{background:#e3f2fd;border:2px solid #1e5fbf;border-radius:20px;padding:15px;margin:15px 0;font-size:20px;box-shadow:0 4px 0 #0a3d7a;}
+
+.submit-btn{background:#28a745;color:white;font-size:32px;padding:12px;border-radius:40px;width:100%;border:none;margin-top:10px;cursor:pointer;box-shadow:0 4px 0 #1e7e34;transition:all 0.1s;}
+.submit-btn:active{transform:translateY(4px);box-shadow:0 1px 0 #1e7e34;}
+.submit-btn:hover{background:#2fcB4f;}
+
+/* Loading indicator */
+.loading{
+display:none;
+position:fixed;
+top:0;
+left:0;
+right:0;
+bottom:0;
+background:rgba(0,0,0,0.5);
+z-index:2000;
+justify-content:center;
+align-items:center;
+color:white;
+font-size:24px;
+}
+.loading.show{display:flex;}
+.spinner{
+border:4px solid rgba(255,255,255,0.3);
+border-radius:50%;
+border-top:4px solid white;
+width:50px;
+height:50px;
+animation:spin 1s linear infinite;
+margin-right:10px;
+}
+@keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
+
+/* FLOATING INPUT */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);backdrop-filter:blur(3px);display:none;z-index:900;}
+.floating-input{
+position:fixed;
+left:50%;
+top:32%;
+transform:translate(-50%,-50%) scale(0.7);
+width:550px;
+height:70px;
+font-size:28px;
+border:4px solid #ff9933;
+border-radius:25px;
+padding:0 25px;
+z-index:1001;
+box-shadow:0 20px 50px rgba(0,0,0,0.4);
+transition:all 0.25s ease;
+display:none;
+}
+.floating-input.show{transform:translate(-50%,-50%) scale(1);}
+.floating-input:focus{outline:none;}
+
+/* QUIET KEYBOARD */
+.keyboard{
+position:fixed;
+bottom:20px;
+left:50%;
+transform:translateX(-50%);
+background:white;
+padding:12px;
+border-radius:18px;
+box-shadow:0 8px 25px rgba(0,0,0,0.3);
+display:none;
+z-index:1000;
+}
+.keyboard-row{display:flex;justify-content:center;}
+.keyboard button{
+min-width:50px;
+height:50px;
+margin:4px;
+font-size:16px;
+border-radius:8px;
+border:2px solid #1e5fbf;
+background:#f0f7ff;
+cursor:pointer;
+transition:all 0.2s;
+}
+.keyboard button:hover{background:#1e5fbf;color:white;}
+.keyboard .ok-btn{background:#28a745;color:white;border:none;}
+.keyboard .ok-btn:hover{background:#218838;}
+
+</style>
+</head>
+<body>
+
+<div class="header">
+<div class="header-left">
+<img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India">
+<div>{% trans "Ministry of Electronics &" %}<br>{% trans "Information Technology" %}<br>{% trans "Government of India" %}</div>
+</div>
+<div class="header-right">
+<img src="https://www.cdac.in/img/cdac-logo.png" alt="CDAC Logo">
+</div>
+</div>
+
+<div class="voice-corner">
+<div class="voice-corner-btn" onclick="alert('{% trans "Voice assistant activated" %}')">🎤</div>
+<div class="voice-corner-text">{% trans "Click" %}</div>
+</div>
+
+<a href="{% url 'electricity-services' %}" class="back-btn">← {% trans "Back" %}</a>
+
+<div class="container">
+<div class="content-wrapper">
+
+<!-- Display Django messages -->
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+    <div class="message {{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<h1>⚡ {% trans "Load Enhancement" %}</h1>
+
+<!-- Django form for load enhancement request -->
+<form id="loadForm" method="post" action="{% url 'electricity-load-enhancement' %}">
+    {% csrf_token %}
+    <input type="hidden" name="consumer_number" id="consumerNumber" value="{{ request.POST.consumer_number|default:'123456789012' }}">
+    <input type="hidden" name="current_load" id="currentLoad" value="{{ request.POST.current_load|default:'3' }}">
+    <input type="hidden" name="requested_load" id="requestedLoad">
+    <input type="hidden" name="reason" id="reasonValue">
+</form>
+
+<div class="info-card">
+<div style="display:flex;justify-content:space-between;">
+<span>{% trans "Current Load:" %}</span>
+<span><strong id="displayCurrentLoad">{% if request.POST.current_load %}{{ request.POST.current_load }}{% else %}3{% endif %} kW</strong></span>
+</div>
+<div style="display:flex;justify-content:space-between;margin-top:10px;">
+<span>{% trans "Consumer No:" %}</span>
+<span><strong id="displayConsumerNo">{% if request.POST.consumer_number %}{{ request.POST.consumer_number|slice:":4" }} {{ request.POST.consumer_number|slice:"4:8" }} {{ request.POST.consumer_number|slice:"8:12" }}{% else %}1234 5678 9012{% endif %}</strong></span>
+</div>
+</div>
+
+<div class="form-group">
+<label>{% trans "Requested Load (kW)" %} *</label>
+<input class="large-input" id="newLoad" placeholder="{% trans "Enter new load (e.g., 5, 7.5)" %}" 
+       value="{{ request.POST.requested_load }}" readonly>
+</div>
+
+<div class="form-group">
+<label>{% trans "Reason for Enhancement" %}</label>
+<select class="large-input" id="reason" onchange="updateReason()">
+    <option value="New Appliances" {% if request.POST.reason == 'New Appliances' %}selected{% endif %}>{% trans "New Appliances" %}</option>
+    <option value="Home Extension" {% if request.POST.reason == 'Home Extension' %}selected{% endif %}>{% trans "Home Extension" %}</option>
+    <option value="Commercial Activity" {% if request.POST.reason == 'Commercial Activity' %}selected{% endif %}>{% trans "Commercial Activity" %}</option>
+    <option value="Other" {% if request.POST.reason == 'Other' %}selected{% endif %}>{% trans "Other" %}</option>
+</select>
+</div>
+
+<div class="form-group">
+<label>{% trans "Estimated Cost" %}</label>
+<div style="font-size:28px;color:#28a745;font-weight:700;" id="estimatedCost">₹ 1,500 + {% trans "Taxes" %}</div>
+</div>
+
+<button class="submit-btn" onclick="submitRequest()">{% trans "Submit Request" %}</button>
+
+</div>
+</div>
+
+<!-- Loading indicator -->
+<div id="loadingIndicator" class="loading">
+    <div class="spinner"></div>
+    <div>{% trans "Processing..." %}</div>
+</div>
+
+<div id="overlay" class="overlay"></div>
+<input id="floatingInput" class="floating-input" placeholder="{% trans "Enter load in kW" %}">
+<div id="keyboard" class="keyboard"></div>
+
+<script>
+let activeInput=null;
+let isUpperCase=true;
+
+const overlay=document.getElementById("overlay");
+const floatingInput=document.getElementById("floatingInput");
+const keyboard=document.getElementById("keyboard");
+const loadingIndicator = document.getElementById("loadingIndicator");
+
+function createKeyboard(){
+keyboard.innerHTML="";
+let keys = ["1","2","3","4","5","6","7","8","9","0",".",".5",".0","Clear","⌫","OK"];
+
+let row=document.createElement("div");
+row.className="keyboard-row";
+
+// Number keys
+for(let i=0; i<10; i++) {
+    let btn=document.createElement("button");
+    btn.innerText=i;
+    btn.type="button";
+    btn.onclick=()=>floatingInput.value+=i;
+    row.appendChild(btn);
+}
+keyboard.appendChild(row);
+
+// Decimal and special keys
+row=document.createElement("div");
+row.className="keyboard-row";
+let decimalBtn=document.createElement("button");
+decimalBtn.innerText=".";
+decimalBtn.type="button";
+decimalBtn.onclick=()=>floatingInput.value+=".";
+row.appendChild(decimalBtn);
+
+let halfBtn=document.createElement("button");
+halfBtn.innerText=".5";
+halfBtn.type="button";
+halfBtn.onclick=()=>floatingInput.value+=".5";
+row.appendChild(halfBtn);
+
+let zeroBtn=document.createElement("button");
+zeroBtn.innerText=".0";
+zeroBtn.type="button";
+zeroBtn.onclick=()=>floatingInput.value+=".0";
+row.appendChild(zeroBtn);
+
+let clearBtn=document.createElement("button");
+clearBtn.innerText="{% trans "Clear" %}";
+clearBtn.type="button";
+clearBtn.onclick=()=>floatingInput.value="";
+row.appendChild(clearBtn);
+
+let backBtn=document.createElement("button");
+backBtn.innerText="⌫";
+backBtn.type="button";
+backBtn.onclick=()=>floatingInput.value=floatingInput.value.slice(0,-1);
+row.appendChild(backBtn);
+
+let okBtn=document.createElement("button");
+okBtn.innerText="{% trans "OK" %}";
+okBtn.className="ok-btn";
+okBtn.type="button";
+okBtn.onclick=()=>finish();
+row.appendChild(okBtn);
+
+keyboard.appendChild(row);
+}
+
+function openKeyboard(){
+activeInput=document.getElementById("newLoad");
+floatingInput.value=activeInput.value;
+overlay.style.display="block";
+floatingInput.style.display="block";
+keyboard.style.display="block";
+setTimeout(()=>{
+floatingInput.classList.add("show");
+floatingInput.focus();
+},10);
+}
+
+function finish(){
+if(activeInput){
+activeInput.value=floatingInput.value;
+document.getElementById('requestedLoad').value = floatingInput.value;
+updateEstimatedCost(floatingInput.value);
+}
+closeKeyboard();
+}
+
+function closeKeyboard(){
+floatingInput.classList.remove("show");
+setTimeout(()=>{
+overlay.style.display="none";
+floatingInput.style.display="none";
+keyboard.style.display="none";
+},200);
+}
+
+function updateEstimatedCost(load) {
+    const costDiv = document.getElementById('estimatedCost');
+    const currentLoad = parseFloat(document.getElementById('displayCurrentLoad').innerText) || 3;
+    const requestedLoad = parseFloat(load) || 0;
+    
+    if(requestedLoad > currentLoad) {
+        const additionalLoad = requestedLoad - currentLoad;
+        const baseCost = 1500;
+        const additionalCost = additionalLoad * 800; // ₹800 per additional kW
+        const totalCost = baseCost + additionalCost;
+        const gst = totalCost * 0.18;
+        const finalCost = totalCost + gst;
+        
+        costDiv.innerHTML = `₹ ${totalCost.toFixed(0)} + GST (₹ ${gst.toFixed(0)}) = <strong>₹ ${finalCost.toFixed(0)}</strong>`;
+    } else if(requestedLoad > 0) {
+        costDiv.innerHTML = '₹ 1,500 + {% trans "Taxes" %} ({% trans "Minimum charges" %})';
+    } else {
+        costDiv.innerHTML = '₹ 1,500 + {% trans "Taxes" %}';
+    }
+}
+
+// Handle Enter key on floating input
+floatingInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        finish();
+    }
+});
+
+document.getElementById("newLoad").addEventListener("click",openKeyboard);
+overlay.addEventListener("click",closeKeyboard);
+
+createKeyboard();
+
+function updateReason() {
+    const reason = document.getElementById('reason').value;
+    document.getElementById('reasonValue').value = reason;
+}
+
+function submitRequest(){
+const newLoad = document.getElementById('newLoad').value;
+const reason = document.getElementById('reason').value;
+
+if(!newLoad){
+alert('{% trans "Please enter requested load" %}');
+return;
+}
+
+// Validate load value
+const loadValue = parseFloat(newLoad);
+if(isNaN(loadValue) || loadValue <= 0){
+alert('{% trans "Please enter a valid load value (positive number)" %}');
+return;
+}
+
+const currentLoad = parseFloat(document.getElementById('displayCurrentLoad').innerText) || 3;
+if(loadValue <= currentLoad){
+alert('{% trans "Requested load must be greater than current load" %} (' + currentLoad + ' kW)');
+return;
+}
+
+if(loadValue > 50){
+alert('{% trans "Maximum load enhancement is 50 kW. Please contact commercial office for higher loads." %}');
+return;
+}
+
+// Set values in hidden fields
+document.getElementById('requestedLoad').value = newLoad;
+document.getElementById('reasonValue').value = reason;
+
+// Show loading
+loadingIndicator.classList.add('show');
+
+// Submit form
+setTimeout(() => {
+    document.getElementById('loadForm').submit();
+}, 500);
+}
+
+// Auto-hide messages after 5 seconds
+setTimeout(function() {
+    document.querySelectorAll('.message').forEach(function(message) {
+        message.style.display = 'none';
+    });
+}, 5000);
+
+// Prevent form submission on Enter key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'INPUT') {
+        e.preventDefault();
+    }
+});
+
+// Update estimated cost if load was previously entered
+{% if request.POST.requested_load %}
+updateEstimatedCost('{{ request.POST.requested_load }}');
+{% endif %}
+</script>
+
+</body>
+</html>

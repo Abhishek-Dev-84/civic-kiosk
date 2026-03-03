@@ -1,0 +1,829 @@
+{% load i18n %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <style>
+        /* Hide Google Translate elements */
+        .goog-te-banner-frame.skiptranslate,
+        .goog-te-gadget-icon,
+        .goog-te-gadget-simple,
+        #goog-gt-tt,
+        .goog-te-balloon-frame,
+        .goog-te-menu-frame,
+        .goog-te-spinner-pos {
+            display: none !important;
+        }
+        
+        body {
+            top: 0px !important;
+            position: static !important;
+        }
+        
+        .goog-te-combo {
+            display: none !important;
+        }
+        
+        .goog-te-gadget {
+            color: transparent !important;
+            height: 0 !important;
+            overflow: hidden !important;
+        }
+    </style>
+
+    <style>
+        /* Hide Google Translate elements */
+        .goog-te-banner-frame.skiptranslate,
+        .goog-te-gadget-icon,
+        .goog-te-gadget-simple,
+        #goog-gt-tt,
+        .goog-te-balloon-frame,
+        .goog-te-menu-frame,
+        .goog-te-spinner-pos {
+            display: none !important;
+        }
+        
+        body {
+            top: 0px !important;
+            position: static !important;
+        }
+        
+        .goog-te-combo {
+            display: none !important;
+        }
+        
+        .goog-te-gadget {
+            color: transparent !important;
+            height: 0 !important;
+            overflow: hidden !important;
+        }
+    </style>
+
+    <meta charset="UTF-8">
+    <title>{% trans "Civic Services Kiosk - Main Menu" %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* ===== CIVIC SERVICES KIOSK - MASTER STYLESHEET ===== */
+        /* This ONE file styles ALL 48 pages */
+
+        /* RESET & BASE */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            user-select: none;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #f0f7ff;
+        }
+
+        /* ===== HEADER (Same on ALL pages) ===== */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 70px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            border-bottom: 3px solid #1e5fbf;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-left img {
+            height: 42px;
+            width: auto;
+        }
+
+        .header-left div {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1e5fbf;
+            line-height: 1.2;
+        }
+
+        .header-right img {
+            height: 38px;
+            width: auto;
+        }
+
+        /* ===== VOICE BUTTON - Top Right (Same on ALL pages) ===== */
+        .voice-corner {
+            position: fixed;
+            top: 80px;
+            right: 15px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .voice-corner-btn {
+            background: #ff9933;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            transition: all 0.2s;
+        }
+
+        .voice-corner-btn:active {
+            transform: scale(0.95);
+        }
+
+        .voice-corner-btn.listening {
+            background: #4CAF50;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .voice-corner-text {
+            background: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #ff9933;
+            border: 1px solid #ff9933;
+            white-space: nowrap;
+        }
+
+        /* ===== BACK BUTTON - Top Left (Same on ALL pages) ===== */
+        .back-btn {
+            position: fixed;
+            top: 80px;
+            left: 15px;
+            background: white;
+            border: 2px solid #1e5fbf;
+            border-radius: 40px;
+            padding: 6px 18px;
+            font-size: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            color: #1e5fbf;
+            box-shadow: 0 4px 0 #0a3d7a;
+            z-index: 1000;
+            transition: all 0.1s;
+        }
+
+        .back-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #0a3d7a;
+        }
+
+        /* ===== MAIN CONTAINER (Same on ALL pages) ===== */
+        .kiosk-container {
+            position: fixed;
+            top: 70px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            overflow: hidden;
+        }
+
+        .content-wrapper {
+            width: 100%;
+            max-width: 700px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* ===== TYPOGRAPHY ===== */
+        h1 {
+            color: #1e5fbf;
+            font-size: 36px;
+            font-weight: 800;
+            text-align: center;
+            margin: 0 0 5px 0;
+        }
+
+        h2 {
+            color: #1e5fbf;
+            font-size: 28px;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+
+        .label {
+            color: #1e5fbf;
+            font-size: 20px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        /* ===== GRID LAYOUTS ===== */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin: 15px 0;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 15px 0;
+        }
+
+        /* ===== MENU CARDS ===== */
+        .menu-card {
+            background: white;
+            border: 3px solid #1e5fbf;
+            border-radius: 30px;
+            padding: 25px 15px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #0a3d7a;
+            transition: all 0.1s;
+            min-height: 160px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .menu-card:active {
+            transform: translateY(6px);
+            box-shadow: 0 2px 0 #0a3d7a;
+        }
+
+        .menu-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .menu-text {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e5fbf;
+        }
+
+        /* ===== NUMBER BOXES (For Aadhaar/OTP) ===== */
+        .number-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin: 10px 0;
+            flex-wrap: nowrap;
+        }
+
+        .number-box {
+            width: 50px;
+            height: 55px;
+            border: 3px solid #1e5fbf;
+            border-radius: 12px;
+            font-size: 32px;
+            font-weight: 800;
+            text-align: center;
+            line-height: 55px;
+            background: white;
+            color: #1e5fbf;
+            box-shadow: 0 4px 0 #0a3d7a;
+            flex-shrink: 0;
+        }
+
+        .number-box.filled {
+            background: #e3f2fd;
+        }
+
+        .number-box.highlight {
+            border-color: #ff9933;
+            border-width: 4px;
+            box-shadow: 0 4px 0 #cc6600;
+        }
+
+        /* ===== KEYPAD ===== */
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin: 10px 0;
+        }
+
+        .key {
+            background: white;
+            border: 3px solid #1e5fbf;
+            border-radius: 25px;
+            padding: 18px 5px;
+            font-size: 40px;
+            font-weight: 800;
+            cursor: pointer;
+            color: #1e5fbf;
+            box-shadow: 0 6px 0 #0a3d7a;
+            text-align: center;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.1s;
+        }
+
+        .key:active {
+            transform: translateY(6px);
+            box-shadow: 0 2px 0 #0a3d7a;
+        }
+
+        .key.special {
+            background: #ff9933;
+            color: white;
+            border-color: #cc6600;
+            box-shadow: 0 6px 0 #b35900;
+        }
+
+        /* ===== FORM ELEMENTS ===== */
+        .form-container {
+            background: white;
+            border: 3px solid #1e5fbf;
+            border-radius: 30px;
+            padding: 25px;
+            margin: 10px 0;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 22px;
+            font-weight: 600;
+            color: #1e5fbf;
+            margin-bottom: 8px;
+        }
+
+        .large-input {
+            width: 100%;
+            height: 70px;
+            border: 3px solid #1e5fbf;
+            border-radius: 25px;
+            font-size: 28px;
+            padding: 0 20px;
+            background: white;
+        }
+
+        .large-input:focus {
+            outline: none;
+            border-color: #ff9933;
+        }
+
+        /* ===== BUTTONS ===== */
+        .primary-btn {
+            background: #28a745;
+            border: none;
+            color: white;
+            font-size: 36px;
+            font-weight: 800;
+            padding: 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 7px 0 #1e7e34;
+            border: 3px solid white;
+            width: 100%;
+            margin: 10px 0;
+            transition: all 0.1s;
+        }
+
+        .primary-btn:active {
+            transform: translateY(7px);
+            box-shadow: 0 2px 0 #1e7e34;
+        }
+
+        /* ===== SUCCESS MESSAGE (Left Side) ===== */
+        .success-message {
+            position: fixed;
+            top: 80px;
+            left: 15px;
+            background: #4CAF50;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 600;
+            z-index: 2000;
+            border: 3px solid white;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+            animation: slideInLeft 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .success-message::before {
+            content: "✅";
+            font-size: 20px;
+        }
+
+        @keyframes slideInLeft {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* ===== SECURITY NOTE ===== */
+        .security-note {
+            background: #e8f5e9;
+            border: 1px solid #28a745;
+            border-radius: 25px;
+            padding: 6px 12px;
+            font-size: 14px;
+            color: #1e5fbf;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .security-note::before {
+            content: "🔒 ";
+        }
+
+        /* ===== TIMER ===== */
+        .timer {
+            font-size: 28px;
+            color: #dc3545;
+            font-weight: 700;
+            background: #ffe6e6;
+            padding: 10px 25px;
+            border-radius: 40px;
+            border: 2px solid #dc3545;
+            display: inline-block;
+        }
+
+        /* ===== STATUS ROW ===== */
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        .resend-link {
+            color: #1e5fbf;
+            font-size: 22px;
+            text-decoration: underline;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .resend-link.disabled {
+            color: #999;
+            pointer-events: none;
+        }
+
+        /* ===== ERROR MESSAGE ===== */
+        .error-message {
+            color: #dc3545;
+            font-size: 22px;
+            text-align: center;
+            font-weight: 700;
+            background: #ffe6e6;
+            padding: 12px;
+            border-radius: 30px;
+            border: 2px solid #dc3545;
+            margin: 10px 0;
+        }
+
+        /* ===== LOADER ===== */
+        .loader {
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #1e5fbf;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            animation: spin 1s linear infinite;
+            margin: 10px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* ===== TIMEOUT WARNING ===== */
+        .timeout-warning {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border: 4px solid #ff9933;
+            border-radius: 40px;
+            padding: 30px;
+            text-align: center;
+            z-index: 2000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            max-width: 500px;
+        }
+
+        .timeout-warning p {
+            font-size: 28px;
+            color: #1e5fbf;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .timeout-warning button {
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            padding: 15px 30px;
+            font-size: 28px;
+            font-weight: 700;
+            cursor: pointer;
+            margin: 10px;
+            min-width: 200px;
+            box-shadow: 0 5px 0 #1e7e34;
+        }
+
+        .timeout-warning button:active {
+            transform: translateY(5px);
+            box-shadow: 0 1px 0 #1e7e34;
+        }
+
+        .timeout-warning .logout-btn {
+            background: #dc3545;
+            box-shadow: 0 5px 0 #a71d2a;
+        }
+
+        /* ===== UTILITY CLASSES ===== */
+        .hidden {
+            display: none !important;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+        
+        .dept-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .dept-card {
+            background: white;
+            border: 4px solid #1e5fbf;
+            border-radius: 40px;
+            padding: 30px 15px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 8px 0 #0a3d7a;
+            min-height: 220px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .dept-card:active { 
+            transform: translateY(8px); 
+            box-shadow: 0 2px 0 #0a3d7a; 
+        }
+        
+        .dept-icon { 
+            font-size: 72px; 
+            margin-bottom: 15px; 
+        }
+        
+        .dept-name { 
+            font-size: 28px; 
+            font-weight: 700; 
+            color: #1e5fbf; 
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India">
+            <div>
+                {% trans "Ministry of Electronics &" %}<br>
+                {% trans "Information Technology" %}<br>
+                {% trans "Government of India" %}
+            </div>
+        </div>
+        <div class="header-right">
+            <img src="https://www.cdac.in/img/cdac-logo.png" alt="CDAC Logo">
+        </div>
+    </div>
+
+    <div class="voice-corner">
+        <div class="voice-corner-btn" id="voiceBtn" onclick="toggleVoiceInput()">🎤</div>
+        <div class="voice-corner-text" id="voiceStatus">{% trans "Click" %}</div>
+    </div>
+
+    <!-- Django Back URL -->
+    <div class="back-btn" onclick="window.location='{% url 'index' %}'">← {% trans "Back" %}</div>
+
+    <!-- Timeout Warning -->
+    <div id="timeoutWarning" class="timeout-warning hidden">
+        <p>⚠️ {% trans "Session about to expire" %}</p>
+        <button onclick="extendSession()">{% trans "Continue Session" %}</button>
+        <button class="logout-btn" onclick="window.location='{% url 'index' %}'">{% trans "Logout" %}</button>
+    </div>
+
+    <!-- Success Message -->
+    {% if messages %}
+        {% for message in messages %}
+            {% if message.tags == 'success' %}
+                <div class="success-message">
+                    {{ message }}
+                </div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+    <div class="kiosk-container">
+        <div class="content-wrapper">
+            <h1>🏛️ {% trans "सेवाएं / Services" %}</h1>
+            <div class="security-note">🔒 {% trans "आपका आधार सुरक्षित रूप से कनेक्ट है" %}</div>
+
+            <div class="dept-grid">
+                <div class="dept-card" onclick="window.location='{% url 'gas-services' %}'">
+                    <div class="dept-icon">🔥</div>
+                    <div class="dept-name">{% trans "Gas" %}</div>
+                </div>
+
+                <div class="dept-card" onclick="window.location='{% url 'electricity-services' %}'">
+                    <div class="dept-icon">⚡</div>
+                    <div class="dept-name">{% trans "Electricity" %}</div>
+                </div>
+
+                <div class="dept-card" onclick="window.location='{% url 'municipal-services' %}'">
+                    <div class="dept-icon">🏛️</div>
+                    <div class="dept-name">{% trans "Municipal" %}</div>
+                </div>
+
+                <div class="dept-card" onclick="window.location='{% url 'transport-services' %}'">
+                    <div class="dept-icon">🚗</div>
+                    <div class="dept-name">{% trans "Transport" %}</div>
+                </div>
+
+                <div class="dept-card" onclick="window.location='{% url 'revenue-services' %}'">
+                    <div class="dept-icon">📜</div>
+                    <div class="dept-name">{% trans "Revenue" %}</div>
+                </div>
+
+                <div class="dept-card" onclick="window.location='{% url 'application-status' %}'">
+                    <div class="dept-icon">📊</div>
+                    <div class="dept-name">{% trans "Status" %}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auto-hide success message after 3 seconds -->
+    <script>
+        setTimeout(function() {
+            const successMsg = document.querySelector('.success-message');
+            if (successMsg) {
+                successMsg.style.animation = 'slideOutLeft 0.3s ease';
+                setTimeout(function() {
+                    if (successMsg) successMsg.remove();
+                }, 300);
+            }
+        }, 3000);
+    </script>
+
+    <style>
+        @keyframes slideOutLeft {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(-100%); opacity: 0; }
+        }
+    </style>
+
+    <script>
+        // ===== ORIGINAL JS (UNCHANGED EXCEPT INDEX REDIRECT) =====
+        function playAudioGuidance(text, lang = 'hi-IN') {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = lang;
+                utterance.rate = 0.9;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        let sessionTimer;
+        let timeoutWarningTimer;
+        const SESSION_DURATION = 120000;
+        const WARNING_TIME = 10000;
+
+        function startSessionTimer() {
+            sessionTimer = setTimeout(() => {
+                showTimeoutWarning();
+            }, SESSION_DURATION - WARNING_TIME);
+        }
+
+        function showTimeoutWarning() {
+            const warning = document.getElementById('timeoutWarning');
+            if (warning) {
+                warning.classList.remove('hidden');
+                timeoutWarningTimer = setTimeout(() => {
+                    window.location.href = "{% url 'index' %}";
+                }, WARNING_TIME);
+            }
+        }
+
+        function extendSession() {
+            const warning = document.getElementById('timeoutWarning');
+            if (warning) {
+                warning.classList.add('hidden');
+            }
+            clearTimeout(sessionTimer);
+            clearTimeout(timeoutWarningTimer);
+            startSessionTimer();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            startSessionTimer();
+            document.addEventListener('click', extendSession);
+            document.addEventListener('touchstart', extendSession);
+        });
+
+        let activeInput = null;
+
+        function openKeyboard(inputId) {
+            const keyboard = document.getElementById("keyboard");
+            const input = document.getElementById(inputId);
+            if (keyboard && input) {
+                activeInput = input;
+                keyboard.classList.remove("hidden");
+            }
+        }
+
+        function closeKeyboard() {
+            const keyboard = document.getElementById("keyboard");
+            if (keyboard) {
+                keyboard.classList.add("hidden");
+            }
+        }
+
+        function pressKey(key) {
+            if (activeInput) {
+                activeInput.value += key;
+            }
+        }
+
+        function backspace() {
+            if (activeInput) {
+                activeInput.value = activeInput.value.slice(0, -1);
+            }
+        }
+
+        function clearInput() {
+            if (activeInput) {
+                activeInput.value = "";
+            }
+        }
+
+        function toggleVoiceInput() {
+            const btn = document.getElementById('voiceBtn');
+            btn.classList.toggle('listening');
+            if (btn.classList.contains('listening')) {
+                document.getElementById('voiceStatus').textContent = '{% trans "Listening..." %}';
+                // Simulate voice recognition
+                setTimeout(() => {
+                    btn.classList.remove('listening');
+                    document.getElementById('voiceStatus').textContent = '{% trans "Click" %}';
+                }, 3000);
+            }
+        }
+    </script>
+</body>
+</html>

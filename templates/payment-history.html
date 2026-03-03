@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+{% load i18n %}
+{% load static %}
+<html>
+<head>
+    <title>{% trans "Payment History - Civic Kiosk" %}</title>
+    
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif; user-select:none; }
+        body { width:100vw; height:100vh; overflow:hidden; background:#f0f7ff; }
+        .header { height:70px; background:white; display:flex; align-items:center; justify-content:space-between; padding:0 20px; border-bottom:2px solid #1e5fbf; }
+        .header-left { display:flex; align-items:center; gap:10px; }
+        .header-left img { height:40px; }
+        .header-left div { font-size:11px; font-weight:600; color:#1e5fbf; line-height:1.2; }
+        .header-right img { height:35px; }
+        .voice-corner { position:fixed; top:80px; right:15px; z-index:1000; display:flex; flex-direction:column; align-items:center; gap:3px; }
+        .voice-corner-btn { background:#ff9933; width:40px; height:40px; border-radius:50%; border:2px solid white; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:20px; box-shadow:0 2px 5px rgba(0,0,0,0.2); }
+        .voice-corner-text { background:white; padding:2px 6px; border-radius:12px; font-size:9px; color:#ff9933; border:1px solid #ff9933; }
+        .back-btn { position:fixed; top:80px; left:15px; background:white; border:2px solid #1e5fbf; border-radius:30px; padding:4px 12px; font-size:16px; font-weight:700; cursor:pointer; color:#1e5fbf; box-shadow:0 3px 0 #0a3d7a; z-index:1000; }
+        .back-btn:active { transform:translateY(3px); box-shadow:0 1px 0 #0a3d7a; }
+        .container { position:fixed; top:70px; left:0; right:0; bottom:0; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:10px; }
+        .content-wrapper { width:100%; max-width:600px; padding:10px 0; }
+        h1 { color:#1e5fbf; font-size:32px; font-weight:800; text-align:center; margin-bottom:15px; }
+        .filter-bar { display:flex; gap:10px; margin:15px 0; }
+        .filter-select { flex:1; height:50px; border:2px solid #1e5fbf; border-radius:25px; font-size:18px; padding:0 12px; background:white; }
+        .history-list { display:flex; flex-direction:column; gap:10px; }
+        .payment-card { background:white; border:2px solid #1e5fbf; border-radius:20px; padding:15px; display:flex; justify-content:space-between; align-items:center; cursor:pointer; }
+        .payment-card:active { background:#e3f2fd; }
+        .payment-left { display:flex; flex-direction:column; gap:3px; }
+        .service-name { font-size:18px; font-weight:700; color:#1e5fbf; }
+        .payment-date { font-size:14px; color:#666; }
+        .payment-ref { font-size:12px; color:#999; }
+        .payment-right { text-align:right; }
+        .amount { font-size:20px; font-weight:700; color:#28a745; }
+        .status { font-size:12px; padding:3px 10px; border-radius:15px; display:inline-block; margin-top:3px; }
+        .status.success { background:#d4edda; color:#155724; }
+        .status.pending { background:#fff3cd; color:#856404; }
+        .messages { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); z-index: 2000; width: 90%; max-width: 600px; }
+        .message { padding: 10px; border-radius: 5px; margin-bottom: 5px; }
+        .message.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .message.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .message.info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .no-payments { text-align: center; padding: 40px; color: #666; font-size: 18px; background: white; border-radius: 20px; border: 2px solid #1e5fbf; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India">
+            <div>{% trans "Ministry of Electronics &" %}<br>{% trans "Information Technology" %}<br>{% trans "Government of India" %}</div>
+        </div>
+        <div class="header-right">
+            <img src="https://www.cdac.in/img/cdac-logo.png" alt="CDAC Logo">
+        </div>
+    </div>
+    
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <div class="voice-corner">
+        <div class="voice-corner-btn" onclick="alert('{% trans "Voice assistant activated" %}')">🎤</div>
+        <div class="voice-corner-text">{% trans "Click" %}</div>
+    </div>
+    <div class="back-btn" onclick="window.location='{% url 'menu' %}'">← {% trans "Back" %}</div>
+    <div class="container">
+        <div class="content-wrapper">
+            <h1>💰 {% trans "Payment History" %}</h1>
+            
+            <form method="GET" action="{% url 'payment-history' %}">
+                <div class="filter-bar">
+                    <select class="filter-select" name="filter" id="filter" onchange="this.form.submit()">
+                        <option value="all" {% if filter == 'all' %}selected{% endif %}>{% trans "All Services" %}</option>
+                        <option value="gas" {% if filter == 'gas' %}selected{% endif %}>{% trans "Gas" %}</option>
+                        <option value="electricity" {% if filter == 'electricity' %}selected{% endif %}>{% trans "Electricity" %}</option>
+                        <option value="water" {% if filter == 'water' %}selected{% endif %}>{% trans "Water" %}</option>
+                        <option value="municipal" {% if filter == 'municipal' %}selected{% endif %}>{% trans "Municipal" %}</option>
+                    </select>
+                </div>
+            </form>
+            
+            <div class="history-list" id="paymentList">
+                {% if payments %}
+                    {% for payment in payments %}
+                    <div class="payment-card" onclick="viewReceipt('{{ payment.reference_no }}')">
+                        <div class="payment-left">
+                            <span class="service-name">
+                                {% if payment.service == 'electricity' %}⚡ {% trans "Electricity Bill" %}
+                                {% elif payment.service == 'gas' %}🔥 {% trans "Gas Bill" %}
+                                {% elif payment.service == 'water' %}💧 {% trans "Water Bill" %}
+                                {% elif payment.service == 'property_tax' %}🏠 {% trans "Property Tax" %}
+                                {% elif payment.service == 'professional_tax' %}💼 {% trans "Professional Tax" %}
+                                {% elif payment.service == 'trade_license' %}📋 {% trans "Trade License" %}
+                                {% elif payment.service == 'birth_certificate' %}📄 {% trans "Birth Certificate" %}
+                                {% elif payment.service == 'death_certificate' %}📄 {% trans "Death Certificate" %}
+                                {% elif payment.service == 'marriage_registration' %}💑 {% trans "Marriage Registration" %}
+                                {% else %}{{ payment.service_name|default:payment.service }}{% endif %}
+                            </span>
+                            <span class="payment-date">{{ payment.date|date:'d M Y, h:i A' }}</span>
+                            <span class="payment-ref">{% trans "Ref:" %} {{ payment.reference_no }}</span>
+                        </div>
+                        <div class="payment-right">
+                            <span class="amount">₹{{ payment.amount|floatformat:2 }}</span>
+                            <span class="status {% if payment.status == 'success' %}success{% else %}pending{% endif %}">{{ payment.status|title }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="no-payments">
+                        {% trans "No payment history found" %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Auto-hide messages after 5 seconds
+        setTimeout(function() {
+            const messages = document.querySelectorAll('.message');
+            messages.forEach(function(message) {
+                message.style.display = 'none';
+            });
+        }, 5000);
+        
+        // Keep original function for compatibility but enhance it
+        function filterPayments() {
+            // This is now handled by form submission
+            const filter = document.getElementById('filter').value;
+            console.log('Filtering by: ' + filter);
+            return true;
+        }
+        
+        function viewReceipt(ref) {
+            // Store receipt reference in session storage for compatibility
+            sessionStorage.setItem('receiptRef', ref);
+            
+            // Create a form to POST the receipt reference
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '{% url 'receipt-print' %}';
+            
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = 'csrfmiddlewaretoken';
+            csrfInput.value = '{{ csrf_token }}';
+            form.appendChild(csrfInput);
+            
+            const refInput = document.createElement('input');
+            refInput.type = 'hidden';
+            refInput.name = 'receipt_ref';
+            refInput.value = ref;
+            form.appendChild(refInput);
+            
+            document.body.appendChild(form);
+            form.submit();
+        }
+        
+        // Optional: Add infinite scroll or pagination
+        let page = 1;
+        window.addEventListener('scroll', function() {
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100) {
+                // Load more payments
+                console.log('Load more payments for page: ' + (page + 1));
+            }
+        });
+    </script>
+</body>
+</html>

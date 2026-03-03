@@ -1,0 +1,528 @@
+{% load i18n %}
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+<title>{% trans "New Electricity Connection - Civic Kiosk" %}</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;user-select:none;}
+body{width:100vw;height:100vh;overflow:hidden;background:#f0f7ff;}
+
+/* HEADER */
+.header{
+height:70px;
+background:white;
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:0 20px;
+border-bottom:2px solid #1e5fbf;
+}
+.header-left{display:flex;align-items:center;gap:10px;}
+.header-left img{height:40px;}
+.header-left div{font-size:12px;font-weight:600;color:#1e5fbf;line-height:1.2;}
+.header-right img{height:35px;}
+
+/* VOICE + BACK */
+.voice-corner{
+position:fixed;
+top:80px;
+right:15px;
+display:flex;
+flex-direction:column;
+align-items:center;
+gap:3px;
+z-index:1000;
+}
+.voice-corner-btn{
+background:#ff9933;
+width:45px;
+height:45px;
+border-radius:50%;
+border:2px solid white;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:24px;
+cursor:pointer;
+}
+.voice-corner-btn:hover{background:#ffaa44;}
+.voice-corner-text{
+background:white;
+padding:2px 8px;
+border-radius:12px;
+font-size:10px;
+color:#ff9933;
+border:1px solid #ff9933;
+}
+
+.back-btn{
+position:fixed;
+top:80px;
+left:15px;
+background:white;
+border:2px solid #1e5fbf;
+border-radius:30px;
+padding:5px 15px;
+font-size:18px;
+font-weight:700;
+color:#1e5fbf;
+text-decoration:none;
+z-index:1000;
+display:inline-block;
+}
+.back-btn:hover{background:#1e5fbf;color:white;}
+.back-btn:active{transform:translateY(2px);}
+
+/* MAIN CONTAINER */
+.container{
+position:fixed;
+top:70px;
+left:0;
+right:0;
+bottom:0;
+display:flex;
+align-items:center;
+justify-content:center;
+padding:15px;
+overflow-y:auto;
+}
+.content-wrapper{
+width:100%;
+max-width:620px;
+display:flex;
+flex-direction:column;
+gap:12px;
+padding:20px 0;
+}
+
+/* Message styles */
+.messages{width:100%;margin-bottom:10px;}
+.message{padding:10px;border-radius:10px;margin-bottom:5px;text-align:center;}
+.message.success{background:#d4edda;color:#155724;border:1px solid #c3e6cb;}
+.message.error{background:#f8d7da;color:#721c24;border:1px solid #f5c6cb;}
+.message.info{background:#d1ecf1;color:#0c5460;border:1px solid #bee5eb;}
+
+/* TITLE */
+h1{
+color:#1e5fbf;
+font-size:32px;
+font-weight:800;
+text-align:center;
+}
+
+.security-note{
+background:#e8f5e9;
+border:1px solid #28a745;
+border-radius:18px;
+padding:6px 12px;
+font-size:14px;
+color:#1e5fbf;
+text-align:center;
+}
+
+/* FORM */
+.form-group{margin:8px 0;}
+label{
+display:block;
+font-size:20px;
+color:#1e5fbf;
+margin-bottom:5px;
+}
+.large-input{
+width:100%;
+height:55px;
+border:3px solid #1e5fbf;
+border-radius:20px;
+font-size:22px;
+padding:0 15px;
+background:white;
+cursor:pointer;
+}
+.large-input:focus{outline:none;border-color:#ff9933;}
+.large-input[readonly]{background:#f9f9f9;}
+
+select.large-input{
+appearance:none;
+background-image:url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+background-repeat:no-repeat;
+background-position:right 15px center;
+background-size:20px;
+padding-right:45px;
+}
+
+.submit-btn{
+background:#28a745;
+color:white;
+font-size:26px;
+padding:12px;
+border-radius:40px;
+width:100%;
+border:none;
+margin-top:10px;
+cursor:pointer;
+box-shadow:0 4px 0 #1e7e34;
+transition:all 0.1s;
+}
+.submit-btn:active{transform:translateY(4px);box-shadow:0 1px 0 #1e7e34;}
+.submit-btn:hover{background:#2fcB4f;}
+
+/* Loading indicator */
+.loading{
+display:none;
+position:fixed;
+top:0;
+left:0;
+right:0;
+bottom:0;
+background:rgba(0,0,0,0.5);
+z-index:2000;
+justify-content:center;
+align-items:center;
+color:white;
+font-size:24px;
+}
+.loading.show{display:flex;}
+.spinner{
+border:4px solid rgba(255,255,255,0.3);
+border-radius:50%;
+border-top:4px solid white;
+width:50px;
+height:50px;
+animation:spin 1s linear infinite;
+margin-right:10px;
+}
+@keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
+
+/* FLOATING INPUT (balanced height) */
+.overlay{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,0.4);
+backdrop-filter:blur(3px);
+display:none;
+z-index:900;
+}
+
+.floating-input{
+position:fixed;
+left:50%;
+top:35%;
+transform:translate(-50%,-50%) scale(0.85);
+width:600px;
+height:85px;
+font-size:22px;
+border:4px solid #ff9933;
+border-radius:25px;
+padding:15px;
+z-index:1001;
+box-shadow:0 20px 50px rgba(0,0,0,0.4);
+transition:all 0.25s ease;
+display:none;
+}
+.floating-input.show{transform:translate(-50%,-50%) scale(1);}
+.floating-input:focus{outline:none;}
+
+/* KEYBOARD */
+.keyboard{
+position:fixed;
+bottom:20px;
+left:50%;
+transform:translateX(-50%);
+background:white;
+padding:12px;
+border-radius:18px;
+box-shadow:0 8px 25px rgba(0,0,0,0.3);
+display:none;
+z-index:1000;
+}
+.keyboard-row{display:flex;justify-content:center;}
+.keyboard button{
+min-width:55px;
+height:50px;
+margin:4px;
+font-size:16px;
+border-radius:10px;
+border:2px solid #1e5fbf;
+background:#f0f7ff;
+cursor:pointer;
+transition:all 0.2s;
+}
+.keyboard button:hover{background:#1e5fbf;color:white;}
+.keyboard .ok-btn{
+background:#28a745;
+color:white;
+border:none;
+}
+.keyboard .ok-btn:hover{background:#218838;}
+
+</style>
+</head>
+<body>
+
+<div class="header">
+<div class="header-left">
+<img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India">
+<div>{% trans "Ministry of Electronics &" %}<br>{% trans "Information Technology" %}<br>{% trans "Government of India" %}</div>
+</div>
+<div class="header-right">
+<img src="https://www.cdac.in/img/cdac-logo.png" alt="CDAC Logo">
+</div>
+</div>
+
+<div class="voice-corner">
+<div class="voice-corner-btn" onclick="alert('{% trans "Voice assistant activated" %}')">🎤</div>
+<div class="voice-corner-text">{% trans "Click" %}</div>
+</div>
+
+<a href="{% url 'electricity-services' %}" class="back-btn">← {% trans "Back" %}</a>
+
+<div class="container">
+<div class="content-wrapper">
+
+<!-- Display Django messages -->
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+    <div class="message {{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<h1>{% trans "New Electricity Connection" %}</h1>
+<div class="security-note">🔒 {% trans "Your data is secure" %}</div>
+
+<!-- Django form for new connection -->
+<form id="connectionForm" method="post" action="{% url 'electricity-new-connection' %}">
+    {% csrf_token %}
+    <input type="hidden" name="full_name" id="fullName" value="{{ request.POST.full_name }}">
+    <input type="hidden" name="address" id="addressField" value="{{ request.POST.address }}">
+    <input type="hidden" name="property_type" id="propertyTypeField" value="{% if request.POST.property_type %}{{ request.POST.property_type }}{% else %}Residential{% endif %}">
+    <input type="hidden" name="load_required" id="loadField" value="{{ request.POST.load_required }}">
+    <input type="hidden" name="mobile_number" id="mobileField" value="{{ request.POST.mobile_number }}">
+</form>
+
+<div class="form-group">
+<label>{% trans "Full Name" %} *</label>
+<input class="large-input" id="name" readonly placeholder="{% trans "Enter your full name" %}" 
+       value="{{ request.POST.full_name }}">
+</div>
+
+<div class="form-group">
+<label>{% trans "Address" %} *</label>
+<input class="large-input" id="address" readonly placeholder="{% trans "Enter complete address" %}" 
+       value="{{ request.POST.address }}">
+</div>
+
+<div class="form-group">
+<label>{% trans "Property Type" %} *</label>
+<select class="large-input" id="propertyType" onchange="updatePropertyType()">
+    <option value="Residential" {% if request.POST.property_type == 'Residential' or not request.POST.property_type %}selected{% endif %}>{% trans "Residential" %}</option>
+    <option value="Commercial" {% if request.POST.property_type == 'Commercial' %}selected{% endif %}>{% trans "Commercial" %}</option>
+    <option value="Industrial" {% if request.POST.property_type == 'Industrial' %}selected{% endif %}>{% trans "Industrial" %}</option>
+    <option value="Agricultural" {% if request.POST.property_type == 'Agricultural' %}selected{% endif %}>{% trans "Agricultural" %}</option>
+</select>
+</div>
+
+<div class="form-group">
+<label>{% trans "Load Required (kW)" %} *</label>
+<input class="large-input" id="load" readonly placeholder="{% trans "e.g., 5" %}" 
+       value="{{ request.POST.load_required }}">
+</div>
+
+<div class="form-group">
+<label>{% trans "Mobile Number" %} *</label>
+<input class="large-input" id="mobile" readonly placeholder="{% trans "10 digit mobile" %}" maxlength="10"
+       value="{{ request.POST.mobile_number }}">
+</div>
+
+<button class="submit-btn" onclick="submitForm()">{% trans "Submit Application" %}</button>
+
+</div>
+</div>
+
+<!-- Loading indicator -->
+<div id="loadingIndicator" class="loading">
+    <div class="spinner"></div>
+    <div>{% trans "Processing..." %}</div>
+</div>
+
+<div id="overlay" class="overlay"></div>
+<textarea id="floatingInput" class="floating-input" placeholder="{% trans "Type here..." %}"></textarea>
+<div id="keyboard" class="keyboard"></div>
+
+<script>
+let activeInput=null;
+let isUpperCase=true;
+
+const overlay=document.getElementById("overlay");
+const floatingInput=document.getElementById("floatingInput");
+const keyboard=document.getElementById("keyboard");
+const loadingIndicator = document.getElementById("loadingIndicator");
+
+function createKeyboard(){
+keyboard.innerHTML="";
+let letters="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+if(!isUpperCase){letters=letters.toLowerCase();}
+let keys=(letters+"0123456789 .-,").split("");
+
+let row=document.createElement("div");
+row.className="keyboard-row";
+
+keys.forEach((k,i)=>{
+if(i%10===0 && i!==0){
+keyboard.appendChild(row);
+row=document.createElement("div");
+row.className="keyboard-row";
+}
+let btn=document.createElement("button");
+btn.innerText=k===" "?"{% trans "Space" %}":k;
+btn.type="button";
+btn.onclick=()=>floatingInput.value+=k;
+row.appendChild(btn);
+});
+keyboard.appendChild(row);
+
+let last=document.createElement("div");
+last.className="keyboard-row";
+last.innerHTML=`
+<button type="button" onclick="toggleCase()">⇧ {% trans "Shift" %}</button>
+<button type="button" onclick="floatingInput.value=floatingInput.value.slice(0,-1)">⌫ {% trans "Back" %}</button>
+<button type="button" onclick="floatingInput.value=''">{% trans "Clear" %}</button>
+<button type="button" class="ok-btn" onclick="finish()">✓ {% trans "OK" %}</button>
+`;
+keyboard.appendChild(last);
+}
+
+function toggleCase(){
+isUpperCase=!isUpperCase;
+createKeyboard();
+}
+
+function openKeyboard(id){
+activeInput=document.getElementById(id);
+floatingInput.value=activeInput.value;
+overlay.style.display="block";
+floatingInput.style.display="block";
+keyboard.style.display="block";
+setTimeout(()=>{
+floatingInput.classList.add("show");
+floatingInput.focus();
+},10);
+}
+
+function finish(){
+if(activeInput){
+activeInput.value=floatingInput.value;
+// Update hidden field based on which input was active
+if(activeInput.id === 'name') {
+    document.getElementById('fullName').value = floatingInput.value;
+} else if(activeInput.id === 'address') {
+    document.getElementById('addressField').value = floatingInput.value;
+} else if(activeInput.id === 'load') {
+    document.getElementById('loadField').value = floatingInput.value;
+} else if(activeInput.id === 'mobile') {
+    document.getElementById('mobileField').value = floatingInput.value;
+}
+}
+closeKeyboard();
+}
+
+function closeKeyboard(){
+floatingInput.classList.remove("show");
+setTimeout(()=>{
+overlay.style.display="none";
+floatingInput.style.display="none";
+keyboard.style.display="none";
+},200);
+}
+
+// Handle Enter key on floating input
+floatingInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        finish();
+    }
+});
+
+document.getElementById("name").addEventListener("click",()=>openKeyboard("name"));
+document.getElementById("address").addEventListener("click",()=>openKeyboard("address"));
+document.getElementById("load").addEventListener("click",()=>openKeyboard("load"));
+document.getElementById("mobile").addEventListener("click",()=>openKeyboard("mobile"));
+overlay.addEventListener("click",closeKeyboard);
+
+createKeyboard();
+
+function updatePropertyType() {
+    const propertyType = document.getElementById('propertyType').value;
+    document.getElementById('propertyTypeField').value = propertyType;
+}
+
+function submitForm(){
+const name = document.getElementById('name').value;
+const address = document.getElementById('address').value;
+const load = document.getElementById('load').value;
+const mobile = document.getElementById('mobile').value;
+
+if(!name){
+alert('{% trans "Please enter your full name" %}');
+return;
+}
+
+if(!address){
+alert('{% trans "Please enter your address" %}');
+return;
+}
+
+if(!load){
+alert('{% trans "Please enter load required" %}');
+return;
+}
+
+// Validate load (should be a positive number)
+if(isNaN(load) || parseFloat(load) <= 0){
+alert('{% trans "Please enter a valid load value (positive number)" %}');
+return;
+}
+
+if(!mobile){
+alert('{% trans "Please enter mobile number" %}');
+return;
+}
+
+// Validate mobile (10 digits)
+if(!/^\d{10}$/.test(mobile)){
+alert('{% trans "Please enter a valid 10-digit mobile number" %}');
+return;
+}
+
+// Update property type before submission
+updatePropertyType();
+
+// Show loading
+loadingIndicator.classList.add('show');
+
+// Submit form
+setTimeout(() => {
+    document.getElementById('connectionForm').submit();
+}, 500);
+}
+
+// Auto-hide messages after 5 seconds
+setTimeout(function() {
+    document.querySelectorAll('.message').forEach(function(message) {
+        message.style.display = 'none';
+    });
+}, 5000);
+
+// Prevent form submission on Enter key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+    }
+});
+</script>
+
+</body>
+</html>

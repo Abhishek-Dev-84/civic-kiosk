@@ -1,0 +1,194 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% trans "Camera Upload - Civic Kiosk" %}</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif; user-select:none; }
+        body { width:100vw; height:100vh; overflow:hidden; background:#f0f7ff; }
+        .header { height:70px; background:white; display:flex; align-items:center; justify-content:space-between; padding:0 20px; border-bottom:2px solid #1e5fbf; }
+        .header-left { display:flex; align-items:center; gap:10px; }
+        .header-left img { height:40px; }
+        .header-left div { font-size:12px; font-weight:600; color:#1e5fbf; line-height:1.2; }
+        .header-right img { height:35px; }
+        .voice-corner { position:fixed; top:80px; right:15px; z-index:1000; display:flex; flex-direction:column; align-items:center; gap:3px; }
+        .voice-corner-btn { background:#ff9933; width:45px; height:45px; border-radius:50%; border:2px solid white; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:24px; box-shadow:0 2px 5px rgba(0,0,0,0.2); }
+        .voice-corner-text { background:white; padding:2px 8px; border-radius:12px; font-size:10px; color:#ff9933; border:1px solid #ff9933; }
+        .back-btn { position:fixed; top:80px; left:15px; background:white; border:2px solid #1e5fbf; border-radius:30px; padding:5px 15px; font-size:18px; font-weight:700; cursor:pointer; color:#1e5fbf; box-shadow:0 3px 0 #0a3d7a; z-index:1000; }
+        .back-btn:active { transform:translateY(3px); box-shadow:0 1px 0 #0a3d7a; }
+        .container { position:fixed; top:70px; left:0; right:0; bottom:0; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:10px; overflow:hidden; }
+        .content-wrapper { width:100%; max-width:600px; text-align:center; }
+        h1 { color:#1e5fbf; font-size:36px; font-weight:800; text-align:center; margin-bottom:20px; }
+        .camera-container { background:black; border:4px solid #1e5fbf; border-radius:30px; overflow:hidden; margin:20px 0; box-shadow:0 8px 0 #0a3d7a; }
+        #camera { width:100%; max-height:400px; object-fit:cover; display:block; }
+        .camera-controls { display:flex; gap:15px; margin:20px 0; }
+        .capture-btn { background:#28a745; color:white; font-size:32px; padding:15px; border-radius:50px; flex:1; border:none; box-shadow:0 6px 0 #1e7e34; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px; }
+        .capture-btn:active { transform:translateY(6px); box-shadow:0 1px 0 #1e7e34; }
+        .switch-btn { background:#1e5fbf; color:white; font-size:32px; padding:15px; border-radius:50px; flex:1; border:none; box-shadow:0 6px 0 #0a3d7a; cursor:pointer; }
+        .switch-btn:active { transform:translateY(6px); box-shadow:0 1px 0 #0a3d7a; }
+        .preview-container { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:20px 0; }
+        .preview-item { background:white; border:2px solid #1e5fbf; border-radius:15px; padding:5px; position:relative; }
+        .preview-item img { width:100%; height:80px; object-fit:cover; border-radius:10px; }
+        .preview-item .remove { position:absolute; top:-5px; right:-5px; background:#dc3545; color:white; width:25px; height:25px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:18px; }
+        .upload-btn { background:#ff9933; color:white; font-size:32px; padding:15px; border-radius:50px; width:100%; border:none; box-shadow:0 6px 0 #b35900; cursor:pointer; margin-top:10px; }
+        .upload-btn:active { transform:translateY(6px); box-shadow:0 1px 0 #b35900; }
+        .hidden { display:none; }
+        canvas { display:none; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg">
+            <div>{% trans "Ministry of Electronics &" %}<br>{% trans "Information Technology" %}<br>{% trans "Government of India" %}</div>
+        </div>
+        <div class="header-right">
+            <img src="https://www.cdac.in/img/cdac-logo.png">
+        </div>
+    </div>
+    <div class="voice-corner">
+        <div class="voice-corner-btn" onclick="alert('{% trans "Voice assistant activated" %}')">🎤</div>
+        <div class="voice-corner-text">{% trans "Click" %}</div>
+    </div>
+    <div class="back-btn" onclick="window.location='menu.html'">← {% trans "Back" %}</div>
+    <div class="container">
+        <div class="content-wrapper">
+            <h1>📸 {% trans "Camera Upload" %}</h1>
+            <div class="camera-container">
+                <video id="camera" autoplay playsinline></video>
+            </div>
+            <div class="camera-controls">
+                <button class="capture-btn" onclick="captureImage()">📸 {% trans "Capture" %}</button>
+                <button class="switch-btn" onclick="switchCamera()">🔄 {% trans "Switch" %}</button>
+            </div>
+            
+            <div id="previewSection" class="hidden">
+                <div style="font-size:22px; color:#1e5fbf; margin:10px 0;">{% trans "Captured Images" %}</div>
+                <div class="preview-container" id="previewContainer"></div>
+                <button class="upload-btn" onclick="uploadImages()">⬆️ {% trans "Upload All" %}</button>
+            </div>
+        </div>
+    </div>
+    <canvas id="canvas"></canvas>
+    <script>
+        const video = document.getElementById('camera');
+        const canvas = document.getElementById('canvas');
+        const previewContainer = document.getElementById('previewContainer');
+        const previewSection = document.getElementById('previewSection');
+        let currentStream = null;
+        let capturedImages = [];
+        let usingFrontCamera = false;
+        
+        // Start camera
+        function startCamera(front = false) {
+            const constraints = {
+                video: {
+                    facingMode: front ? 'user' : 'environment',
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 }
+                }
+            };
+            
+            if (currentStream) {
+                currentStream.getTracks().forEach(track => track.stop());
+            }
+            
+            navigator.mediaDevices.getUserMedia(constraints)
+                .then(stream => {
+                    currentStream = stream;
+                    video.srcObject = stream;
+                })
+                .catch(err => {
+                    alert('{% trans "Camera access denied or not available" %}');
+                    console.error(err);
+                });
+        }
+        
+        // Start with back camera
+        startCamera(false);
+        
+        function switchCamera() {
+            usingFrontCamera = !usingFrontCamera;
+            startCamera(usingFrontCamera);
+        }
+        
+        function captureImage() {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            
+            // Convert to image data URL
+            const imageData = canvas.toDataURL('image/jpeg', 0.8);
+            capturedImages.push(imageData);
+            
+            // Add to preview
+            const previewItem = document.createElement('div');
+            previewItem.className = 'preview-item';
+            previewItem.innerHTML = `
+                <img src="${imageData}" alt="Capture">
+                <div class="remove" onclick="removeImage(this, ${capturedImages.length - 1})">×</div>
+            `;
+            previewContainer.appendChild(previewItem);
+            
+            // Show preview section if hidden
+            if (previewSection.classList.contains('hidden')) {
+                previewSection.classList.remove('hidden');
+            }
+            
+            // Flash effect
+            video.style.animation = 'flash 0.3s';
+            setTimeout(() => video.style.animation = '', 300);
+        }
+        
+        function removeImage(element, index) {
+            capturedImages.splice(index, 1);
+            element.parentElement.remove();
+            
+            // Hide section if no images
+            if (capturedImages.length === 0) {
+                previewSection.classList.add('hidden');
+            } else {
+                // Rebuild preview to update indices
+                refreshPreview();
+            }
+        }
+        
+        function refreshPreview() {
+            previewContainer.innerHTML = '';
+            capturedImages.forEach((img, index) => {
+                const previewItem = document.createElement('div');
+                previewItem.className = 'preview-item';
+                previewItem.innerHTML = `
+                    <img src="${img}" alt="Capture">
+                    <div class="remove" onclick="removeImage(this, ${index})">×</div>
+                `;
+                previewContainer.appendChild(previewItem);
+            });
+        }
+        
+        function uploadImages() {
+            if (capturedImages.length === 0) {
+                alert('{% trans "Please capture at least one image" %}');
+                return;
+            }
+            
+            alert(`{% trans "Uploading" %} ${capturedImages.length} {% trans "images..." %}`);
+            setTimeout(() => {
+                alert('✅ {% trans "Images uploaded successfully!" %}');
+                window.location = 'menu.html';
+            }, 2000);
+        }
+        
+        // Add flash animation
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes flash {
+                0% { opacity: 1; }
+                50% { opacity: 0.5; }
+                100% { opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

@@ -1,0 +1,370 @@
+{% load static %}
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% trans "Application Status - Civic Services Kiosk" %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <style>
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            font-family: 'Segoe UI', sans-serif; 
+            user-select: none; 
+        }
+
+        body {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background: #f0f7ff;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            height: 70px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            border-bottom: 2px solid #1e5fbf;
+            flex-shrink: 0;
+        }
+
+        .header-left { 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+        }
+        
+        .header-left img { height: 40px; }
+        
+        .header-left div { 
+            font-size: 12px; 
+            font-weight: 600; 
+            color: #1e5fbf; 
+            line-height: 1.2; 
+        }
+        
+        .header-right img { height: 35px; }
+
+        .voice-corner {
+            position: absolute;
+            top: 80px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .voice-corner-btn {
+            background: #ff9933;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 2px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .voice-corner-text {
+            background: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            color: #ff9933;
+            border: 1px solid #ff9933;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 80px;
+            left: 20px;
+            background: white;
+            border: 2px solid #1e5fbf;
+            border-radius: 30px;
+            padding: 6px 18px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            color: #1e5fbf;
+            box-shadow: 0 3px 0 #0a3d7a;
+            display: none;
+            z-index: 1000;
+            text-decoration: none;
+        }
+
+        .main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .menu-title {
+            color: #1e5fbf;
+            font-size: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+        }
+
+        .menu-card {
+            background: white;
+            border: 3px solid #1e5fbf;
+            border-radius: 30px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #0a3d7a;
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e5fbf;
+        }
+
+        .screen {
+            display: none;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .section-card {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 15px;
+            font-size: 16px;
+            line-height: 24px;
+            border: 2px solid #1e5fbf;
+            box-shadow: 0 4px 0 #0a3d7a;
+        }
+
+        .section-title {
+            color: #1e5fbf;
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 8px;
+        }
+
+        .progress-container {
+            background: #ddd;
+            height: 15px;
+            border-radius: 20px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: #1e5fbf;
+            transition: width 0.3s ease;
+        }
+
+        .deadline {
+            margin-top: 10px;
+            font-weight: 700;
+            color: #d9534f;
+            padding: 8px;
+            background: #ffeeee;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .info-label { font-weight: 600; color: #1e5fbf; }
+        .info-value { color: #333; }
+
+        .stage-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            margin: 5px 0;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .back-to-menu {
+            display: inline-block;
+            padding: 12px 30px;
+            background: #1e5fbf;
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: 600;
+            margin-top: 20px;
+            border: 2px solid white;
+            box-shadow: 0 4px 0 #0a3d7a;
+        }
+
+        .empty-state { text-align: center; padding: 40px; }
+        .empty-icon { font-size: 64px; margin-bottom: 20px; opacity: 0.5; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="header-left">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India">
+        <div>
+            {% trans "Ministry of Electronics &" %}<br>
+            {% trans "Information Technology" %}<br>
+            {% trans "Government of India" %}
+        </div>
+    </div>
+    <div class="header-right">
+        <img src="https://www.cdac.in/img/cdac-logo.png" alt="CDAC Logo">
+    </div>
+</div>
+
+<div class="voice-corner">
+    <div class="voice-corner-btn" onclick="alert('{% trans "Voice assistant activated" %}')">🎤</div>
+    <div class="voice-corner-text">{% trans "Click" %}</div>
+</div>
+
+<div class="back-btn" onclick="goHome()">← {% trans "Back" %}</div>
+
+<div class="main">
+
+    <div id="mainMenu">
+        <h1 class="menu-title">📄 {% trans "Status Portal" %}</h1>
+        <div class="menu-grid">
+            <div class="menu-card" onclick="openApplication()">
+                {% trans "Application Status" %}
+            </div>
+            <div class="menu-card" onclick="window.location='{% url 'payment-history' %}'">
+                {% trans "Payment History" %}
+            </div>
+        </div>
+    </div>
+
+    <div id="applicationScreen" class="screen">
+        <h1 style="text-align:center; color:#1e5fbf; margin-bottom:20px; font-size:32px;">
+            📑 {% trans "Application & Complaint Status" %}
+        </h1>
+
+        {% if application %}
+        <div class="section-card">
+            <div class="section-title">{% trans "Application Tracking" %}</div>
+
+            <div class="info-row">
+                <span class="info-label">{% trans "Application ID:" %}</span>
+                <span class="info-value">{{ application.application_id }}</span>
+            </div>
+
+            <div class="info-row">
+                <span class="info-label">{% trans "Department:" %}</span>
+                <span class="info-value">{{ application.department }}</span>
+            </div>
+
+            <div class="info-row">
+                <span class="info-label">{% trans "Submitted Date:" %}</span>
+                <span class="info-value">{{ application.submitted_date|date:"d M Y" }}</span>
+            </div>
+
+            <div class="info-row">
+                <span class="info-label">{% trans "Current Stage:" %}</span>
+                <span class="info-value">{{ application.current_stage }}</span>
+            </div>
+
+            <div class="info-row">
+                <span class="info-label">{% trans "Assigned Officer:" %}</span>
+                <span class="info-value">{{ application.assigned_officer }}</span>
+            </div>
+
+            <div class="deadline">
+                {% trans "Expected Completion:" %} {{ application.expected_completion|date:"d M Y" }}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if complaint %}
+        <div class="section-card">
+            <div class="section-title">{% trans "Complaint Tracking" %}</div>
+
+            <div class="info-row">
+                <span class="info-label">{% trans "Complaint ID:" %}</span>
+                <span class="info-value">{{ complaint.complaint_id }}</span>
+            </div>
+
+            <div class="info-row">
+                <span class="info-label">{% trans "Status:" %}</span>
+                <span class="info-value">{{ complaint.status }}</span>
+            </div>
+
+            <div class="info-row">
+                <span class="info-label">{% trans "Work Completed:" %}</span>
+                <span class="info-value">{{ complaint.work_completed }}%</span>
+            </div>
+
+            <div class="info-row">
+                <span class="info-label">{% trans "Officer Remark:" %}</span>
+                <span class="info-value">{{ complaint.officer_remark }}</span>
+            </div>
+
+            <div class="deadline">
+                {% trans "Deadline:" %} {{ complaint.deadline|date:"d M Y" }}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if not application and not complaint %}
+        <div class="section-card empty-state">
+            <div class="empty-icon">📭</div>
+            <div class="section-title">{% trans "No Active Applications" %}</div>
+            <p style="padding: 20px; font-size: 18px; color: #666;">
+                {% trans "You don't have any active applications or complaints." %}
+            </p>
+            <a href="{% url 'menu' %}" class="back-to-menu">
+                ← {% trans "Back to Menu" %}
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+
+<script>
+function openApplication() {
+    document.getElementById("mainMenu").style.display = "none";
+    document.getElementById("applicationScreen").style.display = "block";
+    document.querySelector(".back-btn").style.display = "block";
+    sessionStorage.setItem('appScreenOpen', 'true');
+}
+
+function goHome() {
+    document.getElementById("mainMenu").style.display = "block";
+    document.getElementById("applicationScreen").style.display = "none";
+    document.querySelector(".back-btn").style.display = "none";
+    sessionStorage.setItem('appScreenOpen', 'false');
+}
+</script>
+
+</body>
+</html>

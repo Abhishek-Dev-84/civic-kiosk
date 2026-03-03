@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+{% load i18n %}
+{% load static %}
+<html>
+<head>
+    <title>{% trans "Water Bill - Civic Kiosk" %}</title>
+    
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif; user-select:none; }
+        body { width:100vw; height:100vh; overflow:hidden; background:#f0f7ff; }
+        .header { height:70px; background:white; display:flex; align-items:center; justify-content:space-between; padding:0 20px; border-bottom:2px solid #1e5fbf; }
+        .header-left { display:flex; align-items:center; gap:10px; }
+        .header-left img { height:40px; }
+        .header-left div { font-size:12px; font-weight:600; color:#1e5fbf; line-height:1.2; }
+        .header-right img { height:35px; }
+        .voice-corner { position:fixed; top:80px; right:15px; z-index:1000; display:flex; flex-direction:column; align-items:center; gap:3px; }
+        .voice-corner-btn { background:#ff9933; width:45px; height:45px; border-radius:50%; border:2px solid white; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:24px; box-shadow:0 2px 5px rgba(0,0,0,0.2); }
+        .voice-corner-text { background:white; padding:2px 8px; border-radius:12px; font-size:10px; color:#ff9933; border:1px solid #ff9933; }
+        .back-btn { position:fixed; top:80px; left:15px; background:white; border:2px solid #1e5fbf; border-radius:30px; padding:5px 15px; font-size:18px; font-weight:700; cursor:pointer; color:#1e5fbf; box-shadow:0 3px 0 #0a3d7a; z-index:1000; }
+        .back-btn:active { transform:translateY(3px); box-shadow:0 1px 0 #0a3d7a; }
+        .container { position:fixed; top:70px; left:0; right:0; bottom:0; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:10px; overflow:hidden; }
+        .content-wrapper { width:100%; max-width:600px; }
+        h1 { color:#1e5fbf; font-size:36px; font-weight:800; text-align:center; margin-bottom:20px; }
+        .consumer-input { margin:20px 0; }
+        .large-input { width:100%; height:70px; border:3px solid #1e5fbf; border-radius:30px; font-size:28px; padding:0 20px; background:white; }
+        .fetch-btn { background:#1e5fbf; color:white; font-size:28px; padding:12px; border-radius:40px; width:100%; border:none; box-shadow:0 5px 0 #0a3d7a; cursor:pointer; margin:10px 0; }
+        .fetch-btn:active { transform:translateY(5px); box-shadow:0 1px 0 #0a3d7a; }
+        .bill-card { background:white; border:3px solid #1e5fbf; border-radius:30px; padding:25px; font-size:22px; box-shadow:0 5px 0 #0a3d7a; margin-top:20px; }
+        .bill-row { display:flex; justify-content:space-between; margin:10px 0; padding:5px 0; border-bottom:1px solid #e0e0e0; }
+        .bill-amount { font-size:48px; color:#28a745; font-weight:800; margin:20px 0; text-align:center; }
+        .pay-btn { background:#28a745; color:white; font-size:32px; padding:12px; border-radius:40px; width:100%; border:none; box-shadow:0 5px 0 #1e7e34; cursor:pointer; }
+        .pay-btn:active { transform:translateY(5px); box-shadow:0 1px 0 #1e7e34; }
+        .hidden { display:none; }
+        .messages { margin-bottom: 15px; }
+        .message { padding: 10px; border-radius: 5px; margin-bottom: 5px; }
+        .message.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .message.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        {% if messages %}
+        .has-messages { margin-top: 10px; }
+        {% endif %}
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India">
+            <div>{% trans "Ministry of Electronics &" %}<br>{% trans "Information Technology" %}<br>{% trans "Government of India" %}</div>
+        </div>
+        <div class="header-right">
+            <img src="https://www.cdac.in/img/cdac-logo.png" alt="CDAC Logo">
+        </div>
+    </div>
+    
+    {% if messages %}
+    <div style="position: fixed; top: 80px; left: 50%; transform: translateX(-50%); z-index: 2000; width: 90%; max-width: 600px;">
+        {% for message in messages %}
+        <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <div class="voice-corner">
+        <div class="voice-corner-btn" onclick="alert('{% trans "Voice assistant activated" %}')">🎤</div>
+        <div class="voice-corner-text">{% trans "Click" %}</div>
+    </div>
+    <div class="back-btn" onclick="window.location='{% url 'municipal-services' %}'">← {% trans "Back" %}</div>
+    <div class="container">
+        <div class="content-wrapper">
+            <h1>💧 {% trans "Water Bill" %}</h1>
+            
+            <form method="POST" action="{% url 'water-bill' %}">
+                {% csrf_token %}
+                <div class="consumer-input">
+                    <input class="large-input" id="consumerNo" name="consumer_no" placeholder="{% trans "Enter Consumer No." %}" value="WC123456">
+                </div>
+                <button type="submit" class="fetch-btn" name="fetch_bill">{% trans "Fetch Bill" %}</button>
+            </form>
+            
+            <div id="billCard" class="bill-card {% if not show_bill %}hidden{% endif %}">
+                <div class="bill-row">
+                    <span>{% trans "Consumer No:" %}</span>
+                    <span><strong>{{ consumer_no|default:'WC123456' }}</strong></span>
+                </div>
+                <div class="bill-row">
+                    <span>{% trans "Name:" %}</span>
+                    <span><strong>{{ consumer_name|default:'Rajesh Kumar' }}</strong></span>
+                </div>
+                <div class="bill-row">
+                    <span>{% trans "Bill Number:" %}</span>
+                    <span><strong>{{ bill_number|default:'WATER/2026/0215' }}</strong></span>
+                </div>
+                <div class="bill-row">
+                    <span>{% trans "Bill Date:" %}</span>
+                    <span><strong>{{ bill_date|default:'15 Feb 2026' }}</strong></span>
+                </div>
+                <div class="bill-row">
+                    <span>{% trans "Due Date:" %}</span>
+                    <span style="color:#dc3545;"><strong>{{ due_date|default:'05 Mar 2026' }}</strong></span>
+                </div>
+                <div class="bill-row">
+                    <span>{% trans "Units Consumed:" %}</span>
+                    <span><strong>{{ units_consumed|default:'25 kL' }}</strong></span>
+                </div>
+                <div class="bill-amount">{% trans "₹" %} {{ bill_amount|default:'450.00' }}</div>
+                
+                <form method="POST" action="{% url 'water-bill' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="consumer_no" value="{{ consumer_no|default:'WC123456' }}">
+                    <input type="hidden" name="bill_amount" value="{{ bill_amount|default:'450.00' }}">
+                    <button type="submit" class="pay-btn" name="pay_bill">{% trans "Pay Now" %}</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function fetchBill() {
+            // This function is kept for compatibility but form submission will handle it
+            const consumer = document.getElementById('consumerNo').value;
+            if(!consumer) {
+                alert('{% trans "Please enter consumer number" %}');
+                return false;
+            }
+            return true;
+        }
+        
+        function payBill() {
+            // This function is kept for compatibility but form submission will handle it
+            const amount = '{{ bill_amount|default:"450.00" }}';
+            if(confirm('{% trans "Pay ₹" %}' + amount + '?')) {
+                return true;
+            }
+            return false;
+        }
+        
+        // Auto-hide messages after 5 seconds
+        setTimeout(function() {
+            const messages = document.querySelectorAll('.message');
+            messages.forEach(function(message) {
+                message.style.display = 'none';
+            });
+        }, 5000);
+    </script>
+</body>
+</html>

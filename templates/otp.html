@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+{% load i18n %}
+{% load static %}
+<html lang="en">
+<head>
+
+    <style>
+        /* Hide Google Translate elements */
+        .goog-te-banner-frame.skiptranslate,
+        .goog-te-gadget-icon,
+        .goog-te-gadget-simple,
+        #goog-gt-tt,
+        .goog-te-balloon-frame,
+        .goog-te-menu-frame,
+        .goog-te-spinner-pos {
+            display: none !important;
+        }
+        
+        body {
+            top: 0px !important;
+            position: static !important;
+        }
+        
+        .goog-te-combo {
+            display: none !important;
+        }
+        
+        .goog-te-gadget {
+            color: transparent !important;
+            height: 0 !important;
+            overflow: hidden !important;
+        }
+    </style>
+
+    <meta charset="UTF-8">
+    <title>{% trans "Civic Services Kiosk - OTP Verification" %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+
+    <style>
+        /* Hide Google Translate elements */
+        .goog-te-banner-frame.skiptranslate,
+        .goog-te-gadget-icon,
+        .goog-te-gadget-simple,
+        #goog-gt-tt,
+        .goog-te-balloon-frame,
+        .goog-te-menu-frame,
+        .goog-te-spinner-pos {
+            display: none !important;
+        }
+        
+        body {
+            top: 0px !important;
+            position: static !important;
+        }
+        
+        .goog-te-combo {
+            display: none !important;
+        }
+        
+        .goog-te-gadget {
+            color: transparent !important;
+            height: 0 !important;
+            overflow: hidden !important;
+        }
+    </style>
+
+    <style>
+        /* ---- YOUR COMPLETE CSS UNCHANGED ---- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            user-select: none;
+        }
+
+        body {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background: #f0f7ff;
+        }
+
+        /* HEADER */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 70px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            border-bottom: 2px solid #1e5fbf;
+            z-index: 1000;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-left img {
+            height: 35px;
+        }
+
+        .header-left div {
+            font-size: 12px;
+            font-weight: 600;
+            color: #1e5fbf;
+            line-height: 1.1;
+        }
+
+        .header-right img {
+            height: 30px;
+        }
+
+        /* Voice button */
+        .voice-corner {
+            position: fixed;
+            top: 80px;
+            right: 15px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .voice-corner-btn {
+            background: #ff9933;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .voice-corner-btn.listening {
+            background: #4CAF50;
+        }
+
+        .voice-corner-text {
+            background: white;
+            padding: 2px 8px;
+            border-radius: 15px;
+            font-size: 10px;
+            font-weight: 600;
+            color: #ff9933;
+            border: 1px solid #ff9933;
+        }
+
+        /* Back button */
+        .back-btn {
+            position: fixed;
+            top: 80px;
+            left: 15px;
+            background: white;
+            border: 2px solid #1e5fbf;
+            border-radius: 30px;
+            padding: 5px 15px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            color: #1e5fbf;
+            box-shadow: 0 3px 0 #0a3d7a;
+            z-index: 1000;
+        }
+
+        .back-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #0a3d7a;
+        }
+
+        /* Main container */
+        .kiosk-container {
+            position: fixed;
+            top: 70px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            padding: 15px 20px 20px 20px;
+            overflow: hidden;
+        }
+
+        .content-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Title */
+        h1 {
+            color: #1e5fbf;
+            font-size: 32px;
+            font-weight: 800;
+            text-align: center;
+            margin: 10px 0 15px 0;
+        }
+
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #1e5fbf;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            animation: spin 1s linear infinite;
+            margin: 5px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hidden { display: none; }
+
+        .label {
+            color: #1e5fbf;
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+            margin: 5px 0 10px 0;
+        }
+
+        /* OTP boxes */
+        .otp-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin: 20px 0 25px 0;
+            flex-wrap: nowrap;
+        }
+
+        .otp-box {
+            width: 50px;
+            height: 60px;
+            border: 3px solid #1e5fbf;
+            border-radius: 10px;
+            font-size: 32px;
+            font-weight: 800;
+            text-align: center;
+            line-height: 60px;
+            background: white;
+            color: #1e5fbf;
+            box-shadow: 0 4px 0 #0a3d7a;
+            flex-shrink: 0;
+        }
+
+        .otp-box.filled {
+            background: #e3f2fd;
+        }
+
+        .otp-box.highlight {
+            border-color: #ff9933;
+            border-width: 4px;
+            box-shadow: 0 4px 0 #cc6600;
+        }
+
+        /* Timer moved up - now appears right after OTP boxes */
+        .timer {
+            text-align: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: #ff9933;
+            margin: 0 0 20px 0;
+        }
+
+        /* Keypad */
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 8px;
+        }
+
+        .key {
+            background: white;
+            border: 3px solid #1e5fbf;
+            border-radius: 20px;
+            padding: 18px 5px;
+            font-size: 40px;
+            font-weight: 800;
+            cursor: pointer;
+            color: #1e5fbf;
+            box-shadow: 0 5px 0 #0a3d7a;
+            text-align: center;
+            min-height: 85px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .key:active {
+            transform: translateY(5px);
+            box-shadow: 0 1px 0 #0a3d7a;
+        }
+
+        .key.special {
+            background: #ff9933;
+            color: white;
+            border-color: #cc6600;
+            box-shadow: 0 5px 0 #b35900;
+        }
+
+        /* Verify button - REMOVED */
+
+        /* Error message */
+        .error {
+            color: #dc3545;
+            font-size: 18px;
+            text-align: center;
+            font-weight: 700;
+            background: #ffe6e6;
+            padding: 8px;
+            border-radius: 25px;
+            border: 1px solid #dc3545;
+            margin: 5px 0;
+        }
+
+        /* Success message */
+        .success-message {
+            position: fixed;
+            top: 80px;
+            left: 15px;
+            background: #4CAF50;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 600;
+            z-index: 2000;
+            border: 3px solid white;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+            animation: slideInLeft 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .success-message::before {
+            content: "✅";
+            font-size: 20px;
+        }
+
+        @keyframes slideInLeft {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideOutLeft {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(-100%); opacity: 0; }
+        }
+
+        .resend-btn {
+            background: none;
+            border: none;
+            color: #1e5fbf;
+            font-size: 18px;
+            font-weight: 600;
+            text-decoration: underline;
+            cursor: pointer;
+            margin: 10px auto;
+            display: block;
+        }
+
+        .resend-btn:disabled {
+            color: #999;
+            cursor: not-allowed;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="header-left">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India">
+            <div>
+                {% trans "Ministry of Electronics &" %}<br>
+                {% trans "Information Technology" %}<br>
+                {% trans "Government of India" %}
+            </div>
+        </div>
+        <div class="header-right">
+            <img src="https://www.cdac.in/img/cdac-logo.png" alt="CDAC Logo">
+        </div>
+    </div>
+
+    <div class="voice-corner">
+        <div class="voice-corner-btn" id="voiceBtn" onclick="toggleVoiceInput()">🎤</div>
+        <div class="voice-corner-text" id="voiceStatus">{% trans "Click" %}</div>
+    </div>
+
+    <div class="back-btn" onclick="goBack()">← {% trans "Back" %}</div>
+
+    <!-- Success Messages - Display on left side -->
+    {% if messages %}
+        {% for message in messages %}
+            {% if message.tags == 'success' %}
+                <div class="success-message">
+                    {{ message }}
+                </div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+    <div class="kiosk-container">
+        <div class="content-wrapper">
+            <h1>🔐 {% trans "Verify OTP for" %} {{ aadhaar }}</h1>
+            
+            <!-- Loader - visible initially -->
+            <div id="loader" class="loader"></div>
+            <div id="loaderText" style="text-align: center; color: #1e5fbf; font-weight: 600; margin: 10px 0;">{% trans "Sending OTP..." %}</div>
+            
+            <!-- Error Messages - Display inline -->
+            {% if messages %}
+                {% for message in messages %}
+                    {% if message.tags == 'error' %}
+                        <div class="error">
+                            {{ message }}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+
+            <!-- OTP Form Container - hidden initially -->
+            <div id="otpFormContainer" style="display: none;">
+                <div class="label">{% trans "Enter 6-digit OTP" %}</div>
+
+                <form method="POST" action="{% url 'otp' %}" id="otpForm">
+                    {% csrf_token %}
+                    <input type="hidden" name="otp" id="otpHidden">
+
+                    <div class="otp-row" id="otpRow"></div>
+
+                    <!-- Timer - moved up right after OTP boxes -->
+                    <div class="timer" id="timer">02:00</div>
+
+                    <div class="keypad">
+                        <div class="key" onclick="pressKey(1)">1</div>
+                        <div class="key" onclick="pressKey(2)">2</div>
+                        <div class="key" onclick="pressKey(3)">3</div>
+                        <div class="key" onclick="pressKey(4)">4</div>
+                        <div class="key" onclick="pressKey(5)">5</div>
+                        <div class="key" onclick="pressKey(6)">6</div>
+                        <div class="key" onclick="pressKey(7)">7</div>
+                        <div class="key" onclick="pressKey(8)">8</div>
+                        <div class="key" onclick="pressKey(9)">9</div>
+                        <div class="key special" onclick="backspace()">⌫</div>
+                        <div class="key" onclick="pressKey(0)">0</div>
+                        <div class="key special" onclick="clearAll()">C</div>
+                    </div>
+
+                    <!-- Verify button removed - verification happens automatically -->
+                </form>
+
+                <!-- Resend OTP Form -->
+                <form method="POST" action="{% url 'resend-otp' %}" id="resendForm">
+                    {% csrf_token %}
+                    <button type="submit" class="resend-btn" id="resendBtn">{% trans "Resend OTP" %}</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ================= OTP PAGE JAVASCRIPT =================
+        let otpBoxes = [];
+        let otpPos = 0;
+        let timeLeft = 120; // 2 minutes in seconds
+        let timerInterval;
+
+        // Auto-hide success message after 3 seconds
+        setTimeout(function() {
+            const successMsg = document.querySelector('.success-message');
+            if (successMsg) {
+                successMsg.style.animation = 'slideOutLeft 0.3s ease';
+                setTimeout(function() {
+                    if (successMsg) successMsg.remove();
+                }, 300);
+            }
+        }, 3000);
+
+        // Initialize OTP boxes immediately when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('OTP Page Loaded - Initializing...');
+            
+            // Create OTP boxes
+            const otpRow = document.getElementById('otpRow');
+            if (otpRow) {
+                // Clear any existing content
+                otpRow.innerHTML = '';
+                
+                // Create 6 boxes
+                for(let i = 0; i < 6; i++) {
+                    let box = document.createElement('div');
+                    box.className = 'otp-box';
+                    box.id = `otp_${i}`;
+                    otpRow.appendChild(box);
+                    otpBoxes.push(box);
+                }
+                console.log('Created 6 OTP boxes');
+            }
+            
+            // Get loader elements
+            const loader = document.getElementById('loader');
+            const loaderText = document.getElementById('loaderText');
+            const otpFormContainer = document.getElementById('otpFormContainer');
+            
+            console.log('Loader found:', loader);
+            console.log('OTP Container found:', otpFormContainer);
+            
+            // Hide loader and show OTP form after 2 seconds
+            setTimeout(function() {
+                console.log('Hiding loader and showing OTP form...');
+                
+                // Hide loader
+                if (loader) {
+                    loader.style.display = 'none';
+                    console.log('Loader hidden');
+                }
+                
+                // Hide loader text
+                if (loaderText) {
+                    loaderText.style.display = 'none';
+                    console.log('Loader text hidden');
+                }
+                
+                // Show OTP form
+                if (otpFormContainer) {
+                    otpFormContainer.style.display = 'block';
+                    console.log('OTP form shown');
+                }
+                
+                // Highlight first box
+                highlightCurrentBox();
+                
+                // Start the timer
+                startTimer();
+                
+            }, 2000); // Show loader for 2 seconds, then show OTP form
+        });
+
+        function highlightCurrentBox() {
+            otpBoxes.forEach((box, index) => {
+                if (box) {
+                    if(index === otpPos) {
+                        box.classList.add('highlight');
+                    } else {
+                        box.classList.remove('highlight');
+                    }
+                }
+            });
+        }
+
+        function goBack() {
+            window.location.href = "{% url 'auth' %}";
+        }
+
+        function pressKey(n) {
+            if(otpPos < 6) {
+                if (otpBoxes[otpPos]) {
+                    otpBoxes[otpPos].textContent = n;
+                    otpBoxes[otpPos].classList.add('filled');
+                    otpPos++;
+                    highlightCurrentBox();
+                    console.log('Pressed key:', n, 'Position:', otpPos);
+                    
+                    // Auto-verify when all 6 digits are entered
+                    if (otpPos === 6) {
+                        console.log('All 6 digits entered, auto-verifying...');
+                        setTimeout(function() {
+                            verifyOTP();
+                        }, 100); // Small delay for better UX
+                    }
+                }
+            }
+        }
+
+        function backspace() {
+            if(otpPos > 0) {
+                otpPos--;
+                if (otpBoxes[otpPos]) {
+                    otpBoxes[otpPos].textContent = '';
+                    otpBoxes[otpPos].classList.remove('filled');
+                    highlightCurrentBox();
+                    console.log('Backspace, new position:', otpPos);
+                }
+            }
+        }
+
+        function clearAll() {
+            otpBoxes.forEach(box => {
+                if (box) {
+                    box.textContent = '';
+                    box.classList.remove('filled');
+                }
+            });
+            otpPos = 0;
+            highlightCurrentBox();
+            console.log('Cleared all boxes');
+        }
+
+        function getOTP() {
+            let otp = '';
+            otpBoxes.forEach(box => {
+                if (box) otp += box.textContent || '';
+            });
+            return otp;
+        }
+
+        function verifyOTP() {
+            const otp = getOTP();
+            console.log('Verifying OTP:', otp);
+            
+            if(otp.length !== 6) {
+                alert('{% trans "Please enter 6-digit OTP" %}');
+                return;
+            }
+
+            document.getElementById('otpHidden').value = otp;
+            document.getElementById('otpForm').submit();
+        }
+
+        function startTimer() {
+            console.log('Starting timer...');
+            timerInterval = setInterval(function() {
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                const timerElement = document.getElementById('timer');
+                
+                if (timerElement) {
+                    timerElement.textContent = 
+                        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                }
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    if (timerElement) {
+                        timerElement.textContent = '00:00';
+                    }
+                    // Disable keypad when timer expires
+                    document.querySelectorAll('.key').forEach(key => {
+                        key.style.opacity = '0.5';
+                        key.style.pointerEvents = 'none';
+                    });
+                    
+                    // Disable resend button or handle as needed
+                    const resendBtn = document.getElementById('resendBtn');
+                    if (resendBtn) {
+                        resendBtn.disabled = false; // Enable resend button
+                    }
+                    
+                    alert('{% trans "OTP expired. Please request a new one." %}');
+                    console.log('Timer expired');
+                }
+                timeLeft--;
+            }, 1000);
+        }
+
+        // Voice input function (if needed)
+        function toggleVoiceInput() {
+            console.log('Voice toggled');
+        }
+    </script>
+
+</body>
+</html>
