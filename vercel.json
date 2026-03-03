@@ -2,8 +2,7 @@
   "builds": [
     {
       "src": "Kiosk/wsgi.py",
-      "use": "@vercel/python",
-      "config": { "maxLambdaSize": "15mb" }
+      "use": "@vercel/python"
     }
   ],
   "routes": [
@@ -15,5 +14,10 @@
       "src": "/(.*)",
       "dest": "Kiosk/wsgi.py"
     }
-  ]
+  ],
+  "env": {
+    "DJANGO_SECRET_KEY": "O-gUscikJbpO0mJ5rbTq5xMa8livkBcVckxF2s8urNY8zWV1qC8mmoGsJCQ34kIk9LY",
+    "DEBUG": "False",
+    "ALLOWED_HOSTS": ".vercel.app"
+  }
 }
