@@ -1,6 +1,7 @@
+{% load i18n %}
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ LANGUAGE_CODE }}">
   <head>
     <style>
       /* Hide Google Translate elements */
@@ -31,8 +32,9 @@
     </style>
 
     <meta charset="UTF-8" />
-    <title>Civic Services Kiosk - Language</title>
+    <title>{% trans "Civic Services Kiosk - Language" %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <style>
       .lang-grid {
         display: grid;
@@ -40,7 +42,6 @@
         gap: 25px;
         margin: 30px 0;
       }
-      
       .lang-btn {
         background: white;
         border: 4px solid #1e5fbf;
@@ -57,12 +58,10 @@
         align-items: center;
         justify-content: center;
       }
-      
       .lang-btn:active {
         transform: translateY(8px);
         box-shadow: 0 2px 0 #0a3d7a;
       }
-      
       * {
         margin: 0;
         padding: 0;
@@ -70,15 +69,12 @@
         font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
         user-select: none;
       }
-      
-      html,
-      body {
+      html, body {
         width: 100%;
         height: 100%;
         overflow: hidden;
         background: #f0f7ff;
       }
-      
       .header {
         position: fixed;
         top: 0;
@@ -94,28 +90,10 @@
         z-index: 1000;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
       }
-      
-      .header-left {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-      }
-      
-      .header-left img {
-        height: 42px;
-      }
-      
-      .header-left div {
-        font-size: 13px;
-        font-weight: 600;
-        color: #1e5fbf;
-        line-height: 1.2;
-      }
-      
-      .header-right img {
-        height: 38px;
-      }
-      
+      .header-left { display: flex; align-items: center; gap: 12px; }
+      .header-left img { height: 42px; }
+      .header-left div { font-size: 13px; font-weight: 600; color: #1e5fbf; line-height: 1.2; }
+      .header-right img { height: 38px; }
       .voice-corner {
         position: fixed;
         top: 80px;
@@ -126,7 +104,6 @@
         align-items: center;
         gap: 4px;
       }
-      
       .voice-corner-btn {
         background: #ff9933;
         width: 50px;
@@ -140,7 +117,6 @@
         justify-content: center;
         font-size: 26px;
       }
-      
       .voice-corner-text {
         background: white;
         padding: 4px 10px;
@@ -150,7 +126,6 @@
         color: #ff9933;
         border: 1px solid #ff9933;
       }
-      
       .kiosk-container {
         position: fixed;
         top: 70px;
@@ -162,19 +137,8 @@
         justify-content: center;
         padding: 15px;
       }
-      
-      .content-wrapper {
-        width: 100%;
-        max-width: 700px;
-      }
-      
-      h1 {
-        color: #1e5fbf;
-        font-size: 36px;
-        font-weight: 800;
-        text-align: center;
-      }
-      
+      .content-wrapper { width: 100%; max-width: 700px; }
+      h1 { color: #1e5fbf; font-size: 36px; font-weight: 800; text-align: center; }
       .timeout-warning {
         position: fixed;
         top: 50%;
@@ -188,7 +152,6 @@
         z-index: 2000;
         display: none;
       }
-      
       .timeout-warning button {
         background: #28a745;
         color: white;
@@ -200,18 +163,18 @@
         cursor: pointer;
         margin: 10px;
       }
-      
-      .timeout-warning .logout-btn {
-        background: #dc3545;
-      }
+      .timeout-warning .logout-btn { background: #dc3545; }
     </style>
   </head>
+
   <body>
     <div class="header">
       <div class="header-left">
         <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" />
         <div>
-          'Ministry of Electronics &<br />Information Technology<br />Government of India
+          {% trans "Ministry of Electronics &" %}<br />
+          {% trans "Information Technology" %}<br />
+          {% trans "Government of India" %}
         </div>
       </div>
       <div class="header-right">
@@ -220,19 +183,21 @@
     </div>
 
     <div class="voice-corner">
-      <div class="voice-corner-btn">🎤</div>
-      <div class="voice-corner-text">Click</div>
+      <div class="voice-corner-btn" onclick="startVoice()">🎤</div>
+      <div class="voice-corner-text">{% trans "Click" %}</div>
     </div>
 
     <div id="timeoutWarning" class="timeout-warning">
-      <p>⏰Session about to expire</p>
-      <button onclick="extendSession()">Continue</button>
-      <button class="logout-btn" onclick="window.location='{% url 'index' %}'">Logout</button>
+      <p>{% trans "Session about to expire" %}</p>
+      <button onclick="extendSession()">{% trans "Continue" %}</button>
+      <button class="logout-btn" onclick="window.location='{% url 'index' %}'">
+        {% trans "Logout" %}
+      </button>
     </div>
 
     <div class="kiosk-container">
       <div class="content-wrapper">
-        <h1>भाषा चुनें<br />Select Language</h1>
+        <h1>{% trans "Select Language" %}</h1>
         <div class="lang-grid">
           <div class="lang-btn" onclick="setLanguage('en')">English</div>
           <div class="lang-btn" onclick="setLanguage('hi')">हिंदी</div>
@@ -247,33 +212,65 @@
     <script>
       let sessionTimer
       const SESSION_DURATION = 120000
-      
+
       function startSessionTimer() {
         sessionTimer = setTimeout(() => {
           document.getElementById('timeoutWarning').style.display = 'block'
         }, SESSION_DURATION)
       }
-      
+
       function extendSession() {
         document.getElementById('timeoutWarning').style.display = 'none'
         clearTimeout(sessionTimer)
         startSessionTimer()
       }
-      
+
       function setLanguage(langCode) {
-        // Set language cookie
         document.cookie = 'django_language=' + langCode + '; path=/'
-      
-        // Clear any existing session data that might cause redirect loops
-        // This helps break any stuck redirect loops
-        if (sessionStorage) {
-          sessionStorage.clear()
-        }
-      
-        // Redirect directly to auth WITHOUT any next parameter
+        if (sessionStorage) sessionStorage.clear()
         window.location.href = '/' + langCode + '/auth/'
       }
-      
+
+      function startVoice() {
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+
+        if (!SpeechRecognition) {
+          alert("Voice recognition not supported in this browser.")
+          return
+        }
+
+        const recognition = new SpeechRecognition()
+
+        recognition.lang = document.documentElement.lang || "en-IN"
+        recognition.continuous = false
+        recognition.interimResults = false
+        recognition.maxAlternatives = 1
+
+        recognition.start()
+
+        recognition.onresult = function(event) {
+          const speechResult = event.results[0][0].transcript.toLowerCase().trim()
+
+          if (speechResult.includes("english")) setLanguage('en')
+          else if (speechResult.includes("hindi")) setLanguage('hi')
+          else if (speechResult.includes("odia") || speechResult.includes("oriya")) setLanguage('or')
+          else if (speechResult.includes("bengali") || speechResult.includes("bangla")) setLanguage('bn')
+          else if (speechResult.includes("tamil")) setLanguage('ta')
+          else if (speechResult.includes("telugu")) setLanguage('te')
+          else alert("Command not recognized: " + speechResult)
+        }
+
+        recognition.onerror = function(event) {
+          console.error("Voice error:", event.error)
+          alert("Voice error: " + event.error)
+        }
+
+        recognition.onend = function() {
+          console.log("Voice recognition ended")
+        }
+      }
+
       document.addEventListener('DOMContentLoaded', startSessionTimer)
     </script>
   </body>
