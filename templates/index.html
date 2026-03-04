@@ -1,4 +1,3 @@
-{% load i18n %}
 {% load static %}
 <!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE }}">
@@ -32,7 +31,7 @@
     </style>
 
     <meta charset="UTF-8" />
-    <title>{% trans "Civic Services Kiosk - Language" %}</title>
+    <title>Civic Services Kiosk - Language</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <style>
@@ -172,9 +171,9 @@
       <div class="header-left">
         <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" />
         <div>
-          {% trans "Ministry of Electronics &" %}<br />
-          {% trans "Information Technology" %}<br />
-          {% trans "Government of India" %}
+          Ministry of Electronics &<br />
+          Information Technology<br />
+          Government of India
         </div>
       </div>
       <div class="header-right">
@@ -184,20 +183,20 @@
 
     <div class="voice-corner">
       <div class="voice-corner-btn" onclick="startVoice()">🎤</div>
-      <div class="voice-corner-text">{% trans "Click" %}</div>
+      <div class="voice-corner-text">Click to speak</div>
     </div>
 
     <div id="timeoutWarning" class="timeout-warning">
-      <p>{% trans "Session about to expire" %}</p>
-      <button onclick="extendSession()">{% trans "Continue" %}</button>
-      <button class="logout-btn" onclick="window.location='{% url 'index' %}'">
-        {% trans "Logout" %}
+      <p>Session about to expire</p>
+      <button onclick="extendSession()">Continue</button>
+      <button class="logout-btn" onclick="window.location='/'">
+        Logout  
       </button>
     </div>
 
     <div class="kiosk-container">
       <div class="content-wrapper">
-        <h1>{% trans "Select Language" %}</h1>
+        <h1>Select Language</h1>
         <div class="lang-grid">
           <div class="lang-btn" onclick="setLanguage('en')">English</div>
           <div class="lang-btn" onclick="setLanguage('hi')">हिंदी</div>
