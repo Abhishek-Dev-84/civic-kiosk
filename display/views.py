@@ -20,37 +20,36 @@ def index(request):
 
 def auth(request):
     # Clear any existing messages
-    # storage = messages.get_messages(request)
-    # storage.used = True
+    storage = messages.get_messages(request)
+    storage.used = True
     
-    # # CRITICAL: If there's ANY query parameter, redirect to clean URL
-    # if request.GET:
-    #     return redirect('auth')
+    # CRITICAL: If there's ANY query parameter, redirect to clean URL
+    if request.GET:
+        return redirect('auth')
     
-    # if request.method == 'POST':
-    #     aadhaar_number = request.POST.get('aadhaar_number')
+    if request.method == 'POST':
+        aadhaar_number = request.POST.get('aadhaar_number')
         
-    #     if aadhaar_number and len(aadhaar_number) == 12 and aadhaar_number.isdigit():
-    #         request.session['aadhaar_number'] = aadhaar_number
+        if aadhaar_number and len(aadhaar_number) == 12 and aadhaar_number.isdigit():
+            request.session['aadhaar_number'] = aadhaar_number
             
-    #         # Generate OTP (still generates but won't be checked)
-    #         otp = ''.join([str(random.randint(0, 9)) for _ in range(6)])
-    #         request.session['otp'] = otp
-    #         request.session['otp_attempts'] = 0
+            # Generate OTP (still generates but won't be checked)
+            otp = ''.join([str(random.randint(0, 9)) for _ in range(6)])
+            request.session['otp'] = otp
+            request.session['otp_attempts'] = 0
             
-    #         print("\n" + "="*50)
-    #         print(f"OTP for Aadhaar {aadhaar_number}: {otp}")
-    #         print("="*50 + "\n")
+            print("\n" + "="*50)
+            print(f"OTP for Aadhaar {aadhaar_number}: {otp}")
+            print("="*50 + "\n")
             
-    #         messages.success(request, 'OTP sent successfully')
-    #         return redirect('otp')
-    #     else:
-    #         messages.error(request, 'Please enter a valid 12-digit Aadhaar number')
-    #         return render(request, 'auth.html')
+            messages.success(request, 'OTP sent successfully')
+            return redirect('otp')
+        else:
+            messages.error(request, 'Please enter a valid 12-digit Aadhaar number')
+            return render(request, 'auth.html')
     
     # GET request - show the Aadhaar entry page
-    # return render(request, 'auth.html')
-    return HttpResponse("AUTH PAGE WORKING")
+    return render(request, 'auth.html')
 
 
 # ================= SIMPLIFIED OTP - ANY OTP WORKS =================
