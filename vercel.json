@@ -1,23 +1,18 @@
 {
   "builds": [
     {
-      "src": "Kiosk/wsgi.py",
+      "src": "api/index.py",
       "use": "@vercel/python"
     }
   ],
   "routes": [
     {
-      "src": "/static/(.*)",
-      "dest": "/static/$1"
-    },
-    {
       "src": "/(.*)",
-      "dest": "Kiosk/wsgi.py"
+      "dest": "api/index.py"
     }
   ],
   "env": {
     "DJANGO_SECRET_KEY": "O-gUscikJbpO0mJ5rbTq5xMa8livkBcVckxF2s8urNY8zWV1qC8mmoGsJCQ34kIk9LY",
-    "DEBUG": "False",
-    "ALLOWED_HOSTS": ".vercel.app"
+    "DEBUG": "False"
   }
 }

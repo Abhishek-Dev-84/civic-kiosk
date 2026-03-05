@@ -46,9 +46,8 @@ urlpatterns = [
     path('gas-bill-payment/', views.gas_bill_payment, name='gas-bill-payment'),
 
     # ================= TRANSPORT & REVENUE SERVICES =================
-    path('transport-services/', views.transport_services, name='transport-services'),
-    path('revenue-services/', views.revenue_services, name='revenue-services'),
-
+    path('transport-services/', views.under_development, name='under-development'),
+    path('revenue-services/', views.under_development, name='under-development'),
     # ================= PAYMENTS =================
     path('payment-history/', views.payment_history, name='payment-history'),
     path('receipt-print/', views.receipt_print, name='receipt-print'),
@@ -63,7 +62,6 @@ urlpatterns = [
     path('grievance/', views.grievance, name='grievance'),
     # TEMPORARY - remove after testing
     path('test-404/', views.test_404, name='test-404'),
-    path('transport-services/', views.under_development, name='under-development'),
-    path('revenue-services/', views.under_development, name='under-development'),
+
     
 ]
