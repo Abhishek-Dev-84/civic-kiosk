@@ -244,7 +244,7 @@
 </div>
 
 <div class="voice-corner">
-    <div class="voice-corner-btn" onclick="alert('{% trans "Voice assistant activated" %}')">🎤</div>
+    <div class="voice-corner-btn" onclick="startVoiceAssistant()">🎤</div>
     <div class="voice-corner-text">{% trans "Click" %}</div>
 </div>
 
@@ -366,5 +366,6 @@ function goHome() {
 }
 </script>
 
+<script src="{% static 'js/voice.js' %}"></script>
 </body>
 </html>

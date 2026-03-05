@@ -70,6 +70,10 @@ justify-content:center;
 font-size:26px;
 cursor:pointer;
 }
+.voice-corner-btn.listening{
+background:#28a745;
+transform:scale(1.1);
+}
 .voice-corner-text{
 background:white;
 padding:4px 10px;
@@ -264,10 +268,7 @@ border:1px solid #bee5eb;
 </div>
 {% endif %}
 
-<div class="voice-corner">
-<div class="voice-corner-btn" onclick="alert('{% trans "Voice assistant activated" %}')">🎤</div>
-<div class="voice-corner-text">{% trans "Click" %}</div>
-</div>
+<!-- Voice corner will be created dynamically by voice.js -->
 
 <div class="back-btn" onclick="window.location='{% url 'gas-services' %}'">← {% trans "Back" %}</div>
 
@@ -328,11 +329,13 @@ border:1px solid #bee5eb;
     <input type="hidden" name="cylinder_type" id="selectedCylinder" value="{{ selected_type|default:'14.2kg' }}">
     <input type="hidden" name="cylinder_price_hidden" id="selectedPrice" value="{{ selected_price|default:'856' }}">
 
-    <button type="submit" class="book-btn" name="book_cylinder">{% trans "Book Now" %}</button>
+    <button type="submit" class="book-btn" onclick="return bookCylinder(event)">{% trans "Book Now" %}</button>
 </form>
 
 </div>
 </div>
+
+<script src="{% static 'js/voice.js' %}"></script>
 
 <script>
 function selectCylinder(id, type, price){
@@ -340,23 +343,86 @@ function selectCylinder(id, type, price){
     document.getElementById(id).classList.add('selected');
     document.getElementById('selectedCylinder').value=type;
     document.getElementById('selectedPrice').value=price;
+    if(typeof speak === 'function') speak(type + " selected, price " + price + " rupees");
 }
 
-function bookCylinder(){
+function bookCylinder(e){
+    e.preventDefault();
     const type = document.getElementById('selectedCylinder').value;
     const price = document.getElementById('selectedPrice').value;
+    
+    if(typeof speak === 'function') speak("Booking " + type + " cylinder for " + price + " rupees");
+    
     if(confirm(`{% trans "Book" %} ${type} {% trans "cylinder for ₹" %}${price}?`)){
-        return true;
+        document.getElementById('bookingForm').submit();
     }
     return false;
 }
 
-// Add form submission validation
-document.getElementById('bookingForm').addEventListener('submit', function(e) {
-    if(!bookCylinder()) {
-        e.preventDefault();
+/* ===================== OVERRIDE VOICE COMMANDS ===================== */
+
+// Extend voice.js handleCommand for cylinder booking
+const originalHandleCommand = window.handleCommand;
+window.handleCommand = function(command) {
+    command = command.toLowerCase();
+    console.log("Cylinder booking command:", command);
+    
+    // Cylinder type selection
+    if(command.includes("14.2") || command.includes("14 point 2") || command.includes("domestic") || command.includes("full")) {
+        selectCylinder('opt1', '14.2kg', 856);
+        return;
     }
-});
+    else if(command.includes("5") || command.includes("five") || command.includes("small")) {
+        selectCylinder('opt2', '5kg', 425);
+        return;
+    }
+    else if(command.includes("19") || command.includes("nineteen") || command.includes("commercial") || command.includes("large")) {
+        selectCylinder('opt3', '19kg', 1850);
+        return;
+    }
+    
+    // Booking commands
+    if(command.includes("book") || command.includes("order") || command.includes("buy")) {
+        const type = document.getElementById('selectedCylinder').value;
+        const price = document.getElementById('selectedPrice').value;
+        if(typeof speak === 'function') speak("Booking " + type + " cylinder for " + price + " rupees");
+        
+        if(confirm(`{% trans "Book" %} ${type} {% trans "cylinder for ₹" %}${price}?`)){
+            document.getElementById('bookingForm').submit();
+        }
+        return;
+    }
+    else if(command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
+        window.location.href = "/" + getCurrentLangCode() + "/gas-services/";
+        return;
+    }
+    else if(command.includes("home") || command.includes("होम") || command.includes("ଘର")) {
+        window.location.href = "/" + getCurrentLangCode() + "/";
+        return;
+    }
+    else if(command.includes("price") || command.includes("cost")) {
+        const type = document.getElementById('selectedCylinder').value;
+        const price = document.getElementById('selectedPrice').value;
+        if(typeof speak === 'function') speak(type + " cylinder price is " + price + " rupees");
+        return;
+    }
+    
+    // If not booking-specific, pass to original handler
+    if(originalHandleCommand) {
+        originalHandleCommand(command);
+    }
+};
+
+// Override autoReadPage to read booking instructions
+const originalAutoRead = window.autoReadPage;
+window.autoReadPage = function() {
+    if(originalAutoRead) originalAutoRead();
+    setTimeout(() => {
+        if(typeof speak === 'function') {
+            speak("{% trans 'Select cylinder type by voice, then say book to confirm your order' %}");
+        }
+    }, 2000);
+};
 
 // Auto-hide messages after 5 seconds
 setTimeout(function() {

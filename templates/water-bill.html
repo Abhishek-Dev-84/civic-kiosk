@@ -15,6 +15,7 @@
         .header-right img { height:35px; }
         .voice-corner { position:fixed; top:80px; right:15px; z-index:1000; display:flex; flex-direction:column; align-items:center; gap:3px; }
         .voice-corner-btn { background:#ff9933; width:45px; height:45px; border-radius:50%; border:2px solid white; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:24px; box-shadow:0 2px 5px rgba(0,0,0,0.2); }
+        .voice-corner-btn.listening { background:#28a745; transform:scale(1.1); }
         .voice-corner-text { background:white; padding:2px 8px; border-radius:12px; font-size:10px; color:#ff9933; border:1px solid #ff9933; }
         .back-btn { position:fixed; top:80px; left:15px; background:white; border:2px solid #1e5fbf; border-radius:30px; padding:5px 15px; font-size:18px; font-weight:700; cursor:pointer; color:#1e5fbf; box-shadow:0 3px 0 #0a3d7a; z-index:1000; }
         .back-btn:active { transform:translateY(3px); box-shadow:0 1px 0 #0a3d7a; }
@@ -22,7 +23,8 @@
         .content-wrapper { width:100%; max-width:600px; }
         h1 { color:#1e5fbf; font-size:36px; font-weight:800; text-align:center; margin-bottom:20px; }
         .consumer-input { margin:20px 0; }
-        .large-input { width:100%; height:70px; border:3px solid #1e5fbf; border-radius:30px; font-size:28px; padding:0 20px; background:white; }
+        .large-input { width:100%; height:70px; border:3px solid #1e5fbf; border-radius:30px; font-size:28px; padding:0 20px; background:white; cursor:pointer; }
+        .large-input[readonly] { background:#f9f9f9; }
         .fetch-btn { background:#1e5fbf; color:white; font-size:28px; padding:12px; border-radius:40px; width:100%; border:none; box-shadow:0 5px 0 #0a3d7a; cursor:pointer; margin:10px 0; }
         .fetch-btn:active { transform:translateY(5px); box-shadow:0 1px 0 #0a3d7a; }
         .bill-card { background:white; border:3px solid #1e5fbf; border-radius:30px; padding:25px; font-size:22px; box-shadow:0 5px 0 #0a3d7a; margin-top:20px; }
@@ -38,6 +40,68 @@
         {% if messages %}
         .has-messages { margin-top: 10px; }
         {% endif %}
+        
+        /* FLOATING INPUT SYSTEM */
+        .overlay{
+            position:fixed;
+            inset:0;
+            background:rgba(0,0,0,0.4);
+            backdrop-filter:blur(3px);
+            display:none;
+            z-index:900;
+        }
+        .floating-input{
+            position:fixed;
+            left:50%;
+            top:35%;
+            transform:translate(-50%,-50%) scale(0.85);
+            width:520px;
+            height:70px;
+            font-size:24px;
+            border:4px solid #ff9933;
+            border-radius:20px;
+            padding:12px;
+            z-index:1001;
+            box-shadow:0 20px 50px rgba(0,0,0,0.4);
+            transition:all 0.25s ease;
+            display:none;
+        }
+        .floating-input.show{
+            transform:translate(-50%,-50%) scale(1);
+        }
+        .floating-input:focus{outline:none;}
+
+        .keyboard{
+            position:fixed;
+            bottom:15px;
+            left:50%;
+            transform:translateX(-50%);
+            background:white;
+            padding:10px;
+            border-radius:15px;
+            box-shadow:0 8px 25px rgba(0,0,0,0.3);
+            display:none;
+            z-index:1000;
+        }
+        .keyboard-row{display:flex;justify-content:center;}
+        .keyboard button{
+            min-width:48px;
+            height:42px;
+            margin:3px;
+            font-size:14px;
+            border-radius:8px;
+            border:2px solid #1e5fbf;
+            background:#f0f7ff;
+            cursor:pointer;
+            transition:all 0.2s;
+        }
+        .keyboard button:hover{background:#1e5fbf;color:white;}
+        .keyboard .ok-btn{
+            background:#28a745;
+            color:white;
+            border:none;
+        }
+        .keyboard .ok-btn:hover{background:#218838;}
     </style>
 </head>
 <body>
@@ -61,27 +125,26 @@
     </div>
     {% endif %}
     
-    <div class="voice-corner">
-        <div class="voice-corner-btn" onclick="alert('{% trans "Voice assistant activated" %}')">🎤</div>
-        <div class="voice-corner-text">{% trans "Click" %}</div>
-    </div>
+    <!-- Voice corner will be created dynamically by voice.js -->
+    
     <div class="back-btn" onclick="window.location='{% url 'municipal-services' %}'">← {% trans "Back" %}</div>
+    
     <div class="container">
         <div class="content-wrapper">
             <h1>💧 {% trans "Water Bill" %}</h1>
             
-            <form method="POST" action="{% url 'water-bill' %}">
+            <form method="POST" action="{% url 'water-bill' %}" id="billForm">
                 {% csrf_token %}
                 <div class="consumer-input">
-                    <input class="large-input" id="consumerNo" name="consumer_no" placeholder="{% trans "Enter Consumer No." %}" value="WC123456">
+                    <input class="large-input text-input" id="consumerNo" name="consumer_no" placeholder="{% trans "Enter Consumer No." %}" value="WC123456" readonly>
                 </div>
-                <button type="submit" class="fetch-btn" name="fetch_bill">{% trans "Fetch Bill" %}</button>
+                <button type="submit" class="fetch-btn" name="fetch_bill" onclick="return validateFetch(event)">{% trans "Fetch Bill" %}</button>
             </form>
             
             <div id="billCard" class="bill-card {% if not show_bill %}hidden{% endif %}">
                 <div class="bill-row">
                     <span>{% trans "Consumer No:" %}</span>
-                    <span><strong>{{ consumer_no|default:'WC123456' }}</strong></span>
+                    <span><strong id="displayConsumerNo">{{ consumer_no|default:'WC123456' }}</strong></span>
                 </div>
                 <div class="bill-row">
                     <span>{% trans "Name:" %}</span>
@@ -103,34 +166,126 @@
                     <span>{% trans "Units Consumed:" %}</span>
                     <span><strong>{{ units_consumed|default:'25 kL' }}</strong></span>
                 </div>
-                <div class="bill-amount">{% trans "₹" %} {{ bill_amount|default:'450.00' }}</div>
+                <div class="bill-amount" id="billAmount">{% trans "₹" %} {{ bill_amount|default:'450.00' }}</div>
                 
-                <form method="POST" action="{% url 'water-bill' %}">
+                <form method="POST" action="{% url 'water-bill' %}" id="payForm">
                     {% csrf_token %}
                     <input type="hidden" name="consumer_no" value="{{ consumer_no|default:'WC123456' }}">
                     <input type="hidden" name="bill_amount" value="{{ bill_amount|default:'450.00' }}">
-                    <button type="submit" class="pay-btn" name="pay_bill">{% trans "Pay Now" %}</button>
+                    <button type="submit" class="pay-btn" name="pay_bill" onclick="return validatePay(event)">{% trans "Pay Now" %}</button>
                 </form>
             </div>
         </div>
     </div>
+
+    <!-- Floating input system -->
+    <div id="overlay" class="overlay"></div>
+    <input id="floatingInput" class="floating-input" placeholder="{% trans "Enter Consumer Number" %}">
+    <div id="keyboard" class="keyboard"></div>
+    
+    <script src="{% static 'js/voice.js' %}"></script>
     
     <script>
-        function fetchBill() {
-            // This function is kept for compatibility but form submission will handle it
+        // Floating input system
+        let activeInput = null;
+        const overlay = document.getElementById("overlay");
+        const floatingInput = document.getElementById("floatingInput");
+        const keyboard = document.getElementById("keyboard");
+        
+        const keys = ["W","C","1","2","3","4","5","6","7","8","9","0"];
+
+        function createKeyboard(){
+            keyboard.innerHTML = "";
+            let row = document.createElement("div");
+            row.className = "keyboard-row";
+            keys.forEach((k,i)=>{
+                if(i%6 === 0 && i !== 0){
+                    keyboard.appendChild(row);
+                    row = document.createElement("div");
+                    row.className = "keyboard-row";
+                }
+                let btn = document.createElement("button");
+                btn.innerText = k;
+                btn.type = "button";
+                btn.onclick = ()=>floatingInput.value += k;
+                row.appendChild(btn);
+            });
+            keyboard.appendChild(row);
+
+            let last = document.createElement("div");
+            last.className = "keyboard-row";
+            last.innerHTML = `
+                <button type="button" onclick="floatingInput.value=''">{% trans "Clear" %}</button>
+                <button type="button" onclick="floatingInput.value=floatingInput.value.slice(0,-1)">⌫</button>
+                <button type="button" class="ok-btn" onclick="finish()">✓ {% trans "OK" %}</button>
+            `;
+            keyboard.appendChild(last);
+        }
+
+        function openKeyboard(input){
+            activeInput = input;
+            floatingInput.value = input.value;
+            overlay.style.display = "block";
+            floatingInput.style.display = "block";
+            keyboard.style.display = "block";
+            setTimeout(()=>{
+                floatingInput.classList.add("show");
+                floatingInput.focus();
+            },10);
+        }
+
+        function finish(){
+            if(activeInput){
+                activeInput.value = floatingInput.value;
+            }
+            closeKeyboard();
+        }
+
+        function closeKeyboard(){
+            floatingInput.classList.remove("show");
+            setTimeout(()=>{
+                overlay.style.display = "none";
+                floatingInput.style.display = "none";
+                keyboard.style.display = "none";
+            },200);
+        }
+
+        document.querySelectorAll(".text-input").forEach(i=>{
+            i.addEventListener("click",e=>{
+                e.stopPropagation();
+                e.preventDefault();
+                openKeyboard(i);
+            });
+        });
+
+        floatingInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                finish();
+            }
+        });
+
+        overlay.addEventListener("click", closeKeyboard);
+        createKeyboard();
+
+        function validateFetch(e) {
+            e.preventDefault();
             const consumer = document.getElementById('consumerNo').value;
             if(!consumer) {
-                alert('{% trans "Please enter consumer number" %}');
+                if(typeof speak === 'function') speak("{% trans 'Please enter consumer number' %}");
                 return false;
             }
-            return true;
+            if(typeof speak === 'function') speak("{% trans 'Fetching water bill' %}");
+            document.getElementById('billForm').submit();
+            return false;
         }
         
-        function payBill() {
-            // This function is kept for compatibility but form submission will handle it
-            const amount = '{{ bill_amount|default:"450.00" }}';
-            if(confirm('{% trans "Pay ₹" %}' + amount + '?')) {
-                return true;
+        function validatePay(e) {
+            e.preventDefault();
+            const amount = document.getElementById('billAmount').innerText;
+            if(confirm('{% trans "Pay " %}' + amount + '?')) {
+                if(typeof speak === 'function') speak("{% trans 'Processing payment' %}");
+                document.getElementById('payForm').submit();
             }
             return false;
         }
@@ -142,6 +297,90 @@
                 message.style.display = 'none';
             });
         }, 5000);
+        
+        /* ===================== OVERRIDE VOICE COMMANDS ===================== */
+
+        // Extend voice.js handleCommand for water bill
+        const originalHandleCommand = window.handleCommand;
+        window.handleCommand = function(command) {
+            command = command.toLowerCase();
+            console.log("Water bill command:", command);
+            
+            // Check for consumer number pattern (WC followed by numbers)
+            const consumerMatch = command.match(/wc[-\s]?(\d+)/i) || command.match(/water[-\s]?(\d+)/i);
+            if(consumerMatch) {
+                const consumerNo = "WC" + consumerMatch[1];
+                document.getElementById('consumerNo').value = consumerNo;
+                if(typeof speak === 'function') speak("Consumer number " + consumerNo + " entered");
+                return;
+            }
+            
+            // Check for just numbers (assume WC prefix)
+            const numberMatch = command.match(/\d+/g);
+            if(numberMatch && (command.includes("consumer") || command.includes("water"))) {
+                const consumerNo = "WC" + numberMatch.join('');
+                document.getElementById('consumerNo').value = consumerNo;
+                if(typeof speak === 'function') speak("Consumer number " + consumerNo + " entered");
+                return;
+            }
+            
+            // Fetch command
+            if(command.includes("fetch") || command.includes("search") || command.includes("check")) {
+                const consumer = document.getElementById('consumerNo').value;
+                if(consumer) {
+                    if(typeof speak === 'function') speak("{% trans 'Fetching water bill' %}");
+                    document.getElementById('billForm').submit();
+                } else {
+                    if(typeof speak === 'function') speak("{% trans 'Please enter consumer number first' %}");
+                }
+                return;
+            }
+            
+            // Pay command
+            if(command.includes("pay") || command.includes("payment")) {
+                if(document.getElementById('billCard').classList.contains('hidden')) {
+                    if(typeof speak === 'function') speak("{% trans 'Please fetch bill first' %}");
+                } else {
+                    const amount = document.getElementById('billAmount').innerText;
+                    if(confirm('{% trans "Pay " %}' + amount + '?')) {
+                        if(typeof speak === 'function') speak("{% trans 'Processing payment' %}");
+                        document.getElementById('payForm').submit();
+                    }
+                }
+                return;
+            }
+            
+            // Back and home commands
+            if(command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
+                window.location.href = "/" + getCurrentLangCode() + "/municipal-services/";
+                return;
+            }
+            else if(command.includes("home") || command.includes("होम") || command.includes("ଘର")) {
+                window.location.href = "/" + getCurrentLangCode() + "/";
+                return;
+            }
+            
+            // If not water bill-specific, pass to original handler
+            if(originalHandleCommand) {
+                originalHandleCommand(command);
+            }
+        };
+
+        // Override autoReadPage to read water bill instructions
+        const originalAutoRead = window.autoReadPage;
+        window.autoReadPage = function() {
+            if(originalAutoRead) originalAutoRead();
+            setTimeout(() => {
+                if(typeof speak === 'function') {
+                    if(document.getElementById('billCard').classList.contains('hidden')) {
+                        speak("{% trans 'Enter consumer number starting with WC or say fetch to get water bill' %}");
+                    } else {
+                        const amount = document.getElementById('billAmount').innerText;
+                        speak("{% trans 'Water bill due' %} " + amount + ". {% trans 'Say pay to make payment.' %}");
+                    }
+                }
+            }, 2000);
+        };
     </script>
 </body>
 </html>

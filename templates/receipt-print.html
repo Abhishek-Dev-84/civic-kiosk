@@ -15,6 +15,7 @@
         .header-right img { height:35px; }
         .voice-corner { position:fixed; top:80px; right:15px; z-index:1000; display:flex; flex-direction:column; align-items:center; gap:3px; }
         .voice-corner-btn { background:#ff9933; width:45px; height:45px; border-radius:50%; border:2px solid white; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:24px; box-shadow:0 2px 5px rgba(0,0,0,0.2); }
+        .voice-corner-btn.listening { background:#28a745; transform:scale(1.1); }
         .voice-corner-text { background:white; padding:2px 8px; border-radius:12px; font-size:10px; color:#ff9933; border:1px solid #ff9933; }
         .back-btn { position:fixed; top:80px; left:15px; background:white; border:2px solid #1e5fbf; border-radius:30px; padding:5px 15px; font-size:18px; font-weight:700; cursor:pointer; color:#1e5fbf; box-shadow:0 3px 0 #0a3d7a; z-index:1000; }
         .back-btn:active { transform:translateY(3px); box-shadow:0 1px 0 #0a3d7a; }
@@ -62,11 +63,10 @@
     </div>
     {% endif %}
     
-    <div class="voice-corner">
-        <div class="voice-corner-btn" onclick="alert('{% trans "Voice assistant activated" %}')">🎤</div>
-        <div class="voice-corner-text">{% trans "Click" %}</div>
-    </div>
+    <!-- Voice corner will be created dynamically by voice.js -->
+    
     <div class="back-btn" onclick="window.location='{% url 'payment-history' %}'">← {% trans "Back" %}</div>
+    
     <div class="container">
         <div class="content-wrapper">
             <h1>🧾 {% trans "Payment Receipt" %}</h1>
@@ -124,15 +124,17 @@
                 </div>
             </div>
             <div class="action-buttons">
-                <form method="POST" action="{% url 'receipt-print' %}" style="flex:1; display: flex;">
+                <form method="POST" action="{% url 'receipt-print' %}" style="flex:1; display: flex;" id="printForm">
                     {% csrf_token %}
                     <input type="hidden" name="receipt_id" value="{{ receipt.id|default:'' }}">
-                    <button type="submit" name="print_receipt" class="print-btn" style="width:100%;">🖨️ {% trans "Print" %}</button>
+                    <button type="submit" name="print_receipt" class="print-btn" style="width:100%;" onclick="return printReceipt(event)">🖨️ {% trans "Print" %}</button>
                 </form>
                 <button class="home-btn" onclick="window.location='{% url 'menu' %}'">🏠 {% trans "Home" %}</button>
             </div>
         </div>
     </div>
+    
+    <script src="{% static 'js/voice.js' %}"></script>
     
     <script>
         // Auto-hide messages after 5 seconds
@@ -145,21 +147,92 @@
         
         // Initialize receipt data from Django context
         document.addEventListener('DOMContentLoaded', function() {
-            // The receipt data is already rendered by Django
-            // This function can be used for any additional JavaScript initialization
             console.log('Receipt page loaded');
+            
+            // Auto-read receipt details after page loads
+            setTimeout(() => {
+                if(typeof speak === 'function') {
+                    const receiptNo = document.getElementById('receiptNo').innerText;
+                    speak("{% trans 'Receipt' %} " + receiptNo + " {% trans 'generated. Say print to print, home to return to menu, or back to payment history.' %}");
+                }
+            }, 1500);
         });
         
-        // Keep the original print function for compatibility
-        function printReceipt() {
+        function printReceipt(e) {
+            e.preventDefault();
+            
             {% if receipt.id %}
+                if(typeof speak === 'function') speak("{% trans 'Printing receipt' %}");
                 // Submit the print form
-                document.querySelector('form button[name="print_receipt"]').click();
+                setTimeout(() => {
+                    document.getElementById('printForm').submit();
+                }, 500);
             {% else %}
+                if(typeof speak === 'function') speak("{% trans 'Printing receipt' %}");
                 alert('{% trans "Printing receipt..." %}');
-                // In real implementation: window.print()
             {% endif %}
+            
+            return false;
         }
+        
+        /* ===================== OVERRIDE VOICE COMMANDS ===================== */
+
+        // Extend voice.js handleCommand for receipt page
+        const originalHandleCommand = window.handleCommand;
+        window.handleCommand = function(command) {
+            command = command.toLowerCase();
+            console.log("Receipt command:", command);
+            
+            // Receipt-specific commands
+            if(command.includes("print") || command.includes("receipt") || command.includes("copy")) {
+                printReceipt(event);
+                return;
+            }
+            else if(command.includes("home") || command.includes("menu") || command.includes("main")) {
+                if(typeof speak === 'function') speak("{% trans 'Going to main menu' %}");
+                window.location.href = "/" + getCurrentLangCode() + "/menu/";
+                return;
+            }
+            else if(command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
+                if(typeof speak === 'function') speak("{% trans 'Going back to payment history' %}");
+                window.location.href = "/" + getCurrentLangCode() + "/payment-history/";
+                return;
+            }
+            
+            // Check for receipt number request
+            if(command.includes("receipt number") || command.includes("what is the receipt")) {
+                const receiptNo = document.getElementById('receiptNo').innerText;
+                if(typeof speak === 'function') speak("{% trans 'Receipt number is' %} " + receiptNo);
+                return;
+            }
+            
+            // Check for amount request
+            if(command.includes("amount") || command.includes("total")) {
+                const amountElement = document.querySelector('.receipt-row.total span:last-child');
+                if(amountElement && typeof speak === 'function') {
+                    speak("{% trans 'Total amount is' %} " + amountElement.innerText);
+                }
+                return;
+            }
+            
+            // If not receipt-specific, pass to original handler
+            if(originalHandleCommand) {
+                originalHandleCommand(command);
+            }
+        };
+
+        // Override autoReadPage to read receipt details
+        const originalAutoRead = window.autoReadPage;
+        window.autoReadPage = function() {
+            if(originalAutoRead) originalAutoRead();
+            // Wait a bit for page to fully load
+            setTimeout(() => {
+                if(typeof speak === 'function') {
+                    const receiptNo = document.getElementById('receiptNo').innerText;
+                    speak("{% trans 'Receipt' %} " + receiptNo + " {% trans 'generated. Say print to print, home to return to menu, or back to payment history.' %}");
+                }
+            }, 2000);
+        };
     </script>
 </body>
 </html>

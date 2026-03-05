@@ -32,34 +32,6 @@
         }
     </style>
 
-    <style>
-        /* Hide Google Translate elements */
-        .goog-te-banner-frame.skiptranslate,
-        .goog-te-gadget-icon,
-        .goog-te-gadget-simple,
-        #goog-gt-tt,
-        .goog-te-balloon-frame,
-        .goog-te-menu-frame,
-        .goog-te-spinner-pos {
-            display: none !important;
-        }
-        
-        body {
-            top: 0px !important;
-            position: static !important;
-        }
-        
-        .goog-te-combo {
-            display: none !important;
-        }
-        
-        .goog-te-gadget {
-            color: transparent !important;
-            height: 0 !important;
-            overflow: hidden !important;
-        }
-    </style>
-
     <!-- Load translate.js for multi-language support -->
 
 <title>{% trans "Solar Net Metering - Civic Kiosk" %}</title>
@@ -105,6 +77,10 @@ justify-content:center;
 font-size:24px;
 cursor:pointer;
 }
+.voice-corner-btn.listening{
+background:#28a745;
+transform:scale(1.1);
+}
 .voice-corner-text{
 background:white;
 padding:2px 8px;
@@ -125,6 +101,7 @@ font-size:18px;
 font-weight:700;
 color:#1e5fbf;
 cursor:pointer;
+z-index:1000;
 }
 .back-btn:active{transform:translateY(2px);}
 
@@ -285,10 +262,7 @@ border:none;
 </div>
 </div>
 
-<div class="voice-corner">
-<div class="voice-corner-btn" onclick="alert('{% trans "Voice assistant activated" %}')">🎤</div>
-<div class="voice-corner-text">{% trans "Click" %}</div>
-</div>
+<!-- Voice corner will be created dynamically by voice.js -->
 
 <div class="back-btn" onclick="window.location='{% url 'electricity-services' %}'">← {% trans "Back" %}</div>
 
@@ -314,12 +288,12 @@ border:none;
 
 <div class="form-group">
 <label>{% trans "Consumer Number" %}</label>
-<input type="text" class="large-input" name="consumer_number" value="{{ consumer_number|default:'1234 5678 9012' }}" readonly>
+<input type="text" class="large-input" name="consumer_number" id="consumerNumber" value="{{ consumer_number|default:'1234 5678 9012' }}" readonly>
 </div>
 
 <div class="form-group">
 <label>{% trans "Proposed Solar Capacity (kW)" %}</label>
-<select class="large-input" name="solar_capacity">
+<select class="large-input" name="solar_capacity" id="solarCapacity">
 <option value="1">1 kW</option>
 <option value="2">2 kW</option>
 <option value="3">3 kW</option>
@@ -348,6 +322,8 @@ border:none;
 <div id="overlay" class="overlay"></div>
 <textarea id="floatingInput" class="floating-input" placeholder="{% trans "Type here..." %}"></textarea>
 <div id="keyboard" class="keyboard"></div>
+
+<script src="{% static 'js/voice.js' %}"></script>
 
 <script>
 let activeInput = null;
@@ -429,6 +405,8 @@ function updateEstimatedCost() {
 function submitRequest(){
     const formData = new FormData(document.querySelector('form'));
     
+    if(typeof speak === 'function') speak("{% trans 'Submitting solar net metering application' %}");
+    
     fetch('{% url "electricity-solar" %}', {
         method: 'POST',
         headers: {
@@ -439,17 +417,108 @@ function submitRequest(){
     .then(response => response.json())
     .then(data => {
         if(data.success) {
+            if(typeof speak === 'function') speak("{% trans 'Application submitted successfully' %}");
             alert('{% trans "Solar net metering application submitted! Reference:" %} ' + data.reference);
             window.location.href = '{% url "application-status" %}?ref=' + data.reference;
         } else {
+            if(typeof speak === 'function') speak("{% trans 'Error in submission' %}");
             alert('{% trans "Error:" %} ' + data.message);
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('{% trans "Solar net metering application submitted! Reference: SOLAR" %}' + Math.floor(100000 + Math.random() * 900000));
+        const ref = 'SOLAR' + Math.floor(100000 + Math.random() * 900000);
+        if(typeof speak === 'function') speak("{% trans 'Application submitted' %}");
+        alert('{% trans "Solar net metering application submitted! Reference: " %}' + ref);
     });
 }
+
+/* ===================== OVERRIDE VOICE COMMANDS ===================== */
+
+// Extend voice.js handleCommand for solar-specific commands
+const originalHandleCommand = window.handleCommand;
+window.handleCommand = function(command) {
+    command = command.toLowerCase();
+    console.log("Solar net metering command:", command);
+    
+    // Check for numbers in command (roof area)
+    const numberMatch = command.match(/\d+/g);
+    if(numberMatch && (command.includes("area") || command.includes("roof") || command.includes("square"))) {
+        const value = numberMatch[0];
+        document.getElementById('area').value = value;
+        updateEstimatedCost();
+        if(typeof speak === 'function') speak("Roof area set to " + value + " square feet");
+        return;
+    }
+    
+    // Solar capacity selection
+    if(command.includes("1 kw") || command.includes("one kw")) {
+        document.getElementById('solarCapacity').value = "1";
+        updateEstimatedCost();
+        if(typeof speak === 'function') speak("1 kilowatt selected");
+        return;
+    }
+    else if(command.includes("2 kw") || command.includes("two kw")) {
+        document.getElementById('solarCapacity').value = "2";
+        updateEstimatedCost();
+        if(typeof speak === 'function') speak("2 kilowatt selected");
+        return;
+    }
+    else if(command.includes("3 kw") || command.includes("three kw")) {
+        document.getElementById('solarCapacity').value = "3";
+        updateEstimatedCost();
+        if(typeof speak === 'function') speak("3 kilowatt selected");
+        return;
+    }
+    else if(command.includes("4 kw") || command.includes("four kw")) {
+        document.getElementById('solarCapacity').value = "4";
+        updateEstimatedCost();
+        if(typeof speak === 'function') speak("4 kilowatt selected");
+        return;
+    }
+    else if(command.includes("5 kw") || command.includes("five kw")) {
+        document.getElementById('solarCapacity').value = "5";
+        updateEstimatedCost();
+        if(typeof speak === 'function') speak("5 kilowatt selected");
+        return;
+    }
+    else if(command.includes("above") || command.includes("more than")) {
+        document.getElementById('solarCapacity').value = "6";
+        updateEstimatedCost();
+        if(typeof speak === 'function') speak("Above 5 kilowatt selected");
+        return;
+    }
+    
+    // Submit command
+    if(command.includes("submit") || command.includes("apply")) {
+        submitRequest();
+        return;
+    }
+    else if(command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
+        window.location.href = "/" + getCurrentLangCode() + "/electricity-services/";
+        return;
+    }
+    else if(command.includes("home") || command.includes("होम") || command.includes("ଘର")) {
+        window.location.href = "/" + getCurrentLangCode() + "/";
+        return;
+    }
+    
+    // If not solar-specific, pass to original handler
+    if(originalHandleCommand) {
+        originalHandleCommand(command);
+    }
+};
+
+// Override autoReadPage to read solar net metering instructions
+const originalAutoRead = window.autoReadPage;
+window.autoReadPage = function() {
+    if(originalAutoRead) originalAutoRead();
+    setTimeout(() => {
+        if(typeof speak === 'function') {
+            speak("{% trans 'Select solar capacity, enter roof area, then say submit to apply for net metering' %}");
+        }
+    }, 2000);
+};
 
 // Event Listeners
 document.getElementById("area").addEventListener("click", () => openKeyboard("area"));

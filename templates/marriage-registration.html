@@ -16,13 +16,50 @@ body{width:100vw;height:100vh;overflow:hidden;background:#f0f7ff;}
 .header-left div{font-size:11px;font-weight:600;color:#1e5fbf;line-height:1.2;}
 .header-right img{height:30px;}
 
+/* Voice corner */
+.voice-corner{
+    position:fixed;
+    top:70px;
+    right:15px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:3px;
+    z-index:1000;
+}
+.voice-corner-btn{
+    background:#ff9933;
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    border:2px solid white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:22px;
+    cursor:pointer;
+}
+.voice-corner-btn.listening{
+    background:#28a745;
+    transform:scale(1.1);
+}
+.voice-corner-text{
+    background:white;
+    padding:2px 6px;
+    border-radius:12px;
+    font-size:9px;
+    color:#ff9933;
+    border:1px solid #ff9933;
+}
+
 /* Back button */
 .back-btn{position:fixed;top:70px;left:12px;background:white;border:2px solid #1e5fbf;border-radius:25px;padding:4px 10px;font-size:15px;font-weight:600;cursor:pointer;color:#1e5fbf;z-index:1000;}
 .back-btn:active{transform:translateY(2px);}
 
 /* Container */
-.container{    position:fixed;
-    top:100px;  /* shifted down from 60px to 100px */
+.container{
+    position:fixed;
+    top:100px;
     left:0;
     right:0;
     bottom:0;
@@ -95,6 +132,8 @@ label{font-size:13px; color:#1e5fbf; margin-bottom:2px; display:block;}
 </div>
 {% endif %}
 
+<!-- Voice corner will be created dynamically by voice.js -->
+
 <!-- Back button -->
 <div class="back-btn" onclick="window.location='{% url 'municipal-services' %}'">← {% trans "Back" %}</div>
 
@@ -112,19 +151,19 @@ label{font-size:13px; color:#1e5fbf; margin-bottom:2px; display:block;}
                     <div class="section-title">👨 {% trans "Groom Details" %}</div>
                     <div class="form-group">
                         <label>{% trans "Full Name" %} *</label>
-                        <input class="large-input" type="text" name="groom_name" value="{{ form_data.groom_name|default:'' }}" required>
+                        <input class="large-input text-input" type="text" name="groom_name" id="groom_name" value="{{ form_data.groom_name|default:'' }}" required>
                     </div>
                     <div class="form-group">
                         <label>{% trans "Date of Birth" %} *</label>
-                        <input type="date" class="large-input" name="groom_dob" value="{{ form_data.groom_dob|default:'' }}" required>
+                        <input type="date" class="large-input" name="groom_dob" id="groom_dob" value="{{ form_data.groom_dob|default:'' }}" required>
                     </div>
                     <div class="form-group">
                         <label>{% trans "Aadhaar" %} *</label>
-                        <input class="large-input" type="text" name="groom_aadhaar" value="{{ form_data.groom_aadhaar|default:'' }}" maxlength="12" pattern="\d{12}" title="{% trans "Please enter 12-digit Aadhaar number" %}" required>
+                        <input class="large-input text-input" type="text" name="groom_aadhaar" id="groom_aadhaar" value="{{ form_data.groom_aadhaar|default:'' }}" maxlength="12" pattern="\d{12}" title="{% trans "Please enter 12-digit Aadhaar number" %}" required>
                     </div>
                     <div class="form-group">
                         <label>{% trans "Father's Name" %}</label>
-                        <input class="large-input" type="text" name="groom_father_name" value="{{ form_data.groom_father_name|default:'' }}">
+                        <input class="large-input text-input" type="text" name="groom_father_name" id="groom_father_name" value="{{ form_data.groom_father_name|default:'' }}">
                     </div>
                 </div>
 
@@ -133,19 +172,19 @@ label{font-size:13px; color:#1e5fbf; margin-bottom:2px; display:block;}
                     <div class="section-title">👩 {% trans "Bride Details" %}</div>
                     <div class="form-group">
                         <label>{% trans "Full Name" %} *</label>
-                        <input class="large-input" type="text" name="bride_name" value="{{ form_data.bride_name|default:'' }}" required>
+                        <input class="large-input text-input" type="text" name="bride_name" id="bride_name" value="{{ form_data.bride_name|default:'' }}" required>
                     </div>
                     <div class="form-group">
                         <label>{% trans "Date of Birth" %} *</label>
-                        <input type="date" class="large-input" name="bride_dob" value="{{ form_data.bride_dob|default:'' }}" required>
+                        <input type="date" class="large-input" name="bride_dob" id="bride_dob" value="{{ form_data.bride_dob|default:'' }}" required>
                     </div>
                     <div class="form-group">
                         <label>{% trans "Aadhaar" %} *</label>
-                        <input class="large-input" type="text" name="bride_aadhaar" value="{{ form_data.bride_aadhaar|default:'' }}" maxlength="12" pattern="\d{12}" title="{% trans "Please enter 12-digit Aadhaar number" %}" required>
+                        <input class="large-input text-input" type="text" name="bride_aadhaar" id="bride_aadhaar" value="{{ form_data.bride_aadhaar|default:'' }}" maxlength="12" pattern="\d{12}" title="{% trans "Please enter 12-digit Aadhaar number" %}" required>
                     </div>
                     <div class="form-group">
                         <label>{% trans "Father's Name" %}</label>
-                        <input class="large-input" type="text" name="bride_father_name" value="{{ form_data.bride_father_name|default:'' }}">
+                        <input class="large-input text-input" type="text" name="bride_father_name" id="bride_father_name" value="{{ form_data.bride_father_name|default:'' }}">
                     </div>
                 </div>
 
@@ -155,15 +194,15 @@ label{font-size:13px; color:#1e5fbf; margin-bottom:2px; display:block;}
                     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
                         <div>
                             <label>{% trans "Date" %} *</label>
-                            <input type="date" class="large-input" name="marriage_date" value="{{ form_data.marriage_date|default:'' }}" required>
+                            <input type="date" class="large-input" name="marriage_date" id="marriage_date" value="{{ form_data.marriage_date|default:'' }}" required>
                         </div>
                         <div>
                             <label>{% trans "Place" %} *</label>
-                            <input class="large-input" type="text" name="marriage_place" value="{{ form_data.marriage_place|default:'' }}" required>
+                            <input class="large-input text-input" type="text" name="marriage_place" id="marriage_place" value="{{ form_data.marriage_place|default:'' }}" required>
                         </div>
                         <div>
                             <label>{% trans "Type" %} *</label>
-                            <select class="large-input" name="marriage_type" required>
+                            <select class="large-input" name="marriage_type" id="marriage_type" required>
                                 <option value="" {% if not form_data.marriage_type %}selected{% endif %}>{% trans "Select Type" %}</option>
                                 <option value="Hindu Marriage Act" {% if form_data.marriage_type == 'Hindu Marriage Act' %}selected{% endif %}>{% trans "Hindu Marriage Act" %}</option>
                                 <option value="Special Marriage Act" {% if form_data.marriage_type == 'Special Marriage Act' %}selected{% endif %}>{% trans "Special Marriage Act" %}</option>
@@ -176,18 +215,18 @@ label{font-size:13px; color:#1e5fbf; margin-bottom:2px; display:block;}
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px; margin-top:8px;">
                         <div>
                             <label>{% trans "Witness 1 Name" %}</label>
-                            <input class="large-input" type="text" name="witness1_name" value="{{ form_data.witness1_name|default:'' }}">
+                            <input class="large-input text-input" type="text" name="witness1_name" id="witness1_name" value="{{ form_data.witness1_name|default:'' }}">
                         </div>
                         <div>
                             <label>{% trans "Witness 2 Name" %}</label>
-                            <input class="large-input" type="text" name="witness2_name" value="{{ form_data.witness2_name|default:'' }}">
+                            <input class="large-input text-input" type="text" name="witness2_name" id="witness2_name" value="{{ form_data.witness2_name|default:'' }}">
                         </div>
                     </div>
                 </div>
 
             </div>
 
-            <button type="submit" class="submit-btn" name="register_marriage">{% trans "Register Marriage" %}</button>
+            <button type="submit" class="submit-btn" name="register_marriage" onclick="return validateForm(event)">{% trans "Register Marriage" %}</button>
         </form>
     </div>
 </div>
@@ -196,6 +235,8 @@ label{font-size:13px; color:#1e5fbf; margin-bottom:2px; display:block;}
 <div id="overlay" class="overlay"></div>
 <input id="floatingInput" class="floating-input">
 <div id="keyboard" class="keyboard"></div>
+
+<script src="{% static 'js/voice.js' %}"></script>
 
 <script>
 let activeInput=null;
@@ -263,19 +304,40 @@ function closeKeyboard(){
     },250);
 }
 
-document.querySelectorAll(".large-input").forEach(input=>{
+document.querySelectorAll(".text-input").forEach(input=>{
     input.addEventListener("click",function(e){
         e.preventDefault();
-        if(this.type==="date"){ 
-            this.showPicker(); 
-            return; 
-        }
-        if(this.tagName.toLowerCase() === "select") return;
         openKeyboard(this);
     });
 });
 
 overlay.addEventListener("click",closeKeyboard);
+
+function validateForm(e) {
+    e.preventDefault();
+    const requiredFields = ['groom_name', 'groom_dob', 'groom_aadhaar', 'bride_name', 'bride_dob', 'bride_aadhaar', 'marriage_date', 'marriage_place', 'marriage_type'];
+    
+    for(let field of requiredFields) {
+        const element = document.getElementById(field);
+        if(!element || !element.value) {
+            if(typeof speak === 'function') speak("{% trans 'Please fill all required fields' %}");
+            return false;
+        }
+    }
+    
+    // Validate Aadhaar numbers (12 digits)
+    const groomAadhaar = document.getElementById('groom_aadhaar').value;
+    const brideAadhaar = document.getElementById('bride_aadhaar').value;
+    
+    if(!/^\d{12}$/.test(groomAadhaar) || !/^\d{12}$/.test(brideAadhaar)) {
+        if(typeof speak === 'function') speak("{% trans 'Please enter valid 12-digit Aadhaar numbers' %}");
+        return false;
+    }
+    
+    if(typeof speak === 'function') speak("{% trans 'Submitting marriage registration' %}");
+    document.getElementById('marriageForm').submit();
+    return false;
+}
 
 // Auto-hide messages after 5 seconds
 setTimeout(function() {
@@ -284,6 +346,144 @@ setTimeout(function() {
         message.style.display = 'none';
     });
 }, 5000);
+
+/* ===================== OVERRIDE VOICE COMMANDS ===================== */
+
+// Extend voice.js handleCommand for marriage registration
+const originalHandleCommand = window.handleCommand;
+window.handleCommand = function(command) {
+    command = command.toLowerCase();
+    console.log("Marriage registration command:", command);
+    
+    // Check for numbers (Aadhaar)
+    const numberMatch = command.match(/\d+/g);
+    if(numberMatch && (command.includes("aadhaar") || command.includes("uid"))) {
+        const digits = numberMatch.join('').slice(0,12);
+        if(digits.length === 12) {
+            // Try to determine which Aadhaar field (groom/bride)
+            if(command.includes("groom") || command.includes("bridegroom") || command.includes("male")) {
+                document.getElementById('groom_aadhaar').value = digits;
+                if(typeof speak === 'function') speak("Groom Aadhaar entered");
+            } else if(command.includes("bride") || command.includes("female")) {
+                document.getElementById('bride_aadhaar').value = digits;
+                if(typeof speak === 'function') speak("Bride Aadhaar entered");
+            }
+            return;
+        }
+    }
+    
+    // Name inputs
+    if(command.includes("groom name") && command.length > 15) {
+        let name = command.replace("groom name", "").trim();
+        if(name) {
+            name = name.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+            document.getElementById('groom_name').value = name;
+            if(typeof speak === 'function') speak("Groom name entered");
+            return;
+        }
+    }
+    
+    if(command.includes("bride name") && command.length > 15) {
+        let name = command.replace("bride name", "").trim();
+        if(name) {
+            name = name.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+            document.getElementById('bride_name').value = name;
+            if(typeof speak === 'function') speak("Bride name entered");
+            return;
+        }
+    }
+    
+    if(command.includes("father") || command.includes("fathers name")) {
+        let name = command.replace("father", "").replace("name", "").trim();
+        if(name && (command.includes("groom") || command.includes("bride"))) {
+            if(command.includes("groom")) {
+                document.getElementById('groom_father_name').value = name.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+                if(typeof speak === 'function') speak("Groom's father name entered");
+            } else if(command.includes("bride")) {
+                document.getElementById('bride_father_name').value = name.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+                if(typeof speak === 'function') speak("Bride's father name entered");
+            }
+            return;
+        }
+    }
+    
+    // Place input
+    if(command.includes("place") && command.length > 10) {
+        let place = command.replace("place", "").trim();
+        if(place) {
+            document.getElementById('marriage_place').value = place.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+            if(typeof speak === 'function') speak("Place entered");
+            return;
+        }
+    }
+    
+    // Witness names
+    if(command.includes("witness") && command.length > 15) {
+        let name = command.replace("witness", "").replace("name", "").trim();
+        if(name) {
+            if(command.includes("first") || command.includes("1") || command.includes("one")) {
+                document.getElementById('witness1_name').value = name.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+                if(typeof speak === 'function') speak("First witness name entered");
+            } else if(command.includes("second") || command.includes("2") || command.includes("two")) {
+                document.getElementById('witness2_name').value = name.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+                if(typeof speak === 'function') speak("Second witness name entered");
+            }
+            return;
+        }
+    }
+    
+    // Marriage type selection
+    if(command.includes("hindu")) {
+        document.getElementById('marriage_type').value = "Hindu Marriage Act";
+        if(typeof speak === 'function') speak("Hindu Marriage Act selected");
+        return;
+    }
+    else if(command.includes("special")) {
+        document.getElementById('marriage_type').value = "Special Marriage Act";
+        if(typeof speak === 'function') speak("Special Marriage Act selected");
+        return;
+    }
+    else if(command.includes("muslim")) {
+        document.getElementById('marriage_type').value = "Muslim Personal Law";
+        if(typeof speak === 'function') speak("Muslim Personal Law selected");
+        return;
+    }
+    else if(command.includes("christian")) {
+        document.getElementById('marriage_type').value = "Christian Marriage Act";
+        if(typeof speak === 'function') speak("Christian Marriage Act selected");
+        return;
+    }
+    
+    // Submit command
+    if(command.includes("submit") || command.includes("register")) {
+        validateForm(event);
+        return;
+    }
+    else if(command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
+        window.location.href = "/" + getCurrentLangCode() + "/municipal-services/";
+        return;
+    }
+    else if(command.includes("home") || command.includes("होम") || command.includes("ଘର")) {
+        window.location.href = "/" + getCurrentLangCode() + "/";
+        return;
+    }
+    
+    // If not marriage-specific, pass to original handler
+    if(originalHandleCommand) {
+        originalHandleCommand(command);
+    }
+};
+
+// Override autoReadPage to read marriage registration instructions
+const originalAutoRead = window.autoReadPage;
+window.autoReadPage = function() {
+    if(originalAutoRead) originalAutoRead();
+    setTimeout(() => {
+        if(typeof speak === 'function') {
+            speak("{% trans 'Fill groom and bride details, then marriage details, then say submit to register' %}");
+        }
+    }, 2000);
+};
 
 createKeyboard();
 </script>

@@ -18,6 +18,7 @@ body{width:100vw;height:100vh;overflow:hidden;background:#f0f7ff;}
 .voice-corner{position:fixed;top:80px;right:15px;display:flex;flex-direction:column;align-items:center;gap:3px;z-index:1000;}
 .voice-corner-btn{background:#ff9933;width:45px;height:45px;border-radius:50%;border:2px solid white;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;}
 .voice-corner-btn:hover{background:#ffaa44;}
+.voice-corner-btn.listening{background:#28a745;transform:scale(1.1);}
 .voice-corner-text{background:white;padding:2px 8px;border-radius:12px;font-size:10px;color:#ff9933;border:1px solid #ff9933;}
 
 .back-btn{position:fixed;top:80px;left:15px;background:white;border:2px solid #1e5fbf;border-radius:30px;padding:5px 15px;font-size:18px;font-weight:700;color:#1e5fbf;text-decoration:none;z-index:1000;display:inline-block;}
@@ -149,10 +150,7 @@ transition:all 0.2s;
 </div>
 </div>
 
-<div class="voice-corner">
-<div class="voice-corner-btn" onclick="alert('{% trans "Voice assistant activated" %}')">🎤</div>
-<div class="voice-corner-text">{% trans "Click" %}</div>
-</div>
+<!-- Voice corner will be created dynamically by voice.js -->
 
 <a href="{% url 'electricity-services' %}" class="back-btn">← {% trans "Back" %}</a>
 
@@ -192,7 +190,7 @@ transition:all 0.2s;
 
 <div class="form-group">
 <label>{% trans "Requested Load (kW)" %} *</label>
-<input class="large-input" id="newLoad" placeholder="{% trans "Enter new load (e.g., 5, 7.5)" %}" 
+<input class="large-input text-input" id="newLoad" placeholder="{% trans "Enter new load (e.g., 5, 7.5)" %}" 
        value="{{ request.POST.requested_load }}" readonly>
 </div>
 
@@ -226,7 +224,10 @@ transition:all 0.2s;
 <input id="floatingInput" class="floating-input" placeholder="{% trans "Enter load in kW" %}">
 <div id="keyboard" class="keyboard"></div>
 
+<script src="{% static 'js/voice.js' %}"></script>
+
 <script>
+
 let activeInput=null;
 let isUpperCase=true;
 
@@ -237,61 +238,30 @@ const loadingIndicator = document.getElementById("loadingIndicator");
 
 function createKeyboard(){
 keyboard.innerHTML="";
-let keys = ["1","2","3","4","5","6","7","8","9","0",".",".5",".0","Clear","⌫","OK"];
-
 let row=document.createElement("div");
 row.className="keyboard-row";
-
-// Number keys
-for(let i=0; i<10; i++) {
-    let btn=document.createElement("button");
-    btn.innerText=i;
-    btn.type="button";
-    btn.onclick=()=>floatingInput.value+=i;
-    row.appendChild(btn);
+for(let i=0;i<10;i++){
+let btn=document.createElement("button");
+btn.innerText=i;
+btn.type="button";
+btn.onclick=()=>floatingInput.value+=i;
+row.appendChild(btn);
 }
 keyboard.appendChild(row);
 
-// Decimal and special keys
 row=document.createElement("div");
 row.className="keyboard-row";
-let decimalBtn=document.createElement("button");
-decimalBtn.innerText=".";
-decimalBtn.type="button";
-decimalBtn.onclick=()=>floatingInput.value+=".";
-row.appendChild(decimalBtn);
 
-let halfBtn=document.createElement("button");
-halfBtn.innerText=".5";
-halfBtn.type="button";
-halfBtn.onclick=()=>floatingInput.value+=".5";
-row.appendChild(halfBtn);
-
-let zeroBtn=document.createElement("button");
-zeroBtn.innerText=".0";
-zeroBtn.type="button";
-zeroBtn.onclick=()=>floatingInput.value+=".0";
-row.appendChild(zeroBtn);
-
-let clearBtn=document.createElement("button");
-clearBtn.innerText="{% trans "Clear" %}";
-clearBtn.type="button";
-clearBtn.onclick=()=>floatingInput.value="";
-row.appendChild(clearBtn);
-
-let backBtn=document.createElement("button");
-backBtn.innerText="⌫";
-backBtn.type="button";
-backBtn.onclick=()=>floatingInput.value=floatingInput.value.slice(0,-1);
-row.appendChild(backBtn);
-
-let okBtn=document.createElement("button");
-okBtn.innerText="{% trans "OK" %}";
-okBtn.className="ok-btn";
-okBtn.type="button";
-okBtn.onclick=()=>finish();
-row.appendChild(okBtn);
-
+[".","Clear","⌫","OK"].forEach(key=>{
+let btn=document.createElement("button");
+btn.type="button";
+btn.innerText=key;
+if(key==="Clear") btn.onclick=()=>floatingInput.value="";
+else if(key==="⌫") btn.onclick=()=>floatingInput.value=floatingInput.value.slice(0,-1);
+else if(key==="OK"){ btn.className="ok-btn"; btn.onclick=finish;}
+else btn.onclick=()=>floatingInput.value+=key;
+row.appendChild(btn);
+});
 keyboard.appendChild(row);
 }
 
@@ -301,16 +271,13 @@ floatingInput.value=activeInput.value;
 overlay.style.display="block";
 floatingInput.style.display="block";
 keyboard.style.display="block";
-setTimeout(()=>{
-floatingInput.classList.add("show");
-floatingInput.focus();
-},10);
+setTimeout(()=>floatingInput.classList.add("show"),10);
 }
 
 function finish(){
 if(activeInput){
 activeInput.value=floatingInput.value;
-document.getElementById('requestedLoad').value = floatingInput.value;
+document.getElementById('requestedLoad').value=floatingInput.value;
 updateEstimatedCost(floatingInput.value);
 }
 closeKeyboard();
@@ -325,104 +292,119 @@ keyboard.style.display="none";
 },200);
 }
 
-function updateEstimatedCost(load) {
-    const costDiv = document.getElementById('estimatedCost');
-    const currentLoad = parseFloat(document.getElementById('displayCurrentLoad').innerText) || 3;
-    const requestedLoad = parseFloat(load) || 0;
-    
-    if(requestedLoad > currentLoad) {
-        const additionalLoad = requestedLoad - currentLoad;
-        const baseCost = 1500;
-        const additionalCost = additionalLoad * 800; // ₹800 per additional kW
-        const totalCost = baseCost + additionalCost;
-        const gst = totalCost * 0.18;
-        const finalCost = totalCost + gst;
-        
-        costDiv.innerHTML = `₹ ${totalCost.toFixed(0)} + GST (₹ ${gst.toFixed(0)}) = <strong>₹ ${finalCost.toFixed(0)}</strong>`;
-    } else if(requestedLoad > 0) {
-        costDiv.innerHTML = '₹ 1,500 + {% trans "Taxes" %} ({% trans "Minimum charges" %})';
-    } else {
-        costDiv.innerHTML = '₹ 1,500 + {% trans "Taxes" %}';
-    }
-}
+function updateEstimatedCost(load){
+const costDiv=document.getElementById('estimatedCost');
+const currentLoad=parseFloat(document.getElementById('displayCurrentLoad').innerText)||3;
+const requestedLoad=parseFloat(load)||0;
 
-// Handle Enter key on floating input
-floatingInput.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') {
-        e.preventDefault();
-        finish();
-    }
-});
+if(requestedLoad>currentLoad){
+const additionalLoad=requestedLoad-currentLoad;
+const totalCost=1500+(additionalLoad*800);
+const gst=totalCost*0.18;
+const finalCost=totalCost+gst;
+costDiv.innerHTML=`₹ ${totalCost.toFixed(0)} + GST (₹ ${gst.toFixed(0)}) = <strong>₹ ${finalCost.toFixed(0)}</strong>`;
+}else{
+costDiv.innerHTML='₹ 1,500 + {% trans "Taxes" %}';
+}
+}
 
 document.getElementById("newLoad").addEventListener("click",openKeyboard);
 overlay.addEventListener("click",closeKeyboard);
-
 createKeyboard();
 
-function updateReason() {
-    const reason = document.getElementById('reason').value;
-    document.getElementById('reasonValue').value = reason;
+function updateReason(){
+document.getElementById('reasonValue').value=document.getElementById('reason').value;
 }
 
 function submitRequest(){
-const newLoad = document.getElementById('newLoad').value;
-const reason = document.getElementById('reason').value;
-
+const newLoad=document.getElementById('newLoad').value;
 if(!newLoad){
-alert('{% trans "Please enter requested load" %}');
-return;
+    if(typeof speak === 'function') speak("{% trans 'Please enter requested load' %}");
+    return;
+}
+if(typeof speak === 'function') speak("{% trans 'Submitting request' %}");
+document.getElementById('loadForm').submit();
 }
 
-// Validate load value
-const loadValue = parseFloat(newLoad);
-if(isNaN(loadValue) || loadValue <= 0){
-alert('{% trans "Please enter a valid load value (positive number)" %}');
-return;
-}
+/* ===================== OVERRIDE VOICE COMMANDS ===================== */
 
-const currentLoad = parseFloat(document.getElementById('displayCurrentLoad').innerText) || 3;
-if(loadValue <= currentLoad){
-alert('{% trans "Requested load must be greater than current load" %} (' + currentLoad + ' kW)');
-return;
-}
-
-if(loadValue > 50){
-alert('{% trans "Maximum load enhancement is 50 kW. Please contact commercial office for higher loads." %}');
-return;
-}
-
-// Set values in hidden fields
-document.getElementById('requestedLoad').value = newLoad;
-document.getElementById('reasonValue').value = reason;
-
-// Show loading
-loadingIndicator.classList.add('show');
-
-// Submit form
-setTimeout(() => {
-    document.getElementById('loadForm').submit();
-}, 500);
-}
-
-// Auto-hide messages after 5 seconds
-setTimeout(function() {
-    document.querySelectorAll('.message').forEach(function(message) {
-        message.style.display = 'none';
-    });
-}, 5000);
-
-// Prevent form submission on Enter key
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'INPUT') {
-        e.preventDefault();
+// Extend voice.js handleCommand for load enhancement-specific commands
+const originalHandleCommand = window.handleCommand;
+window.handleCommand = function(command) {
+    command = command.toLowerCase();
+    console.log("Load enhancement command:", command);
+    
+    // Check for numbers in command (load value)
+    const numberMatch = command.match(/\d+(\.\d+)?/g);
+    if(numberMatch && (command.includes("load") || command.includes("kilowatt") || command.includes("kw"))) {
+        const value = numberMatch[0];
+        document.getElementById("newLoad").value = value;
+        document.getElementById("requestedLoad").value = value;
+        updateEstimatedCost(value);
+        if(typeof speak === 'function') speak("Load set to " + value + " kilowatt");
+        return;
     }
-});
+    
+    // Reason selection
+    if(command.includes("appliance") || command.includes("appliances")) {
+        document.getElementById("reason").value = "New Appliances";
+        updateReason();
+        if(typeof speak === 'function') speak("{% trans 'Reason selected new appliances' %}");
+        return;
+    }
+    
+    if(command.includes("extension") || command.includes("home extension")) {
+        document.getElementById("reason").value = "Home Extension";
+        updateReason();
+        if(typeof speak === 'function') speak("{% trans 'Reason selected home extension' %}");
+        return;
+    }
+    
+    if(command.includes("commercial") || command.includes("business")) {
+        document.getElementById("reason").value = "Commercial Activity";
+        updateReason();
+        if(typeof speak === 'function') speak("{% trans 'Reason selected commercial activity' %}");
+        return;
+    }
+    
+    if(command.includes("other")) {
+        document.getElementById("reason").value = "Other";
+        updateReason();
+        if(typeof speak === 'function') speak("{% trans 'Reason selected other' %}");
+        return;
+    }
+    
+    // Load-specific commands
+    if(command.includes("submit") || command.includes("request")) {
+        submitRequest();
+        return;
+    }
+    else if(command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
+        window.location.href = "/" + getCurrentLangCode() + "/electricity-services/";
+        return;
+    }
+    else if(command.includes("home") || command.includes("होम") || command.includes("ଘର")) {
+        window.location.href = "/" + getCurrentLangCode() + "/";
+        return;
+    }
+    
+    // If not load-specific, pass to original handler
+    if(originalHandleCommand) {
+        originalHandleCommand(command);
+    }
+};
 
-// Update estimated cost if load was previously entered
-{% if request.POST.requested_load %}
-updateEstimatedCost('{{ request.POST.requested_load }}');
-{% endif %}
+// Override autoReadPage to read load enhancement instructions
+const originalAutoRead = window.autoReadPage;
+window.autoReadPage = function() {
+    if(originalAutoRead) originalAutoRead();
+    setTimeout(() => {
+        if(typeof speak === 'function') {
+            speak("{% trans 'Say load value, then select reason, say submit to request' %}");
+        }
+    }, 2000);
+};
+
 </script>
-
 </body>
 </html>

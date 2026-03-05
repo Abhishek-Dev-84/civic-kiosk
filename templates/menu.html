@@ -32,34 +32,6 @@
         }
     </style>
 
-    <style>
-        /* Hide Google Translate elements */
-        .goog-te-banner-frame.skiptranslate,
-        .goog-te-gadget-icon,
-        .goog-te-gadget-simple,
-        #goog-gt-tt,
-        .goog-te-balloon-frame,
-        .goog-te-menu-frame,
-        .goog-te-spinner-pos {
-            display: none !important;
-        }
-        
-        body {
-            top: 0px !important;
-            position: static !important;
-        }
-        
-        .goog-te-combo {
-            display: none !important;
-        }
-        
-        .goog-te-gadget {
-            color: transparent !important;
-            height: 0 !important;
-            overflow: hidden !important;
-        }
-    </style>
-
     <meta charset="UTF-8">
     <title>{% trans "Civic Services Kiosk - Main Menu" %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -642,10 +614,7 @@
         </div>
     </div>
 
-    <div class="voice-corner">
-        <div class="voice-corner-btn" id="voiceBtn" onclick="toggleVoiceInput()">🎤</div>
-        <div class="voice-corner-text" id="voiceStatus">{% trans "Click" %}</div>
-    </div>
+    <!-- Voice corner will be created dynamically by voice.js -->
 
     <!-- Django Back URL -->
     <div class="back-btn" onclick="window.location='{% url 'index' %}'">← {% trans "Back" %}</div>
@@ -720,6 +689,8 @@
         }, 3000);
     </script>
 
+    <script src="{% static 'js/voice.js' %}"></script>
+
     <style>
         @keyframes slideOutLeft {
             from { transform: translateX(0); opacity: 1; }
@@ -728,7 +699,7 @@
     </style>
 
     <script>
-        // ===== ORIGINAL JS (UNCHANGED EXCEPT INDEX REDIRECT) =====
+        // ===== ORIGINAL JS (PRESERVED) =====
         function playAudioGuidance(text, lang = 'hi-IN') {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
@@ -776,54 +747,64 @@
             document.addEventListener('touchstart', extendSession);
         });
 
-        let activeInput = null;
+        /* ===================== OVERRIDE VOICE COMMANDS ===================== */
 
-        function openKeyboard(inputId) {
-            const keyboard = document.getElementById("keyboard");
-            const input = document.getElementById(inputId);
-            if (keyboard && input) {
-                activeInput = input;
-                keyboard.classList.remove("hidden");
+        // Extend voice.js handleCommand for main menu navigation
+        const originalHandleCommand = window.handleCommand;
+        window.handleCommand = function(command) {
+            command = command.toLowerCase();
+            console.log("Main menu command:", command);
+            
+            // Department navigation
+            if(command.includes("gas") || command.includes("cylinder") || command.includes("गैस")) {
+                window.location.href = "{% url 'gas-services' %}";
+                return;
             }
-        }
+            else if(command.includes("electricity") || command.includes("बिजली") || command.includes("⚡")) {
+                window.location.href = "{% url 'electricity-services' %}";
+                return;
+            }
+            else if(command.includes("municipal") || command.includes("नगर") || command.includes("🏛️")) {
+                window.location.href = "{% url 'municipal-services' %}";
+                return;
+            }
+            else if(command.includes("transport") || command.includes("परिवहन") || command.includes("🚗")) {
+                window.location.href = "{% url 'transport-services' %}";
+                return;
+            }
+            else if(command.includes("revenue") || command.includes("राजस्व") || command.includes("📜")) {
+                window.location.href = "{% url 'revenue-services' %}";
+                return;
+            }
+            else if(command.includes("status") || command.includes("स्थिति") || command.includes("📊")) {
+                window.location.href = "{% url 'application-status' %}";
+                return;
+            }
+            else if(command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
+                window.location.href = "/" + getCurrentLangCode() + "/";
+                return;
+            }
+            else if(command.includes("home") || command.includes("होम") || command.includes("ଘର")) {
+                window.location.href = "/" + getCurrentLangCode() + "/";
+                return;
+            }
+            
+            // If not menu-specific, pass to original handler
+            if(originalHandleCommand) {
+                originalHandleCommand(command);
+            }
+        };
 
-        function closeKeyboard() {
-            const keyboard = document.getElementById("keyboard");
-            if (keyboard) {
-                keyboard.classList.add("hidden");
-            }
-        }
-
-        function pressKey(key) {
-            if (activeInput) {
-                activeInput.value += key;
-            }
-        }
-
-        function backspace() {
-            if (activeInput) {
-                activeInput.value = activeInput.value.slice(0, -1);
-            }
-        }
-
-        function clearInput() {
-            if (activeInput) {
-                activeInput.value = "";
-            }
-        }
-
-        function toggleVoiceInput() {
-            const btn = document.getElementById('voiceBtn');
-            btn.classList.toggle('listening');
-            if (btn.classList.contains('listening')) {
-                document.getElementById('voiceStatus').textContent = '{% trans "Listening..." %}';
-                // Simulate voice recognition
-                setTimeout(() => {
-                    btn.classList.remove('listening');
-                    document.getElementById('voiceStatus').textContent = '{% trans "Click" %}';
-                }, 3000);
-            }
-        }
+        // Override autoReadPage to read main menu options
+        const originalAutoRead = window.autoReadPage;
+        window.autoReadPage = function() {
+            if(originalAutoRead) originalAutoRead();
+            setTimeout(() => {
+                if(typeof speak === 'function') {
+                    speak("{% trans 'Main menu. Choose Gas, Electricity, Municipal, Transport, Revenue, or Status services' %}");
+                }
+            }, 2000);
+        };
     </script>
 </body>
 </html>

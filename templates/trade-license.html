@@ -15,6 +15,7 @@
         .header-right img { height:35px; }
         .voice-corner { position:fixed; top:80px; right:15px; z-index:1000; display:flex; flex-direction:column; align-items:center; gap:3px; }
         .voice-corner-btn { background:#ff9933; width:45px; height:45px; border-radius:50%; border:2px solid white; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:24px; box-shadow:0 2px 5px rgba(0,0,0,0.2); }
+        .voice-corner-btn.listening { background:#28a745; transform:scale(1.1); }
         .voice-corner-text { background:white; padding:2px 8px; border-radius:12px; font-size:10px; color:#ff9933; border:1px solid #ff9933; }
         .back-btn { position:fixed; top:80px; left:15px; background:white; border:2px solid #1e5fbf; border-radius:30px; padding:5px 15px; font-size:18px; font-weight:700; cursor:pointer; color:#1e5fbf; box-shadow:0 3px 0 #0a3d7a; z-index:1000; }
         .back-btn:active { transform:translateY(3px); box-shadow:0 1px 0 #0a3d7a; }
@@ -23,7 +24,17 @@
         h1 { color:#1e5fbf; font-size:36px; font-weight:800; text-align:center; margin:0; }
         .form-group { margin:15px 0; }
         label { display:block; font-size:22px; color:#1e5fbf; margin-bottom:5px; }
-        .large-input { width:100%; height:60px; border:3px solid #1e5fbf; border-radius:20px; font-size:26px; padding:0 15px; background:white; }
+        .large-input { width:100%; height:60px; border:3px solid #1e5fbf; border-radius:20px; font-size:26px; padding:0 15px; background:white; cursor:pointer; }
+        .large-input[readonly] { background:#f9f9f9; }
+        select.large-input {
+            appearance:none;
+            background-image:url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat:no-repeat;
+            background-position:right 15px center;
+            background-size:20px;
+            padding-right:45px;
+            cursor:pointer;
+        }
         .submit-btn { background:#28a745; color:white; font-size:32px; padding:12px; border-radius:40px; width:100%; border:none; box-shadow:0 5px 0 #1e7e34; cursor:pointer; margin-top:10px; }
         .submit-btn:active { transform:translateY(5px); box-shadow:0 1px 0 #1e7e34; }
         .fee-info { background:#e3f2fd; border-radius:20px; padding:15px; margin:10px 0; font-size:20px; }
@@ -32,6 +43,68 @@
         .message.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
         .message.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
         .message.info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        
+        /* FLOATING INPUT SYSTEM */
+        .overlay{
+            position:fixed;
+            inset:0;
+            background:rgba(0,0,0,0.4);
+            backdrop-filter:blur(3px);
+            display:none;
+            z-index:900;
+        }
+        .floating-input{
+            position:fixed;
+            left:50%;
+            top:35%;
+            transform:translate(-50%,-50%) scale(0.85);
+            width:520px;
+            height:70px;
+            font-size:24px;
+            border:4px solid #ff9933;
+            border-radius:20px;
+            padding:12px;
+            z-index:1001;
+            box-shadow:0 20px 50px rgba(0,0,0,0.4);
+            transition:all 0.25s ease;
+            display:none;
+        }
+        .floating-input.show{
+            transform:translate(-50%,-50%) scale(1);
+        }
+        .floating-input:focus{outline:none;}
+
+        .keyboard{
+            position:fixed;
+            bottom:15px;
+            left:50%;
+            transform:translateX(-50%);
+            background:white;
+            padding:10px;
+            border-radius:15px;
+            box-shadow:0 8px 25px rgba(0,0,0,0.3);
+            display:none;
+            z-index:1000;
+        }
+        .keyboard-row{display:flex;justify-content:center;}
+        .keyboard button{
+            min-width:48px;
+            height:42px;
+            margin:3px;
+            font-size:14px;
+            border-radius:8px;
+            border:2px solid #1e5fbf;
+            background:#f0f7ff;
+            cursor:pointer;
+            transition:all 0.2s;
+        }
+        .keyboard button:hover{background:#1e5fbf;color:white;}
+        .keyboard .ok-btn{
+            background:#28a745;
+            color:white;
+            border:none;
+        }
+        .keyboard .ok-btn:hover{background:#218838;}
     </style>
 </head>
 <body>
@@ -55,19 +128,18 @@
     </div>
     {% endif %}
     
-    <div class="voice-corner">
-        <div class="voice-corner-btn" onclick="alert('{% trans "Voice assistant activated" %}')">🎤</div>
-        <div class="voice-corner-text">{% trans "Click" %}</div>
-    </div>
+    <!-- Voice corner will be created dynamically by voice.js -->
+    
     <div class="back-btn" onclick="window.location='{% url 'municipal-services' %}'">← {% trans "Back" %}</div>
+    
     <div class="container">
         <div class="content-wrapper">
             <h1>📋 {% trans "Trade License" %}</h1>
-            <form method="POST" action="{% url 'trade-license' %}">
+            <form method="POST" action="{% url 'trade-license' %}" id="licenseForm">
                 {% csrf_token %}
                 <div class="form-group">
                     <label>{% trans "Business Name" %} *</label>
-                    <input class="large-input" type="text" name="business_name" placeholder="{% trans "Enter business name" %}" id="businessName" value="{{ form_data.business_name|default:'' }}" required>
+                    <input class="large-input text-input" type="text" name="business_name" placeholder="{% trans "Enter business name" %}" id="businessName" value="{{ form_data.business_name|default:'' }}" readonly required>
                 </div>
                 <div class="form-group">
                     <label>{% trans "Business Type" %} *</label>
@@ -83,15 +155,15 @@
                 </div>
                 <div class="form-group">
                     <label>{% trans "Owner Name" %} *</label>
-                    <input class="large-input" type="text" name="owner_name" placeholder="{% trans "Enter owner name" %}" id="ownerName" value="{{ form_data.owner_name|default:'' }}" required>
+                    <input class="large-input text-input" type="text" name="owner_name" placeholder="{% trans "Enter owner name" %}" id="ownerName" value="{{ form_data.owner_name|default:'' }}" readonly required>
                 </div>
                 <div class="form-group">
                     <label>{% trans "Business Address" %} *</label>
-                    <input class="large-input" type="text" name="address" placeholder="{% trans "Enter complete address" %}" id="address" value="{{ form_data.address|default:'' }}" required>
+                    <input class="large-input text-input" type="text" name="address" placeholder="{% trans "Enter complete address" %}" id="address" value="{{ form_data.address|default:'' }}" readonly required>
                 </div>
                 <div class="form-group">
                     <label>{% trans "GST Number (if applicable)" %}</label>
-                    <input class="large-input" type="text" name="gst_number" placeholder="{% trans "Enter GST number" %}" id="gst" value="{{ form_data.gst_number|default:'' }}">
+                    <input class="large-input text-input" type="text" name="gst_number" placeholder="{% trans "Enter GST number" %}" id="gst" value="{{ form_data.gst_number|default:'' }}" readonly>
                 </div>
                 <div class="fee-info">
                     <div style="display:flex; justify-content:space-between;">
@@ -109,12 +181,110 @@
                     </div>
                     {% endif %}
                 </div>
-                <button type="submit" class="submit-btn" name="apply_license">{% trans "Apply for License" %}</button>
+                <button type="submit" class="submit-btn" name="apply_license" onclick="return validateForm(event)">{% trans "Apply for License" %}</button>
             </form>
         </div>
     </div>
+
+    <!-- Floating input system -->
+    <div id="overlay" class="overlay"></div>
+    <input id="floatingInput" class="floating-input" placeholder="{% trans "Type here..." %}">
+    <div id="keyboard" class="keyboard"></div>
+    
+    <script src="{% static 'js/voice.js' %}"></script>
     
     <script>
+        // Floating input system
+        let activeInput = null;
+        let isUpperCase = true;
+        const overlay = document.getElementById("overlay");
+        const floatingInput = document.getElementById("floatingInput");
+        const keyboard = document.getElementById("keyboard");
+
+        function createKeyboard(){
+            keyboard.innerHTML = "";
+            let letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            if(!isUpperCase){letters = letters.toLowerCase();}
+            let keys = (letters + "0123456789 .-,").split("");
+
+            let row = document.createElement("div");
+            row.className = "keyboard-row";
+
+            keys.forEach((k,i)=>{
+                if(i%10 === 0 && i !== 0){
+                    keyboard.appendChild(row);
+                    row = document.createElement("div");
+                    row.className = "keyboard-row";
+                }
+                let btn = document.createElement("button");
+                btn.innerText = k === " " ? "{% trans "Space" %}" : k;
+                btn.type = "button";
+                btn.onclick = ()=>floatingInput.value += k;
+                row.appendChild(btn);
+            });
+            keyboard.appendChild(row);
+
+            let last = document.createElement("div");
+            last.className = "keyboard-row";
+            last.innerHTML = `
+                <button type="button" onclick="toggleCase()">⇧ {% trans "Shift" %}</button>
+                <button type="button" onclick="floatingInput.value=floatingInput.value.slice(0,-1)">⌫ {% trans "Back" %}</button>
+                <button type="button" onclick="floatingInput.value=''">{% trans "Clear" %}</button>
+                <button type="button" class="ok-btn" onclick="finish()">✓ {% trans "OK" %}</button>
+            `;
+            keyboard.appendChild(last);
+        }
+
+        function toggleCase(){
+            isUpperCase = !isUpperCase;
+            createKeyboard();
+        }
+
+        function openKeyboard(id){
+            activeInput = document.getElementById(id);
+            floatingInput.value = activeInput.value;
+            overlay.style.display = "block";
+            floatingInput.style.display = "block";
+            keyboard.style.display = "block";
+            setTimeout(()=>{
+                floatingInput.classList.add("show");
+                floatingInput.focus();
+            },10);
+        }
+
+        function finish(){
+            if(activeInput){
+                activeInput.value = floatingInput.value;
+            }
+            closeKeyboard();
+        }
+
+        function closeKeyboard(){
+            floatingInput.classList.remove("show");
+            setTimeout(()=>{
+                overlay.style.display = "none";
+                floatingInput.style.display = "none";
+                keyboard.style.display = "none";
+            },200);
+        }
+
+        floatingInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                finish();
+            }
+        });
+
+        overlay.addEventListener("click", closeKeyboard);
+
+        // Add click handlers to all text inputs
+        document.getElementById("businessName").addEventListener("click",()=>openKeyboard("businessName"));
+        document.getElementById("ownerName").addEventListener("click",()=>openKeyboard("ownerName"));
+        document.getElementById("address").addEventListener("click",()=>openKeyboard("address"));
+        document.getElementById("gst").addEventListener("click",()=>openKeyboard("gst"));
+
+        createKeyboard();
+
         // Auto-hide messages after 5 seconds
         setTimeout(function() {
             const messages = document.querySelectorAll('.message');
@@ -126,10 +296,139 @@
         // Optional: Calculate estimated fee based on business type
         document.getElementById('businessType').addEventListener('change', function() {
             const businessType = this.value;
-            // This would normally make an AJAX call to calculate fee
-            // For now, just a placeholder for future functionality
+            if(typeof speak === 'function') speak(businessType + " selected");
             console.log('Business type selected:', businessType);
         });
+
+        function validateForm(e) {
+            e.preventDefault();
+            
+            const businessName = document.getElementById('businessName').value;
+            const businessType = document.getElementById('businessType').value;
+            const ownerName = document.getElementById('ownerName').value;
+            const address = document.getElementById('address').value;
+            
+            if(!businessName || !businessType || !ownerName || !address) {
+                if(typeof speak === 'function') speak("{% trans 'Please fill all required fields' %}");
+                return false;
+            }
+            
+            if(typeof speak === 'function') speak("{% trans 'Submitting license application' %}");
+            document.getElementById('licenseForm').submit();
+            return false;
+        }
+        
+        /* ===================== OVERRIDE VOICE COMMANDS ===================== */
+
+        // Extend voice.js handleCommand for trade license
+        const originalHandleCommand = window.handleCommand;
+        window.handleCommand = function(command) {
+            command = command.toLowerCase();
+            console.log("Trade license command:", command);
+            
+            // Business name input
+            if(command.includes("business name") && command.length > 15) {
+                let name = command.replace("business name", "").trim();
+                if(name) {
+                    name = name.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+                    document.getElementById('businessName').value = name;
+                    if(typeof speak === 'function') speak("Business name entered");
+                    return;
+                }
+            }
+            
+            // Owner name input
+            if(command.includes("owner name") && command.length > 12) {
+                let name = command.replace("owner name", "").trim();
+                if(name) {
+                    name = name.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+                    document.getElementById('ownerName').value = name;
+                    if(typeof speak === 'function') speak("Owner name entered");
+                    return;
+                }
+            }
+            
+            // Address input
+            if(command.includes("address") && command.length > 15) {
+                let address = command.replace("address", "").trim();
+                if(address) {
+                    address = address.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+                    document.getElementById('address').value = address;
+                    if(typeof speak === 'function') speak("Address entered");
+                    return;
+                }
+            }
+            
+            // GST number (alphanumeric pattern)
+            const gstMatch = command.match(/[0-9]{2}[a-zA-Z]{5}[0-9]{4}[a-zA-Z][0-9]{1}[zZ][0-9a-zA-Z]{1}/i);
+            if(gstMatch) {
+                document.getElementById('gst').value = gstMatch[0];
+                if(typeof speak === 'function') speak("GST number entered");
+                return;
+            }
+            
+            // Business type selection
+            if(command.includes("retail") || command.includes("shop")) {
+                document.getElementById('businessType').value = "Retail Shop";
+                if(typeof speak === 'function') speak("Retail Shop selected");
+                return;
+            }
+            else if(command.includes("restaurant") || command.includes("hotel") || command.includes("food")) {
+                document.getElementById('businessType').value = "Restaurant";
+                if(typeof speak === 'function') speak("Restaurant selected");
+                return;
+            }
+            else if(command.includes("manufacturing") || command.includes("factory")) {
+                document.getElementById('businessType').value = "Manufacturing";
+                if(typeof speak === 'function') speak("Manufacturing selected");
+                return;
+            }
+            else if(command.includes("service") || command.includes("provider")) {
+                document.getElementById('businessType').value = "Service Provider";
+                if(typeof speak === 'function') speak("Service Provider selected");
+                return;
+            }
+            else if(command.includes("warehouse")) {
+                document.getElementById('businessType').value = "Warehouse";
+                if(typeof speak === 'function') speak("Warehouse selected");
+                return;
+            }
+            else if(command.includes("other")) {
+                document.getElementById('businessType').value = "Other";
+                if(typeof speak === 'function') speak("Other selected");
+                return;
+            }
+            
+            // Submit command
+            if(command.includes("submit") || command.includes("apply")) {
+                validateForm(event);
+                return;
+            }
+            else if(command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
+                window.location.href = "/" + getCurrentLangCode() + "/municipal-services/";
+                return;
+            }
+            else if(command.includes("home") || command.includes("होम") || command.includes("ଘର")) {
+                window.location.href = "/" + getCurrentLangCode() + "/";
+                return;
+            }
+            
+            // If not license-specific, pass to original handler
+            if(originalHandleCommand) {
+                originalHandleCommand(command);
+            }
+        };
+
+        // Override autoReadPage to read trade license instructions
+        const originalAutoRead = window.autoReadPage;
+        window.autoReadPage = function() {
+            if(originalAutoRead) originalAutoRead();
+            setTimeout(() => {
+                if(typeof speak === 'function') {
+                    speak("{% trans 'Fill business name, type, owner name, address, then say submit to apply for license' %}");
+                }
+            }, 2000);
+        };
     </script>
 </body>
 </html>

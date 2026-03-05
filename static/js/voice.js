@@ -1,19 +1,17 @@
 // ================= LANGUAGE MAP =================
 
 const languageMap = {
-    "en": "en-US",
+    "en": "en-IN",
     "hi": "hi-IN",
     "ta": "ta-IN",
     "te": "te-IN",
     "bn": "bn-IN",
-    "or": "or-IN"   // ✅ Added Odia
+    "or": "or-IN"
 };
 
-// Detect current language from URL (/en/, /hi/, etc.)
 function getCurrentLang() {
     const path = window.location.pathname.split('/');
-    const langCode = path[1];
-    return languageMap[langCode] || "en-US";
+    return languageMap[path[1]] || "en-IN";
 }
 
 function getCurrentLangCode() {
@@ -24,91 +22,170 @@ function getCurrentLangCode() {
 // ================= TEXT TO SPEECH =================
 
 function speak(text) {
-    if (!('speechSynthesis' in window)) {
-        alert("Speech not supported");
-        return;
-    }
+    if (!('speechSynthesis' in window)) return;
+
+    speechSynthesis.cancel();
 
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = getCurrentLang();
     utterance.rate = 1;
-    utterance.pitch = 1;
-
-    speechSynthesis.cancel();
     speechSynthesis.speak(utterance);
 }
 
-// ================= SPEECH TO TEXT =================
+// ================= SPEECH RECOGNITION ENGINE =================
 
-function startListening(callback) {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+const SpeechRecognition =
+    window.SpeechRecognition || window.webkitSpeechRecognition;
 
-    if (!SpeechRecognition) {
-        alert("Speech recognition not supported in this browser.");
+let recognition = SpeechRecognition ? new SpeechRecognition() : null;
+
+if (recognition) {
+    recognition.lang = getCurrentLang();
+    recognition.continuous = true;  // 🔥 Continuous kiosk mode
+    recognition.interimResults = false;
+}
+
+// ================= AUTO READ PAGE =================
+
+function autoReadPage() {
+    let heading = document.querySelector("h1");
+    if (heading) {
+        speak(heading.innerText);
+    }
+}
+
+// ================= UNIVERSAL COMMAND HANDLER =================
+
+function handleCommand(command) {
+
+    command = command.toLowerCase();
+    console.log("Heard:", command);
+
+    const langCode = getCurrentLangCode();
+
+    // BACK
+    if (command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
+        window.history.back();
         return;
     }
 
-    const recognition = new SpeechRecognition();
+    // HOME
+    if (command.includes("home") || command.includes("होम") || command.includes("ଘର")) {
+        window.location.href = "/" + langCode + "/";
+        return;
+    }
+
+    // SUBMIT
+    if (command.includes("submit") || command.includes("जमा") || command.includes("ଦାଖଲ")) {
+        let submitBtn = document.querySelector("button[type='submit'], .submit-btn");
+        if (submitBtn) submitBtn.click();
+        return;
+    }
+
+    // DOWNLOAD
+    if (command.includes("download") || command.includes("डाउनलोड") || command.includes("ଡାଉନଲୋଡ")) {
+        let downloadBtn = document.querySelector(".download-btn");
+        if (downloadBtn) downloadBtn.click();
+        return;
+    }
+
+    // FILL NUMBER INPUT (Consumer No, Load, etc.)
+    let numberMatch = command.match(/\d+(\.\d+)?/);
+    if (numberMatch) {
+        let inputs = document.querySelectorAll("input:not([type='hidden'])");
+        for (let input of inputs) {
+            if (input.offsetParent !== null) {
+                input.value = numberMatch[0];
+                speak("Value entered");
+                return;
+            }
+        }
+    }
+
+    // SMART CLICK BY TEXT MATCH
+    let clickable = document.querySelectorAll("button, a, .menu-card, .lang-btn");
+
+    for (let el of clickable) {
+
+        let text = el.innerText.trim().toLowerCase();
+        if (!text) continue;
+
+        let words = text.split(" ");
+
+        for (let word of words) {
+            if (word.length > 2 && command.includes(word)) {
+                el.click();
+                return;
+            }
+        }
+    }
+
+    speak("Command not recognized");
+}
+
+// ================= START LISTENING =================
+
+function startVoiceEngine() {
+    if (!recognition) return;
+
     recognition.lang = getCurrentLang();
-    recognition.continuous = false;
-    recognition.interimResults = false;
-
-    recognition.onresult = function(event) {
-        const transcript = event.results[0][0].transcript.toLowerCase();
-        console.log("Heard:", transcript);
-        if (callback) callback(transcript);
-    };
-
-    recognition.onerror = function(event) {
-        console.error("Speech error:", event.error);
-        speak("Sorry, I did not understand.");
-    };
-
     recognition.start();
 }
 
-// ================= UNIVERSAL VOICE NAVIGATION =================
+if (recognition) {
 
-function startVoiceAssistant() {
+    recognition.onresult = function (event) {
+        let transcript =
+            event.results[event.results.length - 1][0].transcript;
+        handleCommand(transcript);
+    };
 
-    speak("Listening");
+    recognition.onerror = function () {
+        recognition.stop();
+        startVoiceEngine();
+    };
 
-    startListening(function(command) {
-
-        const currentLang = getCurrentLangCode();
-
-        // BACK
-        if (command.includes("back")) {
-            window.history.back();
-            return;
-        }
-
-        // HOME (language safe)
-        if (command.includes("home")) {
-            window.location.href = "/" + currentLang + "/";
-            return;
-        }
-
-        // SMART BUTTON MATCHING
-        let clickableElements = document.querySelectorAll("button, a, .menu-card, .lang-btn");
-
-        for (let el of clickableElements) {
-
-            let text = el.innerText.trim().toLowerCase();
-
-            if (!text) continue;
-
-            // Check partial word match
-            let words = text.split(" ");
-
-            for (let word of words) {
-                if (word.length > 2 && command.includes(word)) {
-                    el.click();
-                    return;
-                }
-            }
-        }
-
-        speak("Command not recognized");
-    });
+    recognition.onend = function () {
+        startVoiceEngine(); // 🔥 Auto restart (continuous kiosk)
+    };
 }
+
+// ================= AUTO MIC BUTTON =================
+
+function createMicButton() {
+
+    const mic = document.createElement("div");
+    mic.innerHTML = "🎤";
+    mic.style.position = "fixed";
+    mic.style.top = "80px";
+    mic.style.right = "20px";
+    mic.style.width = "60px";
+    mic.style.height = "60px";
+    mic.style.borderRadius = "50%";
+    mic.style.background = "#ff9933";
+    mic.style.display = "flex";
+    mic.style.alignItems = "center";
+    mic.style.justifyContent = "center";
+    mic.style.fontSize = "28px";
+    mic.style.cursor = "pointer";
+    mic.style.zIndex = "9999";
+    mic.style.boxShadow = "0 5px 15px rgba(0,0,0,0.3)";
+
+    mic.onclick = function () {
+        speak("Voice assistant activated");
+        startVoiceEngine();
+    };
+
+    document.body.appendChild(mic);
+}
+
+// ================= INIT =================
+
+window.addEventListener("load", function () {
+
+    createMicButton();
+    autoReadPage();
+
+    // 🔥 Start automatically (full kiosk mode)
+    startVoiceEngine();
+});

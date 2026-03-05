@@ -15,6 +15,7 @@
         .header-right img { height:35px; }
         .voice-corner { position:fixed; top:80px; right:15px; z-index:1000; display:flex; flex-direction:column; align-items:center; gap:3px; }
         .voice-corner-btn { background:#ff9933; width:45px; height:45px; border-radius:50%; border:2px solid white; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:24px; box-shadow:0 2px 5px rgba(0,0,0,0.2); }
+        .voice-corner-btn.listening { background:#28a745; transform:scale(1.1); }
         .voice-corner-text { background:white; padding:2px 8px; border-radius:12px; font-size:10px; color:#ff9933; border:1px solid #ff9933; }
         .back-btn { position:fixed; top:80px; left:15px; background:white; border:2px solid #1e5fbf; border-radius:30px; padding:5px 15px; font-size:18px; font-weight:700; cursor:pointer; color:#1e5fbf; box-shadow:0 3px 0 #0a3d7a; z-index:1000; }
         .back-btn:active { transform:translateY(3px); box-shadow:0 1px 0 #0a3d7a; }
@@ -33,10 +34,73 @@
         .message.info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
         .status-inactive { color:#dc3545; font-weight:700; background:#f8d7da; padding:5px 15px; border-radius:30px; display:inline-block; }
         .consumer-input { margin:20px 0; }
-        .large-input { width:100%; height:70px; border:3px solid #1e5fbf; border-radius:30px; font-size:28px; padding:0 20px; background:white; }
+        .large-input { width:100%; height:70px; border:3px solid #1e5fbf; border-radius:30px; font-size:28px; padding:0 20px; background:white; cursor:pointer; }
+        .large-input[readonly] { background:#f9f9f9; }
         .fetch-btn { background:#1e5fbf; color:white; font-size:28px; padding:12px; border-radius:40px; width:100%; border:none; box-shadow:0 5px 0 #0a3d7a; cursor:pointer; margin:10px 0; }
         .fetch-btn:active { transform:translateY(5px); box-shadow:0 1px 0 #0a3d7a; }
         .hidden { display:none; }
+        
+        /* FLOATING INPUT SYSTEM */
+        .overlay{
+            position:fixed;
+            inset:0;
+            background:rgba(0,0,0,0.4);
+            backdrop-filter:blur(3px);
+            display:none;
+            z-index:900;
+        }
+        .floating-input{
+            position:fixed;
+            left:50%;
+            top:35%;
+            transform:translate(-50%,-50%) scale(0.85);
+            width:520px;
+            height:70px;
+            font-size:24px;
+            border:4px solid #ff9933;
+            border-radius:20px;
+            padding:12px;
+            z-index:1001;
+            box-shadow:0 20px 50px rgba(0,0,0,0.4);
+            transition:all 0.25s ease;
+            display:none;
+        }
+        .floating-input.show{
+            transform:translate(-50%,-50%) scale(1);
+        }
+        .floating-input:focus{outline:none;}
+
+        .keyboard{
+            position:fixed;
+            bottom:15px;
+            left:50%;
+            transform:translateX(-50%);
+            background:white;
+            padding:10px;
+            border-radius:15px;
+            box-shadow:0 8px 25px rgba(0,0,0,0.3);
+            display:none;
+            z-index:1000;
+        }
+        .keyboard-row{display:flex;justify-content:center;}
+        .keyboard button{
+            min-width:48px;
+            height:42px;
+            margin:3px;
+            font-size:14px;
+            border-radius:8px;
+            border:2px solid #1e5fbf;
+            background:#f0f7ff;
+            cursor:pointer;
+            transition:all 0.2s;
+        }
+        .keyboard button:hover{background:#1e5fbf;color:white;}
+        .keyboard .ok-btn{
+            background:#28a745;
+            color:white;
+            border:none;
+        }
+        .keyboard .ok-btn:hover{background:#218838;}
     </style>
 </head>
 <body>
@@ -60,21 +124,20 @@
     </div>
     {% endif %}
     
-    <div class="voice-corner">
-        <div class="voice-corner-btn" onclick="alert('{% trans "Voice assistant activated" %}')">🎤</div>
-        <div class="voice-corner-text">{% trans "Click" %}</div>
-    </div>
+    <!-- Voice corner will be created dynamically by voice.js -->
+    
     <div class="back-btn" onclick="window.location='{% url 'gas-services' %}'">← {% trans "Back" %}</div>
+    
     <div class="container">
         <div class="content-wrapper">
             <h1>💰 {% trans "Subsidy Management" %}</h1>
             
-            <form method="POST" action="{% url 'gas-subsidy' %}">
+            <form method="POST" action="{% url 'gas-subsidy' %}" id="subsidyForm">
                 {% csrf_token %}
                 <div class="consumer-input">
-                    <input class="large-input" id="consumerNo" name="consumer_no" placeholder="{% trans "Enter Consumer No." %}" value="{{ consumer_no|default:'' }}">
+                    <input class="large-input text-input" id="consumerNo" name="consumer_no" placeholder="{% trans "Enter Consumer No." %}" value="{{ consumer_no|default:'' }}" readonly>
                 </div>
-                <button type="submit" class="fetch-btn" name="fetch_subsidy">{% trans "Check Subsidy" %}</button>
+                <button type="submit" class="fetch-btn" name="fetch_subsidy" onclick="return validateForm(event)">{% trans "Check Subsidy" %}</button>
             </form>
             
             <div id="infoCard" class="info-card {% if not show_subsidy %}hidden{% endif %}">
@@ -118,8 +181,103 @@
             </div>
         </div>
     </div>
+
+    <!-- Floating input system -->
+    <div id="overlay" class="overlay"></div>
+    <input id="floatingInput" class="floating-input" placeholder="{% trans "Enter consumer number" %}">
+    <div id="keyboard" class="keyboard"></div>
+    
+    <script src="{% static 'js/voice.js' %}"></script>
     
     <script>
+        // Floating input system
+        let activeInput=null;
+        const overlay=document.getElementById("overlay");
+        const floatingInput=document.getElementById("floatingInput");
+        const keyboard=document.getElementById("keyboard");
+        const keys = ["1","2","3","4","5","6","7","8","9","0"];
+
+        function createKeyboard(){
+            keyboard.innerHTML = "";
+            let row = document.createElement("div");
+            row.className = "keyboard-row";
+            keys.forEach(k=>{
+                let btn = document.createElement("button");
+                btn.innerText = k;
+                btn.type = "button";
+                btn.onclick = ()=>floatingInput.value += k;
+                row.appendChild(btn);
+            });
+            keyboard.appendChild(row);
+
+            let last = document.createElement("div");
+            last.className = "keyboard-row";
+            last.innerHTML = `
+                <button type="button" onclick="floatingInput.value=''">{% trans "Clear" %}</button>
+                <button type="button" onclick="floatingInput.value=floatingInput.value.slice(0,-1)">⌫</button>
+                <button type="button" class="ok-btn" onclick="finish()">✓ {% trans "OK" %}</button>
+            `;
+            keyboard.appendChild(last);
+        }
+
+        function openKeyboard(input){
+            activeInput = input;
+            floatingInput.value = input.value;
+            overlay.style.display = "block";
+            floatingInput.style.display = "block";
+            keyboard.style.display = "block";
+            setTimeout(()=>{
+                floatingInput.classList.add("show");
+                floatingInput.focus();
+            },10);
+        }
+
+        function finish(){
+            if(activeInput){
+                activeInput.value = floatingInput.value;
+            }
+            closeKeyboard();
+        }
+
+        function closeKeyboard(){
+            floatingInput.classList.remove("show");
+            setTimeout(()=>{
+                overlay.style.display = "none";
+                floatingInput.style.display = "none";
+                keyboard.style.display = "none";
+            },200);
+        }
+
+        document.querySelectorAll(".text-input").forEach(i=>{
+            i.addEventListener("click",e=>{
+                e.stopPropagation();
+                e.preventDefault();
+                openKeyboard(i);
+            });
+        });
+
+        floatingInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                finish();
+            }
+        });
+
+        overlay.addEventListener("click", closeKeyboard);
+        createKeyboard();
+
+        function validateForm(e) {
+            e.preventDefault();
+            const consumerNo = document.getElementById('consumerNo').value;
+            if(!consumerNo) {
+                if(typeof speak === 'function') speak("{% trans 'Please enter consumer number' %}");
+                return false;
+            }
+            if(typeof speak === 'function') speak("{% trans 'Checking subsidy status' %}");
+            document.getElementById('subsidyForm').submit();
+            return false;
+        }
+
         // Auto-hide messages after 5 seconds
         setTimeout(function() {
             const messages = document.querySelectorAll('.message');
@@ -127,15 +285,60 @@
                 message.style.display = 'none';
             });
         }, 5000);
-        
-        // Form validation
-        document.querySelector('form').addEventListener('submit', function(e) {
-            const consumerNo = document.getElementById('consumerNo').value;
-            if(!consumerNo && e.submitter.name === 'fetch_subsidy') {
-                alert('{% trans "Please enter consumer number" %}');
-                e.preventDefault();
+
+        /* ===================== OVERRIDE VOICE COMMANDS ===================== */
+
+        // Extend voice.js handleCommand for gas subsidy
+        const originalHandleCommand = window.handleCommand;
+        window.handleCommand = function(command) {
+            command = command.toLowerCase();
+            console.log("Gas subsidy command:", command);
+            
+            // Check for numbers in command (consumer number)
+            const numberMatch = command.match(/\d+/g);
+            if(numberMatch && (command.includes("consumer") || command.includes("number"))) {
+                const digits = numberMatch.join('');
+                document.getElementById('consumerNo').value = digits;
+                if(typeof speak === 'function') speak("Consumer number entered");
+                return;
             }
-        });
+            
+            // Check subsidy command
+            if(command.includes("check") || command.includes("fetch") || command.includes("status")) {
+                const consumerNo = document.getElementById('consumerNo').value;
+                if(consumerNo) {
+                    if(typeof speak === 'function') speak("{% trans 'Checking subsidy status' %}");
+                    document.getElementById('subsidyForm').submit();
+                } else {
+                    if(typeof speak === 'function') speak("{% trans 'Please enter consumer number first' %}");
+                }
+                return;
+            }
+            else if(command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
+                window.location.href = "/" + getCurrentLangCode() + "/gas-services/";
+                return;
+            }
+            else if(command.includes("home") || command.includes("होम") || command.includes("ଘର")) {
+                window.location.href = "/" + getCurrentLangCode() + "/";
+                return;
+            }
+            
+            // If not subsidy-specific, pass to original handler
+            if(originalHandleCommand) {
+                originalHandleCommand(command);
+            }
+        };
+
+        // Override autoReadPage to read subsidy instructions
+        const originalAutoRead = window.autoReadPage;
+        window.autoReadPage = function() {
+            if(originalAutoRead) originalAutoRead();
+            setTimeout(() => {
+                if(typeof speak === 'function') {
+                    speak("{% trans 'Enter consumer number, then say check to view subsidy status' %}");
+                }
+            }, 2000);
+        };
     </script>
 </body>
 </html>

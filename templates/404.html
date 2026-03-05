@@ -187,8 +187,6 @@ color:#777;
 </head>
 <body>
 
-<!-- ================= HEADER ================= -->
-
 <div class="header">
 <div class="header-left">
 <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India">
@@ -203,7 +201,6 @@ color:#777;
 </div>
 </div>
 
-<!-- Display Django messages (if any) -->
 {% if messages %}
 <div class="messages">
     {% for message in messages %}
@@ -211,8 +208,6 @@ color:#777;
     {% endfor %}
 </div>
 {% endif %}
-
-<!-- ================= 404 CONTENT ================= -->
 
 <section class="page_404">
 <div class="container">
@@ -257,6 +252,39 @@ color:#777;
             message.style.display = 'none';
         });
     }, 5000);
+</script>
+
+<!-- ================= VOICE SYSTEM ================= -->
+
+<script src="{% static 'js/voice.js' %}"></script>
+
+<button onclick="enableVoiceNavigation()" 
+        style="position:fixed;
+               bottom:20px;
+               right:20px;
+               padding:15px 25px;
+               font-size:18px;
+               border-radius:40px;
+               background:#ff9933;
+               color:white;
+               border:none;
+               z-index:9999;
+               box-shadow:0 5px 15px rgba(0,0,0,0.3);
+               cursor:pointer;">
+    🎤 {% trans "Voice" %}
+</button>
+
+<script>
+window.onload = function() {
+
+    // Auto speak error message
+    speak("{% trans 'Error 404. Page not found. Say Home to return to menu.' %}");
+
+    // Optional: auto start voice in kiosk mode
+    if (typeof enableVoiceNavigation === "function") {
+        enableVoiceNavigation();
+    }
+};
 </script>
 
 </body>

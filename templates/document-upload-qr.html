@@ -7,264 +7,206 @@
     <style>
         * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif; user-select:none; }
         body { width:100vw; height:100vh; overflow:hidden; background:#f0f7ff; }
+
         .header { height:70px; background:white; display:flex; align-items:center; justify-content:space-between; padding:0 20px; border-bottom:2px solid #1e5fbf; }
         .header-left { display:flex; align-items:center; gap:10px; }
         .header-left img { height:40px; }
         .header-left div { font-size:12px; font-weight:600; color:#1e5fbf; line-height:1.2; }
         .header-right img { height:35px; }
+
+        /* Voice Button */
         .voice-corner { position:fixed; top:80px; right:15px; z-index:1000; display:flex; flex-direction:column; align-items:center; gap:3px; }
-        .voice-corner-btn { background:#ff9933; width:45px; height:45px; border-radius:50%; border:2px solid white; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:24px; box-shadow:0 2px 5px rgba(0,0,0,0.2); }
-        .voice-corner-btn:hover { background:#ffaa44; }
-        .voice-corner-text { background:white; padding:2px 8px; border-radius:12px; font-size:10px; color:#ff9933; border:1px solid #ff9933; }
+        .voice-corner-btn {
+            background:#ff9933;
+            width:50px;
+            height:50px;
+            border-radius:50%;
+            border:2px solid white;
+            cursor:pointer;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:24px;
+            box-shadow:0 2px 5px rgba(0,0,0,0.2);
+            transition:0.2s;
+        }
+        .voice-corner-btn.listening {
+            background:#28a745;
+            transform:scale(1.1);
+        }
+        .voice-corner-text {
+            background:white;
+            padding:3px 8px;
+            border-radius:12px;
+            font-size:11px;
+            color:#ff9933;
+            border:1px solid #ff9933;
+            font-weight:600;
+        }
+
         .back-btn { position:fixed; top:80px; left:15px; background:white; border:2px solid #1e5fbf; border-radius:30px; padding:5px 15px; font-size:18px; font-weight:700; cursor:pointer; color:#1e5fbf; text-decoration:none; box-shadow:0 3px 0 #0a3d7a; z-index:1000; display:inline-block; }
-        .back-btn:active { transform:translateY(3px); box-shadow:0 1px 0 #0a3d7a; }
-        .back-btn:hover { background:#1e5fbf; color:white; }
+
         .container { position:fixed; top:70px; left:0; right:0; bottom:0; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:10px; overflow:hidden; }
         .content-wrapper { width:100%; max-width:600px; text-align:center; }
-        
-        /* Message styles */
-        .messages { margin-bottom:15px; }
-        .message { padding:10px; border-radius:10px; margin-bottom:5px; text-align:center; }
-        .message.success { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
-        .message.error { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
-        .message.info { background:#d1ecf1; color:#0c5460; border:1px solid #bee5eb; }
-        
-        h1 { color:#1e5fbf; font-size:36px; font-weight:800; text-align:center; margin-bottom:20px; }
+
+        h1 { color:#1e5fbf; font-size:36px; font-weight:800; margin-bottom:20px; }
+
         .qr-container { background:white; border:4px solid #1e5fbf; border-radius:40px; padding:30px; display:inline-block; margin:20px 0; box-shadow:0 8px 0 #0a3d7a; }
         .qr-code { width:250px; height:250px; background:#f0f0f0; display:flex; align-items:center; justify-content:center; font-size:40px; border:2px dashed #1e5fbf; }
-        .instruction { font-size:22px; color:#1e5fbf; margin:15px 0; }
-        .steps { text-align:left; background:#e3f2fd; border-radius:30px; padding:20px; font-size:18px; margin:20px 0; }
-        .step-item { margin:10px 0; display:flex; align-items:center; gap:10px; }
-        .step-number { background:#1e5fbf; color:white; width:30px; height:30px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; }
-        
-        /* Document list styles */
+
+        .refresh-qr { background:#ff9933; color:white; font-size:16px; padding:8px 15px; border-radius:20px; border:none; cursor:pointer; margin-top:10px; }
+
+        .continue-btn { background:#28a745; color:white; font-size:24px; padding:12px; border-radius:30px; width:100%; border:none; margin-top:15px; display:none; }
+
         .document-list { background:white; border:2px solid #1e5fbf; border-radius:20px; padding:15px; margin:20px 0; max-height:200px; overflow-y:auto; display:none; }
-        .document-item { padding:10px; border-bottom:1px solid #dee2e6; display:flex; align-items:center; gap:10px; }
-        .document-item:last-child { border-bottom:none; }
-        .document-icon { font-size:24px; }
-        .document-name { flex:1; font-size:16px; text-align:left; }
-        .document-size { color:#6c757d; font-size:14px; }
-        .document-status { color:#28a745; font-size:14px; }
-        
-        /* Continue button */
-        .continue-btn { background:#28a745; color:white; font-size:24px; padding:12px; border-radius:30px; width:100%; border:none; box-shadow:0 4px 0 #1e7e34; cursor:pointer; margin-top:15px; display:none; }
-        .continue-btn:active { transform:translateY(4px); box-shadow:0 1px 0 #1e7e34; }
-        .continue-btn:hover { background:#2fcB4f; }
-        
-        /* Loading indicator */
+
         .loading { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center; color:white; font-size:24px; }
         .loading.show { display:flex; }
-        .spinner { border:4px solid rgba(255,255,255,0.3); border-radius:50%; border-top:4px solid white; width:50px; height:50px; animation:spin 1s linear infinite; margin-right:10px; }
-        @keyframes spin { 0% { transform:rotate(0deg); } 100% { transform:rotate(360deg); } }
-        
-        /* QR Code refresh button */
-        .refresh-qr { background:#ff9933; color:white; font-size:16px; padding:8px 15px; border-radius:20px; border:none; cursor:pointer; margin-top:10px; }
-        .refresh-qr:hover { background:#ffaa44; }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="header-left">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India">
-            <div>{% trans "Ministry of Electronics &" %}<br>{% trans "Information Technology" %}<br>{% trans "Government of India" %}</div>
-        </div>
-        <div class="header-right">
-            <img src="https://www.cdac.in/img/cdac-logo.png" alt="CDAC Logo">
-        </div>
-    </div>
-    
-    <div class="voice-corner">
-        <div class="voice-corner-btn" onclick="alert('{% trans "Voice assistant activated" %}')">🎤</div>
-        <div class="voice-corner-text">{% trans "Click" %}</div>
-    </div>
-    
-    <a href="{% url 'menu' %}" class="back-btn">← {% trans "Back" %}</a>
-    
-    <div class="container">
-        <div class="content-wrapper">
-            
-            <!-- Display Django messages -->
-            {% if messages %}
-            <div class="messages">
-                {% for message in messages %}
-                <div class="message {{ message.tags }}">{{ message }}</div>
-                {% endfor %}
-            </div>
-            {% endif %}
-            
-            <h1>📱 {% trans "QR Code Upload" %}</h1>
-            
-            <!-- Django form for QR upload confirmation -->
-            <form id="qrForm" method="post" action="{% url 'document-upload-qr' %}">
-                {% csrf_token %}
-                <input type="hidden" name="session_id" id="sessionId" value="{{ session_id }}">
-                <input type="hidden" name="document_count" id="documentCount" value="0">
-            </form>
-            
-            <div class="qr-container">
-                <div class="qr-code" id="qrCode">
-                    🔲🔳🔲<br>🔳🔲🔳<br>🔲🔳🔲
-                </div>
-            </div>
-            
-            <button class="refresh-qr" onclick="refreshQRCode()">🔄 {% trans "Refresh QR Code" %}</button>
-            
-            <div class="instruction">{% trans "Scan QR code with your phone" %}</div>
-            
-            <div class="steps">
-                <div class="step-item"><span class="step-number">1</span> {% trans "Open DigiLocker or any scanner app" %}</div>
-                <div class="step-item"><span class="step-number">2</span> {% trans "Scan this QR code" %}</div>
-                <div class="step-item"><span class="step-number">3</span> {% trans "Upload documents from your phone" %}</div>
-                <div class="step-item"><span class="step-number">4</span> {% trans "Documents will appear here automatically" %}</div>
-            </div>
-            
-            <div id="waitingMessage" style="font-size:20px; color:#28a745; margin-top:15px;">⏳ {% trans "Waiting for upload..." %}</div>
-            
-            <!-- Document list that appears after QR scan -->
-            <div id="documentList" class="document-list">
-                <div style="font-weight:bold; margin-bottom:10px;">📄 {% trans "Received Documents:" %}</div>
-                <div id="documentsContainer"></div>
-            </div>
-            
-            <button class="continue-btn" id="continueBtn" onclick="continueToMenu()">✅ {% trans "Continue to Menu" %}</button>
+
+<div class="header">
+    <div class="header-left">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg">
+        <div>
+            {% trans "Ministry of Electronics &" %}<br>
+            {% trans "Information Technology" %}<br>
+            {% trans "Government of India" %}
         </div>
     </div>
-    
-    <!-- Loading indicator -->
-    <div id="loadingIndicator" class="loading">
-        <div class="spinner"></div>
-        <div>{% trans "Processing..." %}</div>
+    <div class="header-right">
+        <img src="https://www.cdac.in/img/cdac-logo.png">
     </div>
+</div>
+
+<!-- Voice corner will be created dynamically by voice.js -->
+
+<a href="{% url 'menu' %}" class="back-btn">← {% trans "Back" %}</a>
+
+<div class="container">
+    <div class="content-wrapper">
+        <h1>📱 {% trans "QR Code Upload" %}</h1>
+
+        <form id="qrForm" method="post" action="{% url 'document-upload-qr' %}">
+            {% csrf_token %}
+            <input type="hidden" name="session_id" id="sessionId">
+            <input type="hidden" name="document_count" id="documentCount" value="0">
+        </form>
+
+        <div class="qr-container">
+            <div class="qr-code" id="qrCode">{% trans "QR" %}</div>
+        </div>
+
+        <button class="refresh-qr" onclick="refreshQRCode()">🔄 {% trans "Refresh QR Code" %}</button>
+
+        <div id="waitingMessage" style="margin-top:15px;">⏳ {% trans "Waiting for upload..." %}</div>
+
+        <div id="documentList" class="document-list">
+            <div id="documentsContainer"></div>
+        </div>
+
+        <button class="continue-btn" id="continueBtn" onclick="continueToMenu()">{% trans "Continue to Menu" %}</button>
+    </div>
+</div>
+
+<div id="loadingIndicator" class="loading">
+    {% trans "Processing..." %}
+</div>
+
+<script src="{% static 'js/voice.js' %}"></script>
+
+<script>
+
+// ===================== QR SIMULATION =====================
+let scanTimeout = setTimeout(simulateDocumentsReceived, 30000);
+
+function simulateDocumentsReceived() {
+    document.getElementById('waitingMessage').style.display = 'none';
+    document.getElementById('documentList').style.display = 'block';
+    document.getElementById('continueBtn').style.display = 'block';
+    document.getElementById('documentCount').value = 4;
+    if(typeof speak === 'function') speak("{% trans 'Documents received. Say continue to proceed.' %}");
+}
+
+function refreshQRCode() {
+    clearTimeout(scanTimeout);
+    document.getElementById('waitingMessage').style.display = 'block';
+    document.getElementById('documentList').style.display = 'none';
+    document.getElementById('continueBtn').style.display = 'none';
+    scanTimeout = setTimeout(simulateDocumentsReceived, 30000);
+    if(typeof speak === 'function') speak("{% trans 'QR code refreshed' %}");
+}
+
+function continueToMenu() {
+    document.getElementById('loadingIndicator').classList.add('show');
+    if(typeof speak === 'function') speak("{% trans 'Processing' %}");
+    setTimeout(() => document.getElementById('qrForm').submit(), 500);
+}
+
+// ===================== OVERRIDE VOICE COMMANDS =====================
+
+// Extend voice.js handleCommand for QR-specific commands
+const originalHandleCommand = window.handleCommand;
+window.handleCommand = function(command) {
+    command = command.toLowerCase();
+    console.log("QR command:", command);
     
-    <script>
-        // Generate a unique session ID for this QR session
-        let sessionId = '{{ session_id|default:"" }}';
-        if (!sessionId) {
-            sessionId = 'QR_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
-            document.getElementById('sessionId').value = sessionId;
+    // QR-specific commands
+    if(command.includes("refresh") || command.includes("new qr") || command.includes("reset")) {
+        refreshQRCode();
+        return;
+    }
+    else if(command.includes("continue") || command.includes("next") || command.includes("proceed")) {
+        if(document.getElementById('continueBtn').style.display === 'block') {
+            continueToMenu();
+        } else {
+            if(typeof speak === 'function') speak("{% trans 'Please wait for documents' %}");
         }
-        
-        let documentsReceived = [];
-        let scanTimeout;
-        
-        // Simulate QR code scanning completion after 30 seconds (for demo)
-        // In production, this would be triggered by an actual backend event
-        scanTimeout = setTimeout(() => {
-            simulateDocumentsReceived();
-        }, 30000);
-        
-        function simulateDocumentsReceived() {
-            // Sample documents that would come from QR scan
-            const sampleDocs = [
-                { name: 'Aadhaar_Card.pdf', size: '245 KB', icon: '📄' },
-                { name: 'Voter_ID.pdf', size: '180 KB', icon: '📄' },
-                { name: 'Photo.jpg', size: '1.2 MB', icon: '🖼️' },
-                { name: 'Signature.png', size: '45 KB', icon: '✍️' }
-            ];
-            
-            documentsReceived = sampleDocs;
-            displayDocuments(sampleDocs);
-            
-            // Hide waiting message
-            document.getElementById('waitingMessage').style.display = 'none';
-            
-            // Show document list
-            const docList = document.getElementById('documentList');
-            docList.style.display = 'block';
-            
-            // Show continue button
-            document.getElementById('continueBtn').style.display = 'block';
-            
-            // Update form with document count
-            document.getElementById('documentCount').value = sampleDocs.length;
-            
-            // Show success message
-            alert('✅ 4 {% trans "documents received successfully via QR scan!" %}');
+        return;
+    }
+    else if(command.includes("status") || command.includes("check")) {
+        if(document.getElementById('continueBtn').style.display === 'block') {
+            if(typeof speak === 'function') speak("{% trans 'Documents received' %}");
+        } else {
+            if(typeof speak === 'function') speak("{% trans 'Waiting for upload' %}");
         }
-        
-        function displayDocuments(docs) {
-            const container = document.getElementById('documentsContainer');
-            container.innerHTML = '';
-            
-            docs.forEach(doc => {
-                const docItem = document.createElement('div');
-                docItem.className = 'document-item';
-                docItem.innerHTML = `
-                    <span class="document-icon">${doc.icon}</span>
-                    <span class="document-name">${doc.name}</span>
-                    <span class="document-size">${doc.size}</span>
-                    <span class="document-status">✓</span>
-                `;
-                container.appendChild(docItem);
-            });
-        }
-        
-        function refreshQRCode() {
-            // Clear previous timeout
-            if (scanTimeout) {
-                clearTimeout(scanTimeout);
-            }
-            
-            // Generate new session ID
-            sessionId = 'QR_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
-            document.getElementById('sessionId').value = sessionId;
-            
-            // Reset UI
-            documentsReceived = [];
-            document.getElementById('documentList').style.display = 'none';
-            document.getElementById('continueBtn').style.display = 'none';
-            document.getElementById('waitingMessage').style.display = 'block';
-            document.getElementById('waitingMessage').innerHTML = '⏳ {% trans "Waiting for upload..." %}';
-            
-            // Flash QR code to indicate refresh
-            const qrCode = document.getElementById('qrCode');
-            qrCode.style.animation = 'flash 0.5s';
-            setTimeout(() => qrCode.style.animation = '', 500);
-            
-            // Set new timeout for demo
-            scanTimeout = setTimeout(() => {
-                simulateDocumentsReceived();
-            }, 30000);
-            
-            // In production, you would make an AJAX call to get a new QR code
-            // fetch(`/api/new-qr-session/${sessionId}`)
-        }
-        
-        function continueToMenu() {
-            // Show loading
-            document.getElementById('loadingIndicator').classList.add('show');
-            
-            // Submit form to confirm receipt
-            setTimeout(() => {
-                document.getElementById('qrForm').submit();
-            }, 500);
-        }
-        
-        // Add flash animation
-        const style = document.createElement('style');
-        style.innerHTML = `
-            @keyframes flash {
-                0% { opacity: 1; }
-                50% { opacity: 0.5; }
-                100% { opacity: 1; }
-            }
-        `;
-        document.head.appendChild(style);
-        
-        // Auto-hide messages after 5 seconds
-        setTimeout(function() {
-            document.querySelectorAll('.message').forEach(function(message) {
-                message.style.display = 'none';
-            });
-        }, 5000);
-        
-        // Clean up timeout on page unload
-        window.addEventListener('beforeunload', function() {
-            if (scanTimeout) {
-                clearTimeout(scanTimeout);
-            }
-        });
+        return;
+    }
+    else if(command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
+        window.location.href = "/" + getCurrentLangCode() + "/menu/";
+        return;
+    }
+    else if(command.includes("home") || command.includes("होम") || command.includes("ଘର")) {
+        window.location.href = "/" + getCurrentLangCode() + "/";
+        return;
+    }
     
-    </script>
+    // If not QR-specific, pass to original handler
+    if(originalHandleCommand) {
+        originalHandleCommand(command);
+    }
+};
+
+// Override autoReadPage to read QR instructions
+const originalAutoRead = window.autoReadPage;
+window.autoReadPage = function() {
+    if(originalAutoRead) originalAutoRead();
+    setTimeout(() => {
+        if(typeof speak === 'function') {
+            speak("{% trans 'Scan QR code with your phone. Say refresh for new code, continue when done' %}");
+        }
+    }, 2000);
+};
+
+// Ensure voice engine starts
+document.addEventListener('DOMContentLoaded', function() {
+    if(typeof startVoiceEngine === 'function') {
+        setTimeout(startVoiceEngine, 1000);
+    }
+});
+
+</script>
+
 </body>
 </html>

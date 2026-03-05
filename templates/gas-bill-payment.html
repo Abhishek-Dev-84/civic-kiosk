@@ -32,34 +32,6 @@
         }
     </style>
 
-    <style>
-        /* Hide Google Translate elements */
-        .goog-te-banner-frame.skiptranslate,
-        .goog-te-gadget-icon,
-        .goog-te-gadget-simple,
-        #goog-gt-tt,
-        .goog-te-balloon-frame,
-        .goog-te-menu-frame,
-        .goog-te-spinner-pos {
-            display: none !important;
-        }
-        
-        body {
-            top: 0px !important;
-            position: static !important;
-        }
-        
-        .goog-te-combo {
-            display: none !important;
-        }
-        
-        .goog-te-gadget {
-            color: transparent !important;
-            height: 0 !important;
-            overflow: hidden !important;
-        }
-    </style>
-
     <title>{% trans "Gas Bill Payment - Civic Kiosk" %}</title>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif; user-select:none; }
@@ -71,8 +43,9 @@
         .header-right img { height:35px; }
         .voice-corner { position:fixed; top:80px; right:15px; z-index:1000; display:flex; flex-direction:column; align-items:center; gap:3px; }
         .voice-corner-btn { background:#ff9933; width:45px; height:45px; border-radius:50%; border:2px solid white; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:24px; box-shadow:0 2px 5px rgba(0,0,0,0.2); }
+        .voice-corner-btn.listening { background:#28a745; transform:scale(1.1); }
         .voice-corner-text { background:white; padding:2px 8px; border-radius:12px; font-size:10px; color:#ff9933; border:1px solid #ff9933; }
-        .back-btn { position:fixed; top:80px; left:15px; background:white; border:2px solid #1e5fbf; border-radius:30px; padding:5px 15px; font-size:18px; font-weight:700; cursor:pointer; color:#1e5fbf; box-shadow:0 3px 0 #0a3d7a; z-index:1000; }
+        .back-btn { position:fixed; top:80px; left:15px; background:white; border:2px solid #1e5fbf; border-radius:30px; padding:5px 15px; font-size:18px; font-weight:700; cursor:pointer; color:#1e5fbf; box-shadow:0 3px 0 #0a3d7a; z-index:1000; text-decoration:none; }
         .back-btn:active { transform:translateY(3px); box-shadow:0 1px 0 #0a3d7a; }
         .container { position:fixed; top:70px; left:0; right:0; bottom:0; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:10px; overflow:hidden; }
         .content-wrapper { width:100%; max-width:600px; }
@@ -96,10 +69,7 @@
         </div>
     </div>
 
-    <div class="voice-corner">
-        <div class="voice-corner-btn" onclick="alert('{% trans "Voice assistant activated" %}')">🎤</div>
-        <div class="voice-corner-text">{% trans "Click" %}</div>
-    </div>
+    <!-- Voice corner will be created dynamically by voice.js -->
 
     <!-- ✅ Django URL -->
     <div class="back-btn" onclick="window.location='{% url 'gas-services' %}'">← {% trans "Back" %}</div>
@@ -109,7 +79,7 @@
             <h1>🧾 {% trans "Gas Bill Payment" %}</h1>
 
             <!-- ✅ Converted to Django POST form -->
-            <form method="POST" action="{% url 'gas-bill-payment' %}">
+            <form method="POST" action="{% url 'gas-bill-payment' %}" id="paymentForm">
                 {% csrf_token %}
 
                 <div class="bill-card">
@@ -140,15 +110,76 @@
                         <span><strong>{% trans "Jan 2026" %}</strong></span>
                     </div>
 
-                    <div class="bill-amount">₹ 856.00</div>
+                    <div class="bill-amount" id="billAmount">₹ 856.00</div>
                     <input type="hidden" name="amount" value="856.00">
 
-                    <button type="submit" class="pay-btn">{% trans "Pay Now" %}</button>
+                    <button type="submit" class="pay-btn" onclick="processPayment(event)">{% trans "Pay Now" %}</button>
                 </div>
             </form>
 
         </div>
     </div>
+
+    <script src="{% static 'js/voice.js' %}"></script>
+
+    <script>
+        function processPayment(event) {
+            event.preventDefault();
+            if(typeof speak === 'function') speak("{% trans 'Processing payment of 856 rupees' %}");
+            
+            // Show loading indicator (you can add a loading div if needed)
+            setTimeout(() => {
+                document.getElementById('paymentForm').submit();
+            }, 1000);
+        }
+
+        /* ===================== OVERRIDE VOICE COMMANDS ===================== */
+
+        // Extend voice.js handleCommand for gas bill payment
+        const originalHandleCommand = window.handleCommand;
+        window.handleCommand = function(command) {
+            command = command.toLowerCase();
+            console.log("Gas bill command:", command);
+            
+            // Payment commands
+            if(command.includes("pay") || command.includes("payment") || command.includes("submit")) {
+                processPayment(event);
+                return;
+            }
+            else if(command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
+                window.location.href = "/" + getCurrentLangCode() + "/gas-services/";
+                return;
+            }
+            else if(command.includes("home") || command.includes("होम") || command.includes("ଘର")) {
+                window.location.href = "/" + getCurrentLangCode() + "/";
+                return;
+            }
+            else if(command.includes("amount") || command.includes("bill amount")) {
+                if(typeof speak === 'function') speak("{% trans 'Bill amount is 856 rupees' %}");
+                return;
+            }
+            else if(command.includes("due date") || command.includes("due")) {
+                if(typeof speak === 'function') speak("{% trans 'Due date is 5th March 2026' %}");
+                return;
+            }
+            
+            // If not gas bill-specific, pass to original handler
+            if(originalHandleCommand) {
+                originalHandleCommand(command);
+            }
+        };
+
+        // Override autoReadPage to read gas bill details
+        const originalAutoRead = window.autoReadPage;
+        window.autoReadPage = function() {
+            if(originalAutoRead) originalAutoRead();
+            setTimeout(() => {
+                if(typeof speak === 'function') {
+                    speak("{% trans 'Gas bill for 856 rupees, due on 5th March. Say pay to make payment.' %}");
+                }
+            }, 2000);
+        };
+    </script>
 
 </body>
 </html>

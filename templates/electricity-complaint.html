@@ -18,6 +18,7 @@ body{width:100vw;height:100vh;overflow:hidden;background:#f0f7ff;}
 .voice-corner{position:fixed;top:80px;right:15px;display:flex;flex-direction:column;align-items:center;gap:3px;z-index:1000;}
 .voice-corner-btn{background:#ff9933;width:45px;height:45px;border-radius:50%;border:2px solid white;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;}
 .voice-corner-btn:hover{background:#ffaa44;}
+.voice-corner-btn.listening{background:#28a745;transform:scale(1.1);}
 .voice-corner-text{background:white;padding:2px 8px;border-radius:12px;font-size:10px;color:#ff9933;border:1px solid #ff9933;}
 
 .back-btn{position:fixed;top:80px;left:15px;background:white;border:2px solid #1e5fbf;border-radius:30px;padding:5px 15px;font-size:18px;font-weight:700;color:#1e5fbf;text-decoration:none;z-index:1000;display:inline-block;}
@@ -158,10 +159,7 @@ margin-right:10px;
 </div>
 </div>
 
-<div class="voice-corner">
-<div class="voice-corner-btn" onclick="alert('{% trans "Voice assistant activated" %}')">🎤</div>
-<div class="voice-corner-text">{% trans "Click" %}</div>
-</div>
+<!-- Voice corner will be created dynamically by voice.js -->
 
 <a href="{% url 'electricity-services' %}" class="back-btn">← {% trans "Back" %}</a>
 
@@ -189,7 +187,7 @@ margin-right:10px;
 
 <div class="form-group">
 <label>{% trans "Consumer Number" %}</label>
-<input class="large-input" id="consumerNoDisplay" value="{% if request.POST.consumer_number %}{{ request.POST.consumer_number }}{% else %}1234 5678 9012{% endif %}" readonly onclick="editConsumerNumber()">
+<input class="large-input text-input" id="consumerNoDisplay" value="{% if request.POST.consumer_number %}{{ request.POST.consumer_number|stringformat:'s'|slice:':4' }} {{ request.POST.consumer_number|stringformat:'s'|slice:'4:8' }} {{ request.POST.consumer_number|stringformat:'s'|slice:'8:12' }}{% else %}1234 5678 9012{% endif %}" readonly onclick="editConsumerNumber()">
 </div>
 
 <div class="form-group">
@@ -224,6 +222,8 @@ margin-right:10px;
 <textarea id="floatingInput" class="floating-input" placeholder="{% trans "Type your complaint here..." %}"></textarea>
 <div id="keyboard" class="keyboard"></div>
 
+<script src="{% static 'js/voice.js' %}"></script>
+
 <script>
 let selectedType = '{% if request.POST.complaint_type %}{{ request.POST.complaint_type }}{% else %}No Power{% endif %}';
 let activeInput = null;
@@ -235,6 +235,7 @@ document.querySelectorAll('.type-btn').forEach(btn=>btn.classList.remove('select
 element.classList.add('selected');
 selectedType = type;
 document.getElementById('complaintType').value = type;
+if(typeof speak === 'function') speak(type + " selected");
 }
 
 function editConsumerNumber() {
@@ -245,7 +246,9 @@ function editConsumerNumber() {
         const formatted = newNumber.match(/.{1,4}/g).join(' ');
         document.getElementById('consumerNoDisplay').value = formatted;
         document.getElementById('consumerNumber').value = newNumber;
+        if(typeof speak === 'function') speak("Consumer number updated");
     } else if (newNumber) {
+        if(typeof speak === 'function') speak("Invalid consumer number");
         alert('{% trans "Please enter a valid consumer number (minimum 6 digits)" %}');
     }
 }
@@ -346,13 +349,13 @@ const consumerNo = document.getElementById('consumerNumber').value;
 const complaintType = document.getElementById('complaintType').value;
 
 if(!description || description.trim() === ''){
-alert('{% trans "Please describe your complaint" %}');
-return;
+    if(typeof speak === 'function') speak("Please describe your complaint");
+    return;
 }
 
 if(!consumerNo || consumerNo.length < 6){
-alert('{% trans "Please enter a valid consumer number" %}');
-return;
+    if(typeof speak === 'function') speak("Please enter a valid consumer number");
+    return;
 }
 
 // Set the description in hidden field
@@ -360,12 +363,83 @@ document.getElementById('complaintDescription').value = description;
 
 // Show loading
 loadingIndicator.classList.add('show');
+if(typeof speak === 'function') speak("Submitting complaint");
 
 // Submit form
 setTimeout(() => {
     document.getElementById('complaintForm').submit();
 }, 500);
 }
+
+/* ===================== OVERRIDE VOICE COMMANDS ===================== */
+
+// Extend voice.js handleCommand for complaint-specific commands
+const originalHandleCommand = window.handleCommand;
+window.handleCommand = function(command) {
+    command = command.toLowerCase();
+    console.log("Complaint command:", command);
+    
+    // Check for numbers in command (consumer number)
+    const numberMatch = command.match(/\d+/g);
+    if(numberMatch && (command.includes("consumer") || command.includes("number"))) {
+        const digits = numberMatch.join('');
+        if(digits.length >= 6) {
+            const formatted = digits.match(/.{1,4}/g).join(' ');
+            document.getElementById('consumerNoDisplay').value = formatted;
+            document.getElementById('consumerNumber').value = digits;
+            if(typeof speak === 'function') speak("Consumer number entered");
+        }
+        return;
+    }
+    
+    // Complaint type selection
+    const complaintTypes = ["no power", "voltage issue", "meter problem", "billing issue", "pole wire issue", "other"];
+    for(let type of complaintTypes) {
+        if(command.includes(type)) {
+            let btn = Array.from(document.querySelectorAll('.type-btn')).find(b => 
+                b.innerText.toLowerCase().includes(type));
+            if(btn) {
+                selectType(btn, btn.innerText);
+                return;
+            }
+        }
+    }
+    
+    // Complaint-specific commands
+    if(command.includes("describe") || command.includes("description")) {
+        openKeyboard();
+        if(typeof speak === 'function') speak("Type your complaint description");
+        return;
+    }
+    else if(command.includes("submit") || command.includes("lodge")) {
+        submitComplaint();
+        return;
+    }
+    else if(command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
+        window.location.href = "/" + getCurrentLangCode() + "/electricity-services/";
+        return;
+    }
+    else if(command.includes("home") || command.includes("होम") || command.includes("ଘର")) {
+        window.location.href = "/" + getCurrentLangCode() + "/";
+        return;
+    }
+    
+    // If not complaint-specific, pass to original handler
+    if(originalHandleCommand) {
+        originalHandleCommand(command);
+    }
+};
+
+// Override autoReadPage to read complaint instructions
+const originalAutoRead = window.autoReadPage;
+window.autoReadPage = function() {
+    if(originalAutoRead) originalAutoRead();
+    setTimeout(() => {
+        if(typeof speak === 'function') {
+            speak("{% trans 'Say consumer number, then complaint type, then describe to enter details, submit to lodge complaint' %}");
+        }
+    }, 2000);
+};
 
 // Auto-hide messages after 5 seconds
 setTimeout(function() {
@@ -381,6 +455,5 @@ document.addEventListener('keydown', function(e) {
     }
 });
 </script>
-
 </body>
 </html>

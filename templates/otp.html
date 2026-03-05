@@ -38,34 +38,6 @@
     
 
     <style>
-        /* Hide Google Translate elements */
-        .goog-te-banner-frame.skiptranslate,
-        .goog-te-gadget-icon,
-        .goog-te-gadget-simple,
-        #goog-gt-tt,
-        .goog-te-balloon-frame,
-        .goog-te-menu-frame,
-        .goog-te-spinner-pos {
-            display: none !important;
-        }
-        
-        body {
-            top: 0px !important;
-            position: static !important;
-        }
-        
-        .goog-te-combo {
-            display: none !important;
-        }
-        
-        .goog-te-gadget {
-            color: transparent !important;
-            height: 0 !important;
-            overflow: hidden !important;
-        }
-    </style>
-
-    <style>
         /* ---- YOUR COMPLETE CSS UNCHANGED ---- */
         * {
             margin: 0;
@@ -403,10 +375,7 @@
         </div>
     </div>
 
-    <div class="voice-corner">
-        <div class="voice-corner-btn" id="voiceBtn" onclick="toggleVoiceInput()">🎤</div>
-        <div class="voice-corner-text" id="voiceStatus">{% trans "Click" %}</div>
-    </div>
+    <!-- Voice corner will be created dynamically by voice.js -->
 
     <div class="back-btn" onclick="goBack()">← {% trans "Back" %}</div>
 
@@ -480,6 +449,8 @@
         </div>
     </div>
 
+    <script src="{% static 'js/voice.js' %}"></script>
+
     <script>
         // ================= OTP PAGE JAVASCRIPT =================
         let otpBoxes = [];
@@ -547,6 +518,13 @@
                 if (otpFormContainer) {
                     otpFormContainer.style.display = 'block';
                     console.log('OTP form shown');
+                    
+                    // Auto-read OTP instructions after form is shown
+                    if (typeof speak === 'function') {
+                        setTimeout(() => {
+                            speak("{% trans 'Enter 6-digit OTP using keypad or speak the numbers' %}");
+                        }, 500);
+                    }
                 }
                 
                 // Highlight first box
@@ -631,10 +609,11 @@
             console.log('Verifying OTP:', otp);
             
             if(otp.length !== 6) {
-                alert('{% trans "Please enter 6-digit OTP" %}');
+                if (typeof speak === 'function') speak("{% trans 'Please enter 6-digit OTP' %}");
                 return;
             }
 
+            if (typeof speak === 'function') speak("{% trans 'Verifying OTP' %}");
             document.getElementById('otpHidden').value = otp;
             document.getElementById('otpForm').submit();
         }
@@ -662,23 +641,77 @@
                         key.style.pointerEvents = 'none';
                     });
                     
-                    // Disable resend button or handle as needed
+                    // Enable resend button
                     const resendBtn = document.getElementById('resendBtn');
                     if (resendBtn) {
-                        resendBtn.disabled = false; // Enable resend button
+                        resendBtn.disabled = false;
                     }
                     
-                    alert('{% trans "OTP expired. Please request a new one." %}');
+                    if (typeof speak === 'function') speak("{% trans 'OTP expired. Please request a new one.' %}");
                     console.log('Timer expired');
                 }
                 timeLeft--;
             }, 1000);
         }
 
-        // Voice input function (if needed)
-        function toggleVoiceInput() {
-            console.log('Voice toggled');
-        }
+        /* ===================== OVERRIDE VOICE COMMANDS ===================== */
+
+        // Extend voice.js handleCommand for OTP verification
+        const originalHandleCommand = window.handleCommand;
+        window.handleCommand = function(command) {
+            command = command.toLowerCase();
+            console.log("OTP command:", command);
+            
+            // Check for numbers in command (OTP digits)
+            const numberMatch = command.match(/\d+/g);
+            if (numberMatch) {
+                const digits = numberMatch.join('').replace(/\s/g, '');
+                if (digits.length >= 6) {
+                    // Clear existing and enter digits one by one
+                    clearAll();
+                    for(let i = 0; i < Math.min(digits.length, 6); i++) {
+                        pressKey(parseInt(digits[i]));
+                    }
+                    return;
+                }
+            }
+            
+            // Resend command
+            if (command.includes("resend") || command.includes("new otp")) {
+                if (typeof speak === 'function') speak("{% trans 'Requesting new OTP' %}");
+                document.getElementById('resendForm').submit();
+                return;
+            }
+            else if (command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
+                goBack();
+                return;
+            }
+            else if (command.includes("home") || command.includes("होम") || command.includes("ଘର")) {
+                window.location.href = "/" + getCurrentLangCode() + "/";
+                return;
+            }
+            else if (command.includes("clear")) {
+                clearAll();
+                return;
+            }
+            
+            // If not OTP-specific, pass to original handler
+            if (originalHandleCommand) {
+                originalHandleCommand(command);
+            }
+        };
+
+        // Override autoReadPage to read OTP instructions
+        const originalAutoRead = window.autoReadPage;
+        window.autoReadPage = function() {
+            if (originalAutoRead) originalAutoRead();
+            // Wait for OTP form to be visible
+            setTimeout(() => {
+                if (typeof speak === 'function' && document.getElementById('otpFormContainer').style.display === 'block') {
+                    speak("{% trans 'Enter 6-digit OTP using keypad or speak the numbers' %}");
+                }
+            }, 2500);
+        };
     </script>
 
 </body>

@@ -15,6 +15,7 @@
         .header-right img { height:35px; }
         .voice-corner { position:fixed; top:80px; right:15px; z-index:1000; display:flex; flex-direction:column; align-items:center; gap:3px; }
         .voice-corner-btn { background:#ff9933; width:45px; height:45px; border-radius:50%; border:2px solid white; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:24px; box-shadow:0 2px 5px rgba(0,0,0,0.2); }
+        .voice-corner-btn.listening { background:#28a745; transform:scale(1.1); }
         .voice-corner-text { background:white; padding:2px 8px; border-radius:12px; font-size:10px; color:#ff9933; border:1px solid #ff9933; }
         .back-btn { position:fixed; top:80px; left:15px; background:white; border:2px solid #1e5fbf; border-radius:30px; padding:5px 15px; font-size:18px; font-weight:700; cursor:pointer; color:#1e5fbf; box-shadow:0 3px 0 #0a3d7a; z-index:1000; }
         .back-btn:active { transform:translateY(3px); box-shadow:0 1px 0 #0a3d7a; }
@@ -22,7 +23,8 @@
         .content-wrapper { width:100%; max-width:600px; }
         h1 { color:#1e5fbf; font-size:36px; font-weight:800; text-align:center; margin-bottom:20px; }
         .property-input { margin:20px 0; }
-        .large-input { width:100%; height:70px; border:3px solid #1e5fbf; border-radius:30px; font-size:28px; padding:0 20px; background:white; }
+        .large-input { width:100%; height:70px; border:3px solid #1e5fbf; border-radius:30px; font-size:28px; padding:0 20px; background:white; cursor:pointer; }
+        .large-input[readonly] { background:#f9f9f9; }
         .fetch-btn { background:#1e5fbf; color:white; font-size:28px; padding:12px; border-radius:40px; width:100%; border:none; box-shadow:0 5px 0 #0a3d7a; cursor:pointer; margin:10px 0; }
         .fetch-btn:active { transform:translateY(5px); box-shadow:0 1px 0 #0a3d7a; }
         .tax-card { background:white; border:3px solid #1e5fbf; border-radius:30px; padding:25px; font-size:22px; box-shadow:0 5px 0 #0a3d7a; margin-top:20px; }
@@ -36,6 +38,68 @@
         .message.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
         .message.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
         .message.info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        
+        /* FLOATING INPUT SYSTEM */
+        .overlay{
+            position:fixed;
+            inset:0;
+            background:rgba(0,0,0,0.4);
+            backdrop-filter:blur(3px);
+            display:none;
+            z-index:900;
+        }
+        .floating-input{
+            position:fixed;
+            left:50%;
+            top:35%;
+            transform:translate(-50%,-50%) scale(0.85);
+            width:520px;
+            height:70px;
+            font-size:24px;
+            border:4px solid #ff9933;
+            border-radius:20px;
+            padding:12px;
+            z-index:1001;
+            box-shadow:0 20px 50px rgba(0,0,0,0.4);
+            transition:all 0.25s ease;
+            display:none;
+        }
+        .floating-input.show{
+            transform:translate(-50%,-50%) scale(1);
+        }
+        .floating-input:focus{outline:none;}
+
+        .keyboard{
+            position:fixed;
+            bottom:15px;
+            left:50%;
+            transform:translateX(-50%);
+            background:white;
+            padding:10px;
+            border-radius:15px;
+            box-shadow:0 8px 25px rgba(0,0,0,0.3);
+            display:none;
+            z-index:1000;
+        }
+        .keyboard-row{display:flex;justify-content:center;}
+        .keyboard button{
+            min-width:48px;
+            height:42px;
+            margin:3px;
+            font-size:14px;
+            border-radius:8px;
+            border:2px solid #1e5fbf;
+            background:#f0f7ff;
+            cursor:pointer;
+            transition:all 0.2s;
+        }
+        .keyboard button:hover{background:#1e5fbf;color:white;}
+        .keyboard .ok-btn{
+            background:#28a745;
+            color:white;
+            border:none;
+        }
+        .keyboard .ok-btn:hover{background:#218838;}
     </style>
 </head>
 <body>
@@ -59,27 +123,26 @@
     </div>
     {% endif %}
     
-    <div class="voice-corner">
-        <div class="voice-corner-btn" onclick="alert('{% trans "Voice assistant activated" %}')">🎤</div>
-        <div class="voice-corner-text">{% trans "Click" %}</div>
-    </div>
+    <!-- Voice corner will be created dynamically by voice.js -->
+    
     <div class="back-btn" onclick="window.location='{% url 'municipal-services' %}'">← {% trans "Back" %}</div>
+    
     <div class="container">
         <div class="content-wrapper">
             <h1>🏠 {% trans "Property Tax" %}</h1>
             
-            <form method="POST" action="{% url 'property-tax' %}">
+            <form method="POST" action="{% url 'property-tax' %}" id="taxForm">
                 {% csrf_token %}
                 <div class="property-input">
-                    <input class="large-input" id="propertyId" name="property_id" placeholder="{% trans "Enter Property ID" %}" value="{{ property_id|default:'PT123456' }}">
+                    <input class="large-input text-input" id="propertyId" name="property_id" placeholder="{% trans "Enter Property ID" %}" value="{{ property_id|default:'PT123456' }}" readonly>
                 </div>
-                <button type="submit" class="fetch-btn" name="fetch_tax">{% trans "Fetch Tax Details" %}</button>
+                <button type="submit" class="fetch-btn" name="fetch_tax" onclick="return validateFetch(event)">{% trans "Fetch Tax Details" %}</button>
             </form>
             
             <div id="taxCard" class="tax-card {% if not show_tax %}hidden{% endif %}">
                 <div class="tax-row">
                     <span>{% trans "Property ID:" %}</span>
-                    <span><strong>{{ tax_details.property_id|default:'PT123456' }}</strong></span>
+                    <span><strong id="displayPropertyId">{{ tax_details.property_id|default:'PT123456' }}</strong></span>
                 </div>
                 <div class="tax-row">
                     <span>{% trans "Owner Name:" %}</span>
@@ -101,19 +164,108 @@
                     <span>{% trans "Due Date:" %}</span>
                     <span style="color:#dc3545;"><strong>{{ tax_details.due_date|default:'31 Mar 2026' }}</strong></span>
                 </div>
-                <div class="tax-amount">{% trans "₹" %} {{ tax_details.amount|default:'3,450.00' }}</div>
+                <div class="tax-amount" id="taxAmount">{% trans "₹" %} {{ tax_details.amount|default:'3,450.00' }}</div>
                 
-                <form method="POST" action="{% url 'property-tax' %}">
+                <form method="POST" action="{% url 'property-tax' %}" id="payForm">
                     {% csrf_token %}
                     <input type="hidden" name="property_id" value="{{ tax_details.property_id|default:'PT123456' }}">
                     <input type="hidden" name="tax_amount" value="{{ tax_details.amount|default:'3450.00' }}">
-                    <button type="submit" class="pay-btn" name="pay_tax">{% trans "Pay Now" %}</button>
+                    <button type="submit" class="pay-btn" name="pay_tax" onclick="return validatePay(event)">{% trans "Pay Now" %}</button>
                 </form>
             </div>
         </div>
     </div>
+
+    <!-- Floating input system -->
+    <div id="overlay" class="overlay"></div>
+    <input id="floatingInput" class="floating-input" placeholder="{% trans "Enter Property ID" %}">
+    <div id="keyboard" class="keyboard"></div>
+    
+    <script src="{% static 'js/voice.js' %}"></script>
     
     <script>
+        // Floating input system
+        let activeInput = null;
+        const overlay = document.getElementById("overlay");
+        const floatingInput = document.getElementById("floatingInput");
+        const keyboard = document.getElementById("keyboard");
+        
+        const keys = ["P","T","1","2","3","4","5","6","7","8","9","0"];
+
+        function createKeyboard(){
+            keyboard.innerHTML = "";
+            let row = document.createElement("div");
+            row.className = "keyboard-row";
+            keys.forEach((k,i)=>{
+                if(i%6 === 0 && i !== 0){
+                    keyboard.appendChild(row);
+                    row = document.createElement("div");
+                    row.className = "keyboard-row";
+                }
+                let btn = document.createElement("button");
+                btn.innerText = k;
+                btn.type = "button";
+                btn.onclick = ()=>floatingInput.value += k;
+                row.appendChild(btn);
+            });
+            keyboard.appendChild(row);
+
+            let last = document.createElement("div");
+            last.className = "keyboard-row";
+            last.innerHTML = `
+                <button type="button" onclick="floatingInput.value=''">{% trans "Clear" %}</button>
+                <button type="button" onclick="floatingInput.value=floatingInput.value.slice(0,-1)">⌫</button>
+                <button type="button" class="ok-btn" onclick="finish()">✓ {% trans "OK" %}</button>
+            `;
+            keyboard.appendChild(last);
+        }
+
+        function openKeyboard(input){
+            activeInput = input;
+            floatingInput.value = input.value;
+            overlay.style.display = "block";
+            floatingInput.style.display = "block";
+            keyboard.style.display = "block";
+            setTimeout(()=>{
+                floatingInput.classList.add("show");
+                floatingInput.focus();
+            },10);
+        }
+
+        function finish(){
+            if(activeInput){
+                activeInput.value = floatingInput.value;
+            }
+            closeKeyboard();
+        }
+
+        function closeKeyboard(){
+            floatingInput.classList.remove("show");
+            setTimeout(()=>{
+                overlay.style.display = "none";
+                floatingInput.style.display = "none";
+                keyboard.style.display = "none";
+            },200);
+        }
+
+        document.querySelectorAll(".text-input").forEach(i=>{
+            i.addEventListener("click",e=>{
+                e.stopPropagation();
+                e.preventDefault();
+                openKeyboard(i);
+            });
+        });
+
+        floatingInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                finish();
+            }
+        });
+
+        overlay.addEventListener("click", closeKeyboard);
+        createKeyboard();
+
         // Auto-hide messages after 5 seconds
         setTimeout(function() {
             const messages = document.querySelectorAll('.message');
@@ -122,44 +274,111 @@
             });
         }, 5000);
         
-        // Keep original functions for compatibility but enhance them
-        function fetchTax() {
+        function validateFetch(e) {
+            e.preventDefault();
             const property = document.getElementById('propertyId').value;
             if(!property) {
-                alert('{% trans "Please enter property ID" %}');
+                if(typeof speak === 'function') speak("{% trans 'Please enter property ID' %}");
                 return false;
             }
-            return true;
+            if(typeof speak === 'function') speak("{% trans 'Fetching property tax details' %}");
+            document.getElementById('taxForm').submit();
+            return false;
         }
         
-        function payTax() {
-            const amount = '{{ tax_details.amount|default:"3,450.00" }}';
-            if(confirm('{% trans "Pay ₹" %}' + amount + '?')) {
-                return true;
+        function validatePay(e) {
+            e.preventDefault();
+            const amount = document.getElementById('taxAmount').innerText;
+            if(confirm('{% trans "Pay " %}' + amount + '?')) {
+                if(typeof speak === 'function') speak("{% trans 'Processing payment' %}");
+                document.getElementById('payForm').submit();
             }
             return false;
         }
         
-        // Update hidden inputs when fetching tax (optional enhancement)
-        document.addEventListener('DOMContentLoaded', function() {
-            const fetchForm = document.querySelector('form[name="fetch_tax"]');
-            if(fetchForm) {
-                fetchForm.addEventListener('submit', function(e) {
-                    if(!fetchTax()) {
-                        e.preventDefault();
-                    }
-                });
+        /* ===================== OVERRIDE VOICE COMMANDS ===================== */
+
+        // Extend voice.js handleCommand for property tax
+        const originalHandleCommand = window.handleCommand;
+        window.handleCommand = function(command) {
+            command = command.toLowerCase();
+            console.log("Property tax command:", command);
+            
+            // Check for property ID pattern (PT followed by numbers)
+            const propertyMatch = command.match(/pt[-\s]?(\d+)/i) || command.match(/property[-\s]?(\d+)/i);
+            if(propertyMatch) {
+                const propertyId = "PT" + propertyMatch[1];
+                document.getElementById('propertyId').value = propertyId;
+                if(typeof speak === 'function') speak("Property ID " + propertyId + " entered");
+                return;
             }
             
-            const payForm = document.querySelector('form[name="pay_tax"]');
-            if(payForm) {
-                payForm.addEventListener('submit', function(e) {
-                    if(!payTax()) {
-                        e.preventDefault();
-                    }
-                });
+            // Check for just numbers (assume PT prefix)
+            const numberMatch = command.match(/\d+/g);
+            if(numberMatch && (command.includes("property") || command.includes("pt"))) {
+                const propertyId = "PT" + numberMatch.join('');
+                document.getElementById('propertyId').value = propertyId;
+                if(typeof speak === 'function') speak("Property ID " + propertyId + " entered");
+                return;
             }
-        });
+            
+            // Search/fetch command
+            if(command.includes("fetch") || command.includes("search") || command.includes("get")) {
+                const property = document.getElementById('propertyId').value;
+                if(property) {
+                    if(typeof speak === 'function') speak("{% trans 'Fetching property tax details' %}");
+                    document.getElementById('taxForm').submit();
+                } else {
+                    if(typeof speak === 'function') speak("{% trans 'Please enter property ID first' %}");
+                }
+                return;
+            }
+            
+            // Pay command
+            if(command.includes("pay") || command.includes("payment")) {
+                if(document.getElementById('taxCard').classList.contains('hidden')) {
+                    if(typeof speak === 'function') speak("{% trans 'Please fetch tax details first' %}");
+                } else {
+                    const amount = document.getElementById('taxAmount').innerText;
+                    if(confirm('{% trans "Pay " %}' + amount + '?')) {
+                        if(typeof speak === 'function') speak("{% trans 'Processing payment' %}");
+                        document.getElementById('payForm').submit();
+                    }
+                }
+                return;
+            }
+            
+            // Back and home commands
+            if(command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
+                window.location.href = "/" + getCurrentLangCode() + "/municipal-services/";
+                return;
+            }
+            else if(command.includes("home") || command.includes("होम") || command.includes("ଘର")) {
+                window.location.href = "/" + getCurrentLangCode() + "/";
+                return;
+            }
+            
+            // If not tax-specific, pass to original handler
+            if(originalHandleCommand) {
+                originalHandleCommand(command);
+            }
+        };
+
+        // Override autoReadPage to read property tax instructions
+        const originalAutoRead = window.autoReadPage;
+        window.autoReadPage = function() {
+            if(originalAutoRead) originalAutoRead();
+            setTimeout(() => {
+                if(typeof speak === 'function') {
+                    if(document.getElementById('taxCard').classList.contains('hidden')) {
+                        speak("{% trans 'Enter property ID or say fetch to get property tax details' %}");
+                    } else {
+                        const amount = document.getElementById('taxAmount').innerText;
+                        speak("{% trans 'Property tax due' %} " + amount + ". {% trans 'Say pay to make payment.' %}");
+                    }
+                }
+            }, 2000);
+        };
     </script>
 </body>
 </html>

@@ -48,6 +48,7 @@ font-size:24px;
 cursor:pointer;
 }
 .voice-corner-btn:hover{background:#ffaa44;}
+.voice-corner-btn.listening{background:#28a745;transform:scale(1.1);}
 .voice-corner-text{
 background:white;
 padding:2px 8px;
@@ -281,10 +282,7 @@ border:none;
 </div>
 </div>
 
-<div class="voice-corner">
-<div class="voice-corner-btn" onclick="alert('{% trans "Voice assistant activated" %}')">🎤</div>
-<div class="voice-corner-text">{% trans "Click" %}</div>
-</div>
+<!-- Voice corner will be created dynamically by voice.js -->
 
 <a href="{% url 'electricity-services' %}" class="back-btn">← {% trans "Back" %}</a>
 
@@ -357,6 +355,8 @@ border:none;
 <div id="overlay" class="overlay"></div>
 <textarea id="floatingInput" class="floating-input" placeholder="{% trans "Type here..." %}"></textarea>
 <div id="keyboard" class="keyboard"></div>
+
+<script src="{% static 'js/voice.js' %}"></script>
 
 <script>
 let activeInput=null;
@@ -464,20 +464,20 @@ const newName = document.getElementById('newName').value;
 const aadhaar = document.getElementById('aadhaar').value;
 
 if(!newName){
-alert('{% trans "Please enter new owner name" %}');
-return;
+    if(typeof speak === 'function') speak("{% trans 'Please enter new owner name' %}");
+    return;
 }
 
 if(!aadhaar){
-alert('{% trans "Please enter new owner Aadhaar number" %}');
-return;
+    if(typeof speak === 'function') speak("{% trans 'Please enter new owner Aadhaar number' %}");
+    return;
 }
 
 // Validate Aadhaar (12 digits)
 const aadhaarClean = aadhaar.replace(/\s/g, '');
 if(!/^\d{12}$/.test(aadhaarClean)){
-alert('{% trans "Please enter a valid 12-digit Aadhaar number" %}');
-return;
+    if(typeof speak === 'function') speak("{% trans 'Please enter a valid 12-digit Aadhaar number' %}");
+    return;
 }
 
 // Update relationship
@@ -485,12 +485,95 @@ updateRelationship();
 
 // Show loading
 loadingIndicator.classList.add('show');
+if(typeof speak === 'function') speak("{% trans 'Submitting transfer request' %}");
 
 // Submit form
 setTimeout(() => {
     document.getElementById('transferForm').submit();
 }, 500);
 }
+
+/* ===================== OVERRIDE VOICE COMMANDS ===================== */
+
+// Extend voice.js handleCommand for name transfer-specific commands
+const originalHandleCommand = window.handleCommand;
+window.handleCommand = function(command) {
+    command = command.toLowerCase();
+    console.log("Name transfer command:", command);
+    
+    // Check for numbers in command (Aadhaar)
+    const numberMatch = command.match(/\d+/g);
+    if(numberMatch && (command.includes("aadhaar") || command.includes("uid"))) {
+        const digits = numberMatch.join('').slice(0,12);
+        if(digits.length === 12) {
+            document.getElementById('aadhaar').value = digits;
+            document.getElementById('newOwnerAadhaar').value = digits;
+            if(typeof speak === 'function') speak("Aadhaar number entered");
+            return;
+        }
+    }
+    
+    // Name input
+    if(command.includes("name") && command.length > 10) {
+        // Extract name part (remove command word)
+        let name = command.replace("name", "").trim();
+        if(name) {
+            // Capitalize first letter of each word
+            name = name.split(' ').map(word => 
+                word.charAt(0).toUpperCase() + word.slice(1)
+            ).join(' ');
+            document.getElementById('newName').value = name;
+            document.getElementById('newOwnerName').value = name;
+            if(typeof speak === 'function') speak("Name entered: " + name);
+            return;
+        }
+    }
+    
+    // Relationship selection
+    const relations = ["purchaser", "family", "legal", "heir", "other"];
+    for(let rel of relations) {
+        if(command.includes(rel)) {
+            const select = document.getElementById('relationship');
+            if(rel === "purchaser") select.value = "Purchaser";
+            else if(rel === "family") select.value = "Family Member";
+            else if(rel === "legal" || rel === "heir") select.value = "Legal Heir";
+            else if(rel === "other") select.value = "Other";
+            updateRelationship();
+            if(typeof speak === 'function') speak(select.value + " selected");
+            return;
+        }
+    }
+    
+    // Submit command
+    if(command.includes("submit") || command.includes("transfer")) {
+        submitRequest();
+        return;
+    }
+    else if(command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
+        window.location.href = "/" + getCurrentLangCode() + "/electricity-services/";
+        return;
+    }
+    else if(command.includes("home") || command.includes("होम") || command.includes("ଘର")) {
+        window.location.href = "/" + getCurrentLangCode() + "/";
+        return;
+    }
+    
+    // If not name transfer-specific, pass to original handler
+    if(originalHandleCommand) {
+        originalHandleCommand(command);
+    }
+};
+
+// Override autoReadPage to read name transfer instructions
+const originalAutoRead = window.autoReadPage;
+window.autoReadPage = function() {
+    if(originalAutoRead) originalAutoRead();
+    setTimeout(() => {
+        if(typeof speak === 'function') {
+            speak("{% trans 'Enter new owner name, aadhaar number, select relationship, then say submit to transfer' %}");
+        }
+    }, 2000);
+};
 
 // Auto-hide messages after 5 seconds
 setTimeout(function() {

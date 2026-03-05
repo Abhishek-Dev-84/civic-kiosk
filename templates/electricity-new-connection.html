@@ -48,6 +48,7 @@ font-size:24px;
 cursor:pointer;
 }
 .voice-corner-btn:hover{background:#ffaa44;}
+.voice-corner-btn.listening{background:#28a745;transform:scale(1.1);}
 .voice-corner-text{
 background:white;
 padding:2px 8px;
@@ -271,10 +272,7 @@ border:none;
 </div>
 </div>
 
-<div class="voice-corner">
-<div class="voice-corner-btn" onclick="alert('{% trans "Voice assistant activated" %}')">🎤</div>
-<div class="voice-corner-text">{% trans "Click" %}</div>
-</div>
+<!-- Voice corner will be created dynamically by voice.js -->
 
 <a href="{% url 'electricity-services' %}" class="back-btn">← {% trans "Back" %}</a>
 
@@ -351,6 +349,8 @@ border:none;
 <div id="overlay" class="overlay"></div>
 <textarea id="floatingInput" class="floating-input" placeholder="{% trans "Type here..." %}"></textarea>
 <div id="keyboard" class="keyboard"></div>
+
+<script src="{% static 'js/voice.js' %}"></script>
 
 <script>
 let activeInput=null;
@@ -466,35 +466,35 @@ const load = document.getElementById('load').value;
 const mobile = document.getElementById('mobile').value;
 
 if(!name){
-alert('{% trans "Please enter your full name" %}');
-return;
+    if(typeof speak === 'function') speak("{% trans 'Please enter your full name' %}");
+    return;
 }
 
 if(!address){
-alert('{% trans "Please enter your address" %}');
-return;
+    if(typeof speak === 'function') speak("{% trans 'Please enter your address' %}");
+    return;
 }
 
 if(!load){
-alert('{% trans "Please enter load required" %}');
-return;
+    if(typeof speak === 'function') speak("{% trans 'Please enter load required' %}");
+    return;
 }
 
 // Validate load (should be a positive number)
 if(isNaN(load) || parseFloat(load) <= 0){
-alert('{% trans "Please enter a valid load value (positive number)" %}');
-return;
+    if(typeof speak === 'function') speak("{% trans 'Please enter a valid load value' %}");
+    return;
 }
 
 if(!mobile){
-alert('{% trans "Please enter mobile number" %}');
-return;
+    if(typeof speak === 'function') speak("{% trans 'Please enter mobile number' %}");
+    return;
 }
 
 // Validate mobile (10 digits)
 if(!/^\d{10}$/.test(mobile)){
-alert('{% trans "Please enter a valid 10-digit mobile number" %}');
-return;
+    if(typeof speak === 'function') speak("{% trans 'Please enter a valid 10-digit mobile number' %}");
+    return;
 }
 
 // Update property type before submission
@@ -502,12 +502,132 @@ updatePropertyType();
 
 // Show loading
 loadingIndicator.classList.add('show');
+if(typeof speak === 'function') speak("{% trans 'Submitting application' %}");
 
 // Submit form
 setTimeout(() => {
     document.getElementById('connectionForm').submit();
 }, 500);
 }
+
+/* ===================== OVERRIDE VOICE COMMANDS ===================== */
+
+// Extend voice.js handleCommand for new connection-specific commands
+const originalHandleCommand = window.handleCommand;
+window.handleCommand = function(command) {
+    command = command.toLowerCase();
+    console.log("New connection command:", command);
+    
+    // Check for numbers in command (mobile or load)
+    const numberMatch = command.match(/\d+/g);
+    
+    // Mobile number detection
+    if(numberMatch && (command.includes("mobile") || command.includes("phone"))) {
+        const digits = numberMatch.join('').slice(0,10);
+        if(digits.length === 10) {
+            document.getElementById('mobile').value = digits;
+            document.getElementById('mobileField').value = digits;
+            if(typeof speak === 'function') speak("Mobile number entered");
+            return;
+        }
+    }
+    
+    // Load value detection
+    if(numberMatch && (command.includes("load") || command.includes("kilowatt") || command.includes("kw"))) {
+        const value = numberMatch[0];
+        document.getElementById('load').value = value;
+        document.getElementById('loadField').value = value;
+        if(typeof speak === 'function') speak("Load set to " + value + " kilowatt");
+        return;
+    }
+    
+    // Name input
+    if((command.includes("name") || command.includes("my name")) && command.length > 10) {
+        // Extract name part (remove command word)
+        let name = command.replace("my name", "").replace("name", "").trim();
+        if(name) {
+            // Capitalize first letter of each word
+            name = name.split(' ').map(word => 
+                word.charAt(0).toUpperCase() + word.slice(1)
+            ).join(' ');
+            document.getElementById('name').value = name;
+            document.getElementById('fullName').value = name;
+            if(typeof speak === 'function') speak("Name entered: " + name);
+            return;
+        }
+    }
+    
+    // Address input
+    if(command.includes("address") && command.length > 15) {
+        let address = command.replace("address", "").trim();
+        if(address) {
+            // Capitalize first letter of each word
+            address = address.split(' ').map(word => 
+                word.charAt(0).toUpperCase() + word.slice(1)
+            ).join(' ');
+            document.getElementById('address').value = address;
+            document.getElementById('addressField').value = address;
+            if(typeof speak === 'function') speak("Address entered");
+            return;
+        }
+    }
+    
+    // Property type selection
+    if(command.includes("residential")) {
+        document.getElementById('propertyType').value = "Residential";
+        updatePropertyType();
+        if(typeof speak === 'function') speak("Residential selected");
+        return;
+    }
+    else if(command.includes("commercial")) {
+        document.getElementById('propertyType').value = "Commercial";
+        updatePropertyType();
+        if(typeof speak === 'function') speak("Commercial selected");
+        return;
+    }
+    else if(command.includes("industrial")) {
+        document.getElementById('propertyType').value = "Industrial";
+        updatePropertyType();
+        if(typeof speak === 'function') speak("Industrial selected");
+        return;
+    }
+    else if(command.includes("agricultural") || command.includes("agriculture")) {
+        document.getElementById('propertyType').value = "Agricultural";
+        updatePropertyType();
+        if(typeof speak === 'function') speak("Agricultural selected");
+        return;
+    }
+    
+    // Submit command
+    if(command.includes("submit") || command.includes("apply")) {
+        submitForm();
+        return;
+    }
+    else if(command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
+        window.location.href = "/" + getCurrentLangCode() + "/electricity-services/";
+        return;
+    }
+    else if(command.includes("home") || command.includes("होम") || command.includes("ଘର")) {
+        window.location.href = "/" + getCurrentLangCode() + "/";
+        return;
+    }
+    
+    // If not connection-specific, pass to original handler
+    if(originalHandleCommand) {
+        originalHandleCommand(command);
+    }
+};
+
+// Override autoReadPage to read new connection instructions
+const originalAutoRead = window.autoReadPage;
+window.autoReadPage = function() {
+    if(originalAutoRead) originalAutoRead();
+    setTimeout(() => {
+        if(typeof speak === 'function') {
+            speak("{% trans 'Enter your name, address, property type, load, mobile number, then say submit to apply' %}");
+        }
+    }, 2000);
+};
 
 // Auto-hide messages after 5 seconds
 setTimeout(function() {

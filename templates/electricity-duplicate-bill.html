@@ -16,46 +16,45 @@ body{width:100vw;height:100vh;overflow:hidden;background:#f0f7ff;}
 .header-right img{height:35px;}
 
 .voice-corner{position:fixed;top:80px;right:15px;display:flex;flex-direction:column;align-items:center;gap:3px;z-index:1000;}
-.voice-corner-btn{background:#ff9933;width:45px;height:45px;border-radius:50%;border:2px solid white;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;}
-.voice-corner-btn:hover{background:#ffaa44;}
-.voice-corner-text{background:white;padding:2px 8px;border-radius:12px;font-size:10px;color:#ff9933;border:1px solid #ff9933;}
+.voice-corner-btn{
+background:#ff9933;
+width:50px;
+height:50px;
+border-radius:50%;
+border:2px solid white;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:24px;
+cursor:pointer;
+transition:0.2s;
+}
+.voice-corner-btn.listening{
+background:#28a745;
+transform:scale(1.1);
+}
+.voice-corner-text{background:white;padding:2px 8px;border-radius:12px;font-size:11px;color:#ff9933;border:1px solid #ff9933;font-weight:600;}
 
 .back-btn{position:fixed;top:80px;left:15px;background:white;border:2px solid #1e5fbf;border-radius:30px;padding:5px 15px;font-size:18px;font-weight:700;color:#1e5fbf;text-decoration:none;z-index:1000;display:inline-block;}
 .back-btn:hover{background:#1e5fbf;color:white;}
-.back-btn:active{transform:translateY(2px);}
 
 .container{position:fixed;top:70px;left:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px;overflow-y:auto;}
 .content-wrapper{width:100%;max-width:600px;padding:20px 0;}
-
-/* Message styles */
-.messages{width:100%;margin-bottom:15px;}
-.message{padding:10px;border-radius:10px;margin-bottom:5px;text-align:center;}
-.message.success{background:#d4edda;color:#155724;border:1px solid #c3e6cb;}
-.message.error{background:#f8d7da;color:#721c24;border:1px solid #f5c6cb;}
-.message.info{background:#d1ecf1;color:#0c5460;border:1px solid #bee5eb;}
 
 h1{color:#1e5fbf;font-size:36px;font-weight:800;text-align:center;margin-bottom:20px;}
 
 .search-box{display:flex;gap:10px;margin:20px 0;}
 .search-input{flex:1;height:70px;border:3px solid #1e5fbf;border-radius:30px;font-size:26px;padding:0 15px;background:white;cursor:pointer;}
-.search-input:focus{outline:none;border-color:#ff9933;}
-.search-input[readonly]{background:#f9f9f9;cursor:pointer;}
-
-.search-btn{background:#1e5fbf;color:white;border:none;border-radius:30px;padding:0 20px;font-size:26px;cursor:pointer;box-shadow:0 4px 0 #0a3d7a;transition:all 0.1s;}
-.search-btn:active{transform:translateY(4px);box-shadow:0 1px 0 #0a3d7a;}
-.search-btn:hover{background:#2f6fcf;}
+.search-btn{background:#1e5fbf;color:white;border:none;border-radius:30px;padding:0 20px;font-size:26px;cursor:pointer;}
 
 .bill-list{margin-top:20px;}
 .bill-item{background:white;border:2px solid #1e5fbf;border-radius:20px;padding:20px;margin:10px 0;display:flex;justify-content:space-between;align-items:center;}
 .bill-month{font-size:22px;font-weight:600;color:#1e5fbf;}
 .bill-amount{font-size:22px;color:#28a745;font-weight:700;}
-.download-btn{background:#ff9933;color:white;border:none;border-radius:30px;padding:8px 20px;font-size:20px;cursor:pointer;box-shadow:0 3px 0 #b35900;transition:all 0.1s;}
-.download-btn:active{transform:translateY(3px);box-shadow:0 1px 0 #b35900;}
-.download-btn:hover{background:#ffaa44;}
+.download-btn{background:#ff9933;color:white;border:none;border-radius:30px;padding:8px 20px;font-size:20px;cursor:pointer;}
 
 .hidden{display:none;}
 
-/* Loading indicator */
 .loading{
 display:none;
 position:fixed;
@@ -71,19 +70,8 @@ color:white;
 font-size:24px;
 }
 .loading.show{display:flex;}
-.spinner{
-border:4px solid rgba(255,255,255,0.3);
-border-radius:50%;
-border-top:4px solid white;
-width:50px;
-height:50px;
-animation:spin 1s linear infinite;
-margin-right:10px;
-}
-@keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
 
-/* FLOATING INPUT */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);backdrop-filter:blur(3px);display:none;z-index:900;}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);display:none;z-index:900;}
 .floating-input{
 position:fixed;
 left:50%;
@@ -96,14 +84,11 @@ border:4px solid #ff9933;
 border-radius:25px;
 padding:0 25px;
 z-index:1001;
-box-shadow:0 20px 50px rgba(0,0,0,0.4);
 transition:all 0.25s ease;
 display:none;
 }
 .floating-input.show{transform:translate(-50%,-50%) scale(1);}
-.floating-input:focus{outline:none;}
 
-/* QUIET KEYBOARD */
 .keyboard{
 position:fixed;
 bottom:20px;
@@ -118,189 +103,110 @@ z-index:1000;
 }
 .keyboard-row{display:flex;justify-content:center;}
 .keyboard button{
-min-width:50px;
-height:50px;
-margin:4px;
-font-size:16px;
-border-radius:8px;
-border:2px solid #1e5fbf;
-background:#f0f7ff;
-cursor:pointer;
-transition:all 0.2s;
+min-width:50px;height:50px;margin:4px;font-size:16px;border-radius:8px;border:2px solid #1e5fbf;background:#f0f7ff;cursor:pointer;
 }
-.keyboard button:hover{background:#1e5fbf;color:white;}
 .keyboard .ok-btn{background:#28a745;color:white;border:none;}
-.keyboard .ok-btn:hover{background:#218838;}
-
 </style>
 </head>
 <body>
 
 <div class="header">
 <div class="header-left">
-<img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India">
-<div>{% trans "Ministry of Electronics &" %}<br>{% trans "Information Technology" %}<br>{% trans "Government of India" %}</div>
+<img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg">
+<div>
+    {% trans "Ministry of Electronics &" %}<br>
+    {% trans "Information Technology" %}<br>
+    {% trans "Government of India" %}
+</div>
 </div>
 <div class="header-right">
-<img src="https://www.cdac.in/img/cdac-logo.png" alt="CDAC Logo">
+<img src="https://www.cdac.in/img/cdac-logo.png">
 </div>
 </div>
 
-<div class="voice-corner">
-<div class="voice-corner-btn" onclick="alert('{% trans "Voice assistant activated" %}')">🎤</div>
-<div class="voice-corner-text">{% trans "Click" %}</div>
-</div>
+<!-- Voice corner will be created dynamically by voice.js -->
 
 <a href="{% url 'electricity-services' %}" class="back-btn">← {% trans "Back" %}</a>
 
 <div class="container">
 <div class="content-wrapper">
 
-<!-- Display Django messages -->
-{% if messages %}
-<div class="messages">
-    {% for message in messages %}
-    <div class="message {{ message.tags }}">{{ message }}</div>
-    {% endfor %}
-</div>
-{% endif %}
-
 <h1>📄 {% trans "Duplicate Bill" %}</h1>
 
-<!-- Django form for bill search -->
-<form id="searchForm" method="post" action="{% url 'electricity-duplicate-bill' %}">
-    {% csrf_token %}
-    <input type="hidden" name="consumer_number" id="consumerNumber" value="{{ request.POST.consumer_number }}">
-</form>
-
 <div class="search-box">
-<input class="search-input" id="consumerNo" placeholder="{% trans "Enter Consumer No." %}" 
-       value="{% if request.POST.consumer_number %}{{ request.POST.consumer_number }}{% endif %}" readonly>
+<input class="search-input text-input" id="consumerNo" placeholder="{% trans "Enter Consumer No." %}" readonly>
 <button class="search-btn" onclick="fetchBills()">{% trans "Search" %}</button>
 </div>
 
-<div id="billList" class="bill-list {% if not show_bills %}hidden{% endif %}">
-    {% if bills %}
-        {% for bill in bills %}
-        <div class="bill-item">
-            <div>
-                <div class="bill-month">{{ bill.month }} {{ bill.year }}</div>
-                <div>{% trans "Bill Date:" %} {{ bill.bill_date }}</div>
-                <div style="font-size:14px; color:#666;">{% trans "Due Date:" %} {{ bill.due_date }}</div>
-            </div>
-            <div class="bill-amount">₹{{ bill.amount }}</div>
-            <button class="download-btn" onclick="downloadBill('{{ bill.month }} {{ bill.year }}', '{{ bill.id }}')">{% trans "Download" %}</button>
-        </div>
-        {% endfor %}
-    {% else %}
-        <!-- Default sample bills for demo -->
-        <div class="bill-item">
-            <div>
-                <div class="bill-month">{% trans "February 2026" %}</div>
-                <div>{% trans "Bill Date:" %} 15 Feb 2026</div>
-                <div style="font-size:14px; color:#666;">{% trans "Due Date:" %} 05 Mar 2026</div>
-            </div>
-            <div class="bill-amount">₹1,250</div>
-            <button class="download-btn" onclick="downloadBill('{% trans "February 2026" %}', 'bill1')">{% trans "Download" %}</button>
-        </div>
-
-        <div class="bill-item">
-            <div>
-                <div class="bill-month">{% trans "January 2026" %}</div>
-                <div>{% trans "Bill Date:" %} 15 Jan 2026</div>
-                <div style="font-size:14px; color:#666;">{% trans "Due Date:" %} 05 Feb 2026</div>
-            </div>
-            <div class="bill-amount">₹1,180</div>
-            <button class="download-btn" onclick="downloadBill('{% trans "January 2026" %}', 'bill2')">{% trans "Download" %}</button>
-        </div>
-
-        <div class="bill-item">
-            <div>
-                <div class="bill-month">{% trans "December 2025" %}</div>
-                <div>{% trans "Bill Date:" %} 15 Dec 2025</div>
-                <div style="font-size:14px; color:#666;">{% trans "Due Date:" %} 05 Jan 2026</div>
-            </div>
-            <div class="bill-amount">₹1,320</div>
-            <button class="download-btn" onclick="downloadBill('{% trans "December 2025" %}', 'bill3')">{% trans "Download" %}</button>
-        </div>
-    {% endif %}
+<div id="billList" class="bill-list hidden">
+<div class="bill-item">
+<div><div class="bill-month">{% trans "February 2026" %}</div></div>
+<div class="bill-amount">₹1,250</div>
+<button class="download-btn" onclick="downloadBill('February 2026')">{% trans "Download" %}</button>
 </div>
-
-<!-- Hidden download form -->
-<form id="downloadForm" method="post" action="{% url 'electricity-duplicate-bill' %}" style="display:none;">
-    {% csrf_token %}
-    <input type="hidden" name="action" id="downloadAction" value="download">
-    <input type="hidden" name="bill_id" id="downloadBillId" value="">
-    <input type="hidden" name="bill_month" id="downloadBillMonth" value="">
-</form>
+<div class="bill-item">
+<div><div class="bill-month">{% trans "January 2026" %}</div></div>
+<div class="bill-amount">₹1,180</div>
+<button class="download-btn" onclick="downloadBill('January 2026')">{% trans "Download" %}</button>
+</div>
+<div class="bill-item">
+<div><div class="bill-month">{% trans "December 2025" %}</div></div>
+<div class="bill-amount">₹1,320</div>
+<button class="download-btn" onclick="downloadBill('December 2025')">{% trans "Download" %}</button>
+</div>
+</div>
 
 </div>
 </div>
 
-<!-- Loading indicator -->
-<div id="loadingIndicator" class="loading">
-    <div class="spinner"></div>
-    <div>{% trans "Processing..." %}</div>
-</div>
+<div id="loadingIndicator" class="loading">{% trans "Processing..." %}</div>
 
 <div id="overlay" class="overlay"></div>
-<input id="floatingInput" class="floating-input" placeholder="{% trans "Enter Consumer Number" %}">
+<input id="floatingInput" class="floating-input" placeholder="{% trans "Enter consumer number" %}">
 <div id="keyboard" class="keyboard"></div>
 
-<script>
-let activeInput=null;
-let isUpperCase=true;
+<script src="{% static 'js/voice.js' %}"></script>
 
-const overlay=document.getElementById("overlay");
-const floatingInput=document.getElementById("floatingInput");
-const keyboard=document.getElementById("keyboard");
+<script>
+let activeInput = null;
+const overlay = document.getElementById("overlay");
+const floatingInput = document.getElementById("floatingInput");
+const keyboard = document.getElementById("keyboard");
 const loadingIndicator = document.getElementById("loadingIndicator");
 
+// ================= KEYBOARD SETUP =================
+
+const keys = ["1","2","3","4","5","6","7","8","9","0"];
+
 function createKeyboard(){
-keyboard.innerHTML="";
-let letters="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-if(!isUpperCase){letters=letters.toLowerCase();}
-let keys=(letters+"0123456789").split("");
-
-let row=document.createElement("div");
-row.className="keyboard-row";
-
-keys.forEach((k,i)=>{
-if(i%10===0 && i!==0){
-keyboard.appendChild(row);
-row=document.createElement("div");
-row.className="keyboard-row";
-}
-let btn=document.createElement("button");
-btn.innerText=k;
-btn.type="button";
-btn.onclick=()=>floatingInput.value+=k;
+keyboard.innerHTML = "";
+let row = document.createElement("div");
+row.className = "keyboard-row";
+keys.forEach(k=>{
+let btn = document.createElement("button");
+btn.innerText = k;
+btn.type = "button";
+btn.onclick = ()=>floatingInput.value += k;
 row.appendChild(btn);
 });
 keyboard.appendChild(row);
 
-let last=document.createElement("div");
-last.className="keyboard-row";
-last.innerHTML=`
-<button type="button" onclick="toggleCase()">⇧ {% trans "Shift" %}</button>
-<button type="button" onclick="floatingInput.value=floatingInput.value.slice(0,-1)">⌫ {% trans "Back" %}</button>
+let last = document.createElement("div");
+last.className = "keyboard-row";
+last.innerHTML = `
 <button type="button" onclick="floatingInput.value=''">{% trans "Clear" %}</button>
+<button type="button" onclick="floatingInput.value=floatingInput.value.slice(0,-1)">⌫</button>
 <button type="button" class="ok-btn" onclick="finish()">✓ {% trans "OK" %}</button>
 `;
 keyboard.appendChild(last);
 }
 
-function toggleCase(){
-isUpperCase=!isUpperCase;
-createKeyboard();
-}
-
-function openKeyboard(){
-activeInput=document.getElementById("consumerNo");
-floatingInput.value=activeInput.value;
-overlay.style.display="block";
-floatingInput.style.display="block";
-keyboard.style.display="block";
+function openKeyboard(input){
+activeInput = input;
+floatingInput.value = input.value;
+overlay.style.display = "block";
+floatingInput.style.display = "block";
+keyboard.style.display = "block";
 setTimeout(()=>{
 floatingInput.classList.add("show");
 floatingInput.focus();
@@ -309,8 +215,7 @@ floatingInput.focus();
 
 function finish(){
 if(activeInput){
-activeInput.value=floatingInput.value;
-document.getElementById('consumerNumber').value = floatingInput.value;
+activeInput.value = floatingInput.value;
 }
 closeKeyboard();
 }
@@ -318,11 +223,19 @@ closeKeyboard();
 function closeKeyboard(){
 floatingInput.classList.remove("show");
 setTimeout(()=>{
-overlay.style.display="none";
-floatingInput.style.display="none";
-keyboard.style.display="none";
+overlay.style.display = "none";
+floatingInput.style.display = "none";
+keyboard.style.display = "none";
 },200);
 }
+
+document.querySelectorAll(".text-input").forEach(i=>{
+i.addEventListener("click",e=>{
+e.stopPropagation();
+e.preventDefault();
+openKeyboard(i);
+});
+});
 
 // Handle Enter key on floating input
 floatingInput.addEventListener('keydown', function(e) {
@@ -332,64 +245,89 @@ floatingInput.addEventListener('keydown', function(e) {
     }
 });
 
-document.getElementById("consumerNo").addEventListener("click",openKeyboard);
-overlay.addEventListener("click",closeKeyboard);
-
+overlay.addEventListener("click", closeKeyboard);
 createKeyboard();
 
+// ================= BILL FUNCTIONS =================
+
 function fetchBills(){
-const consumer = document.getElementById('consumerNo').value;
-if(!consumer || consumer.length < 6){
-alert('{% trans "Please enter a valid consumer number (minimum 6 digits)" %}');
-return;
+const consumerNo = document.getElementById('consumerNo').value;
+if(!consumerNo || consumerNo.length < 6){
+    if(typeof speak === 'function') speak("{% trans 'Please enter a valid consumer number' %}");
+    return;
+}
+document.getElementById("billList").classList.remove("hidden");
+if(typeof speak === 'function') speak("{% trans 'Bills found' %}");
 }
 
-// Show loading
-loadingIndicator.classList.add('show');
-
-// Submit the search form
-setTimeout(() => {
-    document.getElementById('searchForm').submit();
-}, 500);
+function downloadBill(month){
+if(typeof speak === 'function') speak("{% trans 'Downloading' %} " + month);
+alert("{% trans 'Downloading' %} " + month);
 }
 
-function downloadBill(month, billId){
-// Show loading
-loadingIndicator.classList.add('show');
+/* ===================== OVERRIDE VOICE COMMANDS ===================== */
 
-// Set download details
-document.getElementById('downloadAction').value = 'download';
-document.getElementById('downloadBillId').value = billId;
-document.getElementById('downloadBillMonth').value = month;
-
-// Submit download form
-setTimeout(() => {
-    alert('{% trans "Downloading bill for" %} ' + month + '...');
-    loadingIndicator.classList.remove('show');
+// Extend voice.js handleCommand for duplicate bill-specific commands
+const originalHandleCommand = window.handleCommand;
+window.handleCommand = function(command) {
+    command = command.toLowerCase();
+    console.log("Duplicate bill command:", command);
     
-    // In production, this would trigger an actual file download
-    // window.location.href = '/download-bill/' + billId;
-}, 1000);
-}
-
-// Auto-show bills if consumer number was submitted
-{% if show_bills %}
-document.getElementById('billList').classList.remove('hidden');
-{% endif %}
-
-// Auto-hide messages after 5 seconds
-setTimeout(function() {
-    document.querySelectorAll('.message').forEach(function(message) {
-        message.style.display = 'none';
-    });
-}, 5000);
-
-// Prevent form submission on Enter key
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'INPUT') {
-        e.preventDefault();
+    // Check for numbers in command (consumer number)
+    const numberMatch = command.match(/\d+/g);
+    if(numberMatch && (command.includes("consumer") || command.includes("number"))) {
+        const digits = numberMatch.join('');
+        if(digits.length >= 6) {
+            document.getElementById('consumerNo').value = digits;
+            if(typeof speak === 'function') speak("{% trans 'Consumer number entered' %}");
+            return;
+        }
     }
-});
+    
+    // Bill-specific commands
+    if(command.includes("search") || command.includes("find") || command.includes("show bills")) {
+        fetchBills();
+        return;
+    }
+    else if(command.includes("download") || command.includes("get bill")) {
+        // Try to detect which month
+        const months = ["january", "february", "march", "april", "may", "june", 
+                       "july", "august", "september", "october", "november", "december"];
+        for(let month of months) {
+            if(command.includes(month)) {
+                downloadBill(month.charAt(0).toUpperCase() + month.slice(1) + " 2026");
+                return;
+            }
+        }
+        // Default to latest bill
+        downloadBill("February 2026");
+        return;
+    }
+    else if(command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
+        window.location.href = "/" + getCurrentLangCode() + "/electricity-services/";
+        return;
+    }
+    else if(command.includes("home") || command.includes("होम") || command.includes("ଘର")) {
+        window.location.href = "/" + getCurrentLangCode() + "/";
+        return;
+    }
+    
+    // If not bill-specific, pass to original handler
+    if(originalHandleCommand) {
+        originalHandleCommand(command);
+    }
+};
+
+// Override autoReadPage to read duplicate bill instructions
+const originalAutoRead = window.autoReadPage;
+window.autoReadPage = function() {
+    if(originalAutoRead) originalAutoRead();
+    setTimeout(() => {
+        if(typeof speak === 'function') {
+            speak("{% trans 'Enter consumer number or say number, then say search to find bills, download to get bill' %}");
+        }
+    }, 2000);
+};
 </script>
 
 </body>

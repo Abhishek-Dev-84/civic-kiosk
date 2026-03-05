@@ -48,6 +48,10 @@ font-size:26px;
 cursor:pointer;
 }
 .voice-corner-btn:hover{background:#ffaa44;}
+.voice-corner-btn.listening{
+background:#28a745;
+transform:scale(1.1);
+}
 .voice-corner-text{
 background:white;
 padding:4px 10px;
@@ -285,10 +289,7 @@ border:none;
 </div>
 </div>
 
-<div class="voice-corner">
-<div class="voice-corner-btn" onclick="alert('{% trans "Voice assistant activated" %}')">🎤</div>
-<div class="voice-corner-text">{% trans "Click" %}</div>
-</div>
+<!-- Voice corner will be created dynamically by voice.js -->
 
 <a href="{% url 'gas-services' %}" class="back-btn">← {% trans "Back" %}</a>
 
@@ -351,6 +352,8 @@ border:none;
 <textarea id="floatingInput" class="floating-input" placeholder="{% trans "Type your complaint here..." %}"></textarea>
 <div id="keyboard" class="keyboard"></div>
 
+<script src="{% static 'js/voice.js' %}"></script>
+
 <script>
 let selectedType='{% if request.POST.complaint_type %}{{ request.POST.complaint_type }}{% else %}Leakage{% endif %}';
 let activeInput=null;
@@ -361,6 +364,7 @@ document.querySelectorAll('.type-btn').forEach(btn=>btn.classList.remove('select
 element.classList.add('selected');
 selectedType=type;
 document.getElementById('complaintType').value = type;
+if(typeof speak === 'function') speak(type + " selected");
 }
 
 const overlay=document.getElementById("overlay");
@@ -450,23 +454,122 @@ const desc = document.getElementById('description').value;
 const complaintType = document.getElementById('complaintType').value;
 
 if(!desc || desc.trim() === ''){
-alert('{% trans "Please describe your complaint" %}');
-return;
+    if(typeof speak === 'function') speak("{% trans 'Please describe your complaint' %}");
+    return;
 }
 
 if(desc.length < 10){
-alert('{% trans "Please provide a more detailed description (minimum 10 characters)" %}');
-return;
+    if(typeof speak === 'function') speak("{% trans 'Please provide a more detailed description' %}");
+    return;
 }
 
 // Show loading
 loadingIndicator.classList.add('show');
+if(typeof speak === 'function') speak("{% trans 'Submitting complaint' %}");
 
 // Submit form
 setTimeout(() => {
     document.getElementById('complaintForm').submit();
 }, 500);
 }
+
+/* ===================== OVERRIDE VOICE COMMANDS ===================== */
+
+// Extend voice.js handleCommand for gas complaint-specific commands
+const originalHandleCommand = window.handleCommand;
+window.handleCommand = function(command) {
+    command = command.toLowerCase();
+    console.log("Gas complaint command:", command);
+    
+    // Check for numbers in command (consumer number)
+    const numberMatch = command.match(/\d+/g);
+    if(numberMatch && (command.includes("consumer") || command.includes("number"))) {
+        const digits = numberMatch.join('').slice(0,12);
+        if(digits.length >= 6) {
+            // Format consumer number display
+            const formatted = digits.match(/.{1,4}/g).join(' ');
+            document.getElementById('consumerDisplay').value = formatted;
+            document.getElementById('consumerNumber').value = digits;
+            if(typeof speak === 'function') speak("Consumer number entered");
+            return;
+        }
+    }
+    
+    // Complaint type selection
+    if(command.includes("leakage") || command.includes("gas leak")) {
+        let btn = Array.from(document.querySelectorAll('.type-btn')).find(b => 
+            b.innerText.includes('Gas Leakage'));
+        if(btn) selectType(btn, 'Leakage');
+        return;
+    }
+    else if(command.includes("cylinder")) {
+        let btn = Array.from(document.querySelectorAll('.type-btn')).find(b => 
+            b.innerText.includes('Cylinder'));
+        if(btn) selectType(btn, 'Cylinder');
+        return;
+    }
+    else if(command.includes("regulator")) {
+        let btn = Array.from(document.querySelectorAll('.type-btn')).find(b => 
+            b.innerText.includes('Regulator'));
+        if(btn) selectType(btn, 'Regulator');
+        return;
+    }
+    else if(command.includes("billing") || command.includes("bill")) {
+        let btn = Array.from(document.querySelectorAll('.type-btn')).find(b => 
+            b.innerText.includes('Billing'));
+        if(btn) selectType(btn, 'Billing');
+        return;
+    }
+    else if(command.includes("delivery") || command.includes("delay")) {
+        let btn = Array.from(document.querySelectorAll('.type-btn')).find(b => 
+            b.innerText.includes('Delivery'));
+        if(btn) selectType(btn, 'Delivery');
+        return;
+    }
+    else if(command.includes("other")) {
+        let btn = Array.from(document.querySelectorAll('.type-btn')).find(b => 
+            b.innerText.includes('Other'));
+        if(btn) selectType(btn, 'Other');
+        return;
+    }
+    
+    // Description command
+    if(command.includes("describe") || command.includes("description")) {
+        openKeyboard("description");
+        if(typeof speak === 'function') speak("{% trans 'Type your complaint description' %}");
+        return;
+    }
+    
+    // Submit command
+    if(command.includes("submit") || command.includes("lodge")) {
+        submitComplaint();
+        return;
+    }
+    else if(command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
+        window.location.href = "/" + getCurrentLangCode() + "/gas-services/";
+        return;
+    }
+    else if(command.includes("home") || command.includes("होम") || command.includes("ଘର")) {
+        window.location.href = "/" + getCurrentLangCode() + "/";
+        return;
+    }
+    
+    // If not gas complaint-specific, pass to original handler
+    if(originalHandleCommand) {
+        originalHandleCommand(command);
+    }
+};
+
+// Override autoReadPage to read gas complaint instructions
+const originalAutoRead = window.autoReadPage;
+window.autoReadPage = function() {
+    if(originalAutoRead) originalAutoRead();
+    setTimeout(() => {
+        if(typeof speak === 'function') {
+            speak("{% trans 'Select complaint type, describe your issue, then say submit to lodge complaint' %}");
+        }
+    }, 2000);
+};
 
 // Auto-hide messages after 5 seconds
 setTimeout(function() {

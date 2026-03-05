@@ -93,38 +93,6 @@
       .header-left img { height: 42px; }
       .header-left div { font-size: 13px; font-weight: 600; color: #1e5fbf; line-height: 1.2; }
       .header-right img { height: 38px; }
-      .voice-corner {
-        position: fixed;
-        top: 80px;
-        right: 15px;
-        z-index: 1000;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 4px;
-      }
-      .voice-corner-btn {
-        background: #ff9933;
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        border: 3px solid white;
-        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 26px;
-      }
-      .voice-corner-text {
-        background: white;
-        padding: 4px 10px;
-        border-radius: 20px;
-        font-size: 11px;
-        font-weight: 600;
-        color: #ff9933;
-        border: 1px solid #ff9933;
-      }
       .kiosk-container {
         position: fixed;
         top: 70px;
@@ -181,15 +149,10 @@
       </div>
     </div>
 
-    <div class="voice-corner">
-      <div class="voice-corner-btn" onclick="startVoice()">🎤</div>
-      <div class="voice-corner-text">Click to speak</div>
-    </div>
-
     <div id="timeoutWarning" class="timeout-warning">
       <p>Session about to expire</p>
       <button onclick="extendSession()">Continue</button>
-      <button class="logout-btn" onclick="window.location='/'">
+      <button class="logout-btn" onclick="window.location='/';">
         Logout  
       </button>
     </div>
@@ -209,68 +172,226 @@
     </div>
 
     <script>
-      let sessionTimer
-      const SESSION_DURATION = 120000
+      // ================= SESSION TIMER =================
+      let sessionTimer;
+      const SESSION_DURATION = 120000;
 
       function startSessionTimer() {
         sessionTimer = setTimeout(() => {
-          document.getElementById('timeoutWarning').style.display = 'block'
-        }, SESSION_DURATION)
+          document.getElementById('timeoutWarning').style.display = 'block';
+        }, SESSION_DURATION);
       }
 
       function extendSession() {
-        document.getElementById('timeoutWarning').style.display = 'none'
-        clearTimeout(sessionTimer)
-        startSessionTimer()
+        document.getElementById('timeoutWarning').style.display = 'none';
+        clearTimeout(sessionTimer);
+        startSessionTimer();
       }
 
+      // ================= LANGUAGE MAP =================
+      const languageMap = {
+        "en": "en-IN",
+        "hi": "hi-IN",
+        "ta": "ta-IN",
+        "te": "te-IN",
+        "bn": "bn-IN",
+        "or": "or-IN"
+      };
+
+      function getCurrentLang() {
+        const path = window.location.pathname.split('/');
+        return languageMap[path[1]] || "en-IN";
+      }
+
+      function getCurrentLangCode() {
+        const path = window.location.pathname.split('/');
+        return path[1] || "en";
+      }
+
+      // ================= TEXT TO SPEECH =================
+      function speak(text) {
+        if (!('speechSynthesis' in window)) return;
+
+        speechSynthesis.cancel();
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = getCurrentLang();
+        utterance.rate = 1;
+        speechSynthesis.speak(utterance);
+      }
+
+      // ================= SPEECH RECOGNITION ENGINE =================
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      let recognition = SpeechRecognition ? new SpeechRecognition() : null;
+
+      if (recognition) {
+        recognition.lang = getCurrentLang();
+        recognition.continuous = true;  // 🔥 Continuous kiosk mode
+        recognition.interimResults = false;
+      }
+
+      // ================= AUTO READ PAGE =================
+      function autoReadPage() {
+        let heading = document.querySelector("h1");
+        if (heading) {
+          speak(heading.innerText);
+        }
+      }
+
+      // ================= SET LANGUAGE FUNCTION =================
       function setLanguage(langCode) {
-        document.cookie = 'django_language=' + langCode + '; path=/'
-        if (sessionStorage) sessionStorage.clear()
-        window.location.href = '/' + langCode + '/auth/'
+        document.cookie = 'django_language=' + langCode + '; path=/';
+        if (sessionStorage) sessionStorage.clear();
+        
+        // Store selected language in session to know we came from language selection
+        sessionStorage.setItem('selectedLanguage', langCode);
+        
+        // Navigate to auth page with language code
+        window.location.href = '/' + langCode + '/auth/';
       }
 
-      function startVoice() {
-
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
-
-        if (!SpeechRecognition) {
-          alert("Voice recognition not supported in this browser.")
-          return
+      // ================= CHECK FOR RETURN FROM OTHER PAGES =================
+      function checkLanguageOnLoad() {
+        const path = window.location.pathname;
+        
+        // If we're at root (/) and we came from another page
+        if (path === '/' || path === '') {
+          // Clear any language indicators to ensure English is default
+          document.documentElement.lang = 'en';
+          
+          // Update recognition language if it exists
+          if (recognition) {
+            recognition.lang = 'en-IN';
+          }
+          
+          // Optionally, you can show a message that you're back to language selection
+          setTimeout(() => {
+            speak("Please select a language");
+          }, 1000);
         }
+      }
 
-        const recognition = new SpeechRecognition()
+      // ================= UNIVERSAL COMMAND HANDLER =================
+      function handleCommand(command) {
+        command = command.toLowerCase();
+        console.log("Heard:", command);
 
-        recognition.lang = document.documentElement.lang || "en-IN"
-        recognition.continuous = false
-        recognition.interimResults = false
-        recognition.maxAlternatives = 1
+        const langCode = getCurrentLangCode();
 
-        recognition.start()
+        // LANGUAGE SELECTION
+        if (command.includes("english")) setLanguage('en');
+        else if (command.includes("hindi") || command.includes("हिंदी")) setLanguage('hi');
+        else if (command.includes("odia") || command.includes("oriya") || command.includes("ଓଡ଼ିଆ")) setLanguage('or');
+        else if (command.includes("bengali") || command.includes("bangla") || command.includes("বাংলা")) setLanguage('bn');
+        else if (command.includes("tamil") || command.includes("தமிழ்")) setLanguage('ta');
+        else if (command.includes("telugu") || command.includes("తెలుగు")) setLanguage('te');
+        
+        // BACK - Navigate to language selection page
+        else if (command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
+          window.location.href = "/" + langCode + "/";
+        }
+        
+        // HOME - Go to root (language selection in English)
+        else if (command.includes("home") || command.includes("होम") || command.includes("ଘର")) {
+          window.location.href = "/";
+        }
+        
+        // SUBMIT
+        else if (command.includes("submit") || command.includes("जमा") || command.includes("ଦାଖଲ")) {
+          let submitBtn = document.querySelector("button[type='submit'], .submit-btn");
+          if (submitBtn) submitBtn.click();
+        }
+        
+        // DEFAULT: Command not recognized
+        else {
+          speak("Command not recognized");
+        }
+      }
 
+      // ================= START LISTENING =================
+      function startVoiceEngine() {
+        if (!recognition) return;
+
+        recognition.lang = getCurrentLang();
+        recognition.start();
+      }
+
+      if (recognition) {
         recognition.onresult = function(event) {
-          const speechResult = event.results[0][0].transcript.toLowerCase().trim()
+          let transcript = event.results[event.results.length - 1][0].transcript;
+          handleCommand(transcript);
+        };
 
-          if (speechResult.includes("english")) setLanguage('en')
-          else if (speechResult.includes("hindi")) setLanguage('hi')
-          else if (speechResult.includes("odia") || speechResult.includes("oriya")) setLanguage('or')
-          else if (speechResult.includes("bengali") || speechResult.includes("bangla")) setLanguage('bn')
-          else if (speechResult.includes("tamil")) setLanguage('ta')
-          else if (speechResult.includes("telugu")) setLanguage('te')
-          else alert("Command not recognized: " + speechResult)
-        }
-
-        recognition.onerror = function(event) {
-          console.error("Voice error:", event.error)
-          alert("Voice error: " + event.error)
-        }
+        recognition.onerror = function() {
+          recognition.stop();
+          startVoiceEngine();
+        };
 
         recognition.onend = function() {
-          console.log("Voice recognition ended")
-        }
+          startVoiceEngine(); // 🔥 Auto restart (continuous kiosk)
+        };
       }
 
-      document.addEventListener('DOMContentLoaded', startSessionTimer)
+      // ================= AUTO MIC BUTTON =================
+      function createMicButton() {
+        // Check if mic button already exists
+        if (document.querySelector('.voice-corner')) return;
+
+        const micContainer = document.createElement("div");
+        micContainer.className = "voice-corner";
+        micContainer.style.position = "fixed";
+        micContainer.style.top = "80px";
+        micContainer.style.right = "15px";
+        micContainer.style.zIndex = "1000";
+        micContainer.style.display = "flex";
+        micContainer.style.flexDirection = "column";
+        micContainer.style.alignItems = "center";
+        micContainer.style.gap = "4px";
+
+        const micButton = document.createElement("div");
+        micButton.className = "voice-corner-btn";
+        micButton.innerHTML = "🎤";
+        micButton.style.background = "#ff9933";
+        micButton.style.width = "50px";
+        micButton.style.height = "50px";
+        micButton.style.borderRadius = "50%";
+        micButton.style.border = "3px solid white";
+        micButton.style.boxShadow = "0 3px 8px rgba(0,0,0,0.2)";
+        micButton.style.cursor = "pointer";
+        micButton.style.display = "flex";
+        micButton.style.alignItems = "center";
+        micButton.style.justifyContent = "center";
+        micButton.style.fontSize = "26px";
+
+        const micText = document.createElement("div");
+        micText.className = "voice-corner-text";
+        micText.innerHTML = "Click to speak";
+        micText.style.background = "white";
+        micText.style.padding = "4px 10px";
+        micText.style.borderRadius = "20px";
+        micText.style.fontSize = "11px";
+        micText.style.fontWeight = "600";
+        micText.style.color = "#ff9933";
+        micText.style.border = "1px solid #ff9933";
+
+        micButton.onclick = function() {
+          speak("Voice assistant activated");
+          startVoiceEngine();
+        };
+
+        micContainer.appendChild(micButton);
+        micContainer.appendChild(micText);
+        document.body.appendChild(micContainer);
+      }
+
+      // ================= INIT =================
+      window.addEventListener("load", function() {
+        createMicButton();
+        checkLanguageOnLoad(); // Check if we're returning to language selection
+        autoReadPage();
+        startVoiceEngine(); // 🔥 Start automatically (full kiosk mode)
+        startSessionTimer();
+      });
     </script>
   </body>
 </html>

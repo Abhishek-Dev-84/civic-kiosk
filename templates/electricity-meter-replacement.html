@@ -15,6 +15,7 @@
         .voice-corner { position:fixed; top:80px; right:15px; z-index:1000; display:flex; flex-direction:column; align-items:center; gap:3px; }
         .voice-corner-btn { background:#ff9933; width:45px; height:45px; border-radius:50%; border:2px solid white; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:24px; box-shadow:0 2px 5px rgba(0,0,0,0.2); }
         .voice-corner-btn:hover { background:#ffaa44; }
+        .voice-corner-btn.listening { background:#28a745; transform:scale(1.1); }
         .voice-corner-text { background:white; padding:2px 8px; border-radius:12px; font-size:10px; color:#ff9933; border:1px solid #ff9933; }
         .back-btn { position:fixed; top:80px; left:15px; background:white; border:2px solid #1e5fbf; border-radius:30px; padding:5px 15px; font-size:18px; font-weight:700; cursor:pointer; color:#1e5fbf; text-decoration:none; box-shadow:0 3px 0 #0a3d7a; z-index:1000; display:inline-block; }
         .back-btn:hover { background:#1e5fbf; color:white; }
@@ -22,7 +23,6 @@
         .container { position:fixed; top:70px; left:0; right:0; bottom:0; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:10px; overflow-y:auto; }
         .content-wrapper { width:100%; max-width:600px; display:flex; flex-direction:column; gap:15px; padding:20px 0; }
         
-        /* Message styles */
         .messages { width:100%; margin-bottom:15px; }
         .message { padding:10px; border-radius:10px; margin-bottom:5px; text-align:center; }
         .message.success { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
@@ -55,8 +55,7 @@
         .submit-btn { background:#28a745; color:white; font-size:32px; padding:12px; border-radius:40px; width:100%; border:none; box-shadow:0 5px 0 #1e7e34; cursor:pointer; margin-top:10px; transition:all 0.1s; }
         .submit-btn:active { transform:translateY(5px); box-shadow:0 1px 0 #1e7e34; }
         .submit-btn:hover { background:#2fcB4f; }
-        
-        /* Loading indicator */
+
         .loading {
             display:none;
             position:fixed;
@@ -82,212 +81,267 @@
             margin-right:10px;
         }
         @keyframes spin { 0% { transform:rotate(0deg); } 100% { transform:rotate(360deg); } }
-        
-        /* Date input styling */
-        input[type="date"].large-input {
-            font-family: 'Segoe UI', sans-serif;
-            padding-right:10px;
-        }
-        
+
+        input[type="date"].large-input { font-family:'Segoe UI',sans-serif; padding-right:10px; }
+
         @media (max-width:768px) {
             .meter-type { grid-template-columns:1fr; }
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="header-left">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India">
-            <div>{% trans "Ministry of Electronics &" %}<br>{% trans "Information Technology" %}<br>{% trans "Government of India" %}</div>
-        </div>
-        <div class="header-right">
-            <img src="https://www.cdac.in/img/cdac-logo.png" alt="CDAC Logo">
-        </div>
+
+<div class="header">
+    <div class="header-left">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg">
+        <div>{% trans "Ministry of Electronics &" %}<br>{% trans "Information Technology" %}<br>{% trans "Government of India" %}</div>
     </div>
-    
-    <div class="voice-corner">
-        <div class="voice-corner-btn" onclick="alert('{% trans "Voice assistant activated" %}')">🎤</div>
-        <div class="voice-corner-text">{% trans "Click" %}</div>
+    <div class="header-right">
+        <img src="https://www.cdac.in/img/cdac-logo.png">
     </div>
+</div>
+
+<!-- Voice corner will be created dynamically by voice.js -->
+
+<a href="{% url 'electricity-services' %}" class="back-btn">← {% trans "Back" %}</a>
+
+<div class="container">
+<div class="content-wrapper">
+
+{% if messages %}
+<div class="messages">
+{% for message in messages %}
+<div class="message {{ message.tags }}">{{ message }}</div>
+{% endfor %}
+</div>
+{% endif %}
+
+<h1>🔋 {% trans "Meter Replacement" %}</h1>
+
+<form id="replacementForm" method="post" action="{% url 'electricity-meter-replacement' %}">
+{% csrf_token %}
+<input type="hidden" name="consumer_number" id="consumerNumber" value="{{ request.POST.consumer_number|default:'123456789012' }}">
+<input type="hidden" name="meter_type" id="meterType">
+<input type="hidden" name="meter_price" id="meterPrice">
+<input type="hidden" name="reason" id="reasonValue">
+<input type="hidden" name="preferred_date" id="prefDateValue">
+</form>
+
+<div class="form-group">
+<label>{% trans "Consumer Number" %}</label>
+<input class="large-input" id="consumerNo" value="1234 5678 9012" readonly>
+</div>
+
+<div class="form-group">
+<label>{% trans "Reason for Replacement" %}</label>
+<select class="large-input" id="reason" onchange="updateReason()">
+<option value="Meter faulty/not working">{% trans "Meter faulty/not working" %}</option>
+<option value="Meter damaged">{% trans "Meter damaged" %}</option>
+<option value="Upgrade to smart meter">{% trans "Upgrade to smart meter" %}</option>
+<option value="Meter showing error">{% trans "Meter showing error" %}</option>
+<option value="Meter stolen">{% trans "Meter stolen" %}</option>
+<option value="Other">{% trans "Other" %}</option>
+</select>
+</div>
+
+<div class="form-group">
+<label>{% trans "Select Meter Type" %}</label>
+
+<div class="meter-type">
+
+<div class="meter-option selected" onclick="selectMeter(this,'Single Phase',1200)">
+<div>{% trans "Single Phase" %}</div>
+<div class="price">₹1,200</div>
+</div>
+
+<div class="meter-option" onclick="selectMeter(this,'Three Phase',2500)">
+<div>{% trans "Three Phase" %}</div>
+<div class="price">₹2,500</div>
+</div>
+
+<div class="meter-option" onclick="selectMeter(this,'Smart Meter',3000)">
+<div>{% trans "Smart Meter" %}</div>
+<div class="price">₹3,000</div>
+</div>
+
+<div class="meter-option" onclick="selectMeter(this,'CT Meter',4500)">
+<div>{% trans "CT Meter" %}</div>
+<div class="price">₹4,500</div>
+</div>
+
+</div>
+</div>
+
+<div class="form-group">
+<label>{% trans "Preferred Date" %}</label>
+<input class="large-input" type="date" id="prefDate" onchange="updateDate()">
+</div>
+
+<div class="form-group">
+<label>{% trans "Estimated Total" %}</label>
+<div style="font-size:28px;color:#28a745;font-weight:700;text-align:center;" id="totalDisplay">₹ 1,200 + Taxes</div>
+</div>
+
+<button class="submit-btn" onclick="submitRequest()">{% trans "Request Replacement" %}</button>
+
+</div>
+</div>
+
+<div id="loadingIndicator" class="loading">
+<div class="spinner"></div>
+<div>{% trans "Processing..." %}</div>
+</div>
+
+<script src="{% static 'js/voice.js' %}"></script>
+
+<script>
+
+let selectedMeterPrice=1200;
+
+function selectMeter(el,type,price){
+document.querySelectorAll('.meter-option').forEach(o=>o.classList.remove('selected'));
+el.classList.add('selected');
+selectedMeterPrice=price;
+document.getElementById('meterType').value=type;
+document.getElementById('meterPrice').value=price;
+updateTotalDisplay(price);
+if(typeof speak === 'function') speak(type + " selected, price " + price + " rupees");
+}
+
+function updateTotalDisplay(price){
+const gst=price*0.18;
+const total=price+gst;
+document.getElementById('totalDisplay').innerHTML=`₹ ${price} + GST (₹ ${gst.toFixed(0)}) = <strong>₹ ${total.toFixed(0)}</strong>`;
+}
+
+function updateReason(){
+document.getElementById('reasonValue').value=document.getElementById('reason').value;
+}
+
+function updateDate(){
+document.getElementById('prefDateValue').value=document.getElementById('prefDate').value;
+if(typeof speak === 'function') speak("Date selected");
+}
+
+function submitRequest(){
+
+const date=document.getElementById('prefDate').value;
+
+if(!date){
+    if(typeof speak === 'function') speak("{% trans 'Please select a preferred date' %}");
+    return;
+}
+
+updateReason();
+updateDate();
+
+if(typeof speak === 'function') speak("{% trans 'Submitting request' %}");
+document.getElementById('loadingIndicator').classList.add('show');
+
+setTimeout(()=>{
+document.getElementById('replacementForm').submit();
+},500);
+
+}
+
+/* ===================== OVERRIDE VOICE COMMANDS ===================== */
+
+// Extend voice.js handleCommand for meter replacement-specific commands
+const originalHandleCommand = window.handleCommand;
+window.handleCommand = function(command) {
+    command = command.toLowerCase();
+    console.log("Meter replacement command:", command);
     
-    <a href="{% url 'electricity-services' %}" class="back-btn">← {% trans "Back" %}</a>
+    // Reason selection
+    const reasons = [
+        "faulty", "damaged", "upgrade", "smart meter", "error", "stolen", "other"
+    ];
     
-    <div class="container">
-        <div class="content-wrapper">
-            
-            <!-- Display Django messages -->
-            {% if messages %}
-            <div class="messages">
-                {% for message in messages %}
-                <div class="message {{ message.tags }}">{{ message }}</div>
-                {% endfor %}
-            </div>
-            {% endif %}
-            
-            <h1>🔋 {% trans "Meter Replacement" %}</h1>
-            
-            <!-- Django form for meter replacement request -->
-            <form id="replacementForm" method="post" action="{% url 'electricity-meter-replacement' %}">
-                {% csrf_token %}
-                <input type="hidden" name="consumer_number" id="consumerNumber" value="{{ request.POST.consumer_number|default:'123456789012' }}">
-                <input type="hidden" name="meter_type" id="meterType" value="{% if request.POST.meter_type %}{{ request.POST.meter_type }}{% else %}Single Phase{% endif %}">
-                <input type="hidden" name="meter_price" id="meterPrice" value="{% if request.POST.meter_price %}{{ request.POST.meter_price }}{% else %}1200{% endif %}">
-                <input type="hidden" name="reason" id="reasonValue" value="{% if request.POST.reason %}{{ request.POST.reason }}{% else %}Meter faulty/not working{% endif %}">
-                <input type="hidden" name="preferred_date" id="prefDateValue" value="{% if request.POST.preferred_date %}{{ request.POST.preferred_date }}{% else %}2026-03-05{% endif %}">
-            </form>
-            
-            <div class="form-group">
-                <label>{% trans "Consumer Number" %}</label>
-                <input class="large-input" id="consumerDisplay" value="{% if request.POST.consumer_number %}{{ request.POST.consumer_number|slice:":4" }} {{ request.POST.consumer_number|slice:"4:8" }} {{ request.POST.consumer_number|slice:"8:12" }}{% else %}1234 5678 9012{% endif %}" readonly>
-            </div>
-            
-            <div class="form-group">
-                <label>{% trans "Reason for Replacement" %}</label>
-                <select class="large-input" id="reason" onchange="updateReason()">
-                    <option value="Meter faulty/not working" {% if request.POST.reason == 'Meter faulty/not working' or not request.POST.reason %}selected{% endif %}>{% trans "Meter faulty/not working" %}</option>
-                    <option value="Meter damaged" {% if request.POST.reason == 'Meter damaged' %}selected{% endif %}>{% trans "Meter damaged" %}</option>
-                    <option value="Upgrade to smart meter" {% if request.POST.reason == 'Upgrade to smart meter' %}selected{% endif %}>{% trans "Upgrade to smart meter" %}</option>
-                    <option value="Meter showing error" {% if request.POST.reason == 'Meter showing error' %}selected{% endif %}>{% trans "Meter showing error" %}</option>
-                    <option value="Meter stolen" {% if request.POST.reason == 'Meter stolen' %}selected{% endif %}>{% trans "Meter stolen" %}</option>
-                    <option value="Other" {% if request.POST.reason == 'Other' %}selected{% endif %}>{% trans "Other" %}</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label>{% trans "Select Meter Type" %}</label>
-                <div class="meter-type">
-                    <div class="meter-option {% if request.POST.meter_type == 'Single Phase' or not request.POST.meter_type %}selected{% endif %}" onclick="selectMeter(this, 'Single Phase', 1200)">
-                        <div>{% trans "Single Phase" %}</div>
-                        <div class="price">₹1,200</div>
-                    </div>
-                    <div class="meter-option {% if request.POST.meter_type == 'Three Phase' %}selected{% endif %}" onclick="selectMeter(this, 'Three Phase', 2500)">
-                        <div>{% trans "Three Phase" %}</div>
-                        <div class="price">₹2,500</div>
-                    </div>
-                    <div class="meter-option {% if request.POST.meter_type == 'Smart Meter' %}selected{% endif %}" onclick="selectMeter(this, 'Smart Meter', 3000)">
-                        <div>{% trans "Smart Meter" %}</div>
-                        <div class="price">₹3,000</div>
-                    </div>
-                    <div class="meter-option {% if request.POST.meter_type == 'CT Meter' %}selected{% endif %}" onclick="selectMeter(this, 'CT Meter', 4500)">
-                        <div>{% trans "CT Meter" %}</div>
-                        <div class="price">₹4,500</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <label>{% trans "Preferred Date" %}</label>
-                <input class="large-input" type="date" id="prefDate" 
-                       value="{% if request.POST.preferred_date %}{{ request.POST.preferred_date }}{% else %}2026-03-05{% endif %}"
-                       min="{% now 'Y-m-d' %}" max="{% now 'Y' %}-12-31" onchange="updateDate()">
-            </div>
-            
-            <div class="form-group">
-                <label>{% trans "Estimated Total" %}</label>
-                <div style="font-size:28px; color:#28a745; font-weight:700; text-align:center;" id="totalDisplay">
-                    ₹ {% if request.POST.meter_price %}{{ request.POST.meter_price }}{% else %}1,200{% endif %} + {% trans "Taxes" %}
-                </div>
-            </div>
-            
-            <button class="submit-btn" onclick="submitRequest()">{% trans "Request Replacement" %}</button>
-            
-        </div>
-    </div>
-    
-    <!-- Loading indicator -->
-    <div id="loadingIndicator" class="loading">
-        <div class="spinner"></div>
-        <div>{% trans "Processing..." %}</div>
-    </div>
-    
-    <script>
-        let selectedMeterType = '{% if request.POST.meter_type %}{{ request.POST.meter_type }}{% else %}Single Phase{% endif %}';
-        let selectedMeterPrice = {% if request.POST.meter_price %}{{ request.POST.meter_price }}{% else %}1200{% endif %};
-        
-        function selectMeter(element, type, price) {
-            document.querySelectorAll('.meter-option').forEach(opt => opt.classList.remove('selected'));
-            element.classList.add('selected');
-            selectedMeterType = type;
-            selectedMeterPrice = price;
-            
-            document.getElementById('meterType').value = type;
-            document.getElementById('meterPrice').value = price;
-            
-            // Update total display
-            updateTotalDisplay(price);
-        }
-        
-        function updateTotalDisplay(price) {
-            const totalDisplay = document.getElementById('totalDisplay');
-            const gst = price * 0.18;
-            const total = price + gst;
-            totalDisplay.innerHTML = `₹ ${price.toLocaleString('en-IN')} + GST (₹ ${gst.toLocaleString('en-IN')}) = <strong>₹ ${total.toLocaleString('en-IN')}</strong>`;
-        }
-        
-        function updateReason() {
-            const reason = document.getElementById('reason').value;
-            document.getElementById('reasonValue').value = reason;
-        }
-        
-        function updateDate() {
-            const date = document.getElementById('prefDate').value;
-            document.getElementById('prefDateValue').value = date;
-        }
-        
-        function submitRequest() {
-            const reason = document.getElementById('reason').value;
-            const date = document.getElementById('prefDate').value;
-            
-            if (!date) {
-                alert('{% trans "Please select a preferred date" %}');
-                return;
+    for(let reason of reasons) {
+        if(command.includes(reason)) {
+            const select = document.getElementById('reason');
+            for(let option of select.options) {
+                if(option.text.toLowerCase().includes(reason)) {
+                    select.value = option.value;
+                    updateReason();
+                    if(typeof speak === 'function') speak(option.text + " selected");
+                    return;
+                }
             }
-            
-            // Validate date is not in the past
-            const selectedDate = new Date(date);
-            const today = new Date();
-            today.setHours(0,0,0,0);
-            
-            if (selectedDate < today) {
-                alert('{% trans "Preferred date cannot be in the past" %}');
-                return;
-            }
-            
-            // Update hidden fields
-            updateReason();
-            updateDate();
-            
-            // Show loading
-            document.getElementById('loadingIndicator').classList.add('show');
-            
-            // Submit form
-            setTimeout(() => {
-                document.getElementById('replacementForm').submit();
-            }, 500);
         }
-        
-        // Auto-hide messages after 5 seconds
-        setTimeout(function() {
-            document.querySelectorAll('.message').forEach(function(message) {
-                message.style.display = 'none';
-            });
-        }, 5000);
-        
-        // Initialize total display
-        document.addEventListener('DOMContentLoaded', function() {
-            updateTotalDisplay(selectedMeterPrice);
-            
-            // Set min date to today
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('prefDate').setAttribute('min', today);
-        });
-        
-        // Prevent form submission on Enter key
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
-                e.preventDefault();
-            }
-        });
-    </script>
+    }
+    
+    // Meter type selection
+    if(command.includes("single") || command.includes("1 phase")) {
+        let meter = document.querySelectorAll('.meter-option')[0];
+        selectMeter(meter, 'Single Phase', 1200);
+        return;
+    }
+    else if(command.includes("three") || command.includes("3 phase")) {
+        let meter = document.querySelectorAll('.meter-option')[1];
+        selectMeter(meter, 'Three Phase', 2500);
+        return;
+    }
+    else if(command.includes("smart")) {
+        let meter = document.querySelectorAll('.meter-option')[2];
+        selectMeter(meter, 'Smart Meter', 3000);
+        return;
+    }
+    else if(command.includes("ct")) {
+        let meter = document.querySelectorAll('.meter-option')[3];
+        selectMeter(meter, 'CT Meter', 4500);
+        return;
+    }
+    
+    // Date commands
+    if(command.includes("today")) {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('prefDate').value = today;
+        updateDate();
+        if(typeof speak === 'function') speak("Date set to today");
+        return;
+    }
+    else if(command.includes("tomorrow")) {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        document.getElementById('prefDate').value = tomorrow.toISOString().split('T')[0];
+        updateDate();
+        if(typeof speak === 'function') speak("Date set to tomorrow");
+        return;
+    }
+    
+    // Submit command
+    if(command.includes("submit") || command.includes("request")) {
+        submitRequest();
+        return;
+    }
+    else if(command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
+        window.location.href = "/" + getCurrentLangCode() + "/electricity-services/";
+        return;
+    }
+    else if(command.includes("home") || command.includes("होम") || command.includes("ଘର")) {
+        window.location.href = "/" + getCurrentLangCode() + "/";
+        return;
+    }
+    
+    // If not meter-specific, pass to original handler
+    if(originalHandleCommand) {
+        originalHandleCommand(command);
+    }
+};
+
+// Override autoReadPage to read meter replacement instructions
+const originalAutoRead = window.autoReadPage;
+window.autoReadPage = function() {
+    if(originalAutoRead) originalAutoRead();
+    setTimeout(() => {
+        if(typeof speak === 'function') {
+            speak("{% trans 'Select reason, meter type, date, then say submit to request replacement' %}");
+        }
+    }, 2000);
+};
+
+</script>
+
 </body>
 </html>
