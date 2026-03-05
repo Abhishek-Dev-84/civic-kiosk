@@ -49,7 +49,8 @@ def auth(request):
     #         return render(request, 'auth.html')
     
     # GET request - show the Aadhaar entry page
-    return render(request, 'auth.html')
+    # return render(request, 'auth.html')
+    return HttpResponse("AUTH PAGE WORKING")
 
 
 # ================= SIMPLIFIED OTP - ANY OTP WORKS =================
