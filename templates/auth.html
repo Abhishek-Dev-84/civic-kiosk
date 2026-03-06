@@ -467,10 +467,7 @@
         </div>
     </div>
 
-<script src="{% static 'js/voice.js' %}"></script>
-
 <script>
-
 /* ================= LANGUAGE MAP ================= */
 
 const languageMap = {
@@ -484,7 +481,8 @@ const languageMap = {
 
 function getCurrentLang() {
     const path = window.location.pathname.split('/');
-    return languageMap[path[1]] || "en-IN";
+    const langCode = path[1] || "en";
+    return languageMap[langCode] || "en-IN";
 }
 
 function getCurrentLangCode() {
@@ -496,10 +494,24 @@ function getCurrentLangCode() {
 
 function speak(text) {
     if (!('speechSynthesis' in window)) return;
-    const utter = new SpeechSynthesisUtterance(text);
-    utter.lang = getCurrentLang();
+    
+    // Cancel any ongoing speech
     speechSynthesis.cancel();
-    speechSynthesis.speak(utter);
+    
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = getCurrentLang();
+    utterance.rate = 1;
+    utterance.pitch = 1;
+    utterance.volume = 1;
+    
+    // Wait for voices to be loaded
+    if (speechSynthesis.getVoices().length === 0) {
+        speechSynthesis.addEventListener('voiceschanged', function() {
+            speechSynthesis.speak(utterance);
+        }, { once: true });
+    } else {
+        speechSynthesis.speak(utterance);
+    }
 }
 
 /* ================= SESSION TIMER ================= */
@@ -531,6 +543,7 @@ let aadhaarPos = 0;
 
 const aadhaarRow = document.getElementById('aadhaarRow');
 
+// Create 12 Aadhaar boxes
 for(let i = 0; i < 12; i++) {
     let box = document.createElement('div');
     box.className = 'aadhaar-box';
@@ -555,6 +568,11 @@ function pressKey(n) {
         aadhaarBoxes[aadhaarPos].classList.add('filled');
         aadhaarPos++;
         highlightCurrentBox();
+        
+        // Auto-submit when all 12 digits are entered
+        if (aadhaarPos === 12) {
+            setTimeout(proceedToOTP, 500);
+        }
     }
 }
 
@@ -593,7 +611,16 @@ function proceedToOTP() {
     if(aadhaarPos !== 12) {
         document.getElementById("error").innerText = "{% trans 'Please enter 12 digits' %}";
         document.getElementById("error").classList.remove("hidden");
-        speak("{% trans 'Please enter 12 digits' %}");
+        
+        // Speak in selected language
+        const langCode = getCurrentLangCode();
+        if (langCode === 'hi') {
+            speak("कृपया 12 अंक दर्ज करें");
+        } else if (langCode === 'or') {
+            speak("ଦୟାକରି 12 ଅଙ୍କ ପ୍ରବେଶ କରନ୍ତୁ");
+        } else {
+            speak("{% trans 'Please enter 12 digits' %}");
+        }
         
         setTimeout(() => {
             document.getElementById("error").classList.add("hidden");
@@ -603,7 +630,16 @@ function proceedToOTP() {
 
     document.getElementById("error").classList.add("hidden");
     document.getElementById("loader").classList.remove("hidden");
-    speak("{% trans 'Processing' %}");
+    
+    // Speak in selected language
+    const langCode = getCurrentLangCode();
+    if (langCode === 'hi') {
+        speak("प्रसंस्करण हो रहा है");
+    } else if (langCode === 'or') {
+        speak("ପ୍ରକ୍ରିୟାକରଣ ହେଉଛି");
+    } else {
+        speak("{% trans 'Processing' %}");
+    }
     
     // Submit form via POST
     const form = document.createElement('form');
@@ -648,22 +684,59 @@ function toggleVoiceInput() {
     }
 
     recognition = new SpeechRecognition();
-    recognition.lang = getCurrentLang();
+    recognition.lang = getCurrentLang(); // Use the selected language for recognition
     recognition.continuous = false;
     recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
 
     recognition.onstart = function() {
         isListening = true;
         document.getElementById("voiceBtn").classList.add("listening");
         document.getElementById("voiceStatus").innerText = "{% trans 'Listening...' %}";
-        speak("{% trans 'Listening' %}");
+        
+        // Speak in selected language
+        const langCode = getCurrentLangCode();
+        if (langCode === 'hi') {
+            speak("सुन रहा हूँ");
+        } else if (langCode === 'or') {
+            speak("ଶୁଣୁଛି");
+        } else {
+            speak("{% trans 'Listening' %}");
+        }
+        
         resetSessionTimer();
     };
 
     recognition.onresult = function(event) {
         resetSessionTimer();
         const spoken = event.results[0][0].transcript;
-        const digits = spoken.replace(/\D/g, '');
+        console.log("Spoken:", spoken);
+        
+        // Extract digits from spoken text (handles both English and Hindi numbers)
+        let digits = '';
+        for (let i = 0; i < spoken.length; i++) {
+            const char = spoken[i];
+            if (char >= '0' && char <= '9') {
+                digits += char;
+            } else {
+                // Check for Hindi digits
+                const hindiDigits = ['०', '१', '२', '३', '४', '५', '६', '७', '८', '९'];
+                const index = hindiDigits.indexOf(char);
+                if (index !== -1) {
+                    digits += index.toString();
+                }
+            }
+        }
+        
+        // Also try to extract numbers using regex as fallback
+        if (digits.length === 0) {
+            const matches = spoken.match(/\d+/g);
+            if (matches) {
+                digits = matches.join('');
+            }
+        }
+        
+        console.log("Extracted digits:", digits);
 
         if(digits.length === 12) {
             clearAll();
@@ -672,14 +745,33 @@ function toggleVoiceInput() {
                     pressKey(parseInt(digits[i]));
                 }, i * 50);
             }
-            speak("{% trans 'Aadhaar number entered' %}");
+            
+            // Speak in selected language
+            const langCode = getCurrentLangCode();
+            if (langCode === 'hi') {
+                speak("आधार नंबर दर्ज किया गया");
+            } else if (langCode === 'or') {
+                speak("ଆଧାର ନମ୍ବର ପ୍ରବେଶ କରାଯାଇଛି");
+            } else {
+                speak("{% trans 'Aadhaar number entered' %}");
+            }
+            
             setTimeout(proceedToOTP, 1000);
         } else {
-            speak("{% trans 'Invalid Aadhaar number' %}");
+            // Speak in selected language
+            const langCode = getCurrentLangCode();
+            if (langCode === 'hi') {
+                speak("अमान्य आधार नंबर");
+            } else if (langCode === 'or') {
+                speak("ଅବୈଧ ଆଧାର ନମ୍ବର");
+            } else {
+                speak("{% trans 'Invalid Aadhaar number' %}");
+            }
         }
     };
 
-    recognition.onerror = function() {
+    recognition.onerror = function(event) {
+        console.error("Recognition error:", event.error);
         isListening = false;
         document.getElementById("voiceBtn").classList.remove("listening");
         document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
@@ -722,7 +814,14 @@ window.handleCommand = function(command) {
     // Clear command
     if(command.includes("clear") || command.includes("reset")) {
         clearAll();
-        speak("{% trans 'Aadhaar cleared' %}");
+        const langCode = getCurrentLangCode();
+        if (langCode === 'hi') {
+            speak("आधार साफ़ किया गया");
+        } else if (langCode === 'or') {
+            speak("ଆଧାର ସଫା କରାଯାଇଛି");
+        } else {
+            speak("{% trans 'Aadhaar cleared' %}");
+        }
         return;
     }
     
@@ -756,15 +855,28 @@ window.autoReadPage = function() {
     if(originalAutoRead) originalAutoRead();
     setTimeout(() => {
         if(typeof speak === 'function') {
-            speak("{% trans 'Enter your 12-digit Aadhaar number using keypad or voice. Say proceed when done.' %}");
+            const langCode = getCurrentLangCode();
+            if (langCode === 'hi') {
+                speak("अपना 12 अंकों का आधार नंबर कीपैड या आवाज से दर्ज करें। तैयार होने पर सबमिट कहें।");
+            } else if (langCode === 'or') {
+                speak("ଆପଣଙ୍କର 12 ଅଙ୍କ ବିଶିଷ୍ଟ ଆଧାର ନମ୍ବର କୀପ୍ୟାଡ୍ କିମ୍ବା କଣ୍ଠଦ୍ୱାରା ପ୍ରବେଶ କରନ୍ତୁ। ପ୍ରସ୍ତୁତ ହେଲେ ସବମିଟ କୁହନ୍ତୁ।");
+            } else {
+                speak("{% trans 'Enter your 12-digit Aadhaar number using keypad or voice. Say proceed when done.' %}");
+            }
         }
     }, 2000);
 };
 
 /* ================= INIT ================= */
 
+// Highlight first box on load
+setTimeout(() => {
+    if (aadhaarBoxes[0]) {
+        aadhaarBoxes[0].classList.add('highlight');
+    }
+}, 100);
+
 document.addEventListener('DOMContentLoaded', function() {
-    highlightCurrentBox();
     startSessionTimer();
     
     document.addEventListener('click', resetSessionTimer);
