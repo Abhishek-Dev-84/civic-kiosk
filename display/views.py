@@ -63,6 +63,7 @@ def send_otp_via_circuitdigest(phone_number, otp, aadhaar_number):
     # Get API key from settings
     api_key = settings.CIRCUITDIGEST_API_KEY
     template_id = getattr(settings, 'CIRCUITDIGEST_TEMPLATE_ID', '101')
+    console_logging = getattr(settings, 'OTP_CONSOLE_LOGGING', True)
     
     if not api_key:
         logger.error("CircuitDigest API key not configured")
@@ -70,7 +71,7 @@ def send_otp_via_circuitdigest(phone_number, otp, aadhaar_number):
     
     try:
         # For development/testing - log to console
-        if settings.OTP_CONSOLE_LOGGING:
+        if console_logging:
             log_message = f"""
             ===== OTP for Aadhaar {aadhaar_number[-4:]} =====
             Phone: {formatted_phone}

@@ -108,6 +108,7 @@ DATABASES = {
 # CircuitDigest Configuration
 CIRCUITDIGEST_API_KEY = os.environ.get('CIRCUITDIGEST_API_KEY', '')
 CIRCUITDIGEST_TEMPLATE_ID = os.environ.get('CIRCUITDIGEST_TEMPLATE_ID', '101')
+OTP_CONSOLE_LOGGING = os.environ.get('OTP_CONSOLE_LOGGING', 'True') == 'True'
 OTP_PROVIDER = os.environ.get('OTP_PROVIDER', 'CIRCUITDIGEST')
 
 
