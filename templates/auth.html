@@ -161,6 +161,13 @@
 
         .voice-corner-btn.listening {
             background: #28a745;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
 
         .voice-corner-text {
@@ -504,14 +511,7 @@ function speak(text) {
     utterance.pitch = 1;
     utterance.volume = 1;
     
-    // Wait for voices to be loaded
-    if (speechSynthesis.getVoices().length === 0) {
-        speechSynthesis.addEventListener('voiceschanged', function() {
-            speechSynthesis.speak(utterance);
-        }, { once: true });
-    } else {
-        speechSynthesis.speak(utterance);
-    }
+    speechSynthesis.speak(utterance);
 }
 
 /* ================= SESSION TIMER ================= */
@@ -667,13 +667,23 @@ function proceedToOTP() {
 let recognition;
 let isListening = false;
 
+// Auto-start voice from session storage (set by index.html)
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if we should auto-start voice
+    const autoStartVoice = sessionStorage.getItem('autoStartVoice');
+    if (autoStartVoice === 'true') {
+        sessionStorage.removeItem('autoStartVoice'); // Clear it
+        setTimeout(() => {
+            toggleVoiceInput();
+        }, 1000); // Small delay to let page load
+    }
+});
+
 function toggleVoiceInput() {
     resetSessionTimer();
     
     if(isListening) {
-        if(recognition) {
-            recognition.stop();
-        }
+        stopVoiceInput();
         return;
     }
 
@@ -683,10 +693,17 @@ function toggleVoiceInput() {
         return;
     }
 
+    // Stop any existing recognition
+    if (recognition) {
+        try {
+            recognition.stop();
+        } catch(e) {}
+    }
+
     recognition = new SpeechRecognition();
-    recognition.lang = getCurrentLang(); // Use the selected language for recognition
-    recognition.continuous = false;
-    recognition.interimResults = false;
+    recognition.lang = getCurrentLang();
+    recognition.continuous = true; // Enable continuous listening
+    recognition.interimResults = true; // Get interim results for real-time writing
     recognition.maxAlternatives = 1;
 
     recognition.onstart = function() {
@@ -694,28 +711,27 @@ function toggleVoiceInput() {
         document.getElementById("voiceBtn").classList.add("listening");
         document.getElementById("voiceStatus").innerText = "{% trans 'Listening...' %}";
         
-        // Speak in selected language
         const langCode = getCurrentLangCode();
         if (langCode === 'hi') {
-            speak("सुन रहा हूँ");
+            speak("बोलिए...");
         } else if (langCode === 'or') {
-            speak("ଶୁଣୁଛି");
+            speak("କୁହନ୍ତୁ...");
         } else {
-            speak("{% trans 'Listening' %}");
+            speak("{% trans 'Speak now...' %}");
         }
-        
-        resetSessionTimer();
     };
 
     recognition.onresult = function(event) {
         resetSessionTimer();
-        const spoken = event.results[0][0].transcript;
-        console.log("Spoken:", spoken);
         
-        // Extract digits from spoken text (handles both English and Hindi numbers)
+        // Get the latest result
+        const lastResult = event.results[event.results.length - 1];
+        const transcript = lastResult[0].transcript;
+        
+        // Extract digits in real-time
         let digits = '';
-        for (let i = 0; i < spoken.length; i++) {
-            const char = spoken[i];
+        for (let i = 0; i < transcript.length; i++) {
+            const char = transcript[i];
             if (char >= '0' && char <= '9') {
                 digits += char;
             } else {
@@ -728,64 +744,79 @@ function toggleVoiceInput() {
             }
         }
         
-        // Also try to extract numbers using regex as fallback
+        // Also try to extract numbers using regex
         if (digits.length === 0) {
-            const matches = spoken.match(/\d+/g);
+            const matches = transcript.match(/\d+/g);
             if (matches) {
                 digits = matches.join('');
             }
         }
         
-        console.log("Extracted digits:", digits);
-
-        if(digits.length === 12) {
-            clearAll();
-            for(let i = 0; i < 12; i++) {
-                setTimeout(() => {
-                    pressKey(parseInt(digits[i]));
-                }, i * 50);
+        console.log("Transcript:", transcript, "Digits:", digits);
+        
+        // Update Aadhaar boxes in real-time
+        if (digits.length > 0) {
+            // Clear current but preserve position logic
+            for(let i = 0; i < Math.min(digits.length, 12); i++) {
+                if (i < aadhaarBoxes.length) {
+                    aadhaarBoxes[i].textContent = digits[i];
+                    aadhaarBoxes[i].classList.add('filled');
+                }
             }
             
-            // Speak in selected language
-            const langCode = getCurrentLangCode();
-            if (langCode === 'hi') {
-                speak("आधार नंबर दर्ज किया गया");
-            } else if (langCode === 'or') {
-                speak("ଆଧାର ନମ୍ବର ପ୍ରବେଶ କରାଯାଇଛି");
-            } else {
-                speak("{% trans 'Aadhaar number entered' %}");
-            }
+            // Update position
+            aadhaarPos = Math.min(digits.length, 12);
+            highlightCurrentBox();
             
-            setTimeout(proceedToOTP, 1000);
-        } else {
-            // Speak in selected language
-            const langCode = getCurrentLangCode();
-            if (langCode === 'hi') {
-                speak("अमान्य आधार नंबर");
-            } else if (langCode === 'or') {
-                speak("ଅବୈଧ ଆଧାର ନମ୍ବର");
-            } else {
-                speak("{% trans 'Invalid Aadhaar number' %}");
+            // If we have 12 digits, auto-submit
+            if (digits.length >= 12) {
+                setTimeout(proceedToOTP, 500);
             }
         }
     };
 
     recognition.onerror = function(event) {
         console.error("Recognition error:", event.error);
-        isListening = false;
-        document.getElementById("voiceBtn").classList.remove("listening");
-        document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
-        resetSessionTimer();
+        // Don't stop on minor errors, let it continue
+        if (event.error === 'no-speech') {
+            // Ignore no-speech errors, just continue listening
+            return;
+        }
+        stopVoiceInput();
     };
 
     recognition.onend = function() {
-        isListening = false;
-        document.getElementById("voiceBtn").classList.remove("listening");
-        document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
-        resetSessionTimer();
+        // Restart if we're still supposed to be listening
+        if (isListening) {
+            try {
+                recognition.start();
+            } catch(e) {
+                console.error("Failed to restart recognition:", e);
+                stopVoiceInput();
+            }
+        } else {
+            document.getElementById("voiceBtn").classList.remove("listening");
+            document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
+        }
     };
 
-    recognition.start();
+    try {
+        recognition.start();
+    } catch(e) {
+        console.error("Failed to start recognition:", e);
+        stopVoiceInput();
+    }
+}
+
+function stopVoiceInput() {
+    isListening = false;
+    if (recognition) {
+        try {
+            recognition.stop();
+        } catch(e) {}
+    }
+    document.getElementById("voiceBtn").classList.remove("listening");
+    document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
 }
 
 /* ================= OVERRIDE VOICE COMMANDS ================= */
@@ -809,6 +840,17 @@ window.handleCommand = function(command) {
             }
             return;
         }
+    }
+    
+    // Voice control commands
+    if(command.includes("stop listening") || command.includes("stop voice")) {
+        stopVoiceInput();
+        return;
+    }
+    
+    if(command.includes("start listening") || command.includes("start voice")) {
+        toggleVoiceInput();
+        return;
     }
     
     // Clear command
@@ -888,6 +930,7 @@ window.addEventListener('beforeunload', function() {
     if (sessionTimer) {
         clearTimeout(sessionTimer);
     }
+    stopVoiceInput();
 });
 
 </script>
