@@ -9,6 +9,7 @@ import logging
 import requests
 from django.core.files.base import ContentFile
 import datetime
+from datetime import timedelta  # IMPORTANT: Import timedelta separately
 from dateutil.relativedelta import relativedelta
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
@@ -145,8 +146,6 @@ def send_otp_via_circuitdigest(phone_number, otp, aadhaar_number):
         logger.error(f"Unexpected error: {str(e)}")
         return False, f"Failed to send OTP: {str(e)}"
 
-    
-
 
 def verify_otp(stored_otp, entered_otp, otp_timestamp):
     """
@@ -160,8 +159,8 @@ def verify_otp(stored_otp, entered_otp, otp_timestamp):
     if stored_otp != entered_otp:
         return False, "Invalid OTP"
     
-    # Check if OTP is expired (5 minutes)
-    expiry_time = otp_timestamp + datetime.timedelta(minutes=5)
+    # Check if OTP is expired (5 minutes) - FIXED: Use timedelta correctly
+    expiry_time = otp_timestamp + timedelta(minutes=5)
     if datetime.now() > expiry_time:
         return False, "OTP expired"
     
@@ -274,12 +273,12 @@ def otp(request):
         messages.error(request, 'Session expired. Please enter Aadhaar again.')
         return redirect('auth')
     
-    # Parse timestamp
+    # Parse timestamp - FIXED: Proper datetime handling
     try:
         from datetime import datetime
         otp_timestamp = datetime.fromisoformat(otp_timestamp_str)
     except:
-        otp_timestamp = datetime.datetime.now() - datetime.timedelta(minutes=6)  # Force expiry
+        otp_timestamp = datetime.datetime.now() - timedelta(minutes=6)  # Force expiry
     
     if request.method == 'POST':
         entered_otp = request.POST.get('otp')
