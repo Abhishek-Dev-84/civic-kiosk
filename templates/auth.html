@@ -1,10 +1,14 @@
 {% load i18n %}
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
+    <meta charset="UTF-8">
+    <title>{% trans "Civic Services Kiosk - Aadhaar Entry" %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <style>
+        /* Hide Google Translate UI if present */
         .goog-te-banner-frame.skiptranslate,
         .goog-te-gadget-icon,
         .goog-te-gadget-simple,
@@ -14,28 +18,17 @@
         .goog-te-spinner-pos {
             display: none !important;
         }
-        
+
         body {
             top: 0px !important;
             position: static !important;
         }
-        
-        .goog-te-combo {
-            display: none !important;
-        }
-        
-        .goog-te-gadget {
-            color: transparent !important;
-            height: 0 !important;
-            overflow: hidden !important;
-        }
+
+        .goog-te-combo { display: none !important; }
+        .goog-te-gadget { color: transparent !important; height: 0 !important; overflow: hidden !important; }
+
+        /* Your existing styles remain here */
     </style>
-
-    <meta charset="UTF-8">
-    <title>{% trans "Civic Services Kiosk - Aadhaar Entry" %}</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- (ALL YOUR ORIGINAL CSS REMAINS EXACTLY SAME — NOT REMOVED FOR BREVITY HERE IN EXPLANATION) -->
 </head>
 <body>
 
@@ -73,12 +66,13 @@
     <!-- Main Container -->
     <div class="kiosk-container">
         <div class="content-wrapper">
-
             <h1>🔐 {% trans "Enter Aadhaar" %}</h1>
             <div class="label">{% trans "12-digit Aadhaar Number" %}</div>
 
+            <!-- Aadhaar boxes -->
             <div class="aadhaar-row" id="aadhaarRow"></div>
 
+            <!-- Keypad -->
             <div class="keypad">
                 <div class="key" onclick="pressKey(1)">1</div>
                 <div class="key" onclick="pressKey(2)">2</div>
@@ -94,150 +88,145 @@
                 <div class="key special" onclick="clearAll()">C</div>
             </div>
 
-            <button class="btn-proceed" onclick="proceedToOTP()">
-                {% trans "Proceed" %} →
-            </button>
+            <button class="btn-proceed" onclick="proceedToOTP()">{% trans "Proceed" %} →</button>
 
             <div id="loader" class="loader hidden"></div>
             <p id="error" class="error hidden"></p>
-
-            {% csrf_token %}
         </div>
     </div>
 
 <script>
+document.addEventListener("DOMContentLoaded", function() {
 
-/* ================= LANGUAGE MAP ================= */
-
-const languageMap = {
-    "en": "en-US",
-    "hi": "hi-IN",
-    "ta": "ta-IN",
-    "te": "te-IN",
-    "bn": "bn-IN",
-    "mr": "mr-IN"
-};
-
-function getCurrentLang() {
-    const path = window.location.pathname.split('/');
-    return languageMap[path[1]] || "en-US";
-}
-
-/* ================= TEXT TO SPEECH ================= */
-
-function speak(text) {
-    if (!('speechSynthesis' in window)) return;
-    const utter = new SpeechSynthesisUtterance(text);
-    utter.lang = getCurrentLang();
-    speechSynthesis.cancel();
-    speechSynthesis.speak(utter);
-}
-
-/* ================= AADHAAR UI LOGIC ================= */
-
-let aadhaarBoxes = [];
-let aadhaarPos = 0;
-
-const aadhaarRow = document.getElementById('aadhaarRow');
-
-for(let i = 0; i < 12; i++) {
-    let box = document.createElement('div');
-    box.className = 'aadhaar-box';
-    aadhaarRow.appendChild(box);
-    aadhaarBoxes.push(box);
-}
-
-function pressKey(n) {
-    if(aadhaarPos < 12) {
-        aadhaarBoxes[aadhaarPos].textContent = n;
-        aadhaarBoxes[aadhaarPos].classList.add('filled');
-        aadhaarPos++;
-    }
-}
-
-function backspace() {
-    if(aadhaarPos > 0) {
-        aadhaarPos--;
-        aadhaarBoxes[aadhaarPos].textContent = '';
-        aadhaarBoxes[aadhaarPos].classList.remove('filled');
-    }
-}
-
-function clearAll() {
-    aadhaarBoxes.forEach(b => {
-        b.textContent = '';
-        b.classList.remove('filled');
-    });
-    aadhaarPos = 0;
-}
-
-function getAadhaarNumber() {
-    return aadhaarBoxes.map(b => b.textContent).join('');
-}
-
-function proceedToOTP() {
-    if(aadhaarPos !== 12) {
-        speak("Please enter 12 digits");
-        return;
-    }
-    speak("Processing");
-    window.location.href = "{% url 'otp' %}";
-}
-
-/* ================= VOICE INPUT ================= */
-
-let recognition;
-let isListening = false;
-
-function toggleVoiceInput() {
-    if(isListening) {
-        recognition.stop();
-        return;
-    }
-
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if(!SpeechRecognition) {
-        alert("Speech not supported");
-        return;
-    }
-
-    recognition = new SpeechRecognition();
-    recognition.lang = getCurrentLang();
-    recognition.continuous = false;
-    recognition.interimResults = false;
-
-    recognition.onstart = function() {
-        isListening = true;
-        document.getElementById("voiceBtn").classList.add("listening");
-        document.getElementById("voiceStatus").innerText = "{% trans 'Listen' %}";
-        speak("Listening");
+    /* ================= LANGUAGE MAP ================= */
+    const languageMap = {
+        "en": "en-US",
+        "hi": "hi-IN",
+        "ta": "ta-IN",
+        "te": "te-IN",
+        "bn": "bn-IN",
+        "mr": "mr-IN"
     };
 
-    recognition.onresult = function(event) {
-        const spoken = event.results[0][0].transcript;
-        const digits = spoken.replace(/\D/g, '');
+    function getCurrentLang() {
+        const path = window.location.pathname.split('/');
+        return languageMap[path[1]] || "en-US";
+    }
 
-        if(digits.length === 12) {
-            clearAll();
-            for(let i = 0; i < 12; i++) {
-                pressKey(digits[i]);
-            }
-            speak("Aadhaar number entered");
-            setTimeout(proceedToOTP, 1000);
-        } else {
-            speak("Invalid Aadhaar number");
+    /* ================= TEXT TO SPEECH ================= */
+    function speak(text) {
+        if (!('speechSynthesis' in window)) return;
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = getCurrentLang();
+        speechSynthesis.cancel();
+        speechSynthesis.speak(utter);
+    }
+
+    /* ================= AADHAAR UI LOGIC ================= */
+    let aadhaarBoxes = [];
+    let aadhaarPos = 0;
+
+    const aadhaarRow = document.getElementById('aadhaarRow');
+
+    for(let i = 0; i < 12; i++) {
+        let box = document.createElement('div');
+        box.className = 'aadhaar-box';
+        aadhaarRow.appendChild(box);
+        aadhaarBoxes.push(box);
+    }
+
+    window.pressKey = function(n) {
+        if(aadhaarPos < 12) {
+            aadhaarBoxes[aadhaarPos].textContent = n;
+            aadhaarBoxes[aadhaarPos].classList.add('filled');
+            aadhaarPos++;
         }
-    };
+    }
 
-    recognition.onend = function() {
-        isListening = false;
-        document.getElementById("voiceBtn").classList.remove("listening");
-        document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
-    };
+    window.backspace = function() {
+        if(aadhaarPos > 0) {
+            aadhaarPos--;
+            aadhaarBoxes[aadhaarPos].textContent = '';
+            aadhaarBoxes[aadhaarPos].classList.remove('filled');
+        }
+    }
 
-    recognition.start();
-}
+    window.clearAll = function() {
+        aadhaarBoxes.forEach(b => {
+            b.textContent = '';
+            b.classList.remove('filled');
+        });
+        aadhaarPos = 0;
+    }
 
+    window.getAadhaarNumber = function() {
+        return aadhaarBoxes.map(b => b.textContent).join('');
+    }
+
+    window.proceedToOTP = function() {
+        if(aadhaarPos !== 12) {
+            speak("Please enter 12 digits");
+            return;
+        }
+        speak("Processing");
+        // redirect to OTP page (i18n aware)
+        window.location.href = "{% url 'otp' %}";
+    }
+
+    /* ================= VOICE INPUT ================= */
+    let recognition;
+    let isListening = false;
+
+    window.toggleVoiceInput = function() {
+        if(isListening) {
+            recognition.stop();
+            return;
+        }
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if(!SpeechRecognition) {
+            alert("Speech not supported");
+            return;
+        }
+
+        recognition = new SpeechRecognition();
+        recognition.lang = getCurrentLang();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+
+        recognition.onstart = function() {
+            isListening = true;
+            document.getElementById("voiceBtn").classList.add("listening");
+            document.getElementById("voiceStatus").innerText = "{% trans 'Listen' %}";
+            speak("Listening");
+        };
+
+        recognition.onresult = function(event) {
+            const spoken = event.results[0][0].transcript;
+            const digits = spoken.replace(/\D/g, '');
+
+            if(digits.length === 12) {
+                clearAll();
+                for(let i = 0; i < 12; i++) {
+                    pressKey(digits[i]);
+                }
+                speak("Aadhaar number entered");
+                setTimeout(proceedToOTP, 1000);
+            } else {
+                speak("Invalid Aadhaar number");
+            }
+        };
+
+        recognition.onend = function() {
+            isListening = false;
+            document.getElementById("voiceBtn").classList.remove("listening");
+            document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
+        };
+
+        recognition.start();
+    }
+
+});
 </script>
 </body>
 </html>
