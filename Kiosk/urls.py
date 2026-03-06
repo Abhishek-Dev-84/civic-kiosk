@@ -3,17 +3,17 @@ from django.urls import path, include
 from django.conf.urls.i18n import set_language
 from django.conf import settings
 from django.conf.urls.static import static
+from django.conf.urls.i18n import i18n_patterns
 
 urlpatterns = [
-
-    path('admin/', admin.site.urls),
-
-    # Language switch
+    # Language switch URL outside patterns
     path('set-language/', set_language, name='set_language'),
-
-    # App URLs
-    path('', include('display.urls')),
 ]
+
+urlpatterns += i18n_patterns(
+    path('admin/', admin.site.urls),
+    path('', include('display.urls')),
+)
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
