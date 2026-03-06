@@ -122,12 +122,8 @@
             transition: all 0.2s;
         }
 
-        .voice-corner-btn:active {
-            transform: scale(0.95);
-        }
-
         .voice-corner-btn.listening {
-            background: #4CAF50;
+            background: #28a745;
             animation: pulse 1s infinite;
         }
 
@@ -263,6 +259,39 @@
             font-size: 24px;
             font-weight: 700;
             color: #1e5fbf;
+        }
+
+        /* ===== LOADING BUFFER ===== */
+        .loading-buffer {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: rgba(30, 95, 191, 0.9);
+            padding: 12px 24px;
+            border-radius: 40px;
+            z-index: 2000;
+            border: 2px solid white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .loading-buffer .spinner {
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-buffer span {
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
         }
 
         /* ===== NUMBER BOXES (For Aadhaar/OTP) ===== */
@@ -614,7 +643,11 @@
         </div>
     </div>
 
-    <!-- Voice corner will be created dynamically by voice.js -->
+    <!-- Voice Button -->
+    <div class="voice-corner">
+        <div class="voice-corner-btn" id="voiceBtn" onclick="toggleVoiceInput()">🎤</div>
+        <div class="voice-corner-text" id="voiceStatus">{% trans "Click" %}</div>
+    </div>
 
     <!-- Django Back URL -->
     <div class="back-btn" onclick="window.location='{% url 'index' %}'">← {% trans "Back" %}</div>
@@ -624,6 +657,12 @@
         <p>⚠️ {% trans "Session about to expire" %}</p>
         <button onclick="extendSession()">{% trans "Continue Session" %}</button>
         <button class="logout-btn" onclick="window.location='{% url 'index' %}'">{% trans "Logout" %}</button>
+    </div>
+
+    <!-- Loading Buffer (for voice processing) -->
+    <div id="voiceLoadingBuffer" class="loading-buffer hidden">
+        <div class="spinner"></div>
+        <span>{% trans "Processing voice command..." %}</span>
     </div>
 
     <!-- Success Message -->
@@ -699,6 +738,203 @@
     </style>
 
     <script>
+        // ===== LANGUAGE MAP =====
+        const languageMap = {
+            "en": "en-IN",
+            "hi": "hi-IN",
+            "ta": "ta-IN",
+            "te": "te-IN",
+            "bn": "bn-IN",
+            "or": "or-IN"
+        };
+
+        function getCurrentLang() {
+            const path = window.location.pathname.split('/');
+            const langCode = path[1] || "en";
+            return languageMap[langCode] || "en-IN";
+        }
+
+        function getCurrentLangCode() {
+            const path = window.location.pathname.split('/');
+            return path[1] || "en";
+        }
+
+        function speak(text) {
+            if (!('speechSynthesis' in window)) return;
+            speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = getCurrentLang();
+            utterance.rate = 1;
+            speechSynthesis.speak(utterance);
+        }
+
+        // ===== VOICE INPUT =====
+        let recognition = null;
+        let isListening = false;
+        let voiceTimeout = null;
+
+        function toggleVoiceInput() {
+            if(isListening) {
+                stopVoiceInput();
+                return;
+            }
+
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if(!SpeechRecognition) {
+                alert("{% trans 'Speech not supported' %}");
+                return;
+            }
+
+            if (recognition) {
+                try {
+                    recognition.stop();
+                } catch(e) {}
+            }
+
+            recognition = new SpeechRecognition();
+            recognition.lang = getCurrentLang();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.maxAlternatives = 1;
+
+            recognition.onstart = function() {
+                isListening = true;
+                document.getElementById("voiceBtn").classList.add("listening");
+                document.getElementById("voiceStatus").innerText = "{% trans 'Listening...' %}";
+                
+                const langCode = getCurrentLangCode();
+                if (langCode === 'hi') {
+                    speak("कृपया सेवा बोलें... गैस, बिजली, नगर, परिवहन, राजस्व, या स्थिति");
+                } else if (langCode === 'or') {
+                    speak("ଦୟାକରି ସେବା କୁହନ୍ତୁ... ଗ୍ୟାସ୍, ବିଜୁଳି, ନଗର, ପରିବହନ, ରାଜସ୍ୱ, କିମ୍ବା ସ୍ଥିତି");
+                } else {
+                    speak("{% trans 'Please say a service... Gas, Electricity, Municipal, Transport, Revenue, or Status' %}");
+                }
+            };
+
+            recognition.onresult = function(event) {
+                document.getElementById('voiceLoadingBuffer').classList.remove('hidden');
+                
+                if (voiceTimeout) clearTimeout(voiceTimeout);
+                
+                let finalTranscript = '';
+                let interimTranscript = '';
+                
+                for (let i = 0; i < event.results.length; i++) {
+                    const result = event.results[i];
+                    if (result.isFinal) {
+                        finalTranscript += result[0].transcript;
+                    } else {
+                        interimTranscript += result[0].transcript;
+                    }
+                }
+                
+                const transcript = finalTranscript || interimTranscript;
+                const command = transcript.toLowerCase();
+                console.log("Voice command:", command);
+                
+                // Process the voice command
+                if (command.includes("gas") || command.includes("cylinder") || command.includes("गैस")) {
+                    speak("{% trans 'Opening Gas services' %}");
+                    setTimeout(() => {
+                        window.location.href = "{% url 'gas-services' %}";
+                    }, 500);
+                }
+                else if (command.includes("electricity") || command.includes("बिजली")) {
+                    speak("{% trans 'Opening Electricity services' %}");
+                    setTimeout(() => {
+                        window.location.href = "{% url 'electricity-services' %}";
+                    }, 500);
+                }
+                else if (command.includes("municipal") || command.includes("नगर")) {
+                    speak("{% trans 'Opening Municipal services' %}");
+                    setTimeout(() => {
+                        window.location.href = "{% url 'municipal-services' %}";
+                    }, 500);
+                }
+                else if (command.includes("transport") || command.includes("परिवहन") || command.includes("🚗")) {
+                    speak("{% trans 'Opening Transport services' %}");
+                    setTimeout(() => {
+                        window.location.href = "{% url 'transport-services' %}";
+                    }, 500);
+                }
+                else if (command.includes("revenue") || command.includes("राजस्व")) {
+                    speak("{% trans 'Opening Revenue services' %}");
+                    setTimeout(() => {
+                        window.location.href = "{% url 'revenue-services' %}";
+                    }, 500);
+                }
+                else if (command.includes("status") || command.includes("स्थिति")) {
+                    speak("{% trans 'Opening Application Status' %}");
+                    setTimeout(() => {
+                        window.location.href = "{% url 'application-status' %}";
+                    }, 500);
+                }
+                else if (command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
+                    speak("{% trans 'Going back' %}");
+                    setTimeout(() => {
+                        window.location.href = "/" + getCurrentLangCode() + "/";
+                    }, 500);
+                }
+                else if (command.includes("home") || command.includes("होम") || command.includes("ଘର")) {
+                    speak("{% trans 'Going to home' %}");
+                    setTimeout(() => {
+                        window.location.href = "/" + getCurrentLangCode() + "/";
+                    }, 500);
+                }
+                else if (command.includes("stop listening") || command.includes("stop voice")) {
+                    stopVoiceInput();
+                }
+                
+                // Hide loading buffer after processing
+                voiceTimeout = setTimeout(() => {
+                    document.getElementById('voiceLoadingBuffer').classList.add('hidden');
+                }, 1000);
+            };
+
+            recognition.onerror = function(event) {
+                console.error("Recognition error:", event.error);
+                document.getElementById('voiceLoadingBuffer').classList.add('hidden');
+                if (event.error === 'no-speech') return;
+                stopVoiceInput();
+            };
+
+            recognition.onend = function() {
+                document.getElementById('voiceLoadingBuffer').classList.add('hidden');
+                if (isListening) {
+                    try {
+                        recognition.start();
+                    } catch(e) {
+                        console.error("Failed to restart recognition:", e);
+                        stopVoiceInput();
+                    }
+                } else {
+                    document.getElementById("voiceBtn").classList.remove("listening");
+                    document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
+                }
+            };
+
+            try {
+                recognition.start();
+            } catch(e) {
+                console.error("Failed to start recognition:", e);
+                stopVoiceInput();
+            }
+        }
+
+        function stopVoiceInput() {
+            isListening = false;
+            if (recognition) {
+                try {
+                    recognition.stop();
+                } catch(e) {}
+            }
+            document.getElementById("voiceBtn").classList.remove("listening");
+            document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
+            document.getElementById('voiceLoadingBuffer').classList.add('hidden');
+            if (voiceTimeout) clearTimeout(voiceTimeout);
+        }
+
         // ===== ORIGINAL JS (PRESERVED) =====
         function playAudioGuidance(text, lang = 'hi-IN') {
             if ('speechSynthesis' in window) {
@@ -745,9 +981,19 @@
             startSessionTimer();
             document.addEventListener('click', extendSession);
             document.addEventListener('touchstart', extendSession);
+            
+            // Auto-read menu options
+            setTimeout(() => {
+                const langCode = getCurrentLangCode();
+                if (langCode === 'hi') {
+                    speak("मुख्य मेनू। गैस, बिजली, नगर, परिवहन, राजस्व, या स्थिति सेवाएं चुनें। मदद के लिए माइक बटन दबाएं।");
+                } else if (langCode === 'or') {
+                    speak("ମୁଖ୍ୟ ମେନୁ। ଗ୍ୟାସ୍, ବିଜୁଳି, ନଗର, ପରିବହନ, ରାଜସ୍ୱ, କିମ୍ବା ସ୍ଥିତି ସେବା ଚୟନ କରନ୍ତୁ। ସାହାଯ୍ୟ ପାଇଁ ମାଇକ୍ ବଟନ୍ ଦବାନ୍ତୁ।");
+                } else {
+                    speak("{% trans 'Main menu. Choose Gas, Electricity, Municipal, Transport, Revenue, or Status services. Press mic button for voice help.' %}");
+                }
+            }, 1000);
         });
-
-        /* ===================== OVERRIDE VOICE COMMANDS ===================== */
 
         // Extend voice.js handleCommand for main menu navigation
         const originalHandleCommand = window.handleCommand;
