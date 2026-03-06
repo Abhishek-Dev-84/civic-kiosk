@@ -190,10 +190,16 @@ if DEBUG:
 else:
 
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    USE_X_FORWARDED_HOST = True
+
     SECURE_SSL_REDIRECT = True
 
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+
+    CSRF_TRUSTED_ORIGINS = [
+        "https://*.vercel.app"
+    ]
 
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
