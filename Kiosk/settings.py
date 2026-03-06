@@ -105,6 +105,16 @@ DATABASES = {
     )
 }
 
+
+# -------------------------------------------------
+# TWILIO CONFIGURATION (ADD THIS SECTION)
+# -------------------------------------------------
+TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID', '')
+TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN', '')
+TWILIO_PHONE_NUMBER = os.environ.get('TWILIO_PHONE_NUMBER', '')
+OTP_CONSOLE_LOGGING = os.environ.get('OTP_CONSOLE_LOGGING', 'True') == 'True'
+
+
 # -------------------------------------------------
 # PASSWORD VALIDATION
 # -------------------------------------------------

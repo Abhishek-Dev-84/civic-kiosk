@@ -15,13 +15,101 @@ from urllib.parse import urlparse, urlunparse
 from django.views.decorators.csrf import csrf_exempt
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
+from twilio.rest import Client
+from django.conf import settings
+import logging
+from .models import Consumer, UserSession, AuditLog, Notification, ElectricityConsumer, ElectricityBill, ElectricityPayment
+from .models import GasConsumer, GasCylinderBooking, WaterConsumer, WaterBill, Property, PropertyTax
+from .models import ProfessionalTax, TradeLicense, BuildingPlanApplication, Grievance, BirthCertificateApplication
+from .models import DeathCertificateApplication, MarriageRegistration, DocumentUpload
+
+logger = logging.getLogger(__name__)
+
+
+# ================= OTP UTILITY FUNCTIONS =================
+
+def generate_otp(length=6):
+    """Generate a random OTP of specified length"""
+    return ''.join([str(random.randint(0, 9)) for _ in range(length)])
+
+
+def send_otp_via_twilio(phone_number, otp, aadhaar_number):
+    """
+    Send OTP via Twilio SMS to the specific phone number
+    Returns: (success, message)
+    """
+    if not phone_number:
+        logger.warning(f"No phone number found for Aadhaar {aadhaar_number[-4:]}")
+        return False, "No phone number registered"
+    
+    # Format phone number for India (add +91 if not present)
+    if not phone_number.startswith('+'):
+        # Remove any leading zeros
+        phone_number = phone_number.lstrip('0')
+        # Add India country code
+        phone_number = '+91' + phone_number
+    
+    try:
+        # For development/testing - log to console
+        if settings.OTP_CONSOLE_LOGGING:
+            log_message = f"""
+            ===== OTP for Aadhaar {aadhaar_number[-4:]} =====
+            Phone: {phone_number}
+            OTP: {otp}
+            ============================================
+            """
+            print(log_message)
+            logger.info(f"OTP sent via console to {phone_number[-4:]}")
+            return True, "OTP logged to console"
+        
+        # Production - send via Twilio
+        if not all([settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN, settings.TWILIO_PHONE_NUMBER]):
+            logger.error("Twilio credentials not configured")
+            return False, "SMS service not configured"
+        
+        client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
+        message = client.messages.create(
+            body=f"Your OTP for Civic Kiosk is: {otp}. Valid for 5 minutes.",
+            from_=settings.TWILIO_PHONE_NUMBER,
+            to=phone_number
+        )
+        
+        logger.info(f"OTP sent via SMS to {phone_number[-4:]}, SID: {message.sid}")
+        return True, "OTP sent successfully"
+        
+    except Exception as e:
+        logger.error(f"Failed to send OTP to {phone_number[-4:]}: {str(e)}")
+        return False, f"Failed to send OTP: {str(e)}"
+
+
+def verify_otp(stored_otp, entered_otp, otp_timestamp):
+    """
+    Verify OTP and check expiry (5 minutes)
+    """
+    from datetime import datetime
+    
+    if not stored_otp or not entered_otp:
+        return False, "OTP missing"
+    
+    if stored_otp != entered_otp:
+        return False, "Invalid OTP"
+    
+    # Check if OTP is expired (5 minutes)
+    expiry_time = otp_timestamp + datetime.timedelta(minutes=5)
+    if datetime.now() > expiry_time:
+        return False, "OTP expired"
+    
+    return True, "OTP verified"
 
 
 # ================= CORE / AUTH =================
+
 def index(request):
     return render(request, 'index.html')
 
+
 def auth(request):
+    """Aadhaar authentication page"""
     # Clear any existing messages
     storage = messages.get_messages(request)
     storage.used = True
@@ -33,89 +121,263 @@ def auth(request):
     if request.method == 'POST':
         aadhaar_number = request.POST.get('aadhaar_number')
         
-        if aadhaar_number and len(aadhaar_number) == 12 and aadhaar_number.isdigit():
-            request.session['aadhaar_number'] = aadhaar_number
+        # Validate Aadhaar format
+        if not aadhaar_number or len(aadhaar_number) != 12 or not aadhaar_number.isdigit():
+            messages.error(request, 'Please enter a valid 12-digit Aadhaar number')
+            return render(request, 'auth.html')
+        
+        try:
+            # Check if consumer exists in database
+            consumer = Consumer.objects.get(aadhaar_number=aadhaar_number, is_active=True)
             
-            # Generate OTP (still generates but won't be checked)
-            otp = ''.join([str(random.randint(0, 9)) for _ in range(6)])
+            # Store in session
+            request.session['aadhaar_number'] = aadhaar_number
+            request.session['consumer_id'] = consumer.id
+            
+            # Generate OTP
+            otp = generate_otp(6)
             request.session['otp'] = otp
             request.session['otp_attempts'] = 0
+            request.session['otp_timestamp'] = datetime.datetime.now().isoformat()
             
-            print("\n" + "="*50)
-            print(f"OTP for Aadhaar {aadhaar_number}: {otp}")
-            print("="*50 + "\n")
+            # Send OTP via SMS to consumer's phone number from database
+            success, message = send_otp_via_twilio(
+                consumer.mobile,  # Phone number from database
+                otp, 
+                aadhaar_number
+            )
             
-            messages.success(request, 'OTP sent successfully')
-            return redirect('otp')
-        else:
-            messages.error(request, 'Please enter a valid 12-digit Aadhaar number')
+            if success:
+                messages.success(request, 'OTP sent successfully to your registered mobile number')
+                
+                # Create audit log
+                AuditLog.objects.create(
+                    consumer=consumer,
+                    action='OTP_SENT',
+                    model_name='Consumer',
+                    object_id=consumer.id,
+                    changes={'aadhaar': aadhaar_number[-4:]},
+                    ip_address=request.META.get('REMOTE_ADDR', ''),
+                    user_agent=request.META.get('HTTP_USER_AGENT', '')
+                )
+                
+                return redirect('otp')
+            else:
+                messages.error(request, f'Failed to send OTP: {message}')
+                return render(request, 'auth.html')
+                
+        except Consumer.DoesNotExist:
+            messages.error(request, 'Aadhaar number not found in our records. Please contact support.')
+            
+            # Log failed attempt
+            AuditLog.objects.create(
+                consumer=None,
+                action='AUTH_FAILED',
+                model_name='Consumer',
+                object_id='',
+                changes={'aadhaar': aadhaar_number[-4:]},
+                ip_address=request.META.get('REMOTE_ADDR', ''),
+                user_agent=request.META.get('HTTP_USER_AGENT', '')
+            )
+            
+            return render(request, 'auth.html')
+        except Exception as e:
+            logger.error(f"Error during authentication: {str(e)}")
+            messages.error(request, 'An error occurred. Please try again.')
             return render(request, 'auth.html')
     
     # GET request - show the Aadhaar entry page
     return render(request, 'auth.html')
 
 
-# ================= SIMPLIFIED OTP - ANY OTP WORKS =================
 def otp(request):
+    """OTP verification page"""
     # Check if aadhaar is in session
     aadhaar_number = request.session.get('aadhaar_number')
+    consumer_id = request.session.get('consumer_id')
+    stored_otp = request.session.get('otp')
+    otp_timestamp_str = request.session.get('otp_timestamp')
     
-    if not aadhaar_number:
+    if not aadhaar_number or not consumer_id or not stored_otp:
         messages.error(request, 'Session expired. Please enter Aadhaar again.')
         return redirect('auth')
+    
+    # Parse timestamp
+    try:
+        from datetime import datetime
+        otp_timestamp = datetime.fromisoformat(otp_timestamp_str)
+    except:
+        otp_timestamp = datetime.datetime.now() - datetime.timedelta(minutes=6)  # Force expiry
     
     if request.method == 'POST':
         entered_otp = request.POST.get('otp')
         
-        # SIMPLIFIED BYPASS: ANY NON-EMPTY OTP IS ACCEPTED
-        if entered_otp and len(entered_otp) > 0:
-            # OTP verified successfully - no checking!
+        # Get attempt count
+        attempts = request.session.get('otp_attempts', 0)
+        request.session['otp_attempts'] = attempts + 1
+        
+        if attempts >= 3:
+            messages.error(request, 'Too many failed attempts. Please request new OTP.')
+            return redirect('resend-otp')
+        
+        # Verify OTP
+        is_valid, message = verify_otp(stored_otp, entered_otp, otp_timestamp)
+        
+        if is_valid:
+            # OTP verified successfully
             request.session['aadhaar_verified'] = True
-            messages.success(request, 'OTP verified successfully!')
+            request.session['otp_verified'] = True
+            
+            # Update consumer last login
+            try:
+                consumer = Consumer.objects.get(id=consumer_id)
+                consumer.last_login = datetime.datetime.now()
+                consumer.save()
+                
+                # Create user session
+                UserSession.objects.create(
+                    consumer=consumer,
+                    session_key=request.session.session_key,
+                    ip_address=request.META.get('REMOTE_ADDR', ''),
+                    user_agent=request.META.get('HTTP_USER_AGENT', '')
+                )
+                
+                # Create notification
+                Notification.objects.create(
+                    consumer=consumer,
+                    notification_type='GENERAL',
+                    title='Login Successful',
+                    message=f'You have successfully logged in to Civic Kiosk at {datetime.datetime.now().strftime("%d %b %Y %I:%M %p")}'
+                )
+                
+                # Clear OTP from session
+                request.session.pop('otp', None)
+                request.session.pop('otp_timestamp', None)
+                
+                messages.success(request, 'OTP verified successfully!')
+                
+            except Consumer.DoesNotExist:
+                messages.error(request, 'Consumer record not found.')
+                return redirect('auth')
+            
             return redirect('menu')
         else:
-            messages.error(request, 'Please enter OTP')
+            messages.error(request, message)
     
-    # Mask Aadhaar for display (show only last 4 digits)
+    # Mask Aadhaar for display
     masked_aadhaar = 'XXXX XXXX ' + aadhaar_number[-4:]
     
-    return render(request, 'otp.html', {'aadhaar': masked_aadhaar})
+    # Get consumer details for display
+    try:
+        consumer = Consumer.objects.get(id=consumer_id)
+        consumer_name = consumer.name
+        consumer_phone = consumer.mobile
+        # Mask phone number for display (show only last 4 digits)
+        masked_phone = consumer_phone[-4:] if consumer_phone else ''
+    except:
+        consumer_name = ''
+        masked_phone = ''
+    
+    context = {
+        'aadhaar': masked_aadhaar,
+        'consumer_name': consumer_name,
+        'masked_phone': masked_phone,
+        'attempts': request.session.get('otp_attempts', 0)
+    }
+    
+    return render(request, 'otp.html', context)
+
 
 def resend_otp(request):
+    """Resend OTP"""
     if request.method == 'POST':
-        # Get aadhaar from session
         aadhaar_number = request.session.get('aadhaar_number')
+        consumer_id = request.session.get('consumer_id')
         
-        if aadhaar_number:
-            # Generate new OTP
-            otp = ''.join([str(random.randint(0, 9)) for _ in range(6)])
-            request.session['otp'] = otp
-            request.session['otp_attempts'] = 0  # Reset attempts
-            
-            # Print to console for testing
-            print("\n" + "="*50)
-            print(f"RESEND OTP for Aadhaar {aadhaar_number}: {otp}")
-            print("="*50 + "\n")
-            
-            messages.success(request, 'New OTP sent successfully')
-        else:
+        if not aadhaar_number or not consumer_id:
             messages.error(request, 'Session expired. Please login again.')
             return redirect('auth')
+        
+        try:
+            consumer = Consumer.objects.get(id=consumer_id, aadhaar_number=aadhaar_number)
+            
+            # Generate new OTP
+            otp = generate_otp(6)
+            request.session['otp'] = otp
+            request.session['otp_attempts'] = 0
+            request.session['otp_timestamp'] = datetime.datetime.now().isoformat()
+            
+            # Send OTP to consumer's phone number
+            success, message = send_otp_via_twilio(consumer.mobile, otp, aadhaar_number)
+            
+            if success:
+                messages.success(request, 'New OTP sent successfully to your registered mobile number')
+                
+                # Create audit log
+                AuditLog.objects.create(
+                    consumer=consumer,
+                    action='OTP_RESENT',
+                    model_name='Consumer',
+                    object_id=consumer.id,
+                    changes={'aadhaar': aadhaar_number[-4:]},
+                    ip_address=request.META.get('REMOTE_ADDR', ''),
+                    user_agent=request.META.get('HTTP_USER_AGENT', '')
+                )
+            else:
+                messages.error(request, f'Failed to send OTP: {message}')
+                
+        except Consumer.DoesNotExist:
+            messages.error(request, 'Consumer record not found.')
+            return redirect('auth')
+        except Exception as e:
+            logger.error(f"Error resending OTP: {str(e)}")
+            messages.error(request, 'An error occurred. Please try again.')
     
     return redirect('otp')
 
 
-def menu(request):
-    # Debug: Check Django auth
-    print(f"User authenticated: {request.user.is_authenticated}")
-    print(f"User: {request.user}")
+def logout(request):
+    """Logout user"""
+    consumer_id = request.session.get('consumer_id')
     
-    # Check if user is verified with Aadhaar
-    if not request.session.get('aadhaar_verified'):
-        messages.error(request, 'Please verify OTP first')
+    if consumer_id:
+        try:
+            # Update session as inactive
+            UserSession.objects.filter(
+                consumer_id=consumer_id,
+                session_key=request.session.session_key,
+                is_active=True
+            ).update(is_active=False)
+        except:
+            pass
+    
+    # Clear session
+    request.session.flush()
+    messages.success(request, 'You have been logged out successfully.')
+    return redirect('index')
+
+
+def menu(request):
+    """Main menu after authentication"""
+    # Check if user is verified
+    if not request.session.get('aadhaar_verified') or not request.session.get('otp_verified'):
+        messages.error(request, 'Please login first')
         return redirect('auth')
     
-    return render(request, 'menu.html')
+    # Get consumer info for display
+    consumer_id = request.session.get('consumer_id')
+    try:
+        consumer = Consumer.objects.get(id=consumer_id)
+        context = {
+            'consumer_name': consumer.name,
+            'consumer_aadhaar': consumer.aadhaar_number[-4:],
+            'consumer_phone': consumer.mobile[-4:],
+            'notifications': Notification.objects.filter(consumer=consumer, is_read=False).count()
+        }
+    except:
+        context = {}
+    
+    return render(request, 'menu.html', context)
 
 
 # ================= ELECTRICITY =================
@@ -126,11 +388,32 @@ def electricity_services(request):
         messages.error(request, 'Please verify OTP first')
         return redirect('auth')
     
-    # Add some context data to ensure the page renders
-    context = {
-        'page_title': 'Electricity Services',
-        'current_date': datetime.datetime.now().strftime('%d %b %Y'),
-    }
+    # Get consumer from session
+    consumer_id = request.session.get('consumer_id')
+    
+    try:
+        consumer = Consumer.objects.get(id=consumer_id)
+        # Get electricity consumer details if exists
+        try:
+            elec_consumer = ElectricityConsumer.objects.get(consumer=consumer)
+            context = {
+                'page_title': 'Electricity Services',
+                'current_date': datetime.datetime.now().strftime('%d %b %Y'),
+                'consumer_number': elec_consumer.consumer_number,
+                'has_connection': True
+            }
+        except ElectricityConsumer.DoesNotExist:
+            context = {
+                'page_title': 'Electricity Services',
+                'current_date': datetime.datetime.now().strftime('%d %b %Y'),
+                'has_connection': False
+            }
+    except:
+        context = {
+            'page_title': 'Electricity Services',
+            'current_date': datetime.datetime.now().strftime('%d %b %Y'),
+        }
+    
     return render(request, 'electricity-services.html', context)
 
 
@@ -140,13 +423,21 @@ def electricity_bill_payment(request):
         return redirect('auth')
     
     context = {}
+    consumer_id = request.session.get('consumer_id')
+    
+    try:
+        consumer = Consumer.objects.get(id=consumer_id)
+        elec_consumer = ElectricityConsumer.objects.get(consumer=consumer)
+        context['default_consumer_number'] = elec_consumer.consumer_number
+    except:
+        context['default_consumer_number'] = '123456789012'
     
     if request.method == 'POST':
         action = request.POST.get('action')
         consumer_number = request.POST.get('consumer_number')
         bill_amount = request.POST.get('bill_amount')
         
-        # NEW FIELDS for payment method
+        # FIELDS for payment method
         payment_method = request.POST.get('payment_method')  # 'upi' or 'atm'
         upi_id = request.POST.get('upi_id')
         card_number = request.POST.get('card_number')
@@ -195,12 +486,39 @@ def electricity_bill_payment(request):
             # Generate transaction ID
             transaction_id = f"TXN{datetime.datetime.now().strftime('%y%m%d%H%M%S')}{random.randint(100, 999)}"
             
+            # Create payment record
+            try:
+                bill = ElectricityBill.objects.get(consumer__consumer_number=consumer_number, status='PENDING')
+                ElectricityPayment.objects.create(
+                    bill=bill,
+                    transaction_id=transaction_id,
+                    amount=float(bill_amount),
+                    payment_method=payment_method.upper(),
+                    payment_details={'method': payment_method, 'details': payment_details},
+                    status='SUCCESS'
+                )
+                bill.status = 'PAID'
+                bill.paid_amount = float(bill_amount)
+                bill.save()
+            except:
+                pass
+            
             messages.success(request, f'Payment of ₹{bill_amount} for consumer {consumer_number} successful! Transaction ID: {transaction_id}')
             return redirect('payment-history')
         
         elif action == 'fetch':
-            context['show_bill'] = True
-            context['consumer_number'] = consumer_number
+            try:
+                # Try to fetch bill from database
+                bill = ElectricityBill.objects.filter(consumer__consumer_number=consumer_number, status='PENDING').first()
+                if bill:
+                    context['show_bill'] = True
+                    context['consumer_number'] = consumer_number
+                    context['bill'] = bill
+                else:
+                    messages.warning(request, 'No pending bills found for this consumer number')
+            except:
+                context['show_bill'] = True
+                context['consumer_number'] = consumer_number
     
     return render(request, 'electricity-bill-payment.html', context)
 
@@ -248,25 +566,63 @@ def electricity_duplicate_bill(request):
                 messages.error(request, 'Please enter a valid consumer number')
                 return render(request, 'electricity-duplicate-bill.html', context)
             
-            today = datetime.date.today()
-            bills = []
+            # Try to fetch bills from database
+            try:
+                consumer = ElectricityConsumer.objects.filter(consumer_number=consumer_number).first()
+                if consumer:
+                    bills_db = ElectricityBill.objects.filter(consumer=consumer).order_by('-bill_date')[:3]
+                    bills = []
+                    for bill in bills_db:
+                        bills.append({
+                            'id': bill.id,
+                            'month': bill.bill_date.strftime('%B %Y'),
+                            'year': bill.bill_date.year,
+                            'bill_date': bill.bill_date.strftime('%d %b %Y'),
+                            'due_date': bill.due_date.strftime('%d %b %Y'),
+                            'amount': str(bill.total_amount),
+                            'bill_number': bill.bill_number,
+                            'units': bill.units_consumed
+                        })
+                    context['bills'] = bills
+                else:
+                    # Fallback to dummy data
+                    today = datetime.date.today()
+                    bills = []
+                    for i in range(3):
+                        bill_date = today - relativedelta(months=i)
+                        due_date = bill_date + relativedelta(days=15)
+                        
+                        bills.append({
+                            'id': f'bill_{i+1}',
+                            'month': bill_date.strftime('%B'),
+                            'year': bill_date.year,
+                            'bill_date': bill_date.strftime('%d %b %Y'),
+                            'due_date': due_date.strftime('%d %b %Y'),
+                            'amount': f"{1200 + (i * 70)}",
+                            'bill_number': f"EB/{bill_date.year}/{random.randint(1000, 9999)}",
+                            'units': 200 + (i * 25)
+                        })
+                    context['bills'] = bills
+            except:
+                # Fallback to dummy data
+                today = datetime.date.today()
+                bills = []
+                for i in range(3):
+                    bill_date = today - relativedelta(months=i)
+                    due_date = bill_date + relativedelta(days=15)
+                    
+                    bills.append({
+                        'id': f'bill_{i+1}',
+                        'month': bill_date.strftime('%B'),
+                        'year': bill_date.year,
+                        'bill_date': bill_date.strftime('%d %b %Y'),
+                        'due_date': due_date.strftime('%d %b %Y'),
+                        'amount': f"{1200 + (i * 70)}",
+                        'bill_number': f"EB/{bill_date.year}/{random.randint(1000, 9999)}",
+                        'units': 200 + (i * 25)
+                    })
+                context['bills'] = bills
             
-            for i in range(3):
-                bill_date = today - relativedelta(months=i)
-                due_date = bill_date + relativedelta(days=15)
-                
-                bills.append({
-                    'id': f'bill_{i+1}',
-                    'month': bill_date.strftime('%B'),
-                    'year': bill_date.year,
-                    'bill_date': bill_date.strftime('%d %b %Y'),
-                    'due_date': due_date.strftime('%d %b %Y'),
-                    'amount': f"{1200 + (i * 70)}",
-                    'bill_number': f"EB/{bill_date.year}/{random.randint(1000, 9999)}",
-                    'units': 200 + (i * 25)
-                })
-            
-            context['bills'] = bills
             context['show_bills'] = True
             context['consumer_number'] = consumer_number
     
@@ -895,18 +1251,49 @@ def gas_consumer_lookup(request):
             messages.error(request, 'Please enter a valid 12-digit Aadhaar number')
             return render(request, 'gas-consumer-lookup.html')
         
-        # Simulate consumer lookup
-        context = {
-            'show_result': True,
-            'consumer': {
-                'consumer_no': '1234 5678 9012',
-                'name': 'Rajesh Kumar',
-                'address': '123, Gandhi Nagar',
-                'distributor': 'HP Gas - Indane',
-                'status': 'Active',
-                'last_booking': '15 Feb 2026'
+        # Try to fetch from database
+        try:
+            consumer = Consumer.objects.get(aadhaar_number=aadhaar_number)
+            gas_consumer = GasConsumer.objects.filter(consumer=consumer).first()
+            
+            if gas_consumer:
+                context = {
+                    'show_result': True,
+                    'consumer': {
+                        'consumer_no': gas_consumer.consumer_number,
+                        'name': consumer.name,
+                        'address': consumer.address,
+                        'distributor': gas_consumer.distributor,
+                        'status': 'Active',
+                        'last_booking': '15 Feb 2026'  # Would fetch from bookings
+                    }
+                }
+            else:
+                # Simulate consumer lookup
+                context = {
+                    'show_result': True,
+                    'consumer': {
+                        'consumer_no': '1234 5678 9012',
+                        'name': 'Rajesh Kumar',
+                        'address': '123, Gandhi Nagar',
+                        'distributor': 'HP Gas - Indane',
+                        'status': 'Active',
+                        'last_booking': '15 Feb 2026'
+                    }
+                }
+        except:
+            # Simulate consumer lookup
+            context = {
+                'show_result': True,
+                'consumer': {
+                    'consumer_no': '1234 5678 9012',
+                    'name': 'Rajesh Kumar',
+                    'address': '123, Gandhi Nagar',
+                    'distributor': 'HP Gas - Indane',
+                    'status': 'Active',
+                    'last_booking': '15 Feb 2026'
+                }
             }
-        }
         return render(request, 'gas-consumer-lookup.html', context)
     
     return render(request, 'gas-consumer-lookup.html')
@@ -957,46 +1344,98 @@ def gas_bookings_status(request):
         
         today = datetime.date.today()
         
-        # Simulate different booking statuses
-        if reference_number.upper() == 'CYL251234':
-            booking = {
-                'reference_number': 'CYL251234',
-                'booked_date': '22 Feb 2026, 10:30 AM',
-                'expected_delivery': 'Today (25 Feb) by 6 PM',
-                'delivery_person': 'Ramesh (98765 43210)',
-                'cylinder_type': '14.2 kg Domestic Cylinder',
-                'status': 'out_for_delivery'
-            }
-        elif reference_number.upper() == 'CYL251235':
-            booking = {
-                'reference_number': 'CYL251235',
-                'booked_date': '20 Feb 2026, 9:15 AM',
-                'expected_delivery': '23 Feb 2026',
-                'actual_delivery': '23 Feb 2026, 11:30 AM',
-                'delivery_person': 'Suresh (98765 43211)',
-                'cylinder_type': '19 kg Commercial Cylinder',
-                'status': 'delivered'
-            }
-        elif reference_number.upper() == 'CYL251236':
-            booking = {
-                'reference_number': 'CYL251236',
-                'booked_date': '24 Feb 2026, 2:45 PM',
-                'expected_delivery': '26 Feb 2026 by 6 PM',
-                'cylinder_type': '5 kg Domestic Cylinder',
-                'status': 'processed'
-            }
-        else:
-            # Generate random booking for any reference
-            booking = {
-                'reference_number': reference_number,
-                'booked_date': today.strftime('%d %b %Y') + ', 10:30 AM',
-                'expected_delivery': (today + datetime.timedelta(days=2)).strftime('%d %b %Y') + ' by 6 PM',
-                'delivery_person': 'Delivery team will be assigned soon',
-                'cylinder_type': '14.2 kg Domestic Cylinder',
-                'status': random.choice(['pending', 'processed', 'out_for_delivery'])
-            }
-        
-        context['booking'] = booking
+        # Try to fetch from database
+        try:
+            booking = GasCylinderBooking.objects.filter(booking_number=reference_number).first()
+            if booking:
+                context['booking'] = {
+                    'reference_number': booking.booking_number,
+                    'booked_date': booking.booking_date.strftime('%d %b %Y, %I:%M %p'),
+                    'expected_delivery': booking.expected_delivery_date.strftime('%d %b %Y') if booking.expected_delivery_date else 'Pending',
+                    'delivery_person': booking.delivery_person or 'To be assigned',
+                    'cylinder_type': booking.get_cylinder_type_display(),
+                    'status': booking.status
+                }
+            else:
+                # Simulate different booking statuses
+                if reference_number.upper() == 'CYL251234':
+                    booking = {
+                        'reference_number': 'CYL251234',
+                        'booked_date': '22 Feb 2026, 10:30 AM',
+                        'expected_delivery': 'Today (25 Feb) by 6 PM',
+                        'delivery_person': 'Ramesh (98765 43210)',
+                        'cylinder_type': '14.2 kg Domestic Cylinder',
+                        'status': 'out_for_delivery'
+                    }
+                elif reference_number.upper() == 'CYL251235':
+                    booking = {
+                        'reference_number': 'CYL251235',
+                        'booked_date': '20 Feb 2026, 9:15 AM',
+                        'expected_delivery': '23 Feb 2026',
+                        'actual_delivery': '23 Feb 2026, 11:30 AM',
+                        'delivery_person': 'Suresh (98765 43211)',
+                        'cylinder_type': '19 kg Commercial Cylinder',
+                        'status': 'delivered'
+                    }
+                elif reference_number.upper() == 'CYL251236':
+                    booking = {
+                        'reference_number': 'CYL251236',
+                        'booked_date': '24 Feb 2026, 2:45 PM',
+                        'expected_delivery': '26 Feb 2026 by 6 PM',
+                        'cylinder_type': '5 kg Domestic Cylinder',
+                        'status': 'processed'
+                    }
+                else:
+                    # Generate random booking for any reference
+                    booking = {
+                        'reference_number': reference_number,
+                        'booked_date': today.strftime('%d %b %Y') + ', 10:30 AM',
+                        'expected_delivery': (today + datetime.timedelta(days=2)).strftime('%d %b %Y') + ' by 6 PM',
+                        'delivery_person': 'Delivery team will be assigned soon',
+                        'cylinder_type': '14.2 kg Domestic Cylinder',
+                        'status': random.choice(['pending', 'processed', 'out_for_delivery'])
+                    }
+                context['booking'] = booking
+        except:
+            # Simulate different booking statuses
+            if reference_number.upper() == 'CYL251234':
+                booking = {
+                    'reference_number': 'CYL251234',
+                    'booked_date': '22 Feb 2026, 10:30 AM',
+                    'expected_delivery': 'Today (25 Feb) by 6 PM',
+                    'delivery_person': 'Ramesh (98765 43210)',
+                    'cylinder_type': '14.2 kg Domestic Cylinder',
+                    'status': 'out_for_delivery'
+                }
+            elif reference_number.upper() == 'CYL251235':
+                booking = {
+                    'reference_number': 'CYL251235',
+                    'booked_date': '20 Feb 2026, 9:15 AM',
+                    'expected_delivery': '23 Feb 2026',
+                    'actual_delivery': '23 Feb 2026, 11:30 AM',
+                    'delivery_person': 'Suresh (98765 43211)',
+                    'cylinder_type': '19 kg Commercial Cylinder',
+                    'status': 'delivered'
+                }
+            elif reference_number.upper() == 'CYL251236':
+                booking = {
+                    'reference_number': 'CYL251236',
+                    'booked_date': '24 Feb 2026, 2:45 PM',
+                    'expected_delivery': '26 Feb 2026 by 6 PM',
+                    'cylinder_type': '5 kg Domestic Cylinder',
+                    'status': 'processed'
+                }
+            else:
+                # Generate random booking for any reference
+                booking = {
+                    'reference_number': reference_number,
+                    'booked_date': today.strftime('%d %b %Y') + ', 10:30 AM',
+                    'expected_delivery': (today + datetime.timedelta(days=2)).strftime('%d %b %Y') + ' by 6 PM',
+                    'delivery_person': 'Delivery team will be assigned soon',
+                    'cylinder_type': '14.2 kg Domestic Cylinder',
+                    'status': random.choice(['pending', 'processed', 'out_for_delivery'])
+                }
+            context['booking'] = booking
     
     return render(request, 'gas-booking-status.html', context)
 
@@ -1042,50 +1481,72 @@ def payment_history(request):
         return redirect('auth')
     
     filter_param = request.GET.get('filter', 'all')
+    consumer_id = request.session.get('consumer_id')
     
-    # Sample payment data - in production, fetch from database
-    payments = [
-        {
-            'reference_no': 'PAY123456',
-            'service': 'electricity',
-            'service_name': 'Electricity Bill',
-            'date': datetime.datetime.now() - datetime.timedelta(days=2),
-            'amount': 1250.00,
-            'status': 'success'
-        },
-        {
-            'reference_no': 'PAY123457',
-            'service': 'water',
-            'service_name': 'Water Bill',
-            'date': datetime.datetime.now() - datetime.timedelta(days=5),
-            'amount': 450.00,
-            'status': 'success'
-        },
-        {
-            'reference_no': 'PAY123458',
-            'service': 'gas',
-            'service_name': 'Gas Bill',
-            'date': datetime.datetime.now() - datetime.timedelta(days=7),
-            'amount': 856.00,
-            'status': 'success'
-        },
-        {
-            'reference_no': 'PAY123459',
-            'service': 'property_tax',
-            'service_name': 'Property Tax',
-            'date': datetime.datetime.now() - datetime.timedelta(days=10),
-            'amount': 3450.00,
-            'status': 'success'
-        },
-        {
-            'reference_no': 'PAY123460',
-            'service': 'professional_tax',
-            'service_name': 'Professional Tax',
-            'date': datetime.datetime.now() - datetime.timedelta(days=12),
-            'amount': 1250.00,
-            'status': 'success'
-        }
-    ]
+    payments = []
+    
+    # Try to fetch from database
+    try:
+        consumer = Consumer.objects.get(id=consumer_id)
+        
+        # Get electricity payments
+        elec_payments = ElectricityPayment.objects.filter(bill__consumer__consumer=consumer).select_related('bill')[:5]
+        for p in elec_payments:
+            payments.append({
+                'reference_no': p.transaction_id,
+                'service': 'electricity',
+                'service_name': 'Electricity Bill',
+                'date': p.payment_date,
+                'amount': float(p.amount),
+                'status': p.status.lower()
+            })
+    except:
+        pass
+    
+    # If no payments found, use sample data
+    if not payments:
+        payments = [
+            {
+                'reference_no': 'PAY123456',
+                'service': 'electricity',
+                'service_name': 'Electricity Bill',
+                'date': datetime.datetime.now() - datetime.timedelta(days=2),
+                'amount': 1250.00,
+                'status': 'success'
+            },
+            {
+                'reference_no': 'PAY123457',
+                'service': 'water',
+                'service_name': 'Water Bill',
+                'date': datetime.datetime.now() - datetime.timedelta(days=5),
+                'amount': 450.00,
+                'status': 'success'
+            },
+            {
+                'reference_no': 'PAY123458',
+                'service': 'gas',
+                'service_name': 'Gas Bill',
+                'date': datetime.datetime.now() - datetime.timedelta(days=7),
+                'amount': 856.00,
+                'status': 'success'
+            },
+            {
+                'reference_no': 'PAY123459',
+                'service': 'property_tax',
+                'service_name': 'Property Tax',
+                'date': datetime.datetime.now() - datetime.timedelta(days=10),
+                'amount': 3450.00,
+                'status': 'success'
+            },
+            {
+                'reference_no': 'PAY123460',
+                'service': 'professional_tax',
+                'service_name': 'Professional Tax',
+                'date': datetime.datetime.now() - datetime.timedelta(days=12),
+                'amount': 1250.00,
+                'status': 'success'
+            }
+        ]
     
     # Filter payments
     if filter_param != 'all':
@@ -1107,18 +1568,47 @@ def receipt_print(request):
     if request.method == 'POST':
         receipt_ref = request.POST.get('receipt_ref')
         
-        # In production, fetch receipt from database
-        receipt = {
-            'id': random.randint(1000, 9999),
-            'receipt_no': receipt_ref or f'RCPT{random.randint(100000, 999999)}',
-            'datetime': datetime.datetime.now().strftime('%d %b %Y, %I:%M %p'),
-            'service': '⚡ Electricity Bill',
-            'consumer_no': '1234 5678 9012',
-            'bill_period': 'Jan 2026',
-            'payment_mode': 'UPI',
-            'transaction_id': f'TXN{datetime.datetime.now().strftime("%y%m%d%H%M%S")}',
-            'amount': '1,250.00'
-        }
+        # Try to fetch from database
+        try:
+            payment = ElectricityPayment.objects.filter(transaction_id=receipt_ref).first()
+            if payment:
+                receipt = {
+                    'id': payment.id,
+                    'receipt_no': payment.transaction_id,
+                    'datetime': payment.payment_date.strftime('%d %b %Y, %I:%M %p'),
+                    'service': '⚡ Electricity Bill',
+                    'consumer_no': payment.bill.consumer.consumer_number,
+                    'bill_period': payment.bill.bill_date.strftime('%b %Y'),
+                    'payment_mode': payment.get_payment_method_display(),
+                    'transaction_id': payment.transaction_id,
+                    'amount': f"{payment.amount:.2f}"
+                }
+            else:
+                # Sample receipt data
+                receipt = {
+                    'id': random.randint(1000, 9999),
+                    'receipt_no': receipt_ref or f'RCPT{random.randint(100000, 999999)}',
+                    'datetime': datetime.datetime.now().strftime('%d %b %Y, %I:%M %p'),
+                    'service': '⚡ Electricity Bill',
+                    'consumer_no': '1234 5678 9012',
+                    'bill_period': 'Jan 2026',
+                    'payment_mode': 'UPI',
+                    'transaction_id': f'TXN{datetime.datetime.now().strftime("%y%m%d%H%M%S")}',
+                    'amount': '1,250.00'
+                }
+        except:
+            # Sample receipt data
+            receipt = {
+                'id': random.randint(1000, 9999),
+                'receipt_no': receipt_ref or f'RCPT{random.randint(100000, 999999)}',
+                'datetime': datetime.datetime.now().strftime('%d %b %Y, %I:%M %p'),
+                'service': '⚡ Electricity Bill',
+                'consumer_no': '1234 5678 9012',
+                'bill_period': 'Jan 2026',
+                'payment_mode': 'UPI',
+                'transaction_id': f'TXN{datetime.datetime.now().strftime("%y%m%d%H%M%S")}',
+                'amount': '1,250.00'
+            }
         
         return render(request, 'receipt-print.html', {'receipt': receipt})
     
@@ -1264,6 +1754,8 @@ def document_upload_pen_view(request):
         messages.error(request, 'Please verify OTP first')
         return redirect('auth')
     
+    consumer_id = request.session.get('consumer_id')
+    
     if request.method == 'POST':
         if request.FILES:
             uploaded_files = request.FILES.getlist('files')
@@ -1301,8 +1793,21 @@ def document_upload_pen_view(request):
                     messages.error(request, error)
                 return render(request, 'document-upload-pen.html')
             
-            # In production, save files to database/media
-            file_names = [f.name for f in valid_files]
+            # Save to database
+            try:
+                consumer = Consumer.objects.get(id=consumer_id) if consumer_id else None
+            except:
+                consumer = None
+                
+            for file in valid_files:
+                DocumentUpload.objects.create(
+                    consumer=consumer,
+                    upload_type='PEN_DRIVE',
+                    file=file,
+                    file_name=file.name,
+                    file_size=file.size,
+                    mime_type=file.content_type
+                )
             
             messages.success(request, f'Successfully uploaded {len(valid_files)} files!')
             
@@ -1325,6 +1830,8 @@ def document_upload_camera_view(request):
         messages.error(request, 'Please verify OTP first')
         return redirect('auth')
     
+    consumer_id = request.session.get('consumer_id')
+    
     if request.method == 'POST':
         images_count = request.POST.get('images_count')
         images_data = request.POST.get('images_data')
@@ -1337,11 +1844,25 @@ def document_upload_camera_view(request):
             images_list = json.loads(images_data)
             saved_images = []
             
+            try:
+                consumer = Consumer.objects.get(id=consumer_id) if consumer_id else None
+            except:
+                consumer = None
+            
             for i, image_data in enumerate(images_list):
                 format, imgstr = image_data.split(';base64,')
                 ext = format.split('/')[-1]
-                file_name = f"camera_capture_{request.session.get('aadhaar_number')}_{i+1}.{ext}"
+                file_name = f"camera_capture_{request.session.get('aadhaar_number', 'anonymous')}_{i+1}.{ext}"
                 file_data = ContentFile(base64.b64decode(imgstr), name=file_name)
+                
+                DocumentUpload.objects.create(
+                    consumer=consumer,
+                    upload_type='CAMERA',
+                    file=file_data,
+                    file_name=file_name,
+                    file_size=len(imgstr),
+                    mime_type=format
+                )
                 saved_images.append(file_name)
             
             messages.success(request, f'Successfully uploaded {len(saved_images)} images!')
