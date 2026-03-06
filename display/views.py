@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib import messages
 import random
 from django.contrib.auth.decorators import login_required
@@ -12,6 +12,9 @@ from dateutil.relativedelta import relativedelta
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from urllib.parse import urlparse, urlunparse
+from django.views.decorators.csrf import csrf_exempt
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
 
 
 # ================= CORE / AUTH =================
@@ -165,21 +168,42 @@ def electricity_bill_payment(request):
                 if not card_number or not cvv or not pin:
                     messages.error(request, 'Please provide complete card details')
                     return render(request, 'electricity-bill-payment.html', context)
+                
+                # Validate card number (basic check)
+                card_clean = card_number.replace(' ', '')
+                if len(card_clean) < 15 or not card_clean.isdigit():
+                    messages.error(request, 'Please enter a valid card number')
+                    return render(request, 'electricity-bill-payment.html', context)
+                
+                # Validate CVV
+                if len(cvv) != 3 or not cvv.isdigit():
+                    messages.error(request, 'Please enter a valid 3-digit CVV')
+                    return render(request, 'electricity-bill-payment.html', context)
+                
+                # Validate PIN
+                if len(pin) != 4 or not pin.isdigit():
+                    messages.error(request, 'Please enter a valid 4-digit PIN')
+                    return render(request, 'electricity-bill-payment.html', context)
+                    
                 # Mask card number for display
-                masked_card = 'XXXX XXXX XXXX ' + card_number[-4:] if len(card_number) >= 4 else 'XXXX'
+                masked_card = 'XXXX XXXX XXXX ' + card_clean[-4:]
                 payment_details = f"Card: {masked_card}"
             else:
                 messages.error(request, 'Please select a payment method')
                 return render(request, 'electricity-bill-payment.html', context)
             
-            messages.success(request, f'Payment of ₹{bill_amount} for consumer {consumer_number} successful! ({payment_details})')
-            return redirect('electricity-services')
+            # Generate transaction ID
+            transaction_id = f"TXN{datetime.datetime.now().strftime('%y%m%d%H%M%S')}{random.randint(100, 999)}"
+            
+            messages.success(request, f'Payment of ₹{bill_amount} for consumer {consumer_number} successful! Transaction ID: {transaction_id}')
+            return redirect('payment-history')
         
         elif action == 'fetch':
             context['show_bill'] = True
             context['consumer_number'] = consumer_number
     
     return render(request, 'electricity-bill-payment.html', context)
+
 
 def electricity_duplicate_bill(request):
     if not request.session.get('aadhaar_verified'):
@@ -204,7 +228,18 @@ def electricity_duplicate_bill(request):
             # Redirect to payment page with bill details
             bill_month = request.POST.get('bill_month')
             bill_amount = request.POST.get('bill_amount')
-            return redirect(f'/electricity-bill-payment/?amount={bill_amount}&month={bill_month}')
+            bill_number = request.POST.get('bill_number')
+            
+            # Store in session for payment page
+            request.session['pending_payment'] = {
+                'service': 'electricity',
+                'consumer_no': request.POST.get('consumer_number'),
+                'amount': bill_amount,
+                'bill_number': bill_number,
+                'bill_month': bill_month
+            }
+            
+            return redirect('electricity-bill-payment')
         
         else:  # Search action
             consumer_number = request.POST.get('consumer_number')
@@ -226,7 +261,7 @@ def electricity_duplicate_bill(request):
                     'year': bill_date.year,
                     'bill_date': bill_date.strftime('%d %b %Y'),
                     'due_date': due_date.strftime('%d %b %Y'),
-                    'amount': f"{1200 + (i * 70):,}",
+                    'amount': f"{1200 + (i * 70)}",
                     'bill_number': f"EB/{bill_date.year}/{random.randint(1000, 9999)}",
                     'units': 200 + (i * 25)
                 })
@@ -236,6 +271,7 @@ def electricity_duplicate_bill(request):
             context['consumer_number'] = consumer_number
     
     return render(request, 'electricity-duplicate-bill.html', context)
+
 
 def electricity_solar(request):
     if not request.session.get('aadhaar_verified'):
@@ -247,11 +283,16 @@ def electricity_solar(request):
         solar_capacity = request.POST.get('solar_capacity')
         roof_area = request.POST.get('roof_area')
         
+        if not consumer_number or not solar_capacity:
+            messages.error(request, 'Please fill in all required fields')
+            return render(request, 'electricity-solar.html')
+        
         ref_number = f"SOLAR{random.randint(100000, 999999)}"
         messages.success(request, f'Solar net metering application submitted! Reference: {ref_number}')
         return redirect('electricity-services')
     
     return render(request, 'electricity-solar.html')
+
 
 def electricity_new_connection(request):
     if not request.session.get('aadhaar_verified'):
@@ -299,6 +340,7 @@ def electricity_new_connection(request):
     
     return render(request, 'electricity-new-connection.html')
 
+
 def electricity_name_transfer(request):
     if not request.session.get('aadhaar_verified'):
         messages.error(request, 'Please verify OTP first')
@@ -342,9 +384,12 @@ def electricity_name_transfer(request):
             return render(request, 'electricity-name-transfer.html', context)
         
         # Validate email if provided
-        if new_owner_email and '@' not in new_owner_email:
-            messages.error(request, 'Please enter a valid email address')
-            return render(request, 'electricity-name-transfer.html', context)
+        if new_owner_email:
+            try:
+                validate_email(new_owner_email)
+            except ValidationError:
+                messages.error(request, 'Please enter a valid email address')
+                return render(request, 'electricity-name-transfer.html', context)
         
         # Validate required documents
         required_docs = [sale_deed, noc, id_proof, address_proof]
@@ -371,6 +416,7 @@ def electricity_name_transfer(request):
     context['total_fee'] = 826  # 500 + 200 + 18% GST
     
     return render(request, 'electricity-name-transfer.html', context)
+
 
 def electricity_meter_replacement(request):
     if not request.session.get('aadhaar_verified'):
@@ -427,6 +473,7 @@ def electricity_meter_replacement(request):
         return redirect('electricity-services')
     
     return render(request, 'electricity-meter-replacement.html')
+
 
 def electricity_load_enhancement(request):
     if not request.session.get('aadhaar_verified'):
@@ -526,17 +573,30 @@ def water_bill(request):
     
     if request.method == 'POST':
         action = request.POST.get('action')
+        consumer_no = request.POST.get('consumer_no')
         
         if action == 'pay':
-            consumer_no = request.POST.get('consumer_no')
             bill_amount = request.POST.get('bill_amount')
-            messages.success(request, f'Water bill payment of ₹{bill_amount} successful!')
+            payment_method = request.POST.get('payment_method', 'upi')
+            
+            if not consumer_no or not bill_amount:
+                messages.error(request, 'Invalid bill details')
+                return render(request, 'water-bill.html')
+            
+            # Generate transaction ID
+            transaction_id = f"WTR{datetime.datetime.now().strftime('%y%m%d%H%M%S')}{random.randint(100, 999)}"
+            
+            messages.success(request, f'Water bill payment of ₹{bill_amount} for consumer {consumer_no} successful! Transaction ID: {transaction_id}')
             return redirect('municipal-services')
         
         elif action == 'fetch':
+            if not consumer_no:
+                messages.error(request, 'Please enter consumer number')
+                return render(request, 'water-bill.html')
+            
             context = {
                 'show_bill': True,
-                'consumer_no': request.POST.get('consumer_no'),
+                'consumer_no': consumer_no,
                 'consumer_name': 'Rajesh Kumar',
                 'bill_number': f'WATER/{datetime.datetime.now().year}/{random.randint(1000, 9999)}',
                 'bill_date': datetime.datetime.now().strftime('%d %b %Y'),
@@ -574,6 +634,10 @@ def trade_license(request):
             messages.error(request, 'Please fill in all required fields')
             return render(request, 'trade-license.html')
         
+        # Optional GST validation
+        if gst_number and len(gst_number) != 15:
+            messages.warning(request, 'GST number should be 15 characters if provided')
+        
         ref_number = f"TL{random.randint(100000, 999999)}"
         messages.success(request, f'Trade license application submitted! Reference: {ref_number}')
         return redirect('municipal-services')
@@ -588,17 +652,30 @@ def property_tax(request):
     
     if request.method == 'POST':
         action = request.POST.get('action')
+        property_id = request.POST.get('property_id')
         
         if action == 'pay':
-            property_id = request.POST.get('property_id')
             tax_amount = request.POST.get('tax_amount')
-            messages.success(request, f'Property tax of ₹{tax_amount} paid successfully!')
+            payment_method = request.POST.get('payment_method', 'upi')
+            
+            if not property_id or not tax_amount:
+                messages.error(request, 'Invalid tax details')
+                return render(request, 'property-tax.html')
+            
+            # Generate transaction ID
+            transaction_id = f"PTX{datetime.datetime.now().strftime('%y%m%d%H%M%S')}{random.randint(100, 999)}"
+            
+            messages.success(request, f'Property tax of ₹{tax_amount} for property {property_id} paid successfully! Transaction ID: {transaction_id}')
             return redirect('municipal-services')
         
         elif action == 'fetch':
+            if not property_id:
+                messages.error(request, 'Please enter property ID')
+                return render(request, 'property-tax.html')
+            
             context = {
                 'show_tax': True,
-                'property_id': request.POST.get('property_id'),
+                'property_id': property_id,
                 'owner_name': 'Rajesh Kumar',
                 'property_type': 'Residential',
                 'area': '1,200',
@@ -618,17 +695,30 @@ def professional_tax(request):
     
     if request.method == 'POST':
         action = request.POST.get('action')
+        ptin = request.POST.get('ptin')
         
         if action == 'pay':
-            ptin = request.POST.get('ptin')
             tax_amount = request.POST.get('tax_amount')
-            messages.success(request, f'Professional tax of ₹{tax_amount} paid successfully!')
+            payment_method = request.POST.get('payment_method', 'upi')
+            
+            if not ptin or not tax_amount:
+                messages.error(request, 'Invalid tax details')
+                return render(request, 'professional-tax.html')
+            
+            # Generate transaction ID
+            transaction_id = f"PRF{datetime.datetime.now().strftime('%y%m%d%H%M%S')}{random.randint(100, 999)}"
+            
+            messages.success(request, f'Professional tax of ₹{tax_amount} for PTIN {ptin} paid successfully! Transaction ID: {transaction_id}')
             return redirect('municipal-services')
         
         elif action == 'fetch':
+            if not ptin:
+                messages.error(request, 'Please enter PTIN')
+                return render(request, 'professional-tax.html')
+            
             context = {
                 'show_tax': True,
-                'ptin': request.POST.get('ptin'),
+                'ptin': ptin,
                 'name': 'Rajesh Kumar',
                 'profession': 'Self Employed',
                 'assessment_year': '2025-26',
@@ -646,7 +736,27 @@ def application_status(request):
     if not request.session.get('aadhaar_verified'):
         messages.error(request, 'Please verify OTP first')
         return redirect('auth')
-    return render(request, 'application-status.html')
+    
+    # Sample data - in production, fetch from database
+    context = {
+        'application': {
+            'application_id': 'APP123456',
+            'department': 'Electricity',
+            'submitted_date': datetime.date.today() - datetime.timedelta(days=5),
+            'current_stage': 'Document Verification',
+            'assigned_officer': 'Mr. Sharma',
+            'expected_completion': datetime.date.today() + datetime.timedelta(days=10)
+        },
+        'complaint': {
+            'complaint_id': 'CMP789012',
+            'status': 'In Progress',
+            'work_completed': 60,
+            'officer_remark': 'Site visit scheduled',
+            'deadline': datetime.date.today() + datetime.timedelta(days=7)
+        }
+    }
+    
+    return render(request, 'application-status.html', context)
 
 
 def building_plan(request):
@@ -681,8 +791,9 @@ def building_plan(request):
             messages.error(request, 'Only PDF and DWG files are allowed')
             return render(request, 'building-plan.html')
         
-        messages.success(request, 'Building plan application submitted successfully!')
-        return redirect('menu')
+        ref_number = f"BLD{random.randint(100000, 999999)}"
+        messages.success(request, f'Building plan application submitted successfully! Reference: {ref_number}')
+        return redirect('municipal-services')
     
     return render(request, 'building-plan.html')
 
@@ -706,14 +817,19 @@ def gas_subsidy(request):
         
         if action == 'fetch':
             consumer_no = request.POST.get('consumer_no')
+            
+            if not consumer_no:
+                messages.error(request, 'Please enter consumer number')
+                return render(request, 'gas-subsidy.html')
+            
             context = {
                 'show_subsidy': True,
                 'consumer_no': consumer_no,
-                'status': 'Active',
+                'status': 'Active' if random.choice([True, False]) else 'Inactive',
                 'amount_per_cylinder': '200',
                 'total_cylinders': '12',
-                'remaining_cylinders': '3',
-                'next_eligibility': '01 Apr 2026',
+                'remaining_cylinders': random.randint(0, 12),
+                'next_eligibility': (datetime.date.today() + datetime.timedelta(days=30)).strftime('%d %b %Y'),
                 'bank_account': 'XXXXXX1234'
             }
             return render(request, 'gas-subsidy.html', context)
@@ -841,6 +957,7 @@ def gas_bookings_status(request):
         
         today = datetime.date.today()
         
+        # Simulate different booking statuses
         if reference_number.upper() == 'CYL251234':
             booking = {
                 'reference_number': 'CYL251234',
@@ -869,18 +986,20 @@ def gas_bookings_status(request):
                 'status': 'processed'
             }
         else:
+            # Generate random booking for any reference
             booking = {
                 'reference_number': reference_number,
                 'booked_date': today.strftime('%d %b %Y') + ', 10:30 AM',
                 'expected_delivery': (today + datetime.timedelta(days=2)).strftime('%d %b %Y') + ' by 6 PM',
                 'delivery_person': 'Delivery team will be assigned soon',
                 'cylinder_type': '14.2 kg Domestic Cylinder',
-                'status': 'pending'
+                'status': random.choice(['pending', 'processed', 'out_for_delivery'])
             }
         
         context['booking'] = booking
     
     return render(request, 'gas-booking-status.html', context)
+
 
 def gas_bill_payment(request):
     if not request.session.get('aadhaar_verified'):
@@ -888,7 +1007,12 @@ def gas_bill_payment(request):
         return redirect('auth')
     
     if request.method == 'POST':
-        messages.success(request, 'Gas bill payment successful!')
+        consumer_number = request.POST.get('consumer_number')
+        amount = request.POST.get('amount')
+        payment_method = request.POST.get('payment_method', 'upi')
+        
+        transaction_id = f"GAS{datetime.datetime.now().strftime('%y%m%d%H%M%S')}{random.randint(100, 999)}"
+        messages.success(request, f'Gas bill payment of ₹{amount} successful! Transaction ID: {transaction_id}')
         return redirect('gas-services')
     
     return render(request, 'gas-bill-payment.html')
@@ -919,7 +1043,7 @@ def payment_history(request):
     
     filter_param = request.GET.get('filter', 'all')
     
-    # Sample payment data
+    # Sample payment data - in production, fetch from database
     payments = [
         {
             'reference_no': 'PAY123456',
@@ -944,6 +1068,22 @@ def payment_history(request):
             'date': datetime.datetime.now() - datetime.timedelta(days=7),
             'amount': 856.00,
             'status': 'success'
+        },
+        {
+            'reference_no': 'PAY123459',
+            'service': 'property_tax',
+            'service_name': 'Property Tax',
+            'date': datetime.datetime.now() - datetime.timedelta(days=10),
+            'amount': 3450.00,
+            'status': 'success'
+        },
+        {
+            'reference_no': 'PAY123460',
+            'service': 'professional_tax',
+            'service_name': 'Professional Tax',
+            'date': datetime.datetime.now() - datetime.timedelta(days=12),
+            'amount': 1250.00,
+            'status': 'success'
         }
     ]
     
@@ -967,15 +1107,16 @@ def receipt_print(request):
     if request.method == 'POST':
         receipt_ref = request.POST.get('receipt_ref')
         
-        # Sample receipt data
+        # In production, fetch receipt from database
         receipt = {
-            'receipt_no': receipt_ref or 'RCPT123456',
+            'id': random.randint(1000, 9999),
+            'receipt_no': receipt_ref or f'RCPT{random.randint(100000, 999999)}',
             'datetime': datetime.datetime.now().strftime('%d %b %Y, %I:%M %p'),
             'service': '⚡ Electricity Bill',
             'consumer_no': '1234 5678 9012',
             'bill_period': 'Jan 2026',
             'payment_mode': 'UPI',
-            'transaction_id': f'TXN{datetime.datetime.now().strftime("%y%m%d%H%M")}',
+            'transaction_id': f'TXN{datetime.datetime.now().strftime("%y%m%d%H%M%S")}',
             'amount': '1,250.00'
         }
         
@@ -1004,8 +1145,9 @@ def birth_certificate(request):
             messages.error(request, 'Please fill in all required fields')
             return render(request, 'birth-certificate.html')
         
-        messages.success(request, 'Birth certificate application submitted successfully!')
-        return redirect('menu')
+        ref_number = f"BRTH{random.randint(100000, 999999)}"
+        messages.success(request, f'Birth certificate application submitted successfully! Reference: {ref_number}')
+        return redirect('municipal-services')
     
     return render(request, 'birth-certificate.html')
 
@@ -1031,12 +1173,17 @@ def death_certificate(request):
         
         from datetime import date
         if date_of_death:
-            death_date = date.fromisoformat(date_of_death)
-            if death_date > date.today():
-                messages.error(request, 'Date of death cannot be in the future')
+            try:
+                death_date = date.fromisoformat(date_of_death)
+                if death_date > date.today():
+                    messages.error(request, 'Date of death cannot be in the future')
+                    return render(request, 'death-certificate.html')
+            except ValueError:
+                messages.error(request, 'Invalid date format')
                 return render(request, 'death-certificate.html')
         
-        messages.success(request, 'Death certificate application submitted successfully!')
+        ref_number = f"DTH{random.randint(100000, 999999)}"
+        messages.success(request, f'Death certificate application submitted successfully! Reference: {ref_number}')
         return redirect('municipal-services')
     
     return render(request, 'death-certificate.html')
@@ -1059,9 +1206,20 @@ def marriage_registration(request):
         marriage_date = request.POST.get('marriage_date')
         marriage_place = request.POST.get('marriage_place')
         marriage_type = request.POST.get('marriage_type')
+        witness1_name = request.POST.get('witness1_name')
+        witness2_name = request.POST.get('witness2_name')
         
         if not all([groom_name, bride_name, marriage_date, marriage_place, marriage_type]):
             messages.error(request, 'Please fill in all required fields')
+            return render(request, 'marriage-registration.html')
+        
+        # Validate Aadhaar if provided
+        if groom_aadhaar and (len(groom_aadhaar) != 12 or not groom_aadhaar.isdigit()):
+            messages.error(request, 'Please enter a valid 12-digit Aadhaar for groom')
+            return render(request, 'marriage-registration.html')
+        
+        if bride_aadhaar and (len(bride_aadhaar) != 12 or not bride_aadhaar.isdigit()):
+            messages.error(request, 'Please enter a valid 12-digit Aadhaar for bride')
             return render(request, 'marriage-registration.html')
         
         ref_number = f"MAR{random.randint(100000, 999999)}"
@@ -1070,6 +1228,8 @@ def marriage_registration(request):
     
     return render(request, 'marriage-registration.html')
 
+
+# ================= DOCUMENT UPLOADS =================
 
 def document_upload_qr_view(request):
     if not request.session.get('aadhaar_verified'):
@@ -1140,6 +1300,9 @@ def document_upload_pen_view(request):
                 for error in errors:
                     messages.error(request, error)
                 return render(request, 'document-upload-pen.html')
+            
+            # In production, save files to database/media
+            file_names = [f.name for f in valid_files]
             
             messages.success(request, f'Successfully uploaded {len(valid_files)} files!')
             
@@ -1218,17 +1381,8 @@ def grievance(request):
     
     return render(request, 'grievance.html')
 
-# ================= ERROR HANDLERS =================
 
-def custom_404(request, exception):
-    """Custom 404 error handler"""
-    return render(request, '404.html', status=404)
-
-# Add this temporary test view (remove in production)
-def test_404(request):
-    """Test view to check 404 page"""
-    return render(request, '404.html')
-
+# ================= UNDER DEVELOPMENT =================
 
 def under_development(request):
     """View for under development pages"""
@@ -1236,3 +1390,86 @@ def under_development(request):
         messages.error(request, 'Please verify OTP first')
         return redirect('auth')
     return render(request, 'under-development.html')
+
+
+# ================= API ENDPOINTS =================
+
+@csrf_exempt
+def api_calculate_load_cost(request):
+    """API endpoint to calculate load enhancement cost"""
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            current_load = float(data.get('current_load', 3))
+            requested_load = float(data.get('requested_load', 0))
+            
+            if requested_load <= current_load:
+                return JsonResponse({'error': 'Requested load must be greater than current load'}, status=400)
+            
+            additional_load = requested_load - current_load
+            base_fee = 1500
+            additional_fee = additional_load * 800
+            subtotal = base_fee + additional_fee
+            gst = subtotal * 0.18
+            total = subtotal + gst
+            
+            return JsonResponse({
+                'base_fee': base_fee,
+                'additional_fee': additional_fee,
+                'subtotal': subtotal,
+                'gst': gst,
+                'total': total
+            })
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+    
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+
+@csrf_exempt
+def api_calculate_meter_cost(request):
+    """API endpoint to calculate meter replacement cost"""
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            meter_price = float(data.get('meter_price', 1200))
+            additional_services = data.get('additional_services', [])
+            
+            installation_fee = 500
+            additional_cost = 0
+            
+            if 'calibration' in additional_services:
+                additional_cost += 300
+            if 'wiring' in additional_services:
+                additional_cost += 500
+            if 'seal' in additional_services:
+                additional_cost += 100
+            
+            subtotal = meter_price + installation_fee + additional_cost
+            gst = subtotal * 0.18
+            total = subtotal + gst
+            
+            return JsonResponse({
+                'meter_price': meter_price,
+                'installation_fee': installation_fee,
+                'additional_cost': additional_cost,
+                'subtotal': subtotal,
+                'gst': gst,
+                'total': total
+            })
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+    
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+
+# ================= ERROR HANDLERS =================
+
+def custom_404(request, exception):
+    """Custom 404 error handler"""
+    return render(request, '404.html', status=404)
+
+
+def test_404(request):
+    """Test view to check 404 page"""
+    return render(request, '404.html')
