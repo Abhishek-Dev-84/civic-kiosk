@@ -36,7 +36,6 @@
     <title>{% trans "Civic Services Kiosk - OTP Verification" %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-
     <style>
         /* ---- YOUR COMPLETE CSS UNCHANGED ---- */
         * {
@@ -118,7 +117,14 @@
         }
 
         .voice-corner-btn.listening {
-            background: #4CAF50;
+            background: #28a745;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
 
         .voice-corner-text {
@@ -194,6 +200,32 @@
             margin: 5px auto;
         }
 
+        .loading-buffer {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: rgba(30, 95, 191, 0.1);
+            padding: 10px;
+            border-radius: 30px;
+            margin: 10px 0;
+        }
+
+        .loading-buffer .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #1e5fbf;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-buffer span {
+            color: #1e5fbf;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -244,7 +276,7 @@
             box-shadow: 0 4px 0 #cc6600;
         }
 
-        /* Timer moved up - now appears right after OTP boxes */
+        /* Timer */
         .timer {
             text-align: center;
             font-size: 24px;
@@ -289,8 +321,6 @@
             border-color: #cc6600;
             box-shadow: 0 5px 0 #b35900;
         }
-
-        /* Verify button - REMOVED */
 
         /* Error message */
         .error {
@@ -376,6 +406,11 @@
     </div>
 
     <!-- Voice corner will be created dynamically by voice.js -->
+    <!-- Note: voice.js will create the mic button, but we'll also add one explicitly -->
+    <div class="voice-corner">
+        <div class="voice-corner-btn" id="voiceBtn" onclick="toggleVoiceInput()">🎤</div>
+        <div class="voice-corner-text" id="voiceStatus">{% trans "Click" %}</div>
+    </div>
 
     <div class="back-btn" onclick="goBack()">← {% trans "Back" %}</div>
 
@@ -419,7 +454,13 @@
 
                     <div class="otp-row" id="otpRow"></div>
 
-                    <!-- Timer - moved up right after OTP boxes -->
+                    <!-- Loading Buffer - appears during voice processing -->
+                    <div id="voiceLoadingBuffer" class="loading-buffer hidden">
+                        <div class="spinner"></div>
+                        <span>{% trans "Processing voice..." %}</span>
+                    </div>
+
+                    <!-- Timer -->
                     <div class="timer" id="timer">02:00</div>
 
                     <div class="keypad">
@@ -436,8 +477,6 @@
                         <div class="key" onclick="pressKey(0)">0</div>
                         <div class="key special" onclick="clearAll()">C</div>
                     </div>
-
-                    <!-- Verify button removed - verification happens automatically -->
                 </form>
 
                 <!-- Resend OTP Form -->
@@ -452,11 +491,56 @@
     <script src="{% static 'js/voice.js' %}"></script>
 
     <script>
+        // ================= LANGUAGE MAP =================
+        const languageMap = {
+            "en": "en-IN",
+            "hi": "hi-IN",
+            "ta": "ta-IN",
+            "te": "te-IN",
+            "bn": "bn-IN",
+            "or": "or-IN"
+        };
+
+        function getCurrentLang() {
+            const path = window.location.pathname.split('/');
+            const langCode = path[1] || "en";
+            return languageMap[langCode] || "en-IN";
+        }
+
+        function getCurrentLangCode() {
+            const path = window.location.pathname.split('/');
+            return path[1] || "en";
+        }
+
+        // ================= TEXT TO SPEECH =================
+        function speak(text) {
+            if (!('speechSynthesis' in window)) return;
+            speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = getCurrentLang();
+            utterance.rate = 1;
+            speechSynthesis.speak(utterance);
+        }
+
         // ================= OTP PAGE JAVASCRIPT =================
         let otpBoxes = [];
         let otpPos = 0;
         let timeLeft = 120; // 2 minutes in seconds
         let timerInterval;
+        let recognition = null;
+        let isListening = false;
+        let voiceTimeout = null;
+
+        // Auto-start voice from session storage (set by auth.html)
+        document.addEventListener('DOMContentLoaded', function() {
+            const autoStartVoice = sessionStorage.getItem('autoStartVoice');
+            if (autoStartVoice === 'true') {
+                sessionStorage.removeItem('autoStartVoice');
+                setTimeout(() => {
+                    toggleVoiceInput();
+                }, 2500); // Wait for OTP form to appear
+            }
+        });
 
         // Auto-hide success message after 3 seconds
         setTimeout(function() {
@@ -476,10 +560,7 @@
             // Create OTP boxes
             const otpRow = document.getElementById('otpRow');
             if (otpRow) {
-                // Clear any existing content
                 otpRow.innerHTML = '';
-                
-                // Create 6 boxes
                 for(let i = 0; i < 6; i++) {
                     let box = document.createElement('div');
                     box.className = 'otp-box';
@@ -490,36 +571,19 @@
                 console.log('Created 6 OTP boxes');
             }
             
-            // Get loader elements
             const loader = document.getElementById('loader');
             const loaderText = document.getElementById('loaderText');
             const otpFormContainer = document.getElementById('otpFormContainer');
             
-            console.log('Loader found:', loader);
-            console.log('OTP Container found:', otpFormContainer);
-            
-            // Hide loader and show OTP form after 2 seconds
             setTimeout(function() {
                 console.log('Hiding loader and showing OTP form...');
                 
-                // Hide loader
-                if (loader) {
-                    loader.style.display = 'none';
-                    console.log('Loader hidden');
-                }
+                if (loader) loader.style.display = 'none';
+                if (loaderText) loaderText.style.display = 'none';
                 
-                // Hide loader text
-                if (loaderText) {
-                    loaderText.style.display = 'none';
-                    console.log('Loader text hidden');
-                }
-                
-                // Show OTP form
                 if (otpFormContainer) {
                     otpFormContainer.style.display = 'block';
-                    console.log('OTP form shown');
                     
-                    // Auto-read OTP instructions after form is shown
                     if (typeof speak === 'function') {
                         setTimeout(() => {
                             speak("{% trans 'Enter 6-digit OTP using keypad or speak the numbers' %}");
@@ -527,13 +591,10 @@
                     }
                 }
                 
-                // Highlight first box
                 highlightCurrentBox();
-                
-                // Start the timer
                 startTimer();
                 
-            }, 2000); // Show loader for 2 seconds, then show OTP form
+            }, 2000);
         });
 
         function highlightCurrentBox() {
@@ -549,6 +610,7 @@
         }
 
         function goBack() {
+            stopVoiceInput();
             window.location.href = "{% url 'auth' %}";
         }
 
@@ -559,14 +621,11 @@
                     otpBoxes[otpPos].classList.add('filled');
                     otpPos++;
                     highlightCurrentBox();
-                    console.log('Pressed key:', n, 'Position:', otpPos);
                     
-                    // Auto-verify when all 6 digits are entered
                     if (otpPos === 6) {
-                        console.log('All 6 digits entered, auto-verifying...');
                         setTimeout(function() {
                             verifyOTP();
-                        }, 100); // Small delay for better UX
+                        }, 100);
                     }
                 }
             }
@@ -579,7 +638,6 @@
                     otpBoxes[otpPos].textContent = '';
                     otpBoxes[otpPos].classList.remove('filled');
                     highlightCurrentBox();
-                    console.log('Backspace, new position:', otpPos);
                 }
             }
         }
@@ -593,7 +651,6 @@
             });
             otpPos = 0;
             highlightCurrentBox();
-            console.log('Cleared all boxes');
         }
 
         function getOTP() {
@@ -632,42 +689,202 @@
                 
                 if (timeLeft <= 0) {
                     clearInterval(timerInterval);
-                    if (timerElement) {
-                        timerElement.textContent = '00:00';
-                    }
-                    // Disable keypad when timer expires
+                    if (timerElement) timerElement.textContent = '00:00';
+                    
                     document.querySelectorAll('.key').forEach(key => {
                         key.style.opacity = '0.5';
                         key.style.pointerEvents = 'none';
                     });
                     
-                    // Enable resend button
                     const resendBtn = document.getElementById('resendBtn');
-                    if (resendBtn) {
-                        resendBtn.disabled = false;
-                    }
+                    if (resendBtn) resendBtn.disabled = false;
                     
                     if (typeof speak === 'function') speak("{% trans 'OTP expired. Please request a new one.' %}");
-                    console.log('Timer expired');
                 }
                 timeLeft--;
             }, 1000);
         }
 
-        /* ===================== OVERRIDE VOICE COMMANDS ===================== */
+        // ================= VOICE INPUT =================
+        function toggleVoiceInput() {
+            if(isListening) {
+                stopVoiceInput();
+                return;
+            }
 
-        // Extend voice.js handleCommand for OTP verification
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if(!SpeechRecognition) {
+                alert("{% trans 'Speech not supported' %}");
+                return;
+            }
+
+            if (recognition) {
+                try {
+                    recognition.stop();
+                } catch(e) {}
+            }
+
+            recognition = new SpeechRecognition();
+            recognition.lang = getCurrentLang();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.maxAlternatives = 1;
+
+            recognition.onstart = function() {
+                isListening = true;
+                document.getElementById("voiceBtn").classList.add("listening");
+                document.getElementById("voiceStatus").innerText = "{% trans 'Listening...' %}";
+                
+                const langCode = getCurrentLangCode();
+                if (langCode === 'hi') {
+                    speak("ओटीपी बोलिए...");
+                } else if (langCode === 'or') {
+                    speak("ଓଟିପି କୁହନ୍ତୁ...");
+                } else {
+                    speak("{% trans 'Speak OTP...' %}");
+                }
+            };
+
+            recognition.onresult = function(event) {
+                // Show loading buffer
+                document.getElementById('voiceLoadingBuffer').classList.remove('hidden');
+                
+                if (voiceTimeout) clearTimeout(voiceTimeout);
+                
+                let finalTranscript = '';
+                let interimTranscript = '';
+                
+                for (let i = 0; i < event.results.length; i++) {
+                    const result = event.results[i];
+                    if (result.isFinal) {
+                        finalTranscript += result[0].transcript;
+                    } else {
+                        interimTranscript += result[0].transcript;
+                    }
+                }
+                
+                const transcript = finalTranscript || interimTranscript;
+                
+                // Extract digits
+                let digits = '';
+                for (let i = 0; i < transcript.length; i++) {
+                    const char = transcript[i];
+                    if (char >= '0' && char <= '9') {
+                        digits += char;
+                    } else {
+                        const hindiDigits = ['०', '१', '२', '३', '४', '५', '६', '७', '८', '९'];
+                        const index = hindiDigits.indexOf(char);
+                        if (index !== -1) {
+                            digits += index.toString();
+                        }
+                    }
+                }
+                
+                if (digits.length === 0) {
+                    const matches = transcript.match(/\d+/g);
+                    if (matches) {
+                        digits = matches.join('');
+                    }
+                }
+                
+                console.log("OTP Transcript:", transcript, "Digits:", digits);
+                
+                // Update OTP boxes in real-time
+                if (digits.length > 0) {
+                    if (digits.length < otpPos && digits.length > 0) {
+                        clearAll();
+                    }
+                    
+                    for(let i = 0; i < Math.min(digits.length, 6); i++) {
+                        if (i < otpBoxes.length) {
+                            otpBoxes[i].textContent = digits[i];
+                            otpBoxes[i].classList.add('filled');
+                        }
+                    }
+                    
+                    for(let i = digits.length; i < otpBoxes.length; i++) {
+                        otpBoxes[i].textContent = '';
+                        otpBoxes[i].classList.remove('filled');
+                    }
+                    
+                    otpPos = Math.min(digits.length, 6);
+                    highlightCurrentBox();
+                    
+                    // Hide loading buffer after processing
+                    voiceTimeout = setTimeout(() => {
+                        document.getElementById('voiceLoadingBuffer').classList.add('hidden');
+                    }, 500);
+                    
+                    if (digits.length >= 6) {
+                        voiceTimeout = setTimeout(verifyOTP, 800);
+                    }
+                }
+            };
+
+            recognition.onerror = function(event) {
+                console.error("Recognition error:", event.error);
+                document.getElementById('voiceLoadingBuffer').classList.add('hidden');
+                if (event.error === 'no-speech') return;
+                stopVoiceInput();
+            };
+
+            recognition.onend = function() {
+                document.getElementById('voiceLoadingBuffer').classList.add('hidden');
+                if (isListening) {
+                    try {
+                        recognition.start();
+                    } catch(e) {
+                        console.error("Failed to restart recognition:", e);
+                        stopVoiceInput();
+                    }
+                } else {
+                    document.getElementById("voiceBtn").classList.remove("listening");
+                    document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
+                }
+            };
+
+            try {
+                recognition.start();
+            } catch(e) {
+                console.error("Failed to start recognition:", e);
+                stopVoiceInput();
+            }
+        }
+
+        function stopVoiceInput() {
+            isListening = false;
+            if (recognition) {
+                try {
+                    recognition.stop();
+                } catch(e) {}
+            }
+            document.getElementById("voiceBtn").classList.remove("listening");
+            document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
+            document.getElementById('voiceLoadingBuffer').classList.add('hidden');
+            if (voiceTimeout) clearTimeout(voiceTimeout);
+        }
+
+        // ================= OVERRIDE VOICE COMMANDS =================
         const originalHandleCommand = window.handleCommand;
         window.handleCommand = function(command) {
             command = command.toLowerCase();
             console.log("OTP command:", command);
             
-            // Check for numbers in command (OTP digits)
+            // Voice control commands
+            if(command.includes("stop listening") || command.includes("stop voice")) {
+                stopVoiceInput();
+                return;
+            }
+            
+            if(command.includes("start listening") || command.includes("start voice")) {
+                toggleVoiceInput();
+                return;
+            }
+            
             const numberMatch = command.match(/\d+/g);
             if (numberMatch) {
                 const digits = numberMatch.join('').replace(/\s/g, '');
                 if (digits.length >= 6) {
-                    // Clear existing and enter digits one by one
                     clearAll();
                     for(let i = 0; i < Math.min(digits.length, 6); i++) {
                         pressKey(parseInt(digits[i]));
@@ -676,7 +893,6 @@
                 }
             }
             
-            // Resend command
             if (command.includes("resend") || command.includes("new otp")) {
                 if (typeof speak === 'function') speak("{% trans 'Requesting new OTP' %}");
                 document.getElementById('resendForm').submit();
@@ -695,17 +911,15 @@
                 return;
             }
             
-            // If not OTP-specific, pass to original handler
             if (originalHandleCommand) {
                 originalHandleCommand(command);
             }
         };
 
-        // Override autoReadPage to read OTP instructions
+        // Override autoReadPage
         const originalAutoRead = window.autoReadPage;
         window.autoReadPage = function() {
             if (originalAutoRead) originalAutoRead();
-            // Wait for OTP form to be visible
             setTimeout(() => {
                 if (typeof speak === 'function' && document.getElementById('otpFormContainer').style.display === 'block') {
                     speak("{% trans 'Enter 6-digit OTP using keypad or speak the numbers' %}");
