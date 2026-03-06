@@ -145,6 +145,8 @@ def send_otp_via_circuitdigest(phone_number, otp, aadhaar_number):
         logger.error(f"Unexpected error: {str(e)}")
         return False, f"Failed to send OTP: {str(e)}"
 
+    
+
 
 def verify_otp(stored_otp, entered_otp, otp_timestamp):
     """
