@@ -16,6 +16,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.conf import settings
+from datetime import datetime,timedelta
 
 # Import models
 from .models import (
@@ -151,7 +152,6 @@ def verify_otp(stored_otp, entered_otp, otp_timestamp):
     """
     Verify OTP and check expiry (5 minutes)
     """
-    from datetime import datetime
     
     if not stored_otp or not entered_otp:
         return False, "OTP missing"
@@ -203,7 +203,7 @@ def auth(request):
             otp = generate_otp(6)
             request.session['otp'] = otp
             request.session['otp_attempts'] = 0
-            request.session['otp_timestamp'] = datetime.datetime.now().isoformat()
+            request.session['otp_timestamp'] = datetime.now().isoformat()
             
             # Send OTP via CircuitDigest
             print(f"\n🔐 Generated OTP for {consumer.name}: {otp}")
@@ -273,12 +273,11 @@ def otp(request):
         messages.error(request, 'Session expired. Please enter Aadhaar again.')
         return redirect('auth')
     
-    # Parse timestamp - FIXED: Proper datetime handling
+    # Parse timestamp
     try:
-        from datetime import datetime
         otp_timestamp = datetime.fromisoformat(otp_timestamp_str)
     except:
-        otp_timestamp = datetime.datetime.now() - timedelta(minutes=6)  # Force expiry
+        otp_timestamp = datetime.now() - timedelta(minutes=6)  # Force expiry
     
     if request.method == 'POST':
         entered_otp = request.POST.get('otp')
@@ -302,7 +301,7 @@ def otp(request):
             # Update consumer last login
             try:
                 consumer = Consumer.objects.get(id=consumer_id)
-                consumer.last_login = datetime.datetime.now()
+                consumer.last_login = datetime.now()
                 consumer.save()
                 
                 # Create user session
@@ -314,11 +313,12 @@ def otp(request):
                 )
                 
                 # Create notification
+                
                 Notification.objects.create(
                     consumer=consumer,
                     notification_type='GENERAL',
                     title='Login Successful',
-                    message=f'You have successfully logged in to Civic Kiosk at {datetime.datetime.now().strftime("%d %b %Y %I:%M %p")}'
+                    message=f'You have successfully logged in to Civic Kiosk at {datetime.now().strftime("%d %b %Y %I:%M %p")}'
                 )
                 
                 # Clear OTP from session
@@ -358,7 +358,6 @@ def otp(request):
     
     return render(request, 'otp.html', context)
 
-
 def resend_otp(request):
     """Resend OTP"""
     if request.method == 'POST':
@@ -376,7 +375,7 @@ def resend_otp(request):
             otp = generate_otp(6)
             request.session['otp'] = otp
             request.session['otp_attempts'] = 0
-            request.session['otp_timestamp'] = datetime.datetime.now().isoformat()
+            request.session['otp_timestamp'] = datetime.now().isoformat()
             
             # Send OTP via CircuitDigest
             success, message = send_otp_via_circuitdigest(consumer.mobile, otp, aadhaar_number)
