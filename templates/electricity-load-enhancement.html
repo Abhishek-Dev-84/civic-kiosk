@@ -15,16 +15,96 @@ body{width:100vw;height:100vh;overflow:hidden;background:#f0f7ff;}
 .header-left div{font-size:12px;font-weight:600;color:#1e5fbf;line-height:1.2;}
 .header-right img{height:35px;}
 
-.voice-corner{position:fixed;top:80px;right:15px;display:flex;flex-direction:column;align-items:center;gap:3px;z-index:1000;}
-.voice-corner-btn{background:#ff9933;width:45px;height:45px;border-radius:50%;border:2px solid white;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;}
+/* VOICE BUTTON */
+.voice-corner{position:fixed;top:80px;right:15px;display:flex;flex-direction:column;align-items:center;gap:4px;z-index:1000;}
+.voice-corner-btn{background:#ff9933;width:50px;height:50px;border-radius:50%;border:3px solid white;display:flex;align-items:center;justify-content:center;font-size:26px;cursor:pointer;box-shadow:0 3px 8px rgba(0,0,0,0.2);transition:all 0.2s;}
 .voice-corner-btn:hover{background:#ffaa44;}
-.voice-corner-btn.listening{background:#28a745;transform:scale(1.1);}
-.voice-corner-text{background:white;padding:2px 8px;border-radius:12px;font-size:10px;color:#ff9933;border:1px solid #ff9933;}
+.voice-corner-btn.listening{background:#28a745;animation:pulse 1s infinite;transform:scale(1.1);}
+@keyframes pulse{0%{transform:scale(1);}50%{transform:scale(1.1);}100%{transform:scale(1);}}
+.voice-corner-text{background:white;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;color:#ff9933;border:1px solid #ff9933;}
 
-.back-btn{position:fixed;top:80px;left:15px;background:white;border:2px solid #1e5fbf;border-radius:30px;padding:5px 15px;font-size:18px;font-weight:700;color:#1e5fbf;text-decoration:none;z-index:1000;display:inline-block;}
+/* BACK BUTTON */
+.back-btn{position:fixed;top:80px;left:15px;background:white;border:2px solid #1e5fbf;border-radius:40px;padding:6px 20px;font-size:20px;font-weight:700;color:#1e5fbf;text-decoration:none;z-index:1000;display:inline-block;box-shadow:0 4px 0 #0a3d7a;transition:all 0.1s;}
 .back-btn:hover{background:#1e5fbf;color:white;}
-.back-btn:active{transform:translateY(2px);}
+.back-btn:active{transform:translateY(4px);box-shadow:0 1px 0 #0a3d7a;}
 
+/* TIMEOUT WARNING */
+.timeout-warning{
+position:fixed;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+background:white;
+border:4px solid #ff9933;
+border-radius:40px;
+padding:30px;
+text-align:center;
+z-index:2000;
+box-shadow:0 10px 30px rgba(0,0,0,0.3);
+max-width:500px;
+display:none;
+}
+.timeout-warning p{
+font-size:28px;
+color:#1e5fbf;
+margin-bottom:20px;
+font-weight:700;
+}
+.timeout-warning button{
+background:#28a745;
+color:white;
+border:none;
+border-radius:40px;
+padding:15px 30px;
+font-size:28px;
+font-weight:700;
+cursor:pointer;
+margin:10px;
+min-width:200px;
+box-shadow:0 5px 0 #1e7e34;
+}
+.timeout-warning button:active{
+transform:translateY(5px);
+box-shadow:0 1px 0 #1e7e34;
+}
+.timeout-warning .logout-btn{
+background:#dc3545;
+box-shadow:0 5px 0 #a71d2a;
+}
+
+/* SUCCESS MESSAGE */
+.success-message{
+position:fixed;
+top:80px;
+left:15px;
+background:#4CAF50;
+color:white;
+padding:12px 25px;
+border-radius:50px;
+font-size:18px;
+font-weight:600;
+z-index:2000;
+border:3px solid white;
+box-shadow:0 4px 15px rgba(76,175,80,0.3);
+animation:slideInLeft 0.3s ease;
+display:flex;
+align-items:center;
+gap:8px;
+}
+.success-message::before{
+content:"✅";
+font-size:20px;
+}
+@keyframes slideInLeft{
+from{transform:translateX(-100%);opacity:0;}
+to{transform:translateX(0);opacity:1;}
+}
+@keyframes slideOutLeft{
+from{transform:translateX(0);opacity:1;}
+to{transform:translateX(-100%);opacity:0;}
+}
+
+/* MAIN CONTAINER */
 .container{position:fixed;top:70px;left:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px;overflow-y:auto;}
 .content-wrapper{width:100%;max-width:600px;display:flex;flex-direction:column;gap:15px;padding:20px 0;}
 
@@ -37,6 +117,120 @@ body{width:100vw;height:100vh;overflow:hidden;background:#f0f7ff;}
 
 h1{color:#1e5fbf;font-size:36px;font-weight:800;text-align:center;margin:0;}
 
+/* INFO CARD */
+.info-card{background:#e3f2fd;border:2px solid #1e5fbf;border-radius:20px;padding:15px;margin:15px 0;font-size:20px;box-shadow:0 4px 0 #0a3d7a;}
+
+/* LOAD SLIDER SECTION (NEW) */
+.load-slider-section{
+margin:20px 0;
+padding:20px;
+background:white;
+border:2px solid #1e5fbf;
+border-radius:20px;
+}
+.slider-label{
+display:flex;
+justify-content:space-between;
+margin-bottom:10px;
+}
+.slider-value{
+font-size:24px;
+color:#28a745;
+font-weight:700;
+}
+.slider{
+width:100%;
+height:10px;
+border-radius:5px;
+background:#d3d3d3;
+outline:none;
+-webkit-appearance:none;
+}
+.slider::-webkit-slider-thumb{
+-webkit-appearance:none;
+appearance:none;
+width:30px;
+height:30px;
+border-radius:50%;
+background:#1e5fbf;
+cursor:pointer;
+box-shadow:0 2px 5px rgba(0,0,0,0.2);
+}
+.current-load-indicator{
+margin-top:10px;
+padding:10px;
+background:#fff3cd;
+border-radius:10px;
+text-align:center;
+font-size:16px;
+}
+
+/* LOAD SUGGESTIONS (NEW) */
+.load-suggestions{
+display:flex;
+gap:10px;
+margin:10px 0;
+flex-wrap:wrap;
+}
+.suggestion-btn{
+background:white;
+border:2px solid #1e5fbf;
+border-radius:25px;
+padding:8px 15px;
+font-size:16px;
+cursor:pointer;
+transition:all 0.2s;
+}
+.suggestion-btn:hover{
+background:#e3f2fd;
+}
+.suggestion-btn.selected{
+background:#1e5fbf;
+color:white;
+}
+
+/* REASON DETAILS (NEW) */
+.reason-details{
+margin:10px 0;
+padding:15px;
+background:#f8f9fa;
+border-radius:15px;
+display:none;
+}
+.reason-details textarea{
+width:100%;
+height:80px;
+border:2px solid #1e5fbf;
+border-radius:10px;
+padding:10px;
+font-size:16px;
+resize:none;
+}
+
+/* FEE BREAKDOWN (NEW) */
+.fee-breakdown{
+margin:15px 0;
+padding:15px;
+background:white;
+border:2px solid #28a745;
+border-radius:15px;
+}
+.fee-row{
+display:flex;
+justify-content:space-between;
+margin:8px 0;
+font-size:16px;
+}
+.fee-total{
+border-top:2px dashed #1e5fbf;
+margin-top:10px;
+padding-top:10px;
+font-size:20px;
+font-weight:700;
+color:#28a745;
+}
+
+/* FORM ELEMENTS */
 .form-group{margin:15px 0;}
 label{display:block;font-size:22px;color:#1e5fbf;margin-bottom:5px;}
 
@@ -53,13 +247,12 @@ background-size:20px;
 padding-right:45px;
 }
 
-.info-card{background:#e3f2fd;border:2px solid #1e5fbf;border-radius:20px;padding:15px;margin:15px 0;font-size:20px;box-shadow:0 4px 0 #0a3d7a;}
-
 .submit-btn{background:#28a745;color:white;font-size:32px;padding:12px;border-radius:40px;width:100%;border:none;margin-top:10px;cursor:pointer;box-shadow:0 4px 0 #1e7e34;transition:all 0.1s;}
 .submit-btn:active{transform:translateY(4px);box-shadow:0 1px 0 #1e7e34;}
 .submit-btn:hover{background:#2fcB4f;}
+.submit-btn:disabled{background:#6c757d;box-shadow:0 4px 0 #545b62;cursor:not-allowed;}
 
-/* Loading indicator */
+/* LOADING INDICATOR */
 .loading{
 display:none;
 position:fixed;
@@ -107,7 +300,7 @@ display:none;
 .floating-input.show{transform:translate(-50%,-50%) scale(1);}
 .floating-input:focus{outline:none;}
 
-/* QUIET KEYBOARD */
+/* KEYBOARD */
 .keyboard{
 position:fixed;
 bottom:20px;
@@ -136,6 +329,8 @@ transition:all 0.2s;
 .keyboard .ok-btn{background:#28a745;color:white;border:none;}
 .keyboard .ok-btn:hover{background:#218838;}
 
+/* UTILITY CLASSES */
+.hidden{display:none !important;}
 </style>
 </head>
 <body>
@@ -150,9 +345,32 @@ transition:all 0.2s;
 </div>
 </div>
 
-<!-- Voice corner will be created dynamically by voice.js -->
+<!-- Voice Button -->
+<div class="voice-corner">
+<div class="voice-corner-btn" id="voiceBtn" onclick="toggleVoiceInput()">🎤</div>
+<div class="voice-corner-text" id="voiceStatus">{% trans "Click" %}</div>
+</div>
 
+<!-- Back Button -->
 <a href="{% url 'electricity-services' %}" class="back-btn">← {% trans "Back" %}</a>
+
+<!-- Timeout Warning -->
+<div id="timeoutWarning" class="timeout-warning">
+    <p>⏰ {% trans "Session about to expire!" %}</p>
+    <button onclick="extendSession()">{% trans "Continue" %}</button>
+    <button class="logout-btn" onclick="window.location='{% url 'index' %}'">{% trans "Logout" %}</button>
+</div>
+
+<!-- Success Messages -->
+{% if messages %}
+    {% for message in messages %}
+        {% if message.tags == 'success' %}
+            <div class="success-message">
+                {{ message }}
+            </div>
+        {% endif %}
+    {% endfor %}
+{% endif %}
 
 <div class="container">
 <div class="content-wrapper">
@@ -175,6 +393,7 @@ transition:all 0.2s;
     <input type="hidden" name="current_load" id="currentLoad" value="{{ request.POST.current_load|default:'3' }}">
     <input type="hidden" name="requested_load" id="requestedLoad">
     <input type="hidden" name="reason" id="reasonValue">
+    <input type="hidden" name="reason_details" id="reasonDetails">
 </form>
 
 <div class="info-card">
@@ -188,10 +407,31 @@ transition:all 0.2s;
 </div>
 </div>
 
+<!-- Load Slider Section (New) -->
+<div class="load-slider-section">
+    <div class="slider-label">
+        <span>{% trans "Select Load:" %}</span>
+        <span class="slider-value" id="sliderValue">5.0 kW</span>
+    </div>
+    <input type="range" min="1" max="15" step="0.5" value="5" class="slider" id="loadSlider">
+    <div class="current-load-indicator">
+        ⚡ {% trans "Current Load:" %} <span id="currentLoadDisplay">3</span> kW | {% trans "Increase by:" %} <span id="loadIncrease">2.0</span> kW
+    </div>
+</div>
+
+<!-- Load Suggestions (New) -->
+<div class="load-suggestions" id="loadSuggestions">
+    <button class="suggestion-btn" onclick="setSuggestedLoad(5)">5 kW</button>
+    <button class="suggestion-btn" onclick="setSuggestedLoad(7.5)">7.5 kW</button>
+    <button class="suggestion-btn" onclick="setSuggestedLoad(10)">10 kW</button>
+    <button class="suggestion-btn" onclick="setSuggestedLoad(12.5)">12.5 kW</button>
+    <button class="suggestion-btn" onclick="setSuggestedLoad(15)">15 kW</button>
+</div>
+
 <div class="form-group">
 <label>{% trans "Requested Load (kW)" %} *</label>
 <input class="large-input text-input" id="newLoad" placeholder="{% trans "Enter new load (e.g., 5, 7.5)" %}" 
-       value="{{ request.POST.requested_load }}" readonly>
+       value="5" readonly>
 </div>
 
 <div class="form-group">
@@ -200,16 +440,42 @@ transition:all 0.2s;
     <option value="New Appliances" {% if request.POST.reason == 'New Appliances' %}selected{% endif %}>{% trans "New Appliances" %}</option>
     <option value="Home Extension" {% if request.POST.reason == 'Home Extension' %}selected{% endif %}>{% trans "Home Extension" %}</option>
     <option value="Commercial Activity" {% if request.POST.reason == 'Commercial Activity' %}selected{% endif %}>{% trans "Commercial Activity" %}</option>
+    <option value="EV Charger" {% if request.POST.reason == 'EV Charger' %}selected{% endif %}>{% trans "EV Charger Installation" %}</option>
     <option value="Other" {% if request.POST.reason == 'Other' %}selected{% endif %}>{% trans "Other" %}</option>
 </select>
 </div>
 
-<div class="form-group">
-<label>{% trans "Estimated Cost" %}</label>
-<div style="font-size:28px;color:#28a745;font-weight:700;" id="estimatedCost">₹ 1,500 + {% trans "Taxes" %}</div>
+<!-- Reason Details (New) -->
+<div id="reasonDetailsSection" class="reason-details">
+    <textarea id="reasonDetailsInput" placeholder="{% trans "Please provide more details about your reason..." %}" readonly></textarea>
 </div>
 
-<button class="submit-btn" onclick="submitRequest()">{% trans "Submit Request" %}</button>
+<!-- Fee Breakdown (New) -->
+<div class="fee-breakdown" id="feeBreakdown">
+    <div class="fee-row">
+        <span>{% trans "Base Fee:" %}</span>
+        <span>₹1,500</span>
+    </div>
+    <div class="fee-row" id="additionalFeeRow">
+        <span>{% trans "Additional Load Fee:" %}</span>
+        <span id="additionalFee">₹1,600</span>
+    </div>
+    <div class="fee-row">
+        <span>{% trans "GST (18%):" %}</span>
+        <span id="gstAmount">₹558</span>
+    </div>
+    <div class="fee-total">
+        <span>{% trans "Total:" %}</span>
+        <span id="totalAmount">₹3,658</span>
+    </div>
+</div>
+
+<div class="form-group">
+<label>{% trans "Estimated Cost" %}</label>
+<div style="font-size:28px;color:#28a745;font-weight:700;" id="estimatedCost">₹ 3,658</div>
+</div>
+
+<button class="submit-btn" onclick="submitRequest()" id="submitBtn">{% trans "Submit Request" %}</button>
 
 </div>
 </div>
@@ -227,14 +493,81 @@ transition:all 0.2s;
 <script src="{% static 'js/voice.js' %}"></script>
 
 <script>
+/* ================= LANGUAGE MAP ================= */
+const languageMap = {
+    "en": "en-IN",
+    "hi": "hi-IN",
+    "ta": "ta-IN",
+    "te": "te-IN",
+    "bn": "bn-IN",
+    "or": "or-IN"
+};
 
+function getCurrentLang() {
+    let path = window.location.pathname.split('/');
+    const langCode = path[1] || "en";
+    return languageMap[langCode] || "en-IN";
+}
+
+function getCurrentLangCode() {
+    let path = window.location.pathname.split('/');
+    return path[1] || "en";
+}
+
+function speak(text) {
+    if(!('speechSynthesis' in window)) return;
+    speechSynthesis.cancel();
+    let u = new SpeechSynthesisUtterance(text);
+    u.lang = getCurrentLang();
+    u.rate = 1;
+    speechSynthesis.speak(u);
+}
+
+/* ================= SESSION TIMER ================= */
+let sessionTimer;
+let timeoutWarningTimer;
+const SESSION_DURATION = 120000;
+const WARNING_TIME = 10000;
+
+function startSessionTimer() {
+    sessionTimer = setTimeout(() => {
+        showTimeoutWarning();
+    }, SESSION_DURATION - WARNING_TIME);
+}
+
+function showTimeoutWarning() {
+    const warning = document.getElementById('timeoutWarning');
+    if (warning) {
+        warning.style.display = 'block';
+        timeoutWarningTimer = setTimeout(() => {
+            window.location.href = "{% url 'index' %}";
+        }, WARNING_TIME);
+    }
+}
+
+function extendSession() {
+    const warning = document.getElementById('timeoutWarning');
+    if (warning) {
+        warning.style.display = 'none';
+    }
+    clearTimeout(sessionTimer);
+    clearTimeout(timeoutWarningTimer);
+    startSessionTimer();
+}
+
+function resetSessionTimer() {
+    clearTimeout(sessionTimer);
+    clearTimeout(timeoutWarningTimer);
+    startSessionTimer();
+}
+
+/* ================= FLOATING KEYBOARD ================= */
 let activeInput=null;
-let isUpperCase=true;
+let activeFieldType=null;
 
 const overlay=document.getElementById("overlay");
 const floatingInput=document.getElementById("floatingInput");
 const keyboard=document.getElementById("keyboard");
-const loadingIndicator = document.getElementById("loadingIndicator");
 
 function createKeyboard(){
 keyboard.innerHTML="";
@@ -265,9 +598,10 @@ row.appendChild(btn);
 keyboard.appendChild(row);
 }
 
-function openKeyboard(){
-activeInput=document.getElementById("newLoad");
-floatingInput.value=activeInput.value;
+function openKeyboard(input, fieldType='load'){
+activeInput=input;
+activeFieldType=fieldType;
+floatingInput.value=input.value;
 overlay.style.display="block";
 floatingInput.style.display="block";
 keyboard.style.display="block";
@@ -277,8 +611,12 @@ setTimeout(()=>floatingInput.classList.add("show"),10);
 function finish(){
 if(activeInput){
 activeInput.value=floatingInput.value;
+if(activeFieldType==='load'){
 document.getElementById('requestedLoad').value=floatingInput.value;
-updateEstimatedCost(floatingInput.value);
+updateLoadFromInput(floatingInput.value);
+} else if(activeFieldType==='details'){
+document.getElementById('reasonDetails').value=floatingInput.value;
+}
 }
 closeKeyboard();
 }
@@ -292,43 +630,366 @@ keyboard.style.display="none";
 },200);
 }
 
-function updateEstimatedCost(load){
-const costDiv=document.getElementById('estimatedCost');
-const currentLoad=parseFloat(document.getElementById('displayCurrentLoad').innerText)||3;
-const requestedLoad=parseFloat(load)||0;
+document.getElementById("newLoad").addEventListener("click",()=>openKeyboard(document.getElementById("newLoad"),'load'));
+document.getElementById("reasonDetailsInput").addEventListener("click",()=>openKeyboard(document.getElementById("reasonDetailsInput"),'details'));
 
-if(requestedLoad>currentLoad){
-const additionalLoad=requestedLoad-currentLoad;
-const totalCost=1500+(additionalLoad*800);
-const gst=totalCost*0.18;
-const finalCost=totalCost+gst;
-costDiv.innerHTML=`₹ ${totalCost.toFixed(0)} + GST (₹ ${gst.toFixed(0)}) = <strong>₹ ${finalCost.toFixed(0)}</strong>`;
-}else{
-costDiv.innerHTML='₹ 1,500 + {% trans "Taxes" %}';
-}
-}
-
-document.getElementById("newLoad").addEventListener("click",openKeyboard);
 overlay.addEventListener("click",closeKeyboard);
 createKeyboard();
 
-function updateReason(){
-document.getElementById('reasonValue').value=document.getElementById('reason').value;
+/* ================= LOAD ENHANCEMENT FUNCTIONS ================= */
+let currentLoad = 3;
+let requestedLoad = 5;
+
+// Initialize slider
+const loadSlider = document.getElementById('loadSlider');
+loadSlider.addEventListener('input', function() {
+    requestedLoad = parseFloat(this.value);
+    document.getElementById('sliderValue').innerText = requestedLoad.toFixed(1) + ' kW';
+    document.getElementById('newLoad').value = requestedLoad.toFixed(1);
+    document.getElementById('requestedLoad').value = requestedLoad;
+    
+    const increase = (requestedLoad - currentLoad).toFixed(1);
+    document.getElementById('loadIncrease').innerText = increase;
+    
+    updateEstimatedCost(requestedLoad);
+});
+
+function setSuggestedLoad(load) {
+    requestedLoad = load;
+    loadSlider.value = load;
+    document.getElementById('sliderValue').innerText = load.toFixed(1) + ' kW';
+    document.getElementById('newLoad').value = load.toFixed(1);
+    document.getElementById('requestedLoad').value = load;
+    
+    const increase = (load - currentLoad).toFixed(1);
+    document.getElementById('loadIncrease').innerText = increase;
+    
+    updateEstimatedCost(load);
+    
+    // Highlight selected suggestion
+    document.querySelectorAll('.suggestion-btn').forEach(btn => {
+        btn.classList.remove('selected');
+    });
+    event.target.classList.add('selected');
+    
+    const langCode = getCurrentLangCode();
+    if (langCode === 'hi') {
+        speak(load + " किलोवाट चयनित");
+    } else if (langCode === 'or') {
+        speak(load + " କିଲୋୱାଟ୍ ଚୟନ ହେଲା");
+    } else {
+        speak(load + " kilowatt selected");
+    }
 }
 
-function submitRequest(){
-const newLoad=document.getElementById('newLoad').value;
-if(!newLoad){
-    if(typeof speak === 'function') speak("{% trans 'Please enter requested load' %}");
-    return;
-}
-if(typeof speak === 'function') speak("{% trans 'Submitting request' %}");
-document.getElementById('loadForm').submit();
+function updateLoadFromInput(load) {
+    const loadValue = parseFloat(load) || 0;
+    if (loadValue > 0) {
+        requestedLoad = loadValue;
+        loadSlider.value = Math.min(loadValue, 15);
+        document.getElementById('sliderValue').innerText = loadValue.toFixed(1) + ' kW';
+        
+        const increase = (loadValue - currentLoad).toFixed(1);
+        document.getElementById('loadIncrease').innerText = increase;
+        
+        updateEstimatedCost(loadValue);
+    }
 }
 
-/* ===================== OVERRIDE VOICE COMMANDS ===================== */
+function updateEstimatedCost(load) {
+    const requestedLoad = parseFloat(load) || 0;
+    const costDiv = document.getElementById('estimatedCost');
+    const currentLoad = parseFloat(document.getElementById('displayCurrentLoad').innerText) || 3;
 
-// Extend voice.js handleCommand for load enhancement-specific commands
+    if(requestedLoad > currentLoad){
+        const additionalLoad = requestedLoad - currentLoad;
+        const additionalFee = additionalLoad * 800;
+        const totalCost = 1500 + additionalFee;
+        const gst = totalCost * 0.18;
+        const finalCost = totalCost + gst;
+        
+        costDiv.innerHTML = `₹ ${finalCost.toFixed(0)}`;
+        
+        // Update breakdown
+        document.getElementById('additionalFee').innerText = '₹' + additionalFee.toFixed(0);
+        document.getElementById('gstAmount').innerText = '₹' + gst.toFixed(0);
+        document.getElementById('totalAmount').innerText = '₹' + finalCost.toFixed(0);
+    } else {
+        costDiv.innerHTML = '₹ 1,500';
+        document.getElementById('additionalFee').innerText = '₹0';
+        document.getElementById('gstAmount').innerText = '₹270';
+        document.getElementById('totalAmount').innerText = '₹1,770';
+    }
+}
+
+function updateReason() {
+    const reason = document.getElementById('reason').value;
+    document.getElementById('reasonValue').value = reason;
+    
+    // Show/hide reason details based on selection
+    const detailsSection = document.getElementById('reasonDetailsSection');
+    if (reason === 'Other' || reason === 'EV Charger') {
+        detailsSection.style.display = 'block';
+    } else {
+        detailsSection.style.display = 'none';
+        document.getElementById('reasonDetails').value = '';
+    }
+}
+
+function submitRequest() {
+    resetSessionTimer();
+    
+    const newLoad = document.getElementById('newLoad').value;
+    const reason = document.getElementById('reason').value;
+    
+    if(!newLoad || parseFloat(newLoad) <= 0){
+        const langCode = getCurrentLangCode();
+        if (langCode === 'hi') {
+            speak("कृपया वैध लोड दर्ज करें");
+        } else if (langCode === 'or') {
+            speak("ଦୟାକରି ଏକ ବୈଧ ଲୋଡ୍ ପ୍ରବେଶ କରନ୍ତୁ");
+        } else {
+            speak("{% trans 'Please enter a valid load' %}");
+        }
+        return;
+    }
+    
+    if (!reason) {
+        const langCode = getCurrentLangCode();
+        if (langCode === 'hi') {
+            speak("कृपया कारण चुनें");
+        } else if (langCode === 'or') {
+            speak("ଦୟାକରି କାରଣ ଚୟନ କରନ୍ତୁ");
+        } else {
+            speak("Please select a reason");
+        }
+        return;
+    }
+    
+    // Save reason details if any
+    if (document.getElementById('reasonDetailsSection').style.display === 'block') {
+        document.getElementById('reasonDetails').value = document.getElementById('reasonDetailsInput').value;
+    }
+    
+    loadingIndicator.classList.add('show');
+    
+    const langCode = getCurrentLangCode();
+    if (langCode === 'hi') {
+        speak("लोड वृद्धि अनुरोध भेजा जा रहा है");
+    } else if (langCode === 'or') {
+        speak("ଲୋଡ୍ ବୃଦ୍ଧି ଅନୁରୋଧ ପଠାଯାଉଛି");
+    } else {
+        speak("Submitting load enhancement request");
+    }
+    
+    setTimeout(() => {
+        document.getElementById('loadForm').submit();
+    }, 500);
+}
+
+/* ================= VOICE INPUT ================= */
+let recognition;
+let isListening = false;
+
+function toggleVoiceInput() {
+    resetSessionTimer();
+    
+    if(isListening) {
+        stopVoiceInput();
+        return;
+    }
+
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if(!SR) {
+        alert("{% trans 'Speech not supported' %}");
+        return;
+    }
+
+    if (recognition) {
+        try {
+            recognition.stop();
+        } catch(e) {}
+    }
+
+    recognition = new SR();
+    recognition.lang = getCurrentLang();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = function() {
+        isListening = true;
+        document.getElementById("voiceBtn").classList.add("listening");
+        document.getElementById("voiceStatus").innerText = "{% trans 'Listening...' %}";
+        
+        const langCode = getCurrentLangCode();
+        if (langCode === 'hi') {
+            speak("कृपया आदेश बोलें... लोड मान, कारण, या जमा करें");
+        } else if (langCode === 'or') {
+            speak("ଦୟାକରି ନିର୍ଦ୍ଦେଶ କୁହନ୍ତୁ... ଲୋଡ୍ ମୂଲ୍ୟ, କାରଣ, କିମ୍ବା ଦାଖଲ କରନ୍ତୁ");
+        } else {
+            speak("{% trans 'Please say a command... load value, reason, or submit' %}");
+        }
+    };
+
+    recognition.onresult = function(e) {
+        resetSessionTimer();
+        
+        let finalTranscript = '';
+        let interimTranscript = '';
+        
+        for (let i = 0; i < e.results.length; i++) {
+            const result = e.results[i];
+            if (result.isFinal) {
+                finalTranscript += result[0].transcript;
+            } else {
+                interimTranscript += result[0].transcript;
+            }
+        }
+        
+        const transcript = finalTranscript || interimTranscript;
+        const command = transcript.toLowerCase();
+        console.log("Load enhancement command:", command);
+        
+        // Check for numbers in command (load value)
+        const numberMatch = command.match(/\d+(\.\d+)?/g);
+        if(numberMatch && (command.includes("load") || command.includes("kilowatt") || command.includes("kw") || 
+           command.includes("लोड") || command.includes("କିଲୋୱାଟ୍"))) {
+            const value = numberMatch[0];
+            setSuggestedLoad(parseFloat(value));
+            return;
+        }
+        
+        // Reason selection
+        if(command.includes("appliance") || command.includes("appliances") || command.includes("उपकरण") || command.includes("ଉପକରଣ")) {
+            document.getElementById("reason").value = "New Appliances";
+            updateReason();
+            const langCode = getCurrentLangCode();
+            if (langCode === 'hi') {
+                speak("नए उपकरण चयनित");
+            } else if (langCode === 'or') {
+                speak("ନୂଆ ଉପକରଣ ଚୟନ ହେଲା");
+            } else {
+                speak("New appliances selected");
+            }
+            return;
+        }
+        
+        if(command.includes("extension") || command.includes("home extension") || command.includes("विस्तार") || command.includes("ବିସ୍ତାର")) {
+            document.getElementById("reason").value = "Home Extension";
+            updateReason();
+            const langCode = getCurrentLangCode();
+            if (langCode === 'hi') {
+                speak("घर विस्तार चयनित");
+            } else if (langCode === 'or') {
+                speak("ଘର ବିସ୍ତାର ଚୟନ ହେଲା");
+            } else {
+                speak("Home extension selected");
+            }
+            return;
+        }
+        
+        if(command.includes("commercial") || command.includes("business") || command.includes("व्यवसाय") || command.includes("ବ୍ୟବସାୟ")) {
+            document.getElementById("reason").value = "Commercial Activity";
+            updateReason();
+            const langCode = getCurrentLangCode();
+            if (langCode === 'hi') {
+                speak("व्यावसायिक गतिविधि चयनित");
+            } else if (langCode === 'or') {
+                speak("ବ୍ୟବସାୟିକ କାର୍ଯ୍ୟ ଚୟନ ହେଲା");
+            } else {
+                speak("Commercial activity selected");
+            }
+            return;
+        }
+        
+        if(command.includes("ev") || command.includes("charger") || command.includes("इवी") || command.includes("ଇଭି")) {
+            document.getElementById("reason").value = "EV Charger";
+            updateReason();
+            const langCode = getCurrentLangCode();
+            if (langCode === 'hi') {
+                speak("ईवी चार्जर चयनित");
+            } else if (langCode === 'or') {
+                speak("ଇଭି ଚାର୍ଜର ଚୟନ ହେଲା");
+            } else {
+                speak("EV charger selected");
+            }
+            return;
+        }
+        
+        if(command.includes("other") || command.includes("अन्य") || command.includes("ଅନ୍ୟ")) {
+            document.getElementById("reason").value = "Other";
+            updateReason();
+            const langCode = getCurrentLangCode();
+            if (langCode === 'hi') {
+                speak("अन्य कारण चयनित, कृपया विवरण दर्ज करें");
+            } else if (langCode === 'or') {
+                speak("ଅନ୍ୟ କାରଣ ଚୟନ ହେଲା, ଦୟାକରି ବିବରଣୀ ପ୍ରବେଶ କରନ୍ତୁ");
+            } else {
+                speak("Other selected, please enter details");
+            }
+            return;
+        }
+        
+        // Submit command
+        if(command.includes("submit") || command.includes("request") || command.includes("जमा") || command.includes("अनुरोध") || command.includes("ଦାଖଲ")) {
+            submitRequest();
+            return;
+        }
+        else if(command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
+            window.location.href = "/" + getCurrentLangCode() + "/electricity-services/";
+            return;
+        }
+        else if(command.includes("home") || command.includes("होम") || command.includes("ଘର")) {
+            window.location.href = "/" + getCurrentLangCode() + "/";
+            return;
+        }
+        else if(command.includes("stop listening") || command.includes("stop voice")) {
+            stopVoiceInput();
+            return;
+        }
+    };
+
+    recognition.onerror = function(event) {
+        console.error("Recognition error:", event.error);
+        if (event.error === 'no-speech') return;
+        stopVoiceInput();
+    };
+
+    recognition.onend = function() {
+        if (isListening) {
+            try {
+                recognition.start();
+            } catch(e) {
+                console.error("Failed to restart recognition:", e);
+                stopVoiceInput();
+            }
+        } else {
+            document.getElementById("voiceBtn").classList.remove("listening");
+            document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
+        }
+    };
+
+    try {
+        recognition.start();
+    } catch(e) {
+        console.error("Failed to start recognition:", e);
+        stopVoiceInput();
+    }
+}
+
+function stopVoiceInput() {
+    isListening = false;
+    if (recognition) {
+        try {
+            recognition.stop();
+        } catch(e) {}
+    }
+    document.getElementById("voiceBtn").classList.remove("listening");
+    document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
+}
+
+/* ================= OVERRIDE VOICE COMMANDS ================= */
 const originalHandleCommand = window.handleCommand;
 window.handleCommand = function(command) {
     command = command.toLowerCase();
@@ -336,46 +997,51 @@ window.handleCommand = function(command) {
     
     // Check for numbers in command (load value)
     const numberMatch = command.match(/\d+(\.\d+)?/g);
-    if(numberMatch && (command.includes("load") || command.includes("kilowatt") || command.includes("kw"))) {
+    if(numberMatch && (command.includes("load") || command.includes("kilowatt") || command.includes("kw") ||
+       command.includes("लोड") || command.includes("କିଲୋୱାଟ୍"))) {
         const value = numberMatch[0];
-        document.getElementById("newLoad").value = value;
-        document.getElementById("requestedLoad").value = value;
-        updateEstimatedCost(value);
-        if(typeof speak === 'function') speak("Load set to " + value + " kilowatt");
+        setSuggestedLoad(parseFloat(value));
         return;
     }
     
     // Reason selection
-    if(command.includes("appliance") || command.includes("appliances")) {
+    if(command.includes("appliance") || command.includes("appliances") || command.includes("उपकरण") || command.includes("ଉପକରଣ")) {
         document.getElementById("reason").value = "New Appliances";
         updateReason();
-        if(typeof speak === 'function') speak("{% trans 'Reason selected new appliances' %}");
+        if(typeof speak === 'function') speak("New appliances selected");
         return;
     }
     
-    if(command.includes("extension") || command.includes("home extension")) {
+    if(command.includes("extension") || command.includes("home extension") || command.includes("विस्तार") || command.includes("ବିସ୍ତାର")) {
         document.getElementById("reason").value = "Home Extension";
         updateReason();
-        if(typeof speak === 'function') speak("{% trans 'Reason selected home extension' %}");
+        if(typeof speak === 'function') speak("Home extension selected");
         return;
     }
     
-    if(command.includes("commercial") || command.includes("business")) {
+    if(command.includes("commercial") || command.includes("business") || command.includes("व्यवसाय") || command.includes("ବ୍ୟବସାୟ")) {
         document.getElementById("reason").value = "Commercial Activity";
         updateReason();
-        if(typeof speak === 'function') speak("{% trans 'Reason selected commercial activity' %}");
+        if(typeof speak === 'function') speak("Commercial activity selected");
         return;
     }
     
-    if(command.includes("other")) {
+    if(command.includes("ev") || command.includes("charger") || command.includes("इवी") || command.includes("ଇଭି")) {
+        document.getElementById("reason").value = "EV Charger";
+        updateReason();
+        if(typeof speak === 'function') speak("EV charger selected");
+        return;
+    }
+    
+    if(command.includes("other") || command.includes("अन्य") || command.includes("ଅନ୍ୟ")) {
         document.getElementById("reason").value = "Other";
         updateReason();
-        if(typeof speak === 'function') speak("{% trans 'Reason selected other' %}");
+        if(typeof speak === 'function') speak("Other selected");
         return;
     }
     
     // Load-specific commands
-    if(command.includes("submit") || command.includes("request")) {
+    if(command.includes("submit") || command.includes("request") || command.includes("जमा") || command.includes("ଦାଖଲ")) {
         submitRequest();
         return;
     }
@@ -387,8 +1053,11 @@ window.handleCommand = function(command) {
         window.location.href = "/" + getCurrentLangCode() + "/";
         return;
     }
+    else if(command.includes("stop listening") || command.includes("stop voice")) {
+        stopVoiceInput();
+        return;
+    }
     
-    // If not load-specific, pass to original handler
     if(originalHandleCommand) {
         originalHandleCommand(command);
     }
@@ -400,11 +1069,57 @@ window.autoReadPage = function() {
     if(originalAutoRead) originalAutoRead();
     setTimeout(() => {
         if(typeof speak === 'function') {
-            speak("{% trans 'Say load value, then select reason, say submit to request' %}");
+            const langCode = getCurrentLangCode();
+            if (langCode === 'hi') {
+                speak("लोड वृद्धि पृष्ठ। स्लाइडर से लोड चुनें या मान बोलें, कारण चुनें, फिर जमा करें कहें।");
+            } else if (langCode === 'or') {
+                speak("ଲୋଡ୍ ବୃଦ୍ଧି ପୃଷ୍ଠା। ସ୍ଲାଇଡର୍ ରୁ ଲୋଡ୍ ଚୟନ କରନ୍ତୁ କିମ୍ବା ମୂଲ୍ୟ କୁହନ୍ତୁ, କାରଣ ଚୟନ କରନ୍ତୁ, ତାପରେ ଦାଖଲ କରନ୍ତୁ କୁହନ୍ତୁ।");
+            } else {
+                speak("{% trans 'Load enhancement page. Choose load from slider or say value, select reason, then say submit.' %}");
+            }
         }
     }, 2000);
 };
 
+/* ================= INIT ================= */
+document.addEventListener('DOMContentLoaded', function() {
+    startSessionTimer();
+    
+    document.addEventListener('click', resetSessionTimer);
+    document.addEventListener('keypress', resetSessionTimer);
+    document.addEventListener('touchstart', resetSessionTimer);
+    
+    // Initialize with default values
+    updateEstimatedCost(5);
+    updateReason();
+    
+    setTimeout(autoReadPage, 2000);
+});
+
+window.addEventListener('beforeunload', function() {
+    if (sessionTimer) {
+        clearTimeout(sessionTimer);
+    }
+    stopVoiceInput();
+});
+
+// Auto-hide messages after 5 seconds
+setTimeout(function() {
+    document.querySelectorAll('.message').forEach(function(message) {
+        message.style.display = 'none';
+    });
+}, 5000);
+
+// Auto-hide success messages after 3 seconds
+setTimeout(function() {
+    const successMsg = document.querySelector('.success-message');
+    if (successMsg) {
+        successMsg.style.animation = 'slideOutLeft 0.3s ease';
+        setTimeout(function() {
+            if (successMsg) successMsg.remove();
+        }, 300);
+    }
+}, 3000);
 </script>
 </body>
 </html>

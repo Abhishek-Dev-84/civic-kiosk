@@ -13,12 +13,33 @@ body{width:100vw;height:100vh;overflow:hidden;background:#f0f7ff;}
 .header-left img{height:40px;}
 .header-left div{font-size:12px;font-weight:600;color:#1e5fbf;line-height:1.2;}
 .header-right img{height:35px;}
+
+/* ===== VOICE BUTTON ===== */
 .voice-corner{position:fixed;top:85px;right:20px;display:flex;flex-direction:column;align-items:center;gap:4px;z-index:1000;}
-.voice-corner-btn{background:#ff9933;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;border:2px solid white;cursor:pointer;}
-.voice-corner-btn.listening{background:#28a745;}
-.voice-corner-text{background:white;padding:3px 8px;border-radius:12px;font-size:11px;color:#ff9933;border:1px solid #ff9933;}
-.back-btn{position:fixed;top:85px;left:20px;background:white;border:2px solid #1e5fbf;border-radius:25px;padding:6px 18px;font-size:18px;font-weight:700;color:#1e5fbf;text-decoration:none;z-index:1000;display:inline-block;}
+.voice-corner-btn{background:#ff9933;width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;border:3px solid white;cursor:pointer;box-shadow:0 3px 8px rgba(0,0,0,0.2);transition:all 0.2s;}
+.voice-corner-btn.listening{background:#28a745;animation:pulse 1s infinite;}
+@keyframes pulse{0%{transform:scale(1);}50%{transform:scale(1.1);}100%{transform:scale(1);}}
+.voice-corner-text{background:white;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;color:#ff9933;border:1px solid #ff9933;}
+
+/* ===== BACK BUTTON ===== */
+.back-btn{position:fixed;top:85px;left:20px;background:white;border:2px solid #1e5fbf;border-radius:40px;padding:6px 20px;font-size:20px;font-weight:700;color:#1e5fbf;text-decoration:none;z-index:1000;display:inline-block;box-shadow:0 4px 0 #0a3d7a;transition:all 0.1s;}
+.back-btn:active{transform:translateY(4px);box-shadow:0 1px 0 #0a3d7a;}
 .back-btn:hover{background:#1e5fbf;color:white;}
+
+/* ===== TIMEOUT WARNING ===== */
+.timeout-warning{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:white;border:4px solid #ff9933;border-radius:40px;padding:30px;text-align:center;z-index:2000;box-shadow:0 10px 30px rgba(0,0,0,0.3);max-width:500px;display:none;}
+.timeout-warning p{font-size:28px;color:#1e5fbf;margin-bottom:20px;font-weight:700;}
+.timeout-warning button{background:#28a745;color:white;border:none;border-radius:40px;padding:15px 30px;font-size:28px;font-weight:700;cursor:pointer;margin:10px;min-width:200px;box-shadow:0 5px 0 #1e7e34;}
+.timeout-warning button:active{transform:translateY(5px);box-shadow:0 1px 0 #1e7e34;}
+.timeout-warning .logout-btn{background:#dc3545;box-shadow:0 5px 0 #a71d2a;}
+
+/* ===== SUCCESS MESSAGE ===== */
+.success-message{position:fixed;top:80px;left:15px;background:#4CAF50;color:white;padding:12px 25px;border-radius:50px;font-size:18px;font-weight:600;z-index:2000;border:3px solid white;box-shadow:0 4px 15px rgba(76,175,80,0.3);animation:slideInLeft 0.3s ease;display:flex;align-items:center;gap:8px;}
+.success-message::before{content:"✅";font-size:20px;}
+@keyframes slideInLeft{from{transform:translateX(-100%);opacity:0;}to{transform:translateX(0);opacity:1;}}
+@keyframes slideOutLeft{from{transform:translateX(0);opacity:1;}to{transform:translateX(-100%);opacity:0;}}
+
+/* ===== MAIN CONTAINER ===== */
 .container{position:fixed;top:70px;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto;}
 .content-wrapper{width:100%;max-width:1100px;display:grid;grid-template-columns:1fr 1fr;gap:15px 40px;padding:20px 0;}
 h1{grid-column:1/-1;text-align:center;font-size:38px;color:#1e5fbf;}
@@ -34,18 +55,27 @@ label{font-size:18px;color:#1e5fbf;margin-bottom:5px;}
 .large-input:focus{outline:none;border-color:#ff9933;}
 .large-input[readonly]{background:#f9f9f9;cursor:pointer;}
 select.large-input{appearance:none;background-image:url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");background-repeat:no-repeat;background-position:right 15px center;background-size:20px;padding-right:45px;}
-.submit-btn{grid-column:1/-1;justify-self:center;width:300px;background:#28a745;color:white;font-size:24px;padding:12px;border-radius:35px;border:none;margin-top:10px;cursor:pointer;transition:background 0.3s;}
+.submit-btn{grid-column:1/-1;justify-self:center;width:300px;background:#28a745;color:white;font-size:24px;padding:12px;border-radius:35px;border:none;margin-top:10px;cursor:pointer;transition:all 0.1s;box-shadow:0 5px 0 #1e7e34;}
+.submit-btn:active{transform:translateY(5px);box-shadow:0 1px 0 #1e7e34;}
 .submit-btn:hover{background:#218838;}
+
+/* ===== FLOATING INPUT SYSTEM ===== */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);backdrop-filter:blur(3px);display:none;z-index:900;}
 .floating-input{position:fixed;left:50%;top:32%;transform:translate(-50%,-50%) scale(0.7);width:550px;height:70px;font-size:26px;border:4px solid #ff9933;border-radius:25px;padding:0 25px;z-index:1001;box-shadow:0 20px 50px rgba(0,0,0,0.4);transition:all 0.25s ease;display:none;}
 .floating-input.show{transform:translate(-50%,-50%) scale(1);}
 .floating-input:focus{outline:none;}
+
+/* ===== KEYBOARD ===== */
 .keyboard{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:white;padding:15px;border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,0.3);display:none;z-index:1000;}
 .keyboard-row{display:flex;justify-content:center;}
 .keyboard button{min-width:55px;height:55px;margin:4px;font-size:18px;border-radius:10px;border:2px solid #1e5fbf;background:#f0f7ff;cursor:pointer;transition:all 0.2s;}
 .keyboard button:hover{background:#1e5fbf;color:white;}
 .keyboard .ok-btn{background:#28a745;color:white;border:none;}
 .keyboard .ok-btn:hover{background:#218838;}
+
+/* ===== UTILITY CLASSES ===== */
+.hidden{display:none !important;}
+
 @media (max-width:768px){.content-wrapper{grid-template-columns:1fr;}.submit-btn{width:100%;}}
 </style>
 </head>
@@ -61,69 +91,506 @@ select.large-input{appearance:none;background-image:url("data:image/svg+xml;char
 </div>
 </div>
 
+<!-- Voice Button -->
 <div class="voice-corner">
-<div class="voice-corner-btn" id="voiceBtn" onclick="toggleVoice()">🎤</div>
+<div class="voice-corner-btn" id="voiceBtn" onclick="toggleVoiceInput()">🎤</div>
 <div class="voice-corner-text" id="voiceStatus">{% trans "Click" %}</div>
 </div>
 
-<a href="{% url 'municipal-services' %}" class="back-btn">← {% trans "Back" %}</a>
+<!-- Back Button -->
+<a href="{% url 'municipal-services' %}" class="back-btn" id="backBtn">← {% trans "Back" %}</a>
 
-<!-- YOUR FULL ORIGINAL FORM REMAINS EXACTLY SAME HERE -->
-<!-- (No HTML structure removed or altered) -->
+<!-- Timeout Warning -->
+<div id="timeoutWarning" class="timeout-warning">
+    <p>⏰ {% trans "Session about to expire!" %}</p>
+    <button onclick="extendSession()">{% trans "Continue" %}</button>
+    <button class="logout-btn" onclick="window.location='{% url 'index' %}'">{% trans "Logout" %}</button>
+</div>
+
+<!-- Success Messages -->
+{% if messages %}
+    {% for message in messages %}
+        {% if message.tags == 'success' %}
+            <div class="success-message">
+                {{ message }}
+            </div>
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
+<div class="container">
+<form class="content-wrapper" method="post" action="{% url 'death-certificate' %}" id="deathForm">
+{% csrf_token %}
+<h1>⚰️ {% trans "Death Certificate" %}</h1>
+
+{% if messages %}
+<div class="messages">
+{% for message in messages %}
+<div class="message {{ message.tags }}">{{ message }}</div>
+{% endfor %}
+</div>
+{% endif %}
+
+<div class="note">⚠️ {% trans "Please register within 21 days of death" %}</div>
+
+<!-- Left Column -->
+<div class="form-group">
+<label>{% trans "Deceased Full Name" %} *</label>
+<input type="text" id="deceased_name" name="deceased_name" class="large-input text-input" value="{{ request.POST.deceased_name }}" readonly required>
+</div>
+
+<div class="form-group">
+<label>{% trans "Date of Death" %} *</label>
+<input type="date" id="date_of_death" name="date_of_death" class="large-input date-input" value="{{ request.POST.date_of_death }}" required>
+</div>
+
+<div class="form-group">
+<label>{% trans "Place of Death" %} *</label>
+<input type="text" id="place_of_death" name="place_of_death" class="large-input text-input" value="{{ request.POST.place_of_death }}" readonly required>
+</div>
+
+<div class="form-group">
+<label>{% trans "Gender" %} *</label>
+<select id="gender" name="gender" class="large-input" required>
+<option value="">{% trans "Select Gender" %}</option>
+<option value="Male" {% if request.POST.gender == 'Male' %}selected{% endif %}>{% trans "Male" %}</option>
+<option value="Female" {% if request.POST.gender == 'Female' %}selected{% endif %}>{% trans "Female" %}</option>
+<option value="Other" {% if request.POST.gender == 'Other' %}selected{% endif %}>{% trans "Other" %}</option>
+</select>
+</div>
+
+<!-- Right Column -->
+<div class="form-group">
+<label>{% trans "Father's Name" %} *</label>
+<input type="text" id="father_name" name="father_name" class="large-input text-input" value="{{ request.POST.father_name }}" readonly required>
+</div>
+
+<div class="form-group">
+<label>{% trans "Mother's Name" %} *</label>
+<input type="text" id="mother_name" name="mother_name" class="large-input text-input" value="{{ request.POST.mother_name }}" readonly required>
+</div>
+
+<div class="form-group">
+<label>{% trans "Permanent Address" %} *</label>
+<input type="text" id="permanent_address" name="permanent_address" class="large-input text-input" value="{{ request.POST.permanent_address }}" readonly required>
+</div>
+
+<div class="form-group">
+<label>{% trans "Cause of Death" %} *</label>
+<input type="text" id="cause_of_death" name="cause_of_death" class="large-input text-input" value="{{ request.POST.cause_of_death }}" readonly required>
+</div>
+
+<button type="submit" class="submit-btn" id="submitBtn">{% trans "Register Death" %}</button>
+</form>
+</div>
+
+<!-- Floating Input System -->
+<div id="overlay" class="overlay"></div>
+<input id="floatingInput" class="floating-input" placeholder="{% trans "Type here..." %}">
+<div id="keyboard" class="keyboard"></div>
+
+<script src="{% static 'js/voice.js' %}"></script>
 
 <script>
-
 /* ================= LANGUAGE MAP ================= */
-const languageMap={"en":"en-US","hi":"hi-IN","ta":"ta-IN","te":"te-IN","bn":"bn-IN","mr":"mr-IN"};
-function getLang(){let p=window.location.pathname.split('/');return languageMap[p[1]]||"en-US";}
+const languageMap = {
+    "en": "en-IN",
+    "hi": "hi-IN",
+    "ta": "ta-IN",
+    "te": "te-IN",
+    "bn": "bn-IN",
+    "or": "or-IN"
+};
+
+function getCurrentLang() {
+    let p = window.location.pathname.split('/');
+    const langCode = p[1] || "en";
+    return languageMap[langCode] || "en-IN";
+}
+
+function getCurrentLangCode() {
+    let p = window.location.pathname.split('/');
+    return p[1] || "en";
+}
 
 /* ================= TEXT TO SPEECH ================= */
-function speak(text){
-if(!('speechSynthesis' in window)) return;
-let u=new SpeechSynthesisUtterance(text);
-u.lang=getLang();
-speechSynthesis.cancel();
-speechSynthesis.speak(u);
+function speak(text) {
+    if(!('speechSynthesis' in window)) return;
+    speechSynthesis.cancel();
+    let u = new SpeechSynthesisUtterance(text);
+    u.lang = getCurrentLang();
+    u.rate = 1;
+    speechSynthesis.speak(u);
 }
+
+/* ================= SESSION TIMER ================= */
+let sessionTimer;
+let timeoutWarningTimer;
+const SESSION_DURATION = 120000;
+const WARNING_TIME = 10000;
+
+function startSessionTimer() {
+    sessionTimer = setTimeout(() => {
+        showTimeoutWarning();
+    }, SESSION_DURATION - WARNING_TIME);
+}
+
+function showTimeoutWarning() {
+    const warning = document.getElementById('timeoutWarning');
+    if (warning) {
+        warning.style.display = 'block';
+        timeoutWarningTimer = setTimeout(() => {
+            window.location.href = "{% url 'index' %}";
+        }, WARNING_TIME);
+    }
+}
+
+function extendSession() {
+    const warning = document.getElementById('timeoutWarning');
+    if (warning) {
+        warning.style.display = 'none';
+    }
+    clearTimeout(sessionTimer);
+    clearTimeout(timeoutWarningTimer);
+    startSessionTimer();
+}
+
+function resetSessionTimer() {
+    clearTimeout(sessionTimer);
+    clearTimeout(timeoutWarningTimer);
+    startSessionTimer();
+}
+
+/* ================= FLOATING KEYBOARD ================= */
+let activeInput = null;
+const overlay = document.getElementById("overlay");
+const floatingInput = document.getElementById("floatingInput");
+const keyboard = document.getElementById("keyboard");
+let isUpperCase = true;
+
+const keys = ["1","2","3","4","5","6","7","8","9","0",
+    "Q","W","E","R","T","Y","U","I","O","P",
+    "A","S","D","F","G","H","J","K","L",
+    "Z","X","C","V","B","N","M",".","-"," "];
+
+function createKeyboard() {
+    keyboard.innerHTML = "";
+    let row = document.createElement("div");
+    row.className = "keyboard-row";
+    
+    keys.forEach((k, i) => {
+        if (i % 10 === 0 && i !== 0) {
+            keyboard.appendChild(row);
+            row = document.createElement("div");
+            row.className = "keyboard-row";
+        }
+        let btn = document.createElement("button");
+        btn.innerText = k === " " ? "Space" : k;
+        btn.type = "button";
+        btn.onclick = () => floatingInput.value += (k === " " ? " " : k);
+        row.appendChild(btn);
+    });
+    keyboard.appendChild(row);
+
+    let lastRow = document.createElement("div");
+    lastRow.className = "keyboard-row";
+    lastRow.innerHTML = `
+        <button type="button" onclick="toggleCase()">⇧ Shift</button>
+        <button type="button" onclick="floatingInput.value = floatingInput.value.slice(0,-1)">⌫ Back</button>
+        <button type="button" onclick="floatingInput.value=''">Clear</button>
+        <button type="button" class="ok-btn" onclick="finishInput()">✓ OK</button>
+    `;
+    keyboard.appendChild(lastRow);
+}
+
+function toggleCase() {
+    isUpperCase = !isUpperCase;
+    createKeyboard();
+}
+
+function openKeyboard(input) {
+    activeInput = input;
+    floatingInput.value = input.value;
+    overlay.style.display = "block";
+    floatingInput.style.display = "block";
+    keyboard.style.display = "block";
+    setTimeout(() => {
+        floatingInput.classList.add("show");
+    }, 10);
+}
+
+function finishInput() {
+    if (activeInput) {
+        activeInput.value = floatingInput.value;
+    }
+    closeKeyboard();
+}
+
+function closeKeyboard() {
+    floatingInput.classList.remove("show");
+    setTimeout(() => {
+        overlay.style.display = "none";
+        floatingInput.style.display = "none";
+        keyboard.style.display = "none";
+    }, 200);
+}
+
+// Initialize keyboard
+createKeyboard();
+
+// Add click handlers to text inputs
+document.querySelectorAll(".text-input").forEach(input => {
+    input.addEventListener("click", (e) => {
+        e.preventDefault();
+        openKeyboard(input);
+    });
+});
+
+overlay.addEventListener("click", closeKeyboard);
 
 /* ================= VOICE INPUT ================= */
 let recognition;
-function toggleVoice(){
-const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-if(!SR){alert("Speech not supported");return;}
-recognition=new SR();
-recognition.lang=getLang();
+let isListening = false;
 
-recognition.onstart=function(){
-document.getElementById("voiceBtn").classList.add("listening");
-document.getElementById("voiceStatus").innerText="Listening";
+function toggleVoiceInput() {
+    resetSessionTimer();
+    
+    if(isListening) {
+        stopVoiceInput();
+        return;
+    }
+
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if(!SR) {
+        alert("{% trans 'Speech not supported' %}");
+        return;
+    }
+
+    if (recognition) {
+        try {
+            recognition.stop();
+        } catch(e) {}
+    }
+
+    recognition = new SR();
+    recognition.lang = getCurrentLang();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = function() {
+        isListening = true;
+        document.getElementById("voiceBtn").classList.add("listening");
+        document.getElementById("voiceStatus").innerText = "{% trans 'Listening...' %}";
+        
+        const langCode = getCurrentLangCode();
+        if (langCode === 'hi') {
+            speak("कृपया बोलें... मृतक का नाम, मृत्यु स्थान, पिता का नाम, माता का नाम, पता, या मृत्यु का कारण");
+        } else if (langCode === 'or') {
+            speak("ଦୟାକରି କୁହନ୍ତୁ... ମୃତକଙ୍କ ନାମ, ମୃତ୍ୟୁ ସ୍ଥାନ, ପିତାଙ୍କ ନାମ, ମାତାଙ୍କ ନାମ, ଠିକଣା, କିମ୍ବା ମୃତ୍ୟୁର କାରଣ");
+        } else {
+            speak("{% trans 'Please speak... deceased name, place of death, father name, mother name, address, or cause of death' %}");
+        }
+    };
+
+    recognition.onresult = function(e) {
+        resetSessionTimer();
+        
+        let finalTranscript = '';
+        let interimTranscript = '';
+        
+        for (let i = 0; i < e.results.length; i++) {
+            const result = e.results[i];
+            if (result.isFinal) {
+                finalTranscript += result[0].transcript;
+            } else {
+                interimTranscript += result[0].transcript;
+            }
+        }
+        
+        const transcript = finalTranscript || interimTranscript;
+        const text = transcript.trim();
+        console.log("Voice input:", text);
+
+        // Check for gender selection
+        let lower = text.toLowerCase();
+        let genderSelect = document.getElementById("gender");
+        
+        if (lower.includes("male") || lower.includes("पुरुष") || lower.includes("ପୁରୁଷ")) {
+            genderSelect.value = "Male";
+            speak("{% trans 'Selected Male' %}");
+            return;
+        }
+        else if (lower.includes("female") || lower.includes("महिला") || lower.includes("ମହିଳା")) {
+            genderSelect.value = "Female";
+            speak("{% trans 'Selected Female' %}");
+            return;
+        }
+        else if (lower.includes("other") || lower.includes("अन्य") || lower.includes("ଅନ୍ୟ")) {
+            genderSelect.value = "Other";
+            speak("{% trans 'Selected Other' %}");
+            return;
+        }
+        
+        // If keyboard is open, fill floating input
+        if (floatingInput.style.display === "block") {
+            floatingInput.value = text;
+        }
+        // Otherwise, try to determine which field to fill based on context
+        else if (activeInput) {
+            // Capitalize first letter of each word for names/addresses
+            let formattedText = text.split(' ').map(word => 
+                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+            ).join(' ');
+            activeInput.value = formattedText;
+            speak("{% trans 'Field updated' %}");
+        }
+    };
+
+    recognition.onerror = function(event) {
+        console.error("Recognition error:", event.error);
+        if (event.error === 'no-speech') return;
+        stopVoiceInput();
+    };
+
+    recognition.onend = function() {
+        if (isListening) {
+            try {
+                recognition.start();
+            } catch(e) {
+                console.error("Failed to restart recognition:", e);
+                stopVoiceInput();
+            }
+        } else {
+            document.getElementById("voiceBtn").classList.remove("listening");
+            document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
+        }
+    };
+
+    try {
+        recognition.start();
+    } catch(e) {
+        console.error("Failed to start recognition:", e);
+        stopVoiceInput();
+    }
+}
+
+function stopVoiceInput() {
+    isListening = false;
+    if (recognition) {
+        try {
+            recognition.stop();
+        } catch(e) {}
+    }
+    document.getElementById("voiceBtn").classList.remove("listening");
+    document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
+}
+
+// Form validation
+document.getElementById('deathForm').addEventListener('submit', function(e) {
+    const requiredFields = ['deceased_name', 'date_of_death', 'place_of_death', 'gender', 'father_name', 'mother_name', 'permanent_address', 'cause_of_death'];
+    let missing = false;
+    
+    for (let field of requiredFields) {
+        const input = document.getElementById(field);
+        if (!input || !input.value) {
+            missing = true;
+            break;
+        }
+    }
+    
+    if (missing) {
+        e.preventDefault();
+        const langCode = getCurrentLangCode();
+        if (langCode === 'hi') {
+            speak("कृपया सभी आवश्यक फ़ील्ड भरें");
+        } else if (langCode === 'or') {
+            speak("ଦୟାକରି ସମସ୍ତ ଆବଶ୍ୟକୀୟ କ୍ଷେତ୍ର ପୂରଣ କରନ୍ତୁ");
+        } else {
+            speak("{% trans 'Please fill all required fields' %}");
+        }
+    }
+});
+
+/* ================= OVERRIDE VOICE COMMANDS ================= */
+const originalHandleCommand = window.handleCommand;
+window.handleCommand = function(command) {
+    command = command.toLowerCase();
+    console.log("Death certificate command:", command);
+    
+    if (command.includes("submit") || command.includes("register") || command.includes("जमा") || command.includes("ଦାଖଲ")) {
+        document.getElementById('submitBtn').click();
+        return;
+    }
+    else if (command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
+        window.location.href = "/" + getCurrentLangCode() + "/municipal-services/";
+        return;
+    }
+    else if (command.includes("home") || command.includes("होम") || command.includes("ଘର")) {
+        window.location.href = "/" + getCurrentLangCode() + "/";
+        return;
+    }
+    else if (command.includes("stop listening") || command.includes("stop voice")) {
+        stopVoiceInput();
+        return;
+    }
+    else if (command.includes("start listening") || command.includes("start voice")) {
+        toggleVoiceInput();
+        return;
+    }
+    
+    if (originalHandleCommand) {
+        originalHandleCommand(command);
+    }
 };
 
-recognition.onresult=function(e){
-let text=e.results[0][0].transcript;
-
-if(document.getElementById("floatingInput").style.display==="block"){
-floatingInput.value=text;
-}
-else{
-let lower=text.toLowerCase();
-let gender=document.getElementById("gender");
-for(let opt of gender.options){
-if(lower.includes(opt.value.toLowerCase())){
-gender.value=opt.value;
-speak("Selected "+opt.value);
-}
-}
-}
+/* ================= AUTO READ PAGE ================= */
+const originalAutoRead = window.autoReadPage;
+window.autoReadPage = function() {
+    if (originalAutoRead) originalAutoRead();
+    setTimeout(() => {
+        if (typeof speak === 'function') {
+            const langCode = getCurrentLangCode();
+            if (langCode === 'hi') {
+                speak("मृत्यु प्रमाण पत्र आवेदन। मृतक का नाम, मृत्यु तिथि, मृत्यु स्थान, लिंग, पिता का नाम, माता का नाम, स्थायी पता और मृत्यु का कारण भरें। मदद के लिए माइक बटन दबाएं।");
+            } else if (langCode === 'or') {
+                speak("ମୃତ୍ୟୁ ପ୍ରମାଣପତ୍ର ଆବେଦନ। ମୃତକଙ୍କ ନାମ, ମୃତ୍ୟୁ ତାରିଖ, ମୃତ୍ୟୁ ସ୍ଥାନ, ଲିଙ୍ଗ, ପିତାଙ୍କ ନାମ, ମାତାଙ୍କ ନାମ, ସ୍ଥାୟୀ ଠିକଣା ଏବଂ ମୃତ୍ୟୁର କାରଣ ପୂରଣ କରନ୍ତୁ। ସାହାଯ୍ୟ ପାଇଁ ମାଇକ୍ ବଟନ୍ ଦବାନ୍ତୁ।");
+            } else {
+                speak("{% trans 'Death certificate application. Fill deceased name, date of death, place of death, gender, father name, mother name, permanent address, and cause of death. Press mic button for voice help.' %}");
+            }
+        }
+    }, 1000);
 };
 
-recognition.onend=function(){
-document.getElementById("voiceBtn").classList.remove("listening");
-document.getElementById("voiceStatus").innerText="Click";
-};
+/* ================= INIT ================= */
+document.addEventListener('DOMContentLoaded', function() {
+    startSessionTimer();
+    
+    document.addEventListener('click', resetSessionTimer);
+    document.addEventListener('keypress', resetSessionTimer);
+    document.addEventListener('touchstart', resetSessionTimer);
+    
+    // Auto-read form instructions
+    setTimeout(autoReadPage, 1500);
+});
 
-recognition.start();
-}
+window.addEventListener('beforeunload', function() {
+    if (sessionTimer) {
+        clearTimeout(sessionTimer);
+    }
+    stopVoiceInput();
+});
+
+// Auto-hide messages after 3 seconds
+setTimeout(function() {
+    const successMsg = document.querySelector('.success-message');
+    if (successMsg) {
+        successMsg.style.animation = 'slideOutLeft 0.3s ease';
+        setTimeout(function() {
+            if (successMsg) successMsg.remove();
+        }, 300);
+    }
+}, 3000);
 
 </script>
 

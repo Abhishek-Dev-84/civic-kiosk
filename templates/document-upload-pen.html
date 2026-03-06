@@ -14,13 +14,31 @@ body{width:100vw;height:100vh;overflow:hidden;background:#f0f7ff;}
 .header-left div{font-size:12px;font-weight:600;color:#1e5fbf;line-height:1.2;}
 .header-right img{height:35px;}
 
-.voice-corner{position:fixed;top:80px;right:15px;z-index:1000;display:flex;flex-direction:column;align-items:center;gap:3px;}
-.voice-corner-btn{background:#ff9933;width:45px;height:45px;border-radius:50%;border:2px solid white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:24px;}
-.voice-corner-btn.listening{background:#28a745;}
-.voice-corner-text{background:white;padding:2px 8px;border-radius:12px;font-size:10px;color:#ff9933;border:1px solid #ff9933;}
+/* ===== VOICE BUTTON ===== */
+.voice-corner{position:fixed;top:80px;right:15px;z-index:1000;display:flex;flex-direction:column;align-items:center;gap:4px;}
+.voice-corner-btn{background:#ff9933;width:50px;height:50px;border-radius:50%;border:3px solid white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 3px 8px rgba(0,0,0,0.2);transition:all 0.2s;}
+.voice-corner-btn.listening{background:#28a745;animation:pulse 1s infinite;}
+@keyframes pulse{0%{transform:scale(1);}50%{transform:scale(1.1);}100%{transform:scale(1);}}
+.voice-corner-text{background:white;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;color:#ff9933;border:1px solid #ff9933;}
 
-.back-btn{position:fixed;top:80px;left:15px;background:white;border:2px solid #1e5fbf;border-radius:30px;padding:5px 15px;font-size:18px;font-weight:700;color:#1e5fbf;text-decoration:none;z-index:1000;}
+/* ===== BACK BUTTON ===== */
+.back-btn{position:fixed;top:80px;left:15px;background:white;border:2px solid #1e5fbf;border-radius:40px;padding:6px 20px;font-size:20px;font-weight:700;color:#1e5fbf;text-decoration:none;z-index:1000;box-shadow:0 4px 0 #0a3d7a;transition:all 0.1s;}
+.back-btn:active{transform:translateY(4px);box-shadow:0 1px 0 #0a3d7a;}
 
+/* ===== TIMEOUT WARNING ===== */
+.timeout-warning{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:white;border:4px solid #ff9933;border-radius:40px;padding:30px;text-align:center;z-index:2000;box-shadow:0 10px 30px rgba(0,0,0,0.3);max-width:500px;display:none;}
+.timeout-warning p{font-size:28px;color:#1e5fbf;margin-bottom:20px;font-weight:700;}
+.timeout-warning button{background:#28a745;color:white;border:none;border-radius:40px;padding:15px 30px;font-size:28px;font-weight:700;cursor:pointer;margin:10px;min-width:200px;box-shadow:0 5px 0 #1e7e34;}
+.timeout-warning button:active{transform:translateY(5px);box-shadow:0 1px 0 #1e7e34;}
+.timeout-warning .logout-btn{background:#dc3545;box-shadow:0 5px 0 #a71d2a;}
+
+/* ===== SUCCESS MESSAGE ===== */
+.success-message{position:fixed;top:80px;left:15px;background:#4CAF50;color:white;padding:12px 25px;border-radius:50px;font-size:18px;font-weight:600;z-index:2000;border:3px solid white;box-shadow:0 4px 15px rgba(76,175,80,0.3);animation:slideInLeft 0.3s ease;display:flex;align-items:center;gap:8px;}
+.success-message::before{content:"✅";font-size:20px;}
+@keyframes slideInLeft{from{transform:translateX(-100%);opacity:0;}to{transform:translateX(0);opacity:1;}}
+@keyframes slideOutLeft{from{transform:translateX(0);opacity:1;}to{transform:translateX(-100%);opacity:0;}}
+
+/* ===== MAIN CONTAINER ===== */
 .container{position:fixed;top:70px;left:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px;}
 .content-wrapper{width:100%;max-width:600px;text-align:center;}
 
@@ -38,12 +56,17 @@ h1{color:#1e5fbf;font-size:36px;font-weight:800;margin-bottom:20px;}
 .file-item{padding:8px;border-bottom:1px solid #dee2e6;font-size:18px;}
 .file-item:last-child{border-bottom:none;}
 
-.upload-btn{background:#28a745;color:white;font-size:28px;padding:15px;border-radius:50px;width:100%;border:none;cursor:pointer;margin-top:10px;}
-.upload-btn:disabled{background:#6c757d;cursor:not-allowed;}
+.upload-btn{background:#28a745;color:white;font-size:28px;padding:15px;border-radius:50px;width:100%;border:none;cursor:pointer;margin-top:10px;box-shadow:0 5px 0 #1e7e34;transition:all 0.1s;}
+.upload-btn:active{transform:translateY(5px);box-shadow:0 1px 0 #1e7e34;}
+.upload-btn:disabled{background:#6c757d;box-shadow:0 5px 0 #545b62;cursor:not-allowed;}
+
 .hidden{display:none;}
 
 .loading{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2000;justify-content:center;align-items:center;color:white;font-size:24px;}
 .loading.show{display:flex;}
+
+/* ===== UTILITY CLASSES ===== */
+.hidden{display:none !important;}
 </style>
 </head>
 
@@ -59,9 +82,32 @@ h1{color:#1e5fbf;font-size:36px;font-weight:800;margin-bottom:20px;}
 </div>
 </div>
 
-<!-- Voice corner will be created dynamically by voice.js -->
+<!-- Voice Button -->
+<div class="voice-corner">
+<div class="voice-corner-btn" id="voiceBtn" onclick="toggleVoiceInput()">🎤</div>
+<div class="voice-corner-text" id="voiceStatus">{% trans "Click" %}</div>
+</div>
 
-<a href="{% url 'menu' %}" class="back-btn">← {% trans "Back" %}</a>
+<!-- Back Button -->
+<a href="{% url 'menu' %}" class="back-btn" id="backBtn">← {% trans "Back" %}</a>
+
+<!-- Timeout Warning -->
+<div id="timeoutWarning" class="timeout-warning">
+    <p>⏰ {% trans "Session about to expire!" %}</p>
+    <button onclick="extendSession()">{% trans "Continue" %}</button>
+    <button class="logout-btn" onclick="window.location='{% url 'index' %}'">{% trans "Logout" %}</button>
+</div>
+
+<!-- Success Messages -->
+{% if messages %}
+    {% for message in messages %}
+        {% if message.tags == 'success' %}
+            <div class="success-message">
+                {{ message }}
+            </div>
+        {% endif %}
+    {% endfor %}
+{% endif %}
 
 <div class="container">
 <div class="content-wrapper">
@@ -87,7 +133,7 @@ h1{color:#1e5fbf;font-size:36px;font-weight:800;margin-bottom:20px;}
 <div id="driveStatus" style="color:#dc3545;font-size:18px;">⏳ {% trans "No drive detected" %}</div>
 
 <div id="manualSelect" class="hidden">
-<button type="button" class="upload-btn" style="font-size:18px;padding:10px;margin:10px 0;" onclick="document.getElementById('fileInput').click()">
+<button type="button" class="upload-btn" style="font-size:18px;padding:10px;margin:10px 0;" onclick="document.getElementById('fileInput').click()" id="selectBtn">
 📁 {% trans "Select Files from Computer" %}
 </button>
 </div>
@@ -111,52 +157,282 @@ h1{color:#1e5fbf;font-size:36px;font-weight:800;margin-bottom:20px;}
 <script src="{% static 'js/voice.js' %}"></script>
 
 <script>
+/* ================= LANGUAGE MAP ================= */
+const languageMap = {
+    "en": "en-IN",
+    "hi": "hi-IN",
+    "ta": "ta-IN",
+    "te": "te-IN",
+    "bn": "bn-IN",
+    "or": "or-IN"
+};
+
+function getCurrentLang() {
+    let path = window.location.pathname.split('/');
+    const langCode = path[1] || "en";
+    return languageMap[langCode] || "en-IN";
+}
+
+function getCurrentLangCode() {
+    let path = window.location.pathname.split('/');
+    return path[1] || "en";
+}
+
+/* ================= TEXT TO SPEECH ================= */
+function speak(text) {
+    if(!('speechSynthesis' in window)) return;
+    speechSynthesis.cancel();
+    let u = new SpeechSynthesisUtterance(text);
+    u.lang = getCurrentLang();
+    u.rate = 1;
+    speechSynthesis.speak(u);
+}
+
+/* ================= SESSION TIMER ================= */
+let sessionTimer;
+let timeoutWarningTimer;
+const SESSION_DURATION = 120000;
+const WARNING_TIME = 10000;
+
+function startSessionTimer() {
+    sessionTimer = setTimeout(() => {
+        showTimeoutWarning();
+    }, SESSION_DURATION - WARNING_TIME);
+}
+
+function showTimeoutWarning() {
+    const warning = document.getElementById('timeoutWarning');
+    if (warning) {
+        warning.style.display = 'block';
+        timeoutWarningTimer = setTimeout(() => {
+            window.location.href = "{% url 'index' %}";
+        }, WARNING_TIME);
+    }
+}
+
+function extendSession() {
+    const warning = document.getElementById('timeoutWarning');
+    if (warning) {
+        warning.style.display = 'none';
+    }
+    clearTimeout(sessionTimer);
+    clearTimeout(timeoutWarningTimer);
+    startSessionTimer();
+}
+
+function resetSessionTimer() {
+    clearTimeout(sessionTimer);
+    clearTimeout(timeoutWarningTimer);
+    startSessionTimer();
+}
 
 /* ================= SIMULATION ================= */
+let selectedFiles = [];
 
-let selectedFiles=[];
-setTimeout(()=>{
-document.getElementById('driveStatus').innerHTML="✅ Pen drive detected";
-document.getElementById('driveStatus').style.color="#28a745";
-document.getElementById('manualSelect').classList.remove('hidden');
-if(typeof speak === 'function') speak("Pen drive detected. You can select files.");
-},3000);
+setTimeout(() => {
+    document.getElementById('driveStatus').innerHTML = "✅ Pen drive detected";
+    document.getElementById('driveStatus').style.color = "#28a745";
+    document.getElementById('manualSelect').classList.remove('hidden');
+    
+    const langCode = getCurrentLangCode();
+    if (langCode === 'hi') {
+        speak("पेन ड्राइव का पता चला। आप फ़ाइलें चुन सकते हैं।");
+    } else if (langCode === 'or') {
+        speak("ପେନ୍ ଡ୍ରାଇଭ୍ ଚିହ୍ନଟ ହେଲା। ଆପଣ ଫାଇଲ୍ ଚୟନ କରିପାରିବେ।");
+    } else {
+        speak("Pen drive detected. You can select files.");
+    }
+}, 3000);
 
-function handleFileSelect(){
-const input=document.getElementById('fileInput');
-selectedFiles=Array.from(input.files);
-document.getElementById('selectedCount').innerText=selectedFiles.length;
-document.getElementById('selectedFilesInfo').classList.remove('hidden');
-document.getElementById('uploadBtn').disabled=selectedFiles.length===0;
-if(typeof speak === 'function') speak(selectedFiles.length+" files selected");
+function handleFileSelect() {
+    resetSessionTimer();
+    const input = document.getElementById('fileInput');
+    selectedFiles = Array.from(input.files);
+    document.getElementById('selectedCount').innerText = selectedFiles.length;
+    document.getElementById('selectedFilesInfo').classList.remove('hidden');
+    document.getElementById('uploadBtn').disabled = selectedFiles.length === 0;
+    
+    const langCode = getCurrentLangCode();
+    if (langCode === 'hi') {
+        speak(selectedFiles.length + " फ़ाइलें चुनी गईं");
+    } else if (langCode === 'or') {
+        speak(selectedFiles.length + " ଫାଇଲ୍ ଚୟନ ହେଲା");
+    } else {
+        speak(selectedFiles.length + " files selected");
+    }
 }
 
-function uploadFiles(){
-if(selectedFiles.length===0){
-if(typeof speak === 'function') speak("No files selected");
-return;
+function uploadFiles() {
+    resetSessionTimer();
+    
+    if (selectedFiles.length === 0) {
+        const langCode = getCurrentLangCode();
+        if (langCode === 'hi') {
+            speak("कोई फ़ाइल नहीं चुनी गई");
+        } else if (langCode === 'or') {
+            speak("କୌଣସି ଫାଇଲ୍ ଚୟନ ହୋଇନାହିଁ");
+        } else {
+            speak("No files selected");
+        }
+        return;
+    }
+    
+    document.getElementById('loadingIndicator').classList.add('show');
+    
+    const langCode = getCurrentLangCode();
+    if (langCode === 'hi') {
+        speak("फ़ाइलें अपलोड की जा रही हैं");
+    } else if (langCode === 'or') {
+        speak("ଫାଇଲ୍ ଅପଲୋଡ୍ ହେଉଛି");
+    } else {
+        speak("Uploading files");
+    }
+    
+    setTimeout(() => {
+        document.getElementById('uploadForm').submit();
+    }, 800);
 }
-document.getElementById('loadingIndicator').classList.add('show');
-if(typeof speak === 'function') speak("Uploading files");
-setTimeout(()=>{
-document.getElementById('uploadForm').submit();
-},800);
+
+/* ================= VOICE INPUT ================= */
+let recognition;
+let isListening = false;
+
+function toggleVoiceInput() {
+    resetSessionTimer();
+    
+    if(isListening) {
+        stopVoiceInput();
+        return;
+    }
+
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if(!SR) {
+        alert("{% trans 'Speech not supported' %}");
+        return;
+    }
+
+    if (recognition) {
+        try {
+            recognition.stop();
+        } catch(e) {}
+    }
+
+    recognition = new SR();
+    recognition.lang = getCurrentLang();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = function() {
+        isListening = true;
+        document.getElementById("voiceBtn").classList.add("listening");
+        document.getElementById("voiceStatus").innerText = "{% trans 'Listening...' %}";
+        
+        const langCode = getCurrentLangCode();
+        if (langCode === 'hi') {
+            speak("कृपया आदेश बोलें... फ़ाइलें चुनें, अपलोड करें, या वापस जाएं");
+        } else if (langCode === 'or') {
+            speak("ଦୟାକରି ନିର୍ଦ୍ଦେଶ କୁହନ୍ତୁ... ଫାଇଲ୍ ଚୟନ କରନ୍ତୁ, ଅପଲୋଡ୍ କରନ୍ତୁ, କିମ୍ବା ପଛକୁ ଯାଆନ୍ତୁ");
+        } else {
+            speak("{% trans 'Please say a command... select files, upload, or back' %}");
+        }
+    };
+
+    recognition.onresult = function(e) {
+        resetSessionTimer();
+        
+        let finalTranscript = '';
+        let interimTranscript = '';
+        
+        for (let i = 0; i < e.results.length; i++) {
+            const result = e.results[i];
+            if (result.isFinal) {
+                finalTranscript += result[0].transcript;
+            } else {
+                interimTranscript += result[0].transcript;
+            }
+        }
+        
+        const transcript = finalTranscript || interimTranscript;
+        const command = transcript.toLowerCase();
+        console.log("Voice command:", command);
+
+        // Upload commands
+        if (command.includes("select") || command.includes("choose") || command.includes("browse") || 
+            command.includes("चुनें") || command.includes("ଚୟନ")) {
+            document.getElementById('fileInput').click();
+            return;
+        }
+        else if (command.includes("upload") || command.includes("send") || command.includes("अपलोड") || command.includes("ଅପଲୋଡ୍")) {
+            uploadFiles();
+            return;
+        }
+        else if (command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
+            window.location.href = "/" + getCurrentLangCode() + "/menu/";
+            return;
+        }
+        else if (command.includes("home") || command.includes("होम") || command.includes("ଘର")) {
+            window.location.href = "/" + getCurrentLangCode() + "/";
+            return;
+        }
+        else if (command.includes("stop listening") || command.includes("stop voice")) {
+            stopVoiceInput();
+            return;
+        }
+    };
+
+    recognition.onerror = function(event) {
+        console.error("Recognition error:", event.error);
+        if (event.error === 'no-speech') return;
+        stopVoiceInput();
+    };
+
+    recognition.onend = function() {
+        if (isListening) {
+            try {
+                recognition.start();
+            } catch(e) {
+                console.error("Failed to restart recognition:", e);
+                stopVoiceInput();
+            }
+        } else {
+            document.getElementById("voiceBtn").classList.remove("listening");
+            document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
+        }
+    };
+
+    try {
+        recognition.start();
+    } catch(e) {
+        console.error("Failed to start recognition:", e);
+        stopVoiceInput();
+    }
+}
+
+function stopVoiceInput() {
+    isListening = false;
+    if (recognition) {
+        try {
+            recognition.stop();
+        } catch(e) {}
+    }
+    document.getElementById("voiceBtn").classList.remove("listening");
+    document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
 }
 
 /* ================= OVERRIDE VOICE COMMANDS ================= */
-
-// Extend voice.js handleCommand for upload-specific commands
 const originalHandleCommand = window.handleCommand;
 window.handleCommand = function(command) {
     command = command.toLowerCase();
     console.log("Upload command:", command);
     
     // Upload-specific commands
-    if(command.includes("select") || command.includes("choose") || command.includes("browse")) {
+    if(command.includes("select") || command.includes("choose") || command.includes("browse") || 
+       command.includes("चुनें") || command.includes("ଚୟନ")) {
         document.getElementById('fileInput').click();
         return;
     }
-    else if(command.includes("upload") || command.includes("send")) {
+    else if(command.includes("upload") || command.includes("send") || command.includes("अपलोड") || command.includes("ଅପଲୋଡ୍")) {
         uploadFiles();
         return;
     }
@@ -168,6 +444,10 @@ window.handleCommand = function(command) {
         window.location.href = "/" + getCurrentLangCode() + "/";
         return;
     }
+    else if(command.includes("stop listening") || command.includes("stop voice")) {
+        stopVoiceInput();
+        return;
+    }
     
     // If not upload-specific, pass to original handler
     if(originalHandleCommand) {
@@ -175,19 +455,58 @@ window.handleCommand = function(command) {
     }
 };
 
-// Override autoReadPage to read upload instructions
+/* ================= AUTO READ PAGE ================= */
 const originalAutoRead = window.autoReadPage;
 window.autoReadPage = function() {
     if(originalAutoRead) originalAutoRead();
     setTimeout(() => {
         if(typeof speak === 'function') {
-            speak("Insert pen drive or say select to choose files, upload to send");
+            const langCode = getCurrentLangCode();
+            if (langCode === 'hi') {
+                speak("पेन ड्राइव अपलोड पृष्ठ। फ़ाइलें चुनने के लिए सेलेक्ट कहें, अपलोड करने के लिए अपलोड कहें।");
+            } else if (langCode === 'or') {
+                speak("ପେନ୍ ଡ୍ରାଇଭ୍ ଅପଲୋଡ୍ ପୃଷ୍ଠା। ଫାଇଲ୍ ଚୟନ କରିବା ପାଇଁ ସିଲେକ୍ଟ କୁହନ୍ତୁ, ଅପଲୋଡ୍ କରିବା ପାଇଁ ଅପଲୋଡ୍ କୁହନ୍ତୁ।");
+            } else {
+                speak("Pen drive upload page. Say select to choose files, upload to send.");
+            }
         }
     }, 2000);
 };
 
+/* ================= INIT ================= */
+document.addEventListener('DOMContentLoaded', function() {
+    startSessionTimer();
+    
+    document.addEventListener('click', resetSessionTimer);
+    document.addEventListener('keypress', resetSessionTimer);
+    document.addEventListener('touchstart', resetSessionTimer);
+    
+    // Auto-read instructions
+    setTimeout(autoReadPage, 2000);
+});
+
+window.addEventListener('beforeunload', function() {
+    if (sessionTimer) {
+        clearTimeout(sessionTimer);
+    }
+    stopVoiceInput();
+});
+
 // Auto hide messages
-setTimeout(()=>{document.querySelectorAll('.message').forEach(m=>m.style.display='none');},5000);
+setTimeout(() => {
+    document.querySelectorAll('.message').forEach(m => m.style.display = 'none');
+}, 5000);
+
+// Auto-hide success messages after 3 seconds
+setTimeout(function() {
+    const successMsg = document.querySelector('.success-message');
+    if (successMsg) {
+        successMsg.style.animation = 'slideOutLeft 0.3s ease';
+        setTimeout(function() {
+            if (successMsg) successMsg.remove();
+        }, 300);
+    }
+}, 3000);
 
 </script>
 

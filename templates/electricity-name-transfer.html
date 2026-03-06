@@ -24,7 +24,7 @@ border-bottom:2px solid #1e5fbf;
 .header-left div{font-size:12px;font-weight:600;color:#1e5fbf;line-height:1.2;}
 .header-right img{height:35px;}
 
-/* VOICE + BACK */
+/* VOICE BUTTON */
 .voice-corner{
 position:fixed;
 top:80px;
@@ -32,49 +32,140 @@ right:15px;
 display:flex;
 flex-direction:column;
 align-items:center;
-gap:3px;
+gap:4px;
 z-index:1000;
 }
 .voice-corner-btn{
 background:#ff9933;
-width:45px;
-height:45px;
+width:50px;
+height:50px;
 border-radius:50%;
-border:2px solid white;
+border:3px solid white;
 display:flex;
 align-items:center;
 justify-content:center;
-font-size:24px;
+font-size:26px;
 cursor:pointer;
+box-shadow:0 3px 8px rgba(0,0,0,0.2);
+transition:all 0.2s;
 }
 .voice-corner-btn:hover{background:#ffaa44;}
-.voice-corner-btn.listening{background:#28a745;transform:scale(1.1);}
+.voice-corner-btn.listening{
+background:#28a745;
+animation:pulse 1s infinite;
+transform:scale(1.1);
+}
+@keyframes pulse{
+0%{transform:scale(1);}
+50%{transform:scale(1.1);}
+100%{transform:scale(1);}
+}
 .voice-corner-text{
 background:white;
-padding:2px 8px;
-border-radius:12px;
-font-size:10px;
+padding:4px 10px;
+border-radius:20px;
+font-size:11px;
+font-weight:600;
 color:#ff9933;
 border:1px solid #ff9933;
 }
 
+/* BACK BUTTON */
 .back-btn{
 position:fixed;
 top:80px;
 left:15px;
 background:white;
 border:2px solid #1e5fbf;
-border-radius:30px;
-padding:5px 15px;
-font-size:18px;
+border-radius:40px;
+padding:6px 20px;
+font-size:20px;
 font-weight:700;
 color:#1e5fbf;
 text-decoration:none;
 z-index:1000;
 display:inline-block;
+box-shadow:0 4px 0 #0a3d7a;
+transition:all 0.1s;
 }
 .back-btn:hover{background:#1e5fbf;color:white;}
-.back-btn:active{transform:translateY(2px);}
+.back-btn:active{transform:translateY(4px);box-shadow:0 1px 0 #0a3d7a;}
+
+/* TIMEOUT WARNING */
+.timeout-warning{
+position:fixed;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+background:white;
+border:4px solid #ff9933;
+border-radius:40px;
+padding:30px;
+text-align:center;
+z-index:2000;
+box-shadow:0 10px 30px rgba(0,0,0,0.3);
+max-width:500px;
+display:none;
+}
+.timeout-warning p{
+font-size:28px;
+color:#1e5fbf;
+margin-bottom:20px;
+font-weight:700;
+}
+.timeout-warning button{
+background:#28a745;
+color:white;
+border:none;
+border-radius:40px;
+padding:15px 30px;
+font-size:28px;
+font-weight:700;
+cursor:pointer;
+margin:10px;
+min-width:200px;
+box-shadow:0 5px 0 #1e7e34;
+}
+.timeout-warning button:active{
+transform:translateY(5px);
+box-shadow:0 1px 0 #1e7e34;
+}
+.timeout-warning .logout-btn{
+background:#dc3545;
+box-shadow:0 5px 0 #a71d2a;
+}
+
+/* SUCCESS MESSAGE */
+.success-message{
+position:fixed;
+top:80px;
+left:15px;
+background:#4CAF50;
+color:white;
+padding:12px 25px;
+border-radius:50px;
+font-size:18px;
+font-weight:600;
+z-index:2000;
+border:3px solid white;
+box-shadow:0 4px 15px rgba(76,175,80,0.3);
+animation:slideInLeft 0.3s ease;
+display:flex;
+align-items:center;
+gap:8px;
+}
+.success-message::before{
+content:"✅";
+font-size:20px;
+}
+@keyframes slideInLeft{
+from{transform:translateX(-100%);opacity:0;}
+to{transform:translateX(0);opacity:1;}
+}
+@keyframes slideOutLeft{
+from{transform:translateX(0);opacity:1;}
+to{transform:translateX(-100%);opacity:0;}
+}
 
 /* MAIN CONTAINER */
 .container{
@@ -113,7 +204,7 @@ font-weight:800;
 text-align:center;
 }
 
-/* INFO */
+/* INFO CARD */
 .info-card{
 background:#e3f2fd;
 border:2px solid #1e5fbf;
@@ -129,6 +220,92 @@ border:1px solid #ffc107;
 border-radius:20px;
 padding:12px;
 font-size:16px;
+}
+
+/* DOCUMENT UPLOAD SECTION (NEW) */
+.document-upload{
+margin:15px 0;
+}
+.upload-grid{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:10px;
+margin-top:10px;
+}
+.upload-item{
+background:white;
+border:2px solid #1e5fbf;
+border-radius:15px;
+padding:15px;
+text-align:center;
+cursor:pointer;
+transition:all 0.2s;
+}
+.upload-item:hover{
+background:#e3f2fd;
+}
+.upload-item.uploaded{
+background:#d4edda;
+border-color:#28a745;
+}
+.upload-icon{
+font-size:24px;
+margin-bottom:5px;
+}
+.upload-name{
+font-size:14px;
+font-weight:600;
+color:#1e5fbf;
+}
+.upload-status{
+font-size:12px;
+color:#666;
+margin-top:5px;
+}
+
+/* FEE BREAKDOWN (NEW) */
+.fee-breakdown{
+margin:15px 0;
+padding:15px;
+background:white;
+border:2px solid #28a745;
+border-radius:15px;
+}
+.fee-row{
+display:flex;
+justify-content:space-between;
+margin:8px 0;
+font-size:16px;
+}
+.fee-total{
+border-top:2px dashed #1e5fbf;
+margin-top:10px;
+padding-top:10px;
+font-size:20px;
+font-weight:700;
+color:#28a745;
+}
+
+/* CONTACT INFORMATION (NEW) */
+.contact-info{
+margin:15px 0;
+padding:15px;
+background:#f8f9fa;
+border-radius:15px;
+}
+.contact-row{
+display:flex;
+align-items:center;
+gap:10px;
+margin:8px 0;
+}
+.contact-label{
+font-weight:600;
+color:#1e5fbf;
+min-width:100px;
+}
+.contact-value{
+color:#333;
 }
 
 /* FORM */
@@ -176,6 +353,11 @@ transition:all 0.1s;
 }
 .submit-btn:active{transform:translateY(4px);box-shadow:0 1px 0 #1e7e34;}
 .submit-btn:hover{background:#2fcB4f;}
+.submit-btn:disabled{
+background:#6c757d;
+box-shadow:0 4px 0 #545b62;
+cursor:not-allowed;
+}
 
 /* Loading indicator */
 .loading{
@@ -204,7 +386,7 @@ margin-right:10px;
 }
 @keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
 
-/* FLOATING INPUT (FIXED HEIGHT SMALLER) */
+/* FLOATING INPUT */
 .overlay{
 position:fixed;
 inset:0;
@@ -213,7 +395,6 @@ backdrop-filter:blur(3px);
 display:none;
 z-index:900;
 }
-
 .floating-input{
 position:fixed;
 left:50%;
@@ -268,6 +449,8 @@ border:none;
 }
 .keyboard .ok-btn:hover{background:#218838;}
 
+/* UTILITY CLASSES */
+.hidden{display:none !important;}
 </style>
 </head>
 <body>
@@ -282,9 +465,32 @@ border:none;
 </div>
 </div>
 
-<!-- Voice corner will be created dynamically by voice.js -->
+<!-- Voice Button -->
+<div class="voice-corner">
+<div class="voice-corner-btn" id="voiceBtn" onclick="toggleVoiceInput()">🎤</div>
+<div class="voice-corner-text" id="voiceStatus">{% trans "Click" %}</div>
+</div>
 
+<!-- Back Button -->
 <a href="{% url 'electricity-services' %}" class="back-btn">← {% trans "Back" %}</a>
+
+<!-- Timeout Warning -->
+<div id="timeoutWarning" class="timeout-warning">
+    <p>⏰ {% trans "Session about to expire!" %}</p>
+    <button onclick="extendSession()">{% trans "Continue" %}</button>
+    <button class="logout-btn" onclick="window.location='{% url 'index' %}'">{% trans "Logout" %}</button>
+</div>
+
+<!-- Success Messages -->
+{% if messages %}
+    {% for message in messages %}
+        {% if message.tags == 'success' %}
+            <div class="success-message">
+                {{ message }}
+            </div>
+        {% endif %}
+    {% endfor %}
+{% endif %}
 
 <div class="container">
 <div class="content-wrapper">
@@ -310,25 +516,74 @@ border:none;
 📄 {% trans "Required Documents: Sale Deed, NOC, ID Proof, Address Proof" %}
 </div>
 
+<!-- Document Upload Section (New) -->
+<div class="document-upload">
+    <label style="font-size:18px; color:#1e5fbf;">{% trans "Upload Documents" %}</label>
+    <div class="upload-grid">
+        <div class="upload-item" onclick="uploadDocument('saleDeed')" id="saleDeedUpload">
+            <div class="upload-icon">📄</div>
+            <div class="upload-name">{% trans "Sale Deed" %}</div>
+            <div class="upload-status" id="saleDeedStatus">{% trans "Not Uploaded" %}</div>
+        </div>
+        <div class="upload-item" onclick="uploadDocument('noc')" id="nocUpload">
+            <div class="upload-icon">📋</div>
+            <div class="upload-name">{% trans "NOC" %}</div>
+            <div class="upload-status" id="nocStatus">{% trans "Not Uploaded" %}</div>
+        </div>
+        <div class="upload-item" onclick="uploadDocument('idProof')" id="idProofUpload">
+            <div class="upload-icon">🪪</div>
+            <div class="upload-name">{% trans "ID Proof" %}</div>
+            <div class="upload-status" id="idProofStatus">{% trans "Not Uploaded" %}</div>
+        </div>
+        <div class="upload-item" onclick="uploadDocument('addressProof')" id="addressProofUpload">
+            <div class="upload-icon">🏠</div>
+            <div class="upload-name">{% trans "Address Proof" %}</div>
+            <div class="upload-status" id="addressProofStatus">{% trans "Not Uploaded" %}</div>
+        </div>
+    </div>
+</div>
+
 <!-- Django form for name transfer request -->
-<form id="transferForm" method="post" action="{% url 'electricity-name-transfer' %}">
+<form id="transferForm" method="post" action="{% url 'electricity-name-transfer' %}" enctype="multipart/form-data">
     {% csrf_token %}
     <input type="hidden" name="consumer_number" id="consumerNumber" value="{% if consumer_number %}{{ consumer_number }}{% else %}123456789012{% endif %}">
     <input type="hidden" name="new_owner_name" id="newOwnerName" value="{{ request.POST.new_owner_name }}">
     <input type="hidden" name="new_owner_aadhaar" id="newOwnerAadhaar" value="{{ request.POST.new_owner_aadhaar }}">
     <input type="hidden" name="relationship" id="relationshipValue" value="{% if request.POST.relationship %}{{ request.POST.relationship }}{% else %}Purchaser{% endif %}">
+    <input type="hidden" name="new_owner_phone" id="newOwnerPhone" value="{{ request.POST.new_owner_phone }}">
+    <input type="hidden" name="new_owner_email" id="newOwnerEmail" value="{{ request.POST.new_owner_email }}">
+    <input type="hidden" name="transfer_fee" id="transferFee" value="500">
+    
+    <!-- Hidden file inputs for documents -->
+    <input type="file" id="saleDeedFile" name="sale_deed" accept=".pdf,.jpg,.jpeg,.png" style="display:none;" onchange="documentUploaded('saleDeed')">
+    <input type="file" id="nocFile" name="noc" accept=".pdf,.jpg,.jpeg,.png" style="display:none;" onchange="documentUploaded('noc')">
+    <input type="file" id="idProofFile" name="id_proof" accept=".pdf,.jpg,.jpeg,.png" style="display:none;" onchange="documentUploaded('idProof')">
+    <input type="file" id="addressProofFile" name="address_proof" accept=".pdf,.jpg,.jpeg,.png" style="display:none;" onchange="documentUploaded('addressProof')">
 </form>
 
 <div class="form-group">
 <label>{% trans "New Owner Name" %} *</label>
-<input class="large-input" id="newName" readonly placeholder="{% trans "Enter new owner name" %}" 
+<input class="large-input text-input" id="newName" readonly placeholder="{% trans "Enter new owner name" %}" 
        value="{{ request.POST.new_owner_name }}">
 </div>
 
 <div class="form-group">
 <label>{% trans "New Owner Aadhaar" %} *</label>
-<input class="large-input" id="aadhaar" readonly placeholder="{% trans "12 digit Aadhaar" %}" maxlength="12"
+<input class="large-input text-input" id="aadhaar" readonly placeholder="{% trans "12 digit Aadhaar" %}" maxlength="12"
        value="{{ request.POST.new_owner_aadhaar }}">
+</div>
+
+<!-- New Contact Information (New) -->
+<div class="form-group">
+<label>{% trans "New Owner Phone" %}</label>
+<input class="large-input text-input" id="newPhone" readonly placeholder="{% trans "10 digit mobile number" %}" maxlength="10"
+       value="{{ request.POST.new_owner_phone }}">
+</div>
+
+<div class="form-group">
+<label>{% trans "New Owner Email" %}</label>
+<input class="large-input text-input" id="newEmail" readonly placeholder="{% trans "Email address" %}"
+       value="{{ request.POST.new_owner_email }}">
 </div>
 
 <div class="form-group">
@@ -341,7 +596,43 @@ border:none;
 </select>
 </div>
 
-<button class="submit-btn" onclick="submitRequest()">{% trans "Submit Transfer Request" %}</button>
+<!-- Contact Information Display (New) -->
+<div class="contact-info">
+    <div class="contact-row">
+        <span class="contact-label">{% trans "Help Desk:" %}</span>
+        <span class="contact-value">1800-123-4567</span>
+    </div>
+    <div class="contact-row">
+        <span class="contact-label">{% trans "Email:" %}</span>
+        <span class="contact-value">nametransfer@electricity.gov.in</span>
+    </div>
+    <div class="contact-row">
+        <span class="contact-label">{% trans "Processing Time:" %}</span>
+        <span class="contact-value">{% trans "7-10 working days" %}</span>
+    </div>
+</div>
+
+<!-- Fee Breakdown (New) -->
+<div class="fee-breakdown">
+    <div class="fee-row">
+        <span>{% trans "Transfer Fee:" %}</span>
+        <span>₹500</span>
+    </div>
+    <div class="fee-row">
+        <span>{% trans "Document Verification:" %}</span>
+        <span>₹200</span>
+    </div>
+    <div class="fee-row">
+        <span>{% trans "GST (18%):" %}</span>
+        <span id="gstAmount">₹126</span>
+    </div>
+    <div class="fee-total">
+        <span>{% trans "Total:" %}</span>
+        <span id="totalAmount">₹826</span>
+    </div>
+</div>
+
+<button class="submit-btn" onclick="submitRequest()" id="submitBtn">{% trans "Submit Transfer Request" %}</button>
 
 </div>
 </div>
@@ -359,8 +650,77 @@ border:none;
 <script src="{% static 'js/voice.js' %}"></script>
 
 <script>
+/* ================= LANGUAGE MAP ================= */
+const languageMap = {
+    "en": "en-IN",
+    "hi": "hi-IN",
+    "ta": "ta-IN",
+    "te": "te-IN",
+    "bn": "bn-IN",
+    "or": "or-IN"
+};
+
+function getCurrentLang() {
+    let path = window.location.pathname.split('/');
+    const langCode = path[1] || "en";
+    return languageMap[langCode] || "en-IN";
+}
+
+function getCurrentLangCode() {
+    let path = window.location.pathname.split('/');
+    return path[1] || "en";
+}
+
+function speak(text) {
+    if(!('speechSynthesis' in window)) return;
+    speechSynthesis.cancel();
+    let u = new SpeechSynthesisUtterance(text);
+    u.lang = getCurrentLang();
+    u.rate = 1;
+    speechSynthesis.speak(u);
+}
+
+/* ================= SESSION TIMER ================= */
+let sessionTimer;
+let timeoutWarningTimer;
+const SESSION_DURATION = 120000;
+const WARNING_TIME = 10000;
+
+function startSessionTimer() {
+    sessionTimer = setTimeout(() => {
+        showTimeoutWarning();
+    }, SESSION_DURATION - WARNING_TIME);
+}
+
+function showTimeoutWarning() {
+    const warning = document.getElementById('timeoutWarning');
+    if (warning) {
+        warning.style.display = 'block';
+        timeoutWarningTimer = setTimeout(() => {
+            window.location.href = "{% url 'index' %}";
+        }, WARNING_TIME);
+    }
+}
+
+function extendSession() {
+    const warning = document.getElementById('timeoutWarning');
+    if (warning) {
+        warning.style.display = 'none';
+    }
+    clearTimeout(sessionTimer);
+    clearTimeout(timeoutWarningTimer);
+    startSessionTimer();
+}
+
+function resetSessionTimer() {
+    clearTimeout(sessionTimer);
+    clearTimeout(timeoutWarningTimer);
+    startSessionTimer();
+}
+
+/* ================= FLOATING KEYBOARD ================= */
 let activeInput=null;
-let isUpperCase=true;
+let activeFieldType=null;
 
 const overlay=document.getElementById("overlay");
 const floatingInput=document.getElementById("floatingInput");
@@ -371,7 +731,7 @@ function createKeyboard(){
 keyboard.innerHTML="";
 let letters="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 if(!isUpperCase){letters=letters.toLowerCase();}
-let keys=(letters+"0123456789 .-").split("");
+let keys=(letters+"0123456789 .-@").split("");
 
 let row=document.createElement("div");
 row.className="keyboard-row";
@@ -406,8 +766,9 @@ isUpperCase=!isUpperCase;
 createKeyboard();
 }
 
-function openKeyboard(id){
+function openKeyboard(id, fieldType='text'){
 activeInput=document.getElementById(id);
+activeFieldType=fieldType;
 floatingInput.value=activeInput.value;
 overlay.style.display="block";
 floatingInput.style.display="block";
@@ -425,7 +786,15 @@ activeInput.value=floatingInput.value;
 if(activeInput.id === 'newName') {
     document.getElementById('newOwnerName').value = floatingInput.value;
 } else if(activeInput.id === 'aadhaar') {
-    document.getElementById('newOwnerAadhaar').value = floatingInput.value;
+    const digits = floatingInput.value.replace(/\D/g, '').slice(0,12);
+    activeInput.value = digits;
+    document.getElementById('newOwnerAadhaar').value = digits;
+} else if(activeInput.id === 'newPhone') {
+    const digits = floatingInput.value.replace(/\D/g, '').slice(0,10);
+    activeInput.value = digits;
+    document.getElementById('newOwnerPhone').value = digits;
+} else if(activeInput.id === 'newEmail') {
+    document.getElementById('newOwnerEmail').value = floatingInput.value;
 }
 }
 closeKeyboard();
@@ -448,12 +817,52 @@ floatingInput.addEventListener('keydown', function(e) {
     }
 });
 
-document.getElementById("newName").addEventListener("click",()=>openKeyboard("newName"));
-document.getElementById("aadhaar").addEventListener("click",()=>openKeyboard("aadhaar"));
+document.getElementById("newName").addEventListener("click",()=>openKeyboard("newName",'text'));
+document.getElementById("aadhaar").addEventListener("click",()=>openKeyboard("aadhaar",'aadhaar'));
+document.getElementById("newPhone").addEventListener("click",()=>openKeyboard("newPhone",'phone'));
+document.getElementById("newEmail").addEventListener("click",()=>openKeyboard("newEmail",'email'));
 overlay.addEventListener("click",closeKeyboard);
 
 createKeyboard();
 
+/* ================= DOCUMENT UPLOAD FUNCTIONS (NEW) ================= */
+let uploadedDocs = {
+    saleDeed: false,
+    noc: false,
+    idProof: false,
+    addressProof: false
+};
+
+function uploadDocument(docType) {
+    document.getElementById(docType + 'File').click();
+}
+
+function documentUploaded(docType) {
+    const fileInput = document.getElementById(docType + 'File');
+    if (fileInput.files.length > 0) {
+        uploadedDocs[docType] = true;
+        document.getElementById(docType + 'Upload').classList.add('uploaded');
+        document.getElementById(docType + 'Status').innerHTML = '✅ ' + fileInput.files[0].name.substring(0,15) + '...';
+        
+        const langCode = getCurrentLangCode();
+        if (langCode === 'hi') {
+            speak(docType.replace(/([A-Z])/g, ' $1').trim() + " अपलोड हो गया");
+        } else if (langCode === 'or') {
+            speak(docType.replace(/([A-Z])/g, ' $1').trim() + " ଅପଲୋଡ୍ ହେଲା");
+        } else {
+            speak(docType.replace(/([A-Z])/g, ' $1').trim() + " uploaded");
+        }
+    }
+    checkAllDocumentsUploaded();
+}
+
+function checkAllDocumentsUploaded() {
+    const allUploaded = Object.values(uploadedDocs).every(v => v === true);
+    document.getElementById('submitBtn').disabled = !allUploaded;
+    return allUploaded;
+}
+
+/* ================= NAME TRANSFER FUNCTIONS ================= */
 function updateRelationship() {
     const relationship = document.getElementById('relationship').value;
     document.getElementById('relationshipValue').value = relationship;
@@ -462,21 +871,80 @@ function updateRelationship() {
 function submitRequest(){
 const newName = document.getElementById('newName').value;
 const aadhaar = document.getElementById('aadhaar').value;
+const phone = document.getElementById('newPhone').value;
+const email = document.getElementById('newEmail').value;
 
 if(!newName){
-    if(typeof speak === 'function') speak("{% trans 'Please enter new owner name' %}");
+    const langCode = getCurrentLangCode();
+    if (langCode === 'hi') {
+        speak("कृपया नए मालिक का नाम दर्ज करें");
+    } else if (langCode === 'or') {
+        speak("ଦୟାକରି ନୂତନ ମାଲିକଙ୍କ ନାମ ପ୍ରବେଶ କରନ୍ତୁ");
+    } else {
+        speak("{% trans 'Please enter new owner name' %}");
+    }
     return;
 }
 
 if(!aadhaar){
-    if(typeof speak === 'function') speak("{% trans 'Please enter new owner Aadhaar number' %}");
+    const langCode = getCurrentLangCode();
+    if (langCode === 'hi') {
+        speak("कृपया नए मालिक का आधार नंबर दर्ज करें");
+    } else if (langCode === 'or') {
+        speak("ଦୟାକରି ନୂତନ ମାଲିକଙ୍କ ଆଧାର ନମ୍ବର ପ୍ରବେଶ କରନ୍ତୁ");
+    } else {
+        speak("{% trans 'Please enter new owner Aadhaar number' %}");
+    }
     return;
 }
 
 // Validate Aadhaar (12 digits)
 const aadhaarClean = aadhaar.replace(/\s/g, '');
 if(!/^\d{12}$/.test(aadhaarClean)){
-    if(typeof speak === 'function') speak("{% trans 'Please enter a valid 12-digit Aadhaar number' %}");
+    const langCode = getCurrentLangCode();
+    if (langCode === 'hi') {
+        speak("कृपया 12 अंकों का आधार नंबर दर्ज करें");
+    } else if (langCode === 'or') {
+        speak("ଦୟାକରି 12 ଅଙ୍କ ବିଶିଷ୍ଟ ଆଧାର ନମ୍ବର ପ୍ରବେଶ କରନ୍ତୁ");
+    } else {
+        speak("{% trans 'Please enter a valid 12-digit Aadhaar number' %}");
+    }
+    return;
+}
+
+if(phone && phone.length !== 10){
+    const langCode = getCurrentLangCode();
+    if (langCode === 'hi') {
+        speak("कृपया 10 अंकों का मोबाइल नंबर दर्ज करें");
+    } else if (langCode === 'or') {
+        speak("ଦୟାକରି 10 ଅଙ୍କ ବିଶିଷ୍ଟ ମୋବାଇଲ୍ ନମ୍ବର ପ୍ରବେଶ କରନ୍ତୁ");
+    } else {
+        speak("Please enter a 10-digit mobile number");
+    }
+    return;
+}
+
+if(email && !email.includes('@')){
+    const langCode = getCurrentLangCode();
+    if (langCode === 'hi') {
+        speak("कृपया मान्य ईमेल पता दर्ज करें");
+    } else if (langCode === 'or') {
+        speak("ଦୟାକରି ଏକ ବୈଧ ଇମେଲ୍ ଠିକଣା ପ୍ରବେଶ କରନ୍ତୁ");
+    } else {
+        speak("Please enter a valid email address");
+    }
+    return;
+}
+
+if(!checkAllDocumentsUploaded()){
+    const langCode = getCurrentLangCode();
+    if (langCode === 'hi') {
+        speak("कृपया सभी आवश्यक दस्तावेज अपलोड करें");
+    } else if (langCode === 'or') {
+        speak("ଦୟାକରି ସମସ୍ତ ଆବଶ୍ୟକୀୟ ଦଲିଲ ଅପଲୋଡ୍ କରନ୍ତୁ");
+    } else {
+        speak("Please upload all required documents");
+    }
     return;
 }
 
@@ -485,7 +953,14 @@ updateRelationship();
 
 // Show loading
 loadingIndicator.classList.add('show');
-if(typeof speak === 'function') speak("{% trans 'Submitting transfer request' %}");
+const langCode = getCurrentLangCode();
+if (langCode === 'hi') {
+    speak("नामांतरण अनुरोध भेजा जा रहा है");
+} else if (langCode === 'or') {
+    speak("ନାମ ହସ୍ତାନ୍ତର ଅନୁରୋଧ ପଠାଯାଉଛି");
+} else {
+    speak("{% trans 'Submitting transfer request' %}");
+}
 
 // Submit form
 setTimeout(() => {
@@ -493,9 +968,235 @@ setTimeout(() => {
 }, 500);
 }
 
-/* ===================== OVERRIDE VOICE COMMANDS ===================== */
+/* ================= VOICE INPUT ================= */
+let recognition;
+let isListening = false;
 
-// Extend voice.js handleCommand for name transfer-specific commands
+function toggleVoiceInput() {
+    resetSessionTimer();
+    
+    if(isListening) {
+        stopVoiceInput();
+        return;
+    }
+
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if(!SR) {
+        alert("{% trans 'Speech not supported' %}");
+        return;
+    }
+
+    if (recognition) {
+        try {
+            recognition.stop();
+        } catch(e) {}
+    }
+
+    recognition = new SR();
+    recognition.lang = getCurrentLang();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = function() {
+        isListening = true;
+        document.getElementById("voiceBtn").classList.add("listening");
+        document.getElementById("voiceStatus").innerText = "{% trans 'Listening...' %}";
+        
+        const langCode = getCurrentLangCode();
+        if (langCode === 'hi') {
+            speak("कृपया आदेश बोलें... नाम, आधार, फोन, ईमेल, रिश्ता, दस्तावेज, या जमा करें");
+        } else if (langCode === 'or') {
+            speak("ଦୟାକରି ନିର୍ଦ୍ଦେଶ କୁହନ୍ତୁ... ନାମ, ଆଧାର, ଫୋନ୍, ଇମେଲ୍, ସମ୍ପର୍କ, ଦଲିଲ, କିମ୍ବା ଦାଖଲ କରନ୍ତୁ");
+        } else {
+            speak("{% trans 'Please say a command... name, aadhaar, phone, email, relationship, document, or submit' %}");
+        }
+    };
+
+    recognition.onresult = function(e) {
+        resetSessionTimer();
+        
+        let finalTranscript = '';
+        let interimTranscript = '';
+        
+        for (let i = 0; i < e.results.length; i++) {
+            const result = e.results[i];
+            if (result.isFinal) {
+                finalTranscript += result[0].transcript;
+            } else {
+                interimTranscript += result[0].transcript;
+            }
+        }
+        
+        const transcript = finalTranscript || interimTranscript;
+        const command = transcript.toLowerCase();
+        console.log("Name transfer command:", command);
+        
+        // Check for numbers in command (Aadhaar)
+        const numberMatch = command.match(/\d+/g);
+        if(numberMatch && (command.includes("aadhaar") || command.includes("आधार") || command.includes("ଆଧାର"))) {
+            const digits = numberMatch.join('').slice(0,12);
+            if(digits.length === 12) {
+                document.getElementById('aadhaar').value = digits;
+                document.getElementById('newOwnerAadhaar').value = digits;
+                const langCode = getCurrentLangCode();
+                if (langCode === 'hi') {
+                    speak("आधार नंबर दर्ज किया गया");
+                } else if (langCode === 'or') {
+                    speak("ଆଧାର ନମ୍ବର ପ୍ରବେଶ ହେଲା");
+                } else {
+                    speak("Aadhaar number entered");
+                }
+            }
+            return;
+        }
+        
+        if(numberMatch && (command.includes("phone") || command.includes("mobile") || command.includes("फोन") || command.includes("ଫୋନ୍"))) {
+            const digits = numberMatch.join('').slice(0,10);
+            document.getElementById('newPhone').value = digits;
+            document.getElementById('newOwnerPhone').value = digits;
+            const langCode = getCurrentLangCode();
+            if (langCode === 'hi') {
+                speak("फोन नंबर दर्ज किया गया");
+            } else if (langCode === 'or') {
+                speak("ଫୋନ୍ ନମ୍ବର ପ୍ରବେଶ ହେଲା");
+            } else {
+                speak("Phone number entered");
+            }
+            return;
+        }
+        
+        // Name input
+        if((command.includes("name") || command.includes("नाम") || command.includes("ନାମ")) && command.length > 10) {
+            let name = command.replace("name", "").replace("नाम", "").replace("ନାମ", "").trim();
+            if(name) {
+                name = name.split(' ').map(word => 
+                    word.charAt(0).toUpperCase() + word.slice(1)
+                ).join(' ');
+                document.getElementById('newName').value = name;
+                document.getElementById('newOwnerName').value = name;
+                const langCode = getCurrentLangCode();
+                if (langCode === 'hi') {
+                    speak("नाम दर्ज किया गया: " + name);
+                } else if (langCode === 'or') {
+                    speak("ନାମ ପ୍ରବେଶ ହେଲା: " + name);
+                } else {
+                    speak("Name entered: " + name);
+                }
+            }
+            return;
+        }
+        
+        // Email input
+        if(command.includes("@") || (command.includes("email") || command.includes("ईमेल") || command.includes("ଇମେଲ୍"))) {
+            document.getElementById('newEmail').value = command;
+            document.getElementById('newOwnerEmail').value = command;
+            return;
+        }
+        
+        // Document upload commands
+        if(command.includes("sale deed") || command.includes("बिक्री विलेख") || command.includes("ବିକ୍ରୟ ଦଲିଲ")) {
+            document.getElementById('saleDeedFile').click();
+            return;
+        }
+        else if(command.includes("noc") || command.includes("एनओसी") || command.includes("ଏନଓସି")) {
+            document.getElementById('nocFile').click();
+            return;
+        }
+        else if(command.includes("id proof") || command.includes("आईडी") || command.includes("ଆଇଡି")) {
+            document.getElementById('idProofFile').click();
+            return;
+        }
+        else if(command.includes("address proof") || command.includes("पता") || command.includes("ଠିକଣା")) {
+            document.getElementById('addressProofFile').click();
+            return;
+        }
+        
+        // Relationship selection
+        const relations = {
+            "purchaser": "Purchaser",
+            "family": "Family Member",
+            "legal": "Legal Heir",
+            "heir": "Legal Heir",
+            "other": "Other"
+        };
+        
+        for (let [key, value] of Object.entries(relations)) {
+            if(command.includes(key) || (value === "Legal Heir" && (command.includes("legal") || command.includes("heir")))) {
+                const select = document.getElementById('relationship');
+                select.value = value;
+                updateRelationship();
+                const langCode = getCurrentLangCode();
+                if (langCode === 'hi') {
+                    speak(value + " चयनित");
+                } else if (langCode === 'or') {
+                    speak(value + " ଚୟନ ହେଲା");
+                } else {
+                    speak(value + " selected");
+                }
+                return;
+            }
+        }
+        
+        // Submit command
+        if(command.includes("submit") || command.includes("transfer") || command.includes("जमा") || command.includes("हस्तांतरण") || command.includes("ଦାଖଲ")) {
+            submitRequest();
+            return;
+        }
+        else if(command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
+            window.location.href = "/" + getCurrentLangCode() + "/electricity-services/";
+            return;
+        }
+        else if(command.includes("home") || command.includes("होम") || command.includes("ଘର")) {
+            window.location.href = "/" + getCurrentLangCode() + "/";
+            return;
+        }
+        else if(command.includes("stop listening") || command.includes("stop voice")) {
+            stopVoiceInput();
+            return;
+        }
+    };
+
+    recognition.onerror = function(event) {
+        console.error("Recognition error:", event.error);
+        if (event.error === 'no-speech') return;
+        stopVoiceInput();
+    };
+
+    recognition.onend = function() {
+        if (isListening) {
+            try {
+                recognition.start();
+            } catch(e) {
+                console.error("Failed to restart recognition:", e);
+                stopVoiceInput();
+            }
+        } else {
+            document.getElementById("voiceBtn").classList.remove("listening");
+            document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
+        }
+    };
+
+    try {
+        recognition.start();
+    } catch(e) {
+        console.error("Failed to start recognition:", e);
+        stopVoiceInput();
+    }
+}
+
+function stopVoiceInput() {
+    isListening = false;
+    if (recognition) {
+        try {
+            recognition.stop();
+        } catch(e) {}
+    }
+    document.getElementById("voiceBtn").classList.remove("listening");
+    document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
+}
+
+/* ================= OVERRIDE VOICE COMMANDS ================= */
 const originalHandleCommand = window.handleCommand;
 window.handleCommand = function(command) {
     command = command.toLowerCase();
@@ -515,10 +1216,8 @@ window.handleCommand = function(command) {
     
     // Name input
     if(command.includes("name") && command.length > 10) {
-        // Extract name part (remove command word)
         let name = command.replace("name", "").trim();
         if(name) {
-            // Capitalize first letter of each word
             name = name.split(' ').map(word => 
                 word.charAt(0).toUpperCase() + word.slice(1)
             ).join(' ');
@@ -557,8 +1256,11 @@ window.handleCommand = function(command) {
         window.location.href = "/" + getCurrentLangCode() + "/";
         return;
     }
+    else if(command.includes("stop listening") || command.includes("stop voice")) {
+        stopVoiceInput();
+        return;
+    }
     
-    // If not name transfer-specific, pass to original handler
     if(originalHandleCommand) {
         originalHandleCommand(command);
     }
@@ -570,7 +1272,14 @@ window.autoReadPage = function() {
     if(originalAutoRead) originalAutoRead();
     setTimeout(() => {
         if(typeof speak === 'function') {
-            speak("{% trans 'Enter new owner name, aadhaar number, select relationship, then say submit to transfer' %}");
+            const langCode = getCurrentLangCode();
+            if (langCode === 'hi') {
+                speak("नामांतरण पृष्ठ। नए मालिक का नाम, आधार, फोन, ईमेल दर्ज करें, रिश्ता चुनें, सभी दस्तावेज अपलोड करें, फिर जमा करें कहें।");
+            } else if (langCode === 'or') {
+                speak("ନାମ ହସ୍ତାନ୍ତର ପୃଷ୍ଠା। ନୂତନ ମାଲିକଙ୍କ ନାମ, ଆଧାର, ଫୋନ୍, ଇମେଲ୍ ପ୍ରବେଶ କରନ୍ତୁ, ସମ୍ପର୍କ ଚୟନ କରନ୍ତୁ, ସମସ୍ତ ଦଲିଲ ଅପଲୋଡ୍ କରନ୍ତୁ, ତାପରେ ଦାଖଲ କରନ୍ତୁ କୁହନ୍ତୁ।");
+            } else {
+                speak("{% trans 'Name transfer page. Enter new owner name, aadhaar, phone, email, select relationship, upload all documents, then say submit.' %}");
+            }
         }
     }, 2000);
 };
@@ -581,6 +1290,17 @@ setTimeout(function() {
         message.style.display = 'none';
     });
 }, 5000);
+
+// Auto-hide success messages after 3 seconds
+setTimeout(function() {
+    const successMsg = document.querySelector('.success-message');
+    if (successMsg) {
+        successMsg.style.animation = 'slideOutLeft 0.3s ease';
+        setTimeout(function() {
+            if (successMsg) successMsg.remove();
+        }, 300);
+    }
+}, 3000);
 
 // Prevent form submission on Enter key
 document.addEventListener('keydown', function(e) {
@@ -593,6 +1313,24 @@ document.addEventListener('keydown', function(e) {
 function formatAadhaar(aadhaar) {
     return aadhaar.replace(/\s/g, '').replace(/(\d{4})/g, '$1 ').trim();
 }
+
+/* ================= INIT ================= */
+document.addEventListener('DOMContentLoaded', function() {
+    startSessionTimer();
+    
+    document.addEventListener('click', resetSessionTimer);
+    document.addEventListener('keypress', resetSessionTimer);
+    document.addEventListener('touchstart', resetSessionTimer);
+    
+    setTimeout(autoReadPage, 2000);
+});
+
+window.addEventListener('beforeunload', function() {
+    if (sessionTimer) {
+        clearTimeout(sessionTimer);
+    }
+    stopVoiceInput();
+});
 </script>
 
 </body>

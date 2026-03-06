@@ -15,36 +15,138 @@
         .header-right img { height:35px; }
 
         /* Voice Button */
-        .voice-corner { position:fixed; top:80px; right:15px; z-index:1000; display:flex; flex-direction:column; align-items:center; gap:3px; }
+        .voice-corner { position:fixed; top:80px; right:15px; z-index:1000; display:flex; flex-direction:column; align-items:center; gap:4px; }
         .voice-corner-btn {
             background:#ff9933;
             width:50px;
             height:50px;
             border-radius:50%;
-            border:2px solid white;
+            border:3px solid white;
             cursor:pointer;
             display:flex;
             align-items:center;
             justify-content:center;
-            font-size:24px;
-            box-shadow:0 2px 5px rgba(0,0,0,0.2);
-            transition:0.2s;
+            font-size:26px;
+            box-shadow:0 3px 8px rgba(0,0,0,0.2);
+            transition:all 0.2s;
         }
         .voice-corner-btn.listening {
             background:#28a745;
-            transform:scale(1.1);
+            animation:pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0% { transform:scale(1); }
+            50% { transform:scale(1.1); }
+            100% { transform:scale(1); }
         }
         .voice-corner-text {
             background:white;
-            padding:3px 8px;
-            border-radius:12px;
+            padding:4px 10px;
+            border-radius:20px;
             font-size:11px;
+            font-weight:600;
             color:#ff9933;
             border:1px solid #ff9933;
-            font-weight:600;
         }
 
-        .back-btn { position:fixed; top:80px; left:15px; background:white; border:2px solid #1e5fbf; border-radius:30px; padding:5px 15px; font-size:18px; font-weight:700; cursor:pointer; color:#1e5fbf; text-decoration:none; box-shadow:0 3px 0 #0a3d7a; z-index:1000; display:inline-block; }
+        .back-btn { 
+            position:fixed; 
+            top:80px; 
+            left:15px; 
+            background:white; 
+            border:2px solid #1e5fbf; 
+            border-radius:40px; 
+            padding:6px 20px; 
+            font-size:20px; 
+            font-weight:700; 
+            cursor:pointer; 
+            color:#1e5fbf; 
+            text-decoration:none; 
+            box-shadow:0 4px 0 #0a3d7a; 
+            z-index:1000; 
+            display:inline-block;
+            transition:all 0.1s;
+        }
+        .back-btn:active {
+            transform:translateY(4px);
+            box-shadow:0 1px 0 #0a3d7a;
+        }
+
+        /* Timeout Warning */
+        .timeout-warning {
+            position:fixed;
+            top:50%;
+            left:50%;
+            transform:translate(-50%,-50%);
+            background:white;
+            border:4px solid #ff9933;
+            border-radius:40px;
+            padding:30px;
+            text-align:center;
+            z-index:2000;
+            box-shadow:0 10px 30px rgba(0,0,0,0.3);
+            max-width:500px;
+            display:none;
+        }
+        .timeout-warning p {
+            font-size:28px;
+            color:#1e5fbf;
+            margin-bottom:20px;
+            font-weight:700;
+        }
+        .timeout-warning button {
+            background:#28a745;
+            color:white;
+            border:none;
+            border-radius:40px;
+            padding:15px 30px;
+            font-size:28px;
+            font-weight:700;
+            cursor:pointer;
+            margin:10px;
+            min-width:200px;
+            box-shadow:0 5px 0 #1e7e34;
+        }
+        .timeout-warning button:active {
+            transform:translateY(5px);
+            box-shadow:0 1px 0 #1e7e34;
+        }
+        .timeout-warning .logout-btn {
+            background:#dc3545;
+            box-shadow:0 5px 0 #a71d2a;
+        }
+
+        /* Success Message */
+        .success-message {
+            position:fixed;
+            top:80px;
+            left:15px;
+            background:#4CAF50;
+            color:white;
+            padding:12px 25px;
+            border-radius:50px;
+            font-size:18px;
+            font-weight:600;
+            z-index:2000;
+            border:3px solid white;
+            box-shadow:0 4px 15px rgba(76,175,80,0.3);
+            animation:slideInLeft 0.3s ease;
+            display:flex;
+            align-items:center;
+            gap:8px;
+        }
+        .success-message::before {
+            content:"✅";
+            font-size:20px;
+        }
+        @keyframes slideInLeft {
+            from { transform:translateX(-100%); opacity:0; }
+            to { transform:translateX(0); opacity:1; }
+        }
+        @keyframes slideOutLeft {
+            from { transform:translateX(0); opacity:1; }
+            to { transform:translateX(-100%); opacity:0; }
+        }
 
         .container { position:fixed; top:70px; left:0; right:0; bottom:0; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:10px; overflow:hidden; }
         .content-wrapper { width:100%; max-width:600px; text-align:center; }
@@ -54,14 +156,19 @@
         .qr-container { background:white; border:4px solid #1e5fbf; border-radius:40px; padding:30px; display:inline-block; margin:20px 0; box-shadow:0 8px 0 #0a3d7a; }
         .qr-code { width:250px; height:250px; background:#f0f0f0; display:flex; align-items:center; justify-content:center; font-size:40px; border:2px dashed #1e5fbf; }
 
-        .refresh-qr { background:#ff9933; color:white; font-size:16px; padding:8px 15px; border-radius:20px; border:none; cursor:pointer; margin-top:10px; }
+        .refresh-qr { background:#ff9933; color:white; font-size:16px; padding:8px 15px; border-radius:20px; border:none; cursor:pointer; margin-top:10px; box-shadow:0 3px 0 #b35900; transition:all 0.1s; }
+        .refresh-qr:active { transform:translateY(3px); box-shadow:0 1px 0 #b35900; }
 
-        .continue-btn { background:#28a745; color:white; font-size:24px; padding:12px; border-radius:30px; width:100%; border:none; margin-top:15px; display:none; }
+        .continue-btn { background:#28a745; color:white; font-size:24px; padding:12px; border-radius:30px; width:100%; border:none; margin-top:15px; display:none; box-shadow:0 5px 0 #1e7e34; transition:all 0.1s; }
+        .continue-btn:active { transform:translateY(5px); box-shadow:0 1px 0 #1e7e34; }
 
         .document-list { background:white; border:2px solid #1e5fbf; border-radius:20px; padding:15px; margin:20px 0; max-height:200px; overflow-y:auto; display:none; }
 
         .loading { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center; color:white; font-size:24px; }
         .loading.show { display:flex; }
+
+        /* Utility Classes */
+        .hidden { display:none !important; }
     </style>
 </head>
 <body>
@@ -80,9 +187,32 @@
     </div>
 </div>
 
-<!-- Voice corner will be created dynamically by voice.js -->
+<!-- Voice Button -->
+<div class="voice-corner">
+    <div class="voice-corner-btn" id="voiceBtn" onclick="toggleVoiceInput()">🎤</div>
+    <div class="voice-corner-text" id="voiceStatus">{% trans "Click" %}</div>
+</div>
 
-<a href="{% url 'menu' %}" class="back-btn">← {% trans "Back" %}</a>
+<!-- Back Button -->
+<a href="{% url 'menu' %}" class="back-btn" id="backBtn">← {% trans "Back" %}</a>
+
+<!-- Timeout Warning -->
+<div id="timeoutWarning" class="timeout-warning">
+    <p>⏰ {% trans "Session about to expire!" %}</p>
+    <button onclick="extendSession()">{% trans "Continue" %}</button>
+    <button class="logout-btn" onclick="window.location='{% url 'index' %}'">{% trans "Logout" %}</button>
+</div>
+
+<!-- Success Messages -->
+{% if messages %}
+    {% for message in messages %}
+        {% if message.tags == 'success' %}
+            <div class="success-message">
+                {{ message }}
+            </div>
+        {% endif %}
+    {% endfor %}
+{% endif %}
 
 <div class="container">
     <div class="content-wrapper">
@@ -98,7 +228,7 @@
             <div class="qr-code" id="qrCode">{% trans "QR" %}</div>
         </div>
 
-        <button class="refresh-qr" onclick="refreshQRCode()">🔄 {% trans "Refresh QR Code" %}</button>
+        <button class="refresh-qr" onclick="refreshQRCode()" id="refreshBtn">🔄 {% trans "Refresh QR Code" %}</button>
 
         <div id="waitingMessage" style="margin-top:15px;">⏳ {% trans "Waiting for upload..." %}</div>
 
@@ -117,47 +247,304 @@
 <script src="{% static 'js/voice.js' %}"></script>
 
 <script>
+/* ================= LANGUAGE MAP ================= */
+const languageMap = {
+    "en": "en-IN",
+    "hi": "hi-IN",
+    "ta": "ta-IN",
+    "te": "te-IN",
+    "bn": "bn-IN",
+    "or": "or-IN"
+};
 
-// ===================== QR SIMULATION =====================
+function getCurrentLang() {
+    let path = window.location.pathname.split('/');
+    const langCode = path[1] || "en";
+    return languageMap[langCode] || "en-IN";
+}
+
+function getCurrentLangCode() {
+    let path = window.location.pathname.split('/');
+    return path[1] || "en";
+}
+
+/* ================= TEXT TO SPEECH ================= */
+function speak(text) {
+    if(!('speechSynthesis' in window)) return;
+    speechSynthesis.cancel();
+    let u = new SpeechSynthesisUtterance(text);
+    u.lang = getCurrentLang();
+    u.rate = 1;
+    speechSynthesis.speak(u);
+}
+
+/* ================= SESSION TIMER ================= */
+let sessionTimer;
+let timeoutWarningTimer;
+const SESSION_DURATION = 120000;
+const WARNING_TIME = 10000;
+
+function startSessionTimer() {
+    sessionTimer = setTimeout(() => {
+        showTimeoutWarning();
+    }, SESSION_DURATION - WARNING_TIME);
+}
+
+function showTimeoutWarning() {
+    const warning = document.getElementById('timeoutWarning');
+    if (warning) {
+        warning.style.display = 'block';
+        timeoutWarningTimer = setTimeout(() => {
+            window.location.href = "{% url 'index' %}";
+        }, WARNING_TIME);
+    }
+}
+
+function extendSession() {
+    const warning = document.getElementById('timeoutWarning');
+    if (warning) {
+        warning.style.display = 'none';
+    }
+    clearTimeout(sessionTimer);
+    clearTimeout(timeoutWarningTimer);
+    startSessionTimer();
+}
+
+function resetSessionTimer() {
+    clearTimeout(sessionTimer);
+    clearTimeout(timeoutWarningTimer);
+    startSessionTimer();
+}
+
+/* ================= QR SIMULATION ================= */
 let scanTimeout = setTimeout(simulateDocumentsReceived, 30000);
 
 function simulateDocumentsReceived() {
+    resetSessionTimer();
     document.getElementById('waitingMessage').style.display = 'none';
     document.getElementById('documentList').style.display = 'block';
     document.getElementById('continueBtn').style.display = 'block';
     document.getElementById('documentCount').value = 4;
-    if(typeof speak === 'function') speak("{% trans 'Documents received. Say continue to proceed.' %}");
+    
+    const langCode = getCurrentLangCode();
+    if (langCode === 'hi') {
+        speak("दस्तावेज़ प्राप्त हो गए। जारी रखने के लिए कंटिन्यू कहें।");
+    } else if (langCode === 'or') {
+        speak("ଦଲିଲଗୁଡିକ ପ୍ରାପ୍ତ ହେଲା। ଜାରି ରଖିବା ପାଇଁ କଣ୍ଟିନ୍ୟୁ କୁହନ୍ତୁ।");
+    } else {
+        speak("{% trans 'Documents received. Say continue to proceed.' %}");
+    }
 }
 
 function refreshQRCode() {
+    resetSessionTimer();
     clearTimeout(scanTimeout);
     document.getElementById('waitingMessage').style.display = 'block';
     document.getElementById('documentList').style.display = 'none';
     document.getElementById('continueBtn').style.display = 'none';
     scanTimeout = setTimeout(simulateDocumentsReceived, 30000);
-    if(typeof speak === 'function') speak("{% trans 'QR code refreshed' %}");
+    
+    const langCode = getCurrentLangCode();
+    if (langCode === 'hi') {
+        speak("क्यूआर कोड रीफ्रेश किया गया");
+    } else if (langCode === 'or') {
+        speak("QR କୋଡ୍ ରିଫ୍ରେସ୍ ହେଲା");
+    } else {
+        speak("{% trans 'QR code refreshed' %}");
+    }
 }
 
 function continueToMenu() {
+    resetSessionTimer();
     document.getElementById('loadingIndicator').classList.add('show');
-    if(typeof speak === 'function') speak("{% trans 'Processing' %}");
+    
+    const langCode = getCurrentLangCode();
+    if (langCode === 'hi') {
+        speak("प्रसंस्करण हो रहा है");
+    } else if (langCode === 'or') {
+        speak("ପ୍ରକ୍ରିୟାକରଣ ହେଉଛି");
+    } else {
+        speak("{% trans 'Processing' %}");
+    }
+    
     setTimeout(() => document.getElementById('qrForm').submit(), 500);
 }
 
-// ===================== OVERRIDE VOICE COMMANDS =====================
+/* ================= VOICE INPUT ================= */
+let recognition;
+let isListening = false;
 
-// Extend voice.js handleCommand for QR-specific commands
+function toggleVoiceInput() {
+    resetSessionTimer();
+    
+    if(isListening) {
+        stopVoiceInput();
+        return;
+    }
+
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if(!SR) {
+        alert("{% trans 'Speech not supported' %}");
+        return;
+    }
+
+    if (recognition) {
+        try {
+            recognition.stop();
+        } catch(e) {}
+    }
+
+    recognition = new SR();
+    recognition.lang = getCurrentLang();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = function() {
+        isListening = true;
+        document.getElementById("voiceBtn").classList.add("listening");
+        document.getElementById("voiceStatus").innerText = "{% trans 'Listening...' %}";
+        
+        const langCode = getCurrentLangCode();
+        if (langCode === 'hi') {
+            speak("कृपया आदेश बोलें... रीफ्रेश, कंटिन्यू, स्टेटस, या वापस");
+        } else if (langCode === 'or') {
+            speak("ଦୟାକରି ନିର୍ଦ୍ଦେଶ କୁହନ୍ତୁ... ରିଫ୍ରେସ୍, କଣ୍ଟିନ୍ୟୁ, ସ୍ଥିତି, କିମ୍ବା ପଛକୁ");
+        } else {
+            speak("{% trans 'Please say a command... refresh, continue, status, or back' %}");
+        }
+    };
+
+    recognition.onresult = function(e) {
+        resetSessionTimer();
+        
+        let finalTranscript = '';
+        let interimTranscript = '';
+        
+        for (let i = 0; i < e.results.length; i++) {
+            const result = e.results[i];
+            if (result.isFinal) {
+                finalTranscript += result[0].transcript;
+            } else {
+                interimTranscript += result[0].transcript;
+            }
+        }
+        
+        const transcript = finalTranscript || interimTranscript;
+        const command = transcript.toLowerCase();
+        console.log("QR command:", command);
+
+        // QR-specific commands
+        if (command.includes("refresh") || command.includes("new qr") || command.includes("reset") || 
+            command.includes("रीफ्रेश") || command.includes("ରିଫ୍ରେସ୍")) {
+            refreshQRCode();
+            return;
+        }
+        else if (command.includes("continue") || command.includes("next") || command.includes("proceed") || 
+                 command.includes("कंटिन्यू") || command.includes("କଣ୍ଟିନ୍ୟୁ")) {
+            if (document.getElementById('continueBtn').style.display === 'block') {
+                continueToMenu();
+            } else {
+                const langCode = getCurrentLangCode();
+                if (langCode === 'hi') {
+                    speak("कृपया दस्तावेज़ों के लिए प्रतीक्षा करें");
+                } else if (langCode === 'or') {
+                    speak("ଦୟାକରି ଦଲିଲ ପାଇଁ ଅପେକ୍ଷା କରନ୍ତୁ");
+                } else {
+                    speak("{% trans 'Please wait for documents' %}");
+                }
+            }
+            return;
+        }
+        else if (command.includes("status") || command.includes("check") || command.includes("स्थिति") || command.includes("ସ୍ଥିତି")) {
+            if (document.getElementById('continueBtn').style.display === 'block') {
+                const langCode = getCurrentLangCode();
+                if (langCode === 'hi') {
+                    speak("दस्तावेज़ प्राप्त हो गए");
+                } else if (langCode === 'or') {
+                    speak("ଦଲିଲଗୁଡିକ ପ୍ରାପ୍ତ ହେଲା");
+                } else {
+                    speak("{% trans 'Documents received' %}");
+                }
+            } else {
+                const langCode = getCurrentLangCode();
+                if (langCode === 'hi') {
+                    speak("अपलोड की प्रतीक्षा है");
+                } else if (langCode === 'or') {
+                    speak("ଅପଲୋଡ୍ ପାଇଁ ଅପେକ୍ଷା");
+                } else {
+                    speak("{% trans 'Waiting for upload' %}");
+                }
+            }
+            return;
+        }
+        else if (command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
+            window.location.href = "/" + getCurrentLangCode() + "/menu/";
+            return;
+        }
+        else if (command.includes("home") || command.includes("होम") || command.includes("ଘର")) {
+            window.location.href = "/" + getCurrentLangCode() + "/";
+            return;
+        }
+        else if (command.includes("stop listening") || command.includes("stop voice")) {
+            stopVoiceInput();
+            return;
+        }
+    };
+
+    recognition.onerror = function(event) {
+        console.error("Recognition error:", event.error);
+        if (event.error === 'no-speech') return;
+        stopVoiceInput();
+    };
+
+    recognition.onend = function() {
+        if (isListening) {
+            try {
+                recognition.start();
+            } catch(e) {
+                console.error("Failed to restart recognition:", e);
+                stopVoiceInput();
+            }
+        } else {
+            document.getElementById("voiceBtn").classList.remove("listening");
+            document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
+        }
+    };
+
+    try {
+        recognition.start();
+    } catch(e) {
+        console.error("Failed to start recognition:", e);
+        stopVoiceInput();
+    }
+}
+
+function stopVoiceInput() {
+    isListening = false;
+    if (recognition) {
+        try {
+            recognition.stop();
+        } catch(e) {}
+    }
+    document.getElementById("voiceBtn").classList.remove("listening");
+    document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
+}
+
+/* ================= OVERRIDE VOICE COMMANDS ================= */
 const originalHandleCommand = window.handleCommand;
 window.handleCommand = function(command) {
     command = command.toLowerCase();
     console.log("QR command:", command);
     
     // QR-specific commands
-    if(command.includes("refresh") || command.includes("new qr") || command.includes("reset")) {
+    if(command.includes("refresh") || command.includes("new qr") || command.includes("reset") || 
+       command.includes("रीफ्रेश") || command.includes("ରିଫ୍ରେସ୍")) {
         refreshQRCode();
         return;
     }
-    else if(command.includes("continue") || command.includes("next") || command.includes("proceed")) {
+    else if(command.includes("continue") || command.includes("next") || command.includes("proceed") || 
+            command.includes("कंटिन्यू") || command.includes("କଣ୍ଟିନ୍ୟୁ")) {
         if(document.getElementById('continueBtn').style.display === 'block') {
             continueToMenu();
         } else {
@@ -165,7 +552,7 @@ window.handleCommand = function(command) {
         }
         return;
     }
-    else if(command.includes("status") || command.includes("check")) {
+    else if(command.includes("status") || command.includes("check") || command.includes("स्थिति") || command.includes("ସ୍ଥିତି")) {
         if(document.getElementById('continueBtn').style.display === 'block') {
             if(typeof speak === 'function') speak("{% trans 'Documents received' %}");
         } else {
@@ -181,6 +568,10 @@ window.handleCommand = function(command) {
         window.location.href = "/" + getCurrentLangCode() + "/";
         return;
     }
+    else if(command.includes("stop listening") || command.includes("stop voice")) {
+        stopVoiceInput();
+        return;
+    }
     
     // If not QR-specific, pass to original handler
     if(originalHandleCommand) {
@@ -188,16 +579,53 @@ window.handleCommand = function(command) {
     }
 };
 
-// Override autoReadPage to read QR instructions
+/* ================= AUTO READ PAGE ================= */
 const originalAutoRead = window.autoReadPage;
 window.autoReadPage = function() {
     if(originalAutoRead) originalAutoRead();
     setTimeout(() => {
         if(typeof speak === 'function') {
-            speak("{% trans 'Scan QR code with your phone. Say refresh for new code, continue when done' %}");
+            const langCode = getCurrentLangCode();
+            if (langCode === 'hi') {
+                speak("क्यूआर कोड अपलोड पृष्ठ। अपने फोन से क्यूआर कोड स्कैन करें। नया कोड के लिए रीफ्रेश कहें, तैयार होने पर कंटिन्यू कहें।");
+            } else if (langCode === 'or') {
+                speak("QR କୋଡ୍ ଅପଲୋଡ୍ ପୃଷ୍ଠା। ଆପଣଙ୍କ ଫୋନ୍ ରେ QR କୋଡ୍ ସ୍କାନ୍ କରନ୍ତୁ। ନୂଆ କୋଡ୍ ପାଇଁ ରିଫ୍ରେସ୍ କୁହନ୍ତୁ, ପ୍ରସ୍ତୁତ ହେଲେ କଣ୍ଟିନ୍ୟୁ କୁହନ୍ତୁ।");
+            } else {
+                speak("{% trans 'QR code upload page. Scan QR code with your phone. Say refresh for new code, continue when done.' %}");
+            }
         }
     }, 2000);
 };
+
+/* ================= INIT ================= */
+document.addEventListener('DOMContentLoaded', function() {
+    startSessionTimer();
+    
+    document.addEventListener('click', resetSessionTimer);
+    document.addEventListener('keypress', resetSessionTimer);
+    document.addEventListener('touchstart', resetSessionTimer);
+    
+    // Auto-read instructions
+    setTimeout(autoReadPage, 2000);
+});
+
+window.addEventListener('beforeunload', function() {
+    if (sessionTimer) {
+        clearTimeout(sessionTimer);
+    }
+    stopVoiceInput();
+});
+
+// Auto-hide success messages after 3 seconds
+setTimeout(function() {
+    const successMsg = document.querySelector('.success-message');
+    if (successMsg) {
+        successMsg.style.animation = 'slideOutLeft 0.3s ease';
+        setTimeout(function() {
+            if (successMsg) successMsg.remove();
+        }, 300);
+    }
+}, 3000);
 
 // Ensure voice engine starts
 document.addEventListener('DOMContentLoaded', function() {

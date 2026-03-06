@@ -15,46 +15,240 @@ body{width:100vw;height:100vh;overflow:hidden;background:#f0f7ff;}
 .header-left div{font-size:12px;font-weight:600;color:#1e5fbf;line-height:1.2;}
 .header-right img{height:35px;}
 
-.voice-corner{position:fixed;top:80px;right:15px;display:flex;flex-direction:column;align-items:center;gap:3px;z-index:1000;}
+/* VOICE BUTTON */
+.voice-corner{position:fixed;top:80px;right:15px;display:flex;flex-direction:column;align-items:center;gap:4px;z-index:1000;}
 .voice-corner-btn{
 background:#ff9933;
 width:50px;
 height:50px;
 border-radius:50%;
-border:2px solid white;
+border:3px solid white;
 display:flex;
 align-items:center;
 justify-content:center;
-font-size:24px;
+font-size:26px;
 cursor:pointer;
-transition:0.2s;
+box-shadow:0 3px 8px rgba(0,0,0,0.2);
+transition:all 0.2s;
 }
 .voice-corner-btn.listening{
 background:#28a745;
+animation:pulse 1s infinite;
 transform:scale(1.1);
 }
-.voice-corner-text{background:white;padding:2px 8px;border-radius:12px;font-size:11px;color:#ff9933;border:1px solid #ff9933;font-weight:600;}
+@keyframes pulse{
+0%{transform:scale(1);}
+50%{transform:scale(1.1);}
+100%{transform:scale(1);}
+}
+.voice-corner-text{background:white;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;color:#ff9933;border:1px solid #ff9933;}
 
-.back-btn{position:fixed;top:80px;left:15px;background:white;border:2px solid #1e5fbf;border-radius:30px;padding:5px 15px;font-size:18px;font-weight:700;color:#1e5fbf;text-decoration:none;z-index:1000;display:inline-block;}
+/* BACK BUTTON */
+.back-btn{position:fixed;top:80px;left:15px;background:white;border:2px solid #1e5fbf;border-radius:40px;padding:6px 20px;font-size:20px;font-weight:700;color:#1e5fbf;text-decoration:none;z-index:1000;display:inline-block;box-shadow:0 4px 0 #0a3d7a;transition:all 0.1s;}
 .back-btn:hover{background:#1e5fbf;color:white;}
+.back-btn:active{transform:translateY(4px);box-shadow:0 1px 0 #0a3d7a;}
 
+/* TIMEOUT WARNING */
+.timeout-warning{
+position:fixed;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+background:white;
+border:4px solid #ff9933;
+border-radius:40px;
+padding:30px;
+text-align:center;
+z-index:2000;
+box-shadow:0 10px 30px rgba(0,0,0,0.3);
+max-width:500px;
+display:none;
+}
+.timeout-warning p{
+font-size:28px;
+color:#1e5fbf;
+margin-bottom:20px;
+font-weight:700;
+}
+.timeout-warning button{
+background:#28a745;
+color:white;
+border:none;
+border-radius:40px;
+padding:15px 30px;
+font-size:28px;
+font-weight:700;
+cursor:pointer;
+margin:10px;
+min-width:200px;
+box-shadow:0 5px 0 #1e7e34;
+}
+.timeout-warning button:active{
+transform:translateY(5px);
+box-shadow:0 1px 0 #1e7e34;
+}
+.timeout-warning .logout-btn{
+background:#dc3545;
+box-shadow:0 5px 0 #a71d2a;
+}
+
+/* SUCCESS MESSAGE */
+.success-message{
+position:fixed;
+top:80px;
+left:15px;
+background:#4CAF50;
+color:white;
+padding:12px 25px;
+border-radius:50px;
+font-size:18px;
+font-weight:600;
+z-index:2000;
+border:3px solid white;
+box-shadow:0 4px 15px rgba(76,175,80,0.3);
+animation:slideInLeft 0.3s ease;
+display:flex;
+align-items:center;
+gap:8px;
+}
+.success-message::before{
+content:"✅";
+font-size:20px;
+}
+@keyframes slideInLeft{
+from{transform:translateX(-100%);opacity:0;}
+to{transform:translateX(0);opacity:1;}
+}
+@keyframes slideOutLeft{
+from{transform:translateX(0);opacity:1;}
+to{transform:translateX(-100%);opacity:0;}
+}
+
+/* MAIN CONTAINER */
 .container{position:fixed;top:70px;left:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px;overflow-y:auto;}
 .content-wrapper{width:100%;max-width:600px;padding:20px 0;}
 
 h1{color:#1e5fbf;font-size:36px;font-weight:800;text-align:center;margin-bottom:20px;}
 
+/* SEARCH SECTION */
 .search-box{display:flex;gap:10px;margin:20px 0;}
 .search-input{flex:1;height:70px;border:3px solid #1e5fbf;border-radius:30px;font-size:26px;padding:0 15px;background:white;cursor:pointer;}
-.search-btn{background:#1e5fbf;color:white;border:none;border-radius:30px;padding:0 20px;font-size:26px;cursor:pointer;}
+.search-input[readonly]{background:#f9f9f9;}
+.search-btn{background:#1e5fbf;color:white;border:none;border-radius:30px;padding:0 20px;font-size:26px;cursor:pointer;box-shadow:0 4px 0 #0a3d7a;transition:all 0.1s;}
+.search-btn:active{transform:translateY(4px);box-shadow:0 1px 0 #0a3d7a;}
 
+/* BILL PERIOD FILTER (NEW) */
+.filter-section{
+margin:20px 0;
+display:flex;
+gap:10px;
+justify-content:center;
+}
+.filter-btn{
+background:white;
+border:2px solid #1e5fbf;
+border-radius:25px;
+padding:10px 20px;
+font-size:18px;
+cursor:pointer;
+transition:all 0.2s;
+}
+.filter-btn:hover{background:#e3f2fd;}
+.filter-btn.selected{
+background:#1e5fbf;
+color:white;
+}
+
+/* BILL LIST */
 .bill-list{margin-top:20px;}
-.bill-item{background:white;border:2px solid #1e5fbf;border-radius:20px;padding:20px;margin:10px 0;display:flex;justify-content:space-between;align-items:center;}
+.bill-item{
+background:white;
+border:2px solid #1e5fbf;
+border-radius:20px;
+padding:20px;
+margin:10px 0;
+display:flex;
+justify-content:space-between;
+align-items:center;
+transition:all 0.2s;
+}
+.bill-item:hover{
+transform:translateY(-2px);
+box-shadow:0 4px 10px rgba(0,0,0,0.1);
+}
+.bill-item.selected{
+border-color:#ff9933;
+border-width:3px;
+}
+.bill-info{flex:1;}
 .bill-month{font-size:22px;font-weight:600;color:#1e5fbf;}
-.bill-amount{font-size:22px;color:#28a745;font-weight:700;}
-.download-btn{background:#ff9933;color:white;border:none;border-radius:30px;padding:8px 20px;font-size:20px;cursor:pointer;}
+.bill-date{font-size:14px;color:#666;margin-top:5px;}
+.bill-details{display:flex;gap:15px;margin-top:5px;}
+.bill-units{font-size:14px;color:#666;}
+.bill-amount{font-size:22px;color:#28a745;font-weight:700;margin-right:15px;}
+.download-btn{
+background:#ff9933;
+color:white;
+border:none;
+border-radius:30px;
+padding:8px 20px;
+font-size:20px;
+cursor:pointer;
+box-shadow:0 3px 0 #b35900;
+transition:all 0.1s;
+}
+.download-btn:active{
+transform:translateY(3px);
+box-shadow:0 1px 0 #b35900;
+}
+.download-btn:disabled{
+background:#6c757d;
+box-shadow:0 3px 0 #545b62;
+cursor:not-allowed;
+}
 
-.hidden{display:none;}
+/* BILL DETAILS SECTION (NEW) */
+.bill-details-section{
+margin-top:20px;
+padding:20px;
+background:white;
+border:3px solid #1e5fbf;
+border-radius:20px;
+display:none;
+}
+.bill-details-title{
+font-size:24px;
+color:#1e5fbf;
+margin-bottom:15px;
+font-weight:600;
+}
+.detail-row{
+display:flex;
+justify-content:space-between;
+padding:10px 0;
+border-bottom:1px solid #e0e0e0;
+}
+.detail-label{color:#666;}
+.detail-value{font-weight:600;color:#1e5fbf;}
+.pay-now-btn{
+background:#28a745;
+color:white;
+font-size:24px;
+padding:12px;
+border-radius:30px;
+width:100%;
+border:none;
+margin-top:15px;
+cursor:pointer;
+box-shadow:0 4px 0 #1e7e34;
+transition:all 0.1s;
+}
+.pay-now-btn:active{
+transform:translateY(4px);
+box-shadow:0 1px 0 #1e7e34;
+}
 
+/* LOADING */
 .loading{
 display:none;
 position:fixed;
@@ -70,7 +264,21 @@ color:white;
 font-size:24px;
 }
 .loading.show{display:flex;}
+.spinner{
+border:4px solid rgba(255,255,255,0.3);
+border-radius:50%;
+border-top:4px solid white;
+width:50px;
+height:50px;
+animation:spin 1s linear infinite;
+margin-right:10px;
+}
+@keyframes spin{
+0%{transform:rotate(0deg);}
+100%{transform:rotate(360deg);}
+}
 
+/* FLOATING INPUT */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);display:none;z-index:900;}
 .floating-input{
 position:fixed;
@@ -89,6 +297,7 @@ display:none;
 }
 .floating-input.show{transform:translate(-50%,-50%) scale(1);}
 
+/* KEYBOARD */
 .keyboard{
 position:fixed;
 bottom:20px;
@@ -103,9 +312,13 @@ z-index:1000;
 }
 .keyboard-row{display:flex;justify-content:center;}
 .keyboard button{
-min-width:50px;height:50px;margin:4px;font-size:16px;border-radius:8px;border:2px solid #1e5fbf;background:#f0f7ff;cursor:pointer;
+min-width:50px;height:50px;margin:4px;font-size:16px;border-radius:8px;border:2px solid #1e5fbf;background:#f0f7ff;cursor:pointer;transition:all 0.2s;
 }
+.keyboard button:hover{background:#1e5fbf;color:white;}
 .keyboard .ok-btn{background:#28a745;color:white;border:none;}
+
+/* UTILITY CLASSES */
+.hidden{display:none !important;}
 </style>
 </head>
 <body>
@@ -124,9 +337,32 @@ min-width:50px;height:50px;margin:4px;font-size:16px;border-radius:8px;border:2p
 </div>
 </div>
 
-<!-- Voice corner will be created dynamically by voice.js -->
+<!-- Voice Button -->
+<div class="voice-corner">
+<div class="voice-corner-btn" id="voiceBtn" onclick="toggleVoiceInput()">🎤</div>
+<div class="voice-corner-text" id="voiceStatus">{% trans "Click" %}</div>
+</div>
 
+<!-- Back Button -->
 <a href="{% url 'electricity-services' %}" class="back-btn">← {% trans "Back" %}</a>
+
+<!-- Timeout Warning -->
+<div id="timeoutWarning" class="timeout-warning">
+    <p>⏰ {% trans "Session about to expire!" %}</p>
+    <button onclick="extendSession()">{% trans "Continue" %}</button>
+    <button class="logout-btn" onclick="window.location='{% url 'index' %}'">{% trans "Logout" %}</button>
+</div>
+
+<!-- Success Messages -->
+{% if messages %}
+    {% for message in messages %}
+        {% if message.tags == 'success' %}
+            <div class="success-message">
+                {{ message }}
+            </div>
+        {% endif %}
+    {% endfor %}
+{% endif %}
 
 <div class="container">
 <div class="content-wrapper">
@@ -135,32 +371,55 @@ min-width:50px;height:50px;margin:4px;font-size:16px;border-radius:8px;border:2p
 
 <div class="search-box">
 <input class="search-input text-input" id="consumerNo" placeholder="{% trans "Enter Consumer No." %}" readonly>
-<button class="search-btn" onclick="fetchBills()">{% trans "Search" %}</button>
+<button class="search-btn" onclick="fetchBills()" id="searchBtn">{% trans "Search" %}</button>
 </div>
 
-<div id="billList" class="bill-list hidden">
-<div class="bill-item">
-<div><div class="bill-month">{% trans "February 2026" %}</div></div>
-<div class="bill-amount">₹1,250</div>
-<button class="download-btn" onclick="downloadBill('February 2026')">{% trans "Download" %}</button>
+<!-- Bill Period Filter (New) -->
+<div class="filter-section" id="filterSection" style="display:none;">
+    <button class="filter-btn selected" onclick="filterBills('all')" id="filterAll">{% trans "All" %}</button>
+    <button class="filter-btn" onclick="filterBills('2026')" id="filter2026">2026</button>
+    <button class="filter-btn" onclick="filterBills('2025')" id="filter2025">2025</button>
 </div>
-<div class="bill-item">
-<div><div class="bill-month">{% trans "January 2026" %}</div></div>
-<div class="bill-amount">₹1,180</div>
-<button class="download-btn" onclick="downloadBill('January 2026')">{% trans "Download" %}</button>
-</div>
-<div class="bill-item">
-<div><div class="bill-month">{% trans "December 2025" %}</div></div>
-<div class="bill-amount">₹1,320</div>
-<button class="download-btn" onclick="downloadBill('December 2025')">{% trans "Download" %}</button>
-</div>
+
+<!-- Bill List -->
+<div id="billList" class="bill-list hidden"></div>
+
+<!-- Bill Details Section (New) -->
+<div id="billDetails" class="bill-details-section hidden">
+    <div class="bill-details-title" id="selectedBillMonth"></div>
+    <div class="detail-row">
+        <span class="detail-label">{% trans "Bill Number:" %}</span>
+        <span class="detail-value" id="detailBillNumber">EB/2026/0215</span>
+    </div>
+    <div class="detail-row">
+        <span class="detail-label">{% trans "Bill Date:" %}</span>
+        <span class="detail-value" id="detailBillDate">15 Feb 2026</span>
+    </div>
+    <div class="detail-row">
+        <span class="detail-label">{% trans "Due Date:" %}</span>
+        <span class="detail-value" id="detailDueDate">05 Mar 2026</span>
+    </div>
+    <div class="detail-row">
+        <span class="detail-label">{% trans "Units Consumed:" %}</span>
+        <span class="detail-value" id="detailUnits">250 kWh</span>
+    </div>
+    <div class="detail-row">
+        <span class="detail-label">{% trans "Amount:" %}</span>
+        <span class="detail-value" style="color:#28a745; font-size:24px;" id="detailAmount">₹1,250</span>
+    </div>
+    <button class="pay-now-btn" onclick="payBill()" id="payNowBtn">{% trans "Pay Now" %}</button>
 </div>
 
 </div>
 </div>
 
-<div id="loadingIndicator" class="loading">{% trans "Processing..." %}</div>
+<!-- Loading Indicator -->
+<div id="loadingIndicator" class="loading">
+    <div class="spinner"></div>
+    <div>{% trans "Processing..." %}</div>
+</div>
 
+<!-- Floating Input System -->
 <div id="overlay" class="overlay"></div>
 <input id="floatingInput" class="floating-input" placeholder="{% trans "Enter consumer number" %}">
 <div id="keyboard" class="keyboard"></div>
@@ -168,76 +427,141 @@ min-width:50px;height:50px;margin:4px;font-size:16px;border-radius:8px;border:2p
 <script src="{% static 'js/voice.js' %}"></script>
 
 <script>
+/* ================= LANGUAGE MAP ================= */
+const languageMap = {
+    "en": "en-IN",
+    "hi": "hi-IN",
+    "ta": "ta-IN",
+    "te": "te-IN",
+    "bn": "bn-IN",
+    "or": "or-IN"
+};
+
+function getCurrentLang() {
+    let path = window.location.pathname.split('/');
+    const langCode = path[1] || "en";
+    return languageMap[langCode] || "en-IN";
+}
+
+function getCurrentLangCode() {
+    let path = window.location.pathname.split('/');
+    return path[1] || "en";
+}
+
+function speak(text) {
+    if(!('speechSynthesis' in window)) return;
+    speechSynthesis.cancel();
+    let u = new SpeechSynthesisUtterance(text);
+    u.lang = getCurrentLang();
+    u.rate = 1;
+    speechSynthesis.speak(u);
+}
+
+/* ================= SESSION TIMER ================= */
+let sessionTimer;
+let timeoutWarningTimer;
+const SESSION_DURATION = 120000;
+const WARNING_TIME = 10000;
+
+function startSessionTimer() {
+    sessionTimer = setTimeout(() => {
+        showTimeoutWarning();
+    }, SESSION_DURATION - WARNING_TIME);
+}
+
+function showTimeoutWarning() {
+    const warning = document.getElementById('timeoutWarning');
+    if (warning) {
+        warning.style.display = 'block';
+        timeoutWarningTimer = setTimeout(() => {
+            window.location.href = "{% url 'index' %}";
+        }, WARNING_TIME);
+    }
+}
+
+function extendSession() {
+    const warning = document.getElementById('timeoutWarning');
+    if (warning) {
+        warning.style.display = 'none';
+    }
+    clearTimeout(sessionTimer);
+    clearTimeout(timeoutWarningTimer);
+    startSessionTimer();
+}
+
+function resetSessionTimer() {
+    clearTimeout(sessionTimer);
+    clearTimeout(timeoutWarningTimer);
+    startSessionTimer();
+}
+
+/* ================= FLOATING KEYBOARD ================= */
 let activeInput = null;
 const overlay = document.getElementById("overlay");
 const floatingInput = document.getElementById("floatingInput");
 const keyboard = document.getElementById("keyboard");
-const loadingIndicator = document.getElementById("loadingIndicator");
-
-// ================= KEYBOARD SETUP =================
 
 const keys = ["1","2","3","4","5","6","7","8","9","0"];
 
 function createKeyboard(){
-keyboard.innerHTML = "";
-let row = document.createElement("div");
-row.className = "keyboard-row";
-keys.forEach(k=>{
-let btn = document.createElement("button");
-btn.innerText = k;
-btn.type = "button";
-btn.onclick = ()=>floatingInput.value += k;
-row.appendChild(btn);
-});
-keyboard.appendChild(row);
+    keyboard.innerHTML = "";
+    let row = document.createElement("div");
+    row.className = "keyboard-row";
+    keys.forEach(k => {
+        let btn = document.createElement("button");
+        btn.innerText = k;
+        btn.type = "button";
+        btn.onclick = () => floatingInput.value += k;
+        row.appendChild(btn);
+    });
+    keyboard.appendChild(row);
 
-let last = document.createElement("div");
-last.className = "keyboard-row";
-last.innerHTML = `
-<button type="button" onclick="floatingInput.value=''">{% trans "Clear" %}</button>
-<button type="button" onclick="floatingInput.value=floatingInput.value.slice(0,-1)">⌫</button>
-<button type="button" class="ok-btn" onclick="finish()">✓ {% trans "OK" %}</button>
-`;
-keyboard.appendChild(last);
+    let last = document.createElement("div");
+    last.className = "keyboard-row";
+    last.innerHTML = `
+    <button type="button" onclick="floatingInput.value=''">{% trans "Clear" %}</button>
+    <button type="button" onclick="floatingInput.value=floatingInput.value.slice(0,-1)">⌫</button>
+    <button type="button" class="ok-btn" onclick="finish()">✓ {% trans "OK" %}</button>
+    `;
+    keyboard.appendChild(last);
 }
 
 function openKeyboard(input){
-activeInput = input;
-floatingInput.value = input.value;
-overlay.style.display = "block";
-floatingInput.style.display = "block";
-keyboard.style.display = "block";
-setTimeout(()=>{
-floatingInput.classList.add("show");
-floatingInput.focus();
-},10);
+    activeInput = input;
+    floatingInput.value = input.value;
+    overlay.style.display = "block";
+    floatingInput.style.display = "block";
+    keyboard.style.display = "block";
+    setTimeout(() => {
+        floatingInput.classList.add("show");
+        floatingInput.focus();
+    }, 10);
 }
 
 function finish(){
-if(activeInput){
-activeInput.value = floatingInput.value;
-}
-closeKeyboard();
+    if(activeInput){
+        activeInput.value = floatingInput.value;
+    }
+    closeKeyboard();
 }
 
 function closeKeyboard(){
-floatingInput.classList.remove("show");
-setTimeout(()=>{
-overlay.style.display = "none";
-floatingInput.style.display = "none";
-keyboard.style.display = "none";
-},200);
+    floatingInput.classList.remove("show");
+    setTimeout(() => {
+        overlay.style.display = "none";
+        floatingInput.style.display = "none";
+        keyboard.style.display = "none";
+    }, 200);
 }
 
-document.querySelectorAll(".text-input").forEach(i=>{
-i.addEventListener("click",e=>{
-e.stopPropagation();
-e.preventDefault();
-openKeyboard(i);
-});
+document.querySelectorAll(".text-input").forEach(i => {
+    i.addEventListener("click", e => {
+        e.stopPropagation();
+        e.preventDefault();
+        openKeyboard(i);
+    });
 });
 
-// Handle Enter key on floating input
 floatingInput.addEventListener('keydown', function(e) {
     if (e.key === 'Enter') {
         e.preventDefault();
@@ -248,26 +572,358 @@ floatingInput.addEventListener('keydown', function(e) {
 overlay.addEventListener("click", closeKeyboard);
 createKeyboard();
 
-// ================= BILL FUNCTIONS =================
+/* ================= BILL DATA ================= */
+let allBills = [
+    { month: "February 2026", amount: 1250, billNumber: "EB/2026/0215", date: "15 Feb 2026", dueDate: "05 Mar 2026", units: 250 },
+    { month: "January 2026", amount: 1180, billNumber: "EB/2026/0115", date: "15 Jan 2026", dueDate: "05 Feb 2026", units: 235 },
+    { month: "December 2025", amount: 1320, billNumber: "EB/2025/1215", date: "15 Dec 2025", dueDate: "05 Jan 2026", units: 264 }
+];
+let currentFilter = 'all';
+let selectedBill = null;
 
-function fetchBills(){
-const consumerNo = document.getElementById('consumerNo').value;
-if(!consumerNo || consumerNo.length < 6){
-    if(typeof speak === 'function') speak("{% trans 'Please enter a valid consumer number' %}");
-    return;
+function fetchBills() {
+    resetSessionTimer();
+    
+    const consumerNo = document.getElementById('consumerNo').value;
+    if(!consumerNo || consumerNo.length < 6){
+        const langCode = getCurrentLangCode();
+        if (langCode === 'hi') {
+            speak("कृपया एक वैध उपभोक्ता संख्या दर्ज करें");
+        } else if (langCode === 'or') {
+            speak("ଦୟାକରି ଏକ ବୈଧ ଗ୍ରାହକ ନମ୍ବର ପ୍ରବେଶ କରନ୍ତୁ");
+        } else {
+            speak("{% trans 'Please enter a valid consumer number' %}");
+        }
+        return;
+    }
+    
+    loadingIndicator.classList.add('show');
+    
+    setTimeout(() => {
+        displayBills(allBills);
+        document.getElementById('filterSection').style.display = 'flex';
+        loadingIndicator.classList.remove('show');
+        
+        const langCode = getCurrentLangCode();
+        if (langCode === 'hi') {
+            speak(allBills.length + " बिल मिले");
+        } else if (langCode === 'or') {
+            speak(allBills.length + " ବିଲ୍ ମିଳିଲା");
+        } else {
+            speak(allBills.length + " bills found");
+        }
+    }, 1000);
 }
-document.getElementById("billList").classList.remove("hidden");
-if(typeof speak === 'function') speak("{% trans 'Bills found' %}");
+
+function displayBills(bills) {
+    const billList = document.getElementById('billList');
+    billList.innerHTML = '';
+    billList.classList.remove('hidden');
+    
+    bills.forEach((bill, index) => {
+        const billItem = document.createElement('div');
+        billItem.className = 'bill-item';
+        billItem.onclick = () => selectBill(index);
+        billItem.id = `bill_${index}`;
+        
+        billItem.innerHTML = `
+            <div class="bill-info">
+                <div class="bill-month">${bill.month}</div>
+                <div class="bill-date">${bill.date}</div>
+                <div class="bill-details">
+                    <span class="bill-units">${bill.units} kWh</span>
+                </div>
+            </div>
+            <div style="display:flex; align-items:center;">
+                <span class="bill-amount">₹${bill.amount}</span>
+                <button class="download-btn" onclick="event.stopPropagation(); downloadBill('${bill.month}')">📥</button>
+            </div>
+        `;
+        billList.appendChild(billItem);
+    });
 }
 
-function downloadBill(month){
-if(typeof speak === 'function') speak("{% trans 'Downloading' %} " + month);
-alert("{% trans 'Downloading' %} " + month);
+function selectBill(index) {
+    // Remove previous selection
+    document.querySelectorAll('.bill-item').forEach(item => {
+        item.classList.remove('selected');
+    });
+    
+    // Add selection to current bill
+    document.getElementById(`bill_${index}`).classList.add('selected');
+    selectedBill = allBills[index];
+    
+    // Show bill details
+    document.getElementById('selectedBillMonth').innerText = selectedBill.month;
+    document.getElementById('detailBillNumber').innerText = selectedBill.billNumber;
+    document.getElementById('detailBillDate').innerText = selectedBill.date;
+    document.getElementById('detailDueDate').innerText = selectedBill.dueDate;
+    document.getElementById('detailUnits').innerText = selectedBill.units + ' kWh';
+    document.getElementById('detailAmount').innerText = '₹' + selectedBill.amount;
+    document.getElementById('billDetails').classList.remove('hidden');
+    
+    const langCode = getCurrentLangCode();
+    if (langCode === 'hi') {
+        speak(selectedBill.month + " का बिल चयनित");
+    } else if (langCode === 'or') {
+        speak(selectedBill.month + " ର ବିଲ୍ ଚୟନ ହେଲା");
+    } else {
+        speak(selectedBill.month + " bill selected");
+    }
 }
 
-/* ===================== OVERRIDE VOICE COMMANDS ===================== */
+function filterBills(year) {
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.remove('selected');
+    });
+    document.getElementById(`filter${year === 'all' ? 'All' : year}`).classList.add('selected');
+    
+    currentFilter = year;
+    
+    let filteredBills = allBills;
+    if (year !== 'all') {
+        filteredBills = allBills.filter(bill => bill.month.includes(year));
+    }
+    
+    displayBills(filteredBills);
+    document.getElementById('billDetails').classList.add('hidden');
+    
+    const langCode = getCurrentLangCode();
+    if (langCode === 'hi') {
+        speak(filteredBills.length + " बिल दिखाए जा रहे हैं");
+    } else if (langCode === 'or') {
+        speak(filteredBills.length + " ବିଲ୍ ଦେଖାଯାଉଛି");
+    } else {
+        speak("Showing " + filteredBills.length + " bills");
+    }
+}
 
-// Extend voice.js handleCommand for duplicate bill-specific commands
+function downloadBill(month) {
+    resetSessionTimer();
+    
+    const langCode = getCurrentLangCode();
+    if (langCode === 'hi') {
+        speak(month + " का बिल डाउनलोड हो रहा है");
+    } else if (langCode === 'or') {
+        speak(month + " ର ବିଲ୍ ଡାଉନଲୋଡ୍ ହେଉଛି");
+    } else {
+        speak("{% trans 'Downloading' %} " + month);
+    }
+    
+    // Simulate download
+    loadingIndicator.classList.add('show');
+    setTimeout(() => {
+        loadingIndicator.classList.remove('show');
+        alert("{% trans 'Downloading' %} " + month);
+    }, 1000);
+}
+
+function payBill() {
+    resetSessionTimer();
+    
+    if (!selectedBill) return;
+    
+    const langCode = getCurrentLangCode();
+    if (langCode === 'hi') {
+        speak(selectedBill.amount + " रुपये का भुगतान किया जा रहा है");
+    } else if (langCode === 'or') {
+        speak(selectedBill.amount + " ଟଙ୍କା ଦେୟ ହେଉଛି");
+    } else {
+        speak("Processing payment of ₹" + selectedBill.amount);
+    }
+    
+    loadingIndicator.classList.add('show');
+    setTimeout(() => {
+        window.location.href = "/" + getCurrentLangCode() + "/electricity-bill-payment/?amount=" + selectedBill.amount;
+    }, 1000);
+}
+
+/* ================= VOICE INPUT ================= */
+let recognition;
+let isListening = false;
+
+function toggleVoiceInput() {
+    resetSessionTimer();
+    
+    if(isListening) {
+        stopVoiceInput();
+        return;
+    }
+
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if(!SR) {
+        alert("{% trans 'Speech not supported' %}");
+        return;
+    }
+
+    if (recognition) {
+        try {
+            recognition.stop();
+        } catch(e) {}
+    }
+
+    recognition = new SR();
+    recognition.lang = getCurrentLang();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = function() {
+        isListening = true;
+        document.getElementById("voiceBtn").classList.add("listening");
+        document.getElementById("voiceStatus").innerText = "{% trans 'Listening...' %}";
+        
+        const langCode = getCurrentLangCode();
+        if (langCode === 'hi') {
+            speak("कृपया आदेश बोलें... उपभोक्ता संख्या, खोजें, फ़िल्टर, डाउनलोड, या भुगतान करें");
+        } else if (langCode === 'or') {
+            speak("ଦୟାକରି ନିର୍ଦ୍ଦେଶ କୁହନ୍ତୁ... ଗ୍ରାହକ ନମ୍ବର, ଖୋଜନ୍ତୁ, ଫିଲ୍ଟର୍, ଡାଉନଲୋଡ୍, କିମ୍ବା ଦେୟ କରନ୍ତୁ");
+        } else {
+            speak("{% trans 'Please say a command... consumer number, search, filter, download, or pay' %}");
+        }
+    };
+
+    recognition.onresult = function(e) {
+        resetSessionTimer();
+        
+        let finalTranscript = '';
+        let interimTranscript = '';
+        
+        for (let i = 0; i < e.results.length; i++) {
+            const result = e.results[i];
+            if (result.isFinal) {
+                finalTranscript += result[0].transcript;
+            } else {
+                interimTranscript += result[0].transcript;
+            }
+        }
+        
+        const transcript = finalTranscript || interimTranscript;
+        const command = transcript.toLowerCase();
+        console.log("Duplicate bill command:", command);
+        
+        // Check for numbers in command (consumer number)
+        const numberMatch = command.match(/\d+/g);
+        if(numberMatch && (command.includes("consumer") || command.includes("number") || command.includes("उपभोक्ता") || command.includes("ଗ୍ରାହକ"))) {
+            const digits = numberMatch.join('');
+            if(digits.length >= 6) {
+                document.getElementById('consumerNo').value = digits;
+                const langCode = getCurrentLangCode();
+                if (langCode === 'hi') {
+                    speak("उपभोक्ता संख्या दर्ज की गई");
+                } else if (langCode === 'or') {
+                    speak("ଗ୍ରାହକ ନମ୍ବର ପ୍ରବେଶ ହେଲା");
+                } else {
+                    speak("{% trans 'Consumer number entered' %}");
+                }
+            }
+            return;
+        }
+        
+        // Filter commands
+        if (command.includes("show all") || command.includes("सभी दिखाएं") || command.includes("ସବୁ ଦେଖାନ୍ତୁ")) {
+            filterBills('all');
+            return;
+        } else if (command.includes("2026") || command.includes("२०२६")) {
+            filterBills('2026');
+            return;
+        } else if (command.includes("2025") || command.includes("२०२५")) {
+            filterBills('2025');
+            return;
+        }
+        
+        // Bill selection by month
+        const months = {
+            "january": "January 2026", "february": "February 2026", "march": "March 2026",
+            "april": "April 2026", "may": "May 2026", "june": "June 2026",
+            "july": "July 2026", "august": "August 2026", "september": "September 2026",
+            "october": "October 2026", "november": "November 2026", "december": "December 2026"
+        };
+        
+        for (let [key, value] of Object.entries(months)) {
+            if (command.includes(key) || command.includes(key.replace('uary', ''))) {
+                const index = allBills.findIndex(b => b.month === value);
+                if (index !== -1) {
+                    selectBill(index);
+                }
+                return;
+            }
+        }
+        
+        // Action commands
+        if(command.includes("search") || command.includes("find") || command.includes("show bills") || 
+           command.includes("खोजें") || command.includes("ଖୋଜନ୍ତୁ")) {
+            fetchBills();
+            return;
+        }
+        else if(command.includes("download") || command.includes("डाउनलोड") || command.includes("ଡାଉନଲୋଡ୍")) {
+            if (selectedBill) {
+                downloadBill(selectedBill.month);
+            } else {
+                downloadBill("February 2026");
+            }
+            return;
+        }
+        else if(command.includes("pay") || command.includes("भुगतान") || command.includes("ଦେୟ")) {
+            if (selectedBill) {
+                payBill();
+            }
+            return;
+        }
+        else if(command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
+            window.location.href = "/" + getCurrentLangCode() + "/electricity-services/";
+            return;
+        }
+        else if(command.includes("home") || command.includes("होम") || command.includes("ଘର")) {
+            window.location.href = "/" + getCurrentLangCode() + "/";
+            return;
+        }
+        else if(command.includes("stop listening") || command.includes("stop voice")) {
+            stopVoiceInput();
+            return;
+        }
+    };
+
+    recognition.onerror = function(event) {
+        console.error("Recognition error:", event.error);
+        if (event.error === 'no-speech') return;
+        stopVoiceInput();
+    };
+
+    recognition.onend = function() {
+        if (isListening) {
+            try {
+                recognition.start();
+            } catch(e) {
+                console.error("Failed to restart recognition:", e);
+                stopVoiceInput();
+            }
+        } else {
+            document.getElementById("voiceBtn").classList.remove("listening");
+            document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
+        }
+    };
+
+    try {
+        recognition.start();
+    } catch(e) {
+        console.error("Failed to start recognition:", e);
+        stopVoiceInput();
+    }
+}
+
+function stopVoiceInput() {
+    isListening = false;
+    if (recognition) {
+        try {
+            recognition.stop();
+        } catch(e) {}
+    }
+    document.getElementById("voiceBtn").classList.remove("listening");
+    document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
+}
+
+/* ================= OVERRIDE VOICE COMMANDS ================= */
 const originalHandleCommand = window.handleCommand;
 window.handleCommand = function(command) {
     command = command.toLowerCase();
@@ -275,7 +931,7 @@ window.handleCommand = function(command) {
     
     // Check for numbers in command (consumer number)
     const numberMatch = command.match(/\d+/g);
-    if(numberMatch && (command.includes("consumer") || command.includes("number"))) {
+    if(numberMatch && (command.includes("consumer") || command.includes("number") || command.includes("उपभोक्ता") || command.includes("ଗ୍ରାହକ"))) {
         const digits = numberMatch.join('');
         if(digits.length >= 6) {
             document.getElementById('consumerNo').value = digits;
@@ -284,23 +940,52 @@ window.handleCommand = function(command) {
         }
     }
     
-    // Bill-specific commands
-    if(command.includes("search") || command.includes("find") || command.includes("show bills")) {
+    // Filter commands
+    if (command.includes("show all") || command.includes("सभी दिखाएं") || command.includes("ସବୁ ଦେଖାନ୍ତୁ")) {
+        filterBills('all');
+        return;
+    } else if (command.includes("2026") || command.includes("२०२६")) {
+        filterBills('2026');
+        return;
+    } else if (command.includes("2025") || command.includes("२०२५")) {
+        filterBills('2025');
+        return;
+    }
+    
+    // Bill selection by month
+    const months = ["january", "february", "march", "april", "may", "june", 
+                    "july", "august", "september", "october", "november", "december"];
+    for(let month of months) {
+        if(command.includes(month)) {
+            const monthName = month.charAt(0).toUpperCase() + month.slice(1);
+            const year = command.includes("2025") ? "2025" : "2026";
+            const fullMonth = monthName + " " + year;
+            const index = allBills.findIndex(b => b.month === fullMonth);
+            if (index !== -1) {
+                selectBill(index);
+            }
+            return;
+        }
+    }
+    
+    // Action commands
+    if(command.includes("search") || command.includes("find") || command.includes("show bills") ||
+       command.includes("खोजें") || command.includes("ଖୋଜନ୍ତୁ")) {
         fetchBills();
         return;
     }
-    else if(command.includes("download") || command.includes("get bill")) {
-        // Try to detect which month
-        const months = ["january", "february", "march", "april", "may", "june", 
-                       "july", "august", "september", "october", "november", "december"];
-        for(let month of months) {
-            if(command.includes(month)) {
-                downloadBill(month.charAt(0).toUpperCase() + month.slice(1) + " 2026");
-                return;
-            }
+    else if(command.includes("download") || command.includes("डाउनलोड") || command.includes("ଡାଉନଲୋଡ୍")) {
+        if (selectedBill) {
+            downloadBill(selectedBill.month);
+        } else {
+            downloadBill("February 2026");
         }
-        // Default to latest bill
-        downloadBill("February 2026");
+        return;
+    }
+    else if(command.includes("pay") || command.includes("भुगतान") || command.includes("ଦେୟ")) {
+        if (selectedBill) {
+            payBill();
+        }
         return;
     }
     else if(command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
@@ -311,23 +996,69 @@ window.handleCommand = function(command) {
         window.location.href = "/" + getCurrentLangCode() + "/";
         return;
     }
+    else if(command.includes("stop listening") || command.includes("stop voice")) {
+        stopVoiceInput();
+        return;
+    }
     
-    // If not bill-specific, pass to original handler
     if(originalHandleCommand) {
         originalHandleCommand(command);
     }
 };
 
-// Override autoReadPage to read duplicate bill instructions
+/* ================= AUTO READ PAGE ================= */
 const originalAutoRead = window.autoReadPage;
 window.autoReadPage = function() {
     if(originalAutoRead) originalAutoRead();
     setTimeout(() => {
         if(typeof speak === 'function') {
-            speak("{% trans 'Enter consumer number or say number, then say search to find bills, download to get bill' %}");
+            const langCode = getCurrentLangCode();
+            if (langCode === 'hi') {
+                speak("डुप्लिकेट बिल पृष्ठ। उपभोक्ता संख्या दर्ज करें या नंबर बोलें, फिर खोजें कहें। बिल देखने के लिए महीना बोलें, डाउनलोड करने के लिए डाउनलोड कहें।");
+            } else if (langCode === 'or') {
+                speak("ନକଲ ବିଲ୍ ପୃଷ୍ଠା। ଗ୍ରାହକ ନମ୍ବର ପ୍ରବେଶ କରନ୍ତୁ କିମ୍ବା ନମ୍ବର କୁହନ୍ତୁ, ତାପରେ ଖୋଜନ୍ତୁ କୁହନ୍ତୁ। ବିଲ୍ ଦେଖିବା ପାଇଁ ମାସ କୁହନ୍ତୁ, ଡାଉନଲୋଡ୍ କରିବା ପାଇଁ ଡାଉନଲୋଡ୍ କୁହନ୍ତୁ।");
+            } else {
+                speak("{% trans 'Duplicate bill page. Enter consumer number or say number, then say search. Say month to view bill, download to download, pay to make payment.' %}");
+            }
         }
     }, 2000);
 };
+
+/* ================= INIT ================= */
+document.addEventListener('DOMContentLoaded', function() {
+    startSessionTimer();
+    
+    document.addEventListener('click', resetSessionTimer);
+    document.addEventListener('keypress', resetSessionTimer);
+    document.addEventListener('touchstart', resetSessionTimer);
+    
+    setTimeout(autoReadPage, 2000);
+});
+
+window.addEventListener('beforeunload', function() {
+    if (sessionTimer) {
+        clearTimeout(sessionTimer);
+    }
+    stopVoiceInput();
+});
+
+// Auto-hide messages after 5 seconds
+setTimeout(function() {
+    document.querySelectorAll('.message').forEach(function(message) {
+        message.style.display = 'none';
+    });
+}, 5000);
+
+// Auto-hide success messages after 3 seconds
+setTimeout(function() {
+    const successMsg = document.querySelector('.success-message');
+    if (successMsg) {
+        successMsg.style.animation = 'slideOutLeft 0.3s ease';
+        setTimeout(function() {
+            if (successMsg) successMsg.remove();
+        }, 300);
+    }
+}, 3000);
 </script>
 
 </body>
