@@ -8,24 +8,224 @@
     <style>
         * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif; user-select:none; }
         body { width:100vw; height:100vh; overflow:hidden; background:#f0f7ff; }
-        .header { height:70px; background:white; display:flex; align-items:center; justify-content:space-between; padding:0 20px; border-bottom:2px solid #1e5fbf; }
+        
+        /* HEADER */
+        .header {
+            position:fixed;
+            top:0;
+            left:0;
+            width:100%;
+            height:70px;
+            background:white;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            padding:0 20px;
+            border-bottom:2px solid #1e5fbf;
+            z-index:1000;
+        }
         .header-left { display:flex; align-items:center; gap:10px; }
         .header-left img { height:40px; }
         .header-left div { font-size:12px; font-weight:600; color:#1e5fbf; line-height:1.2; }
         .header-right img { height:35px; }
-        .voice-corner { position:fixed; top:80px; right:15px; z-index:1000; display:flex; flex-direction:column; align-items:center; gap:3px; }
-        .voice-corner-btn { background:#ff9933; width:45px; height:45px; border-radius:50%; border:2px solid white; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:24px; box-shadow:0 2px 5px rgba(0,0,0,0.2); }
-        .voice-corner-btn.listening { background:#28a745; transform:scale(1.1); }
-        .voice-corner-text { background:white; padding:2px 8px; border-radius:12px; font-size:10px; color:#ff9933; border:1px solid #ff9933; }
-        .back-btn { position:fixed; top:80px; left:15px; background:white; border:2px solid #1e5fbf; border-radius:30px; padding:5px 15px; font-size:18px; font-weight:700; cursor:pointer; color:#1e5fbf; box-shadow:0 3px 0 #0a3d7a; z-index:1000; }
-        .back-btn:active { transform:translateY(3px); box-shadow:0 1px 0 #0a3d7a; }
-        .container { position:fixed; top:70px; left:0; right:0; bottom:0; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:10px; overflow:hidden; }
-        .content-wrapper { width:100%; max-width:600px; display:flex; flex-direction:column; gap:15px; }
+
+        /* VOICE BUTTON */
+        .voice-corner {
+            position:fixed;
+            top:75px;
+            right:15px;
+            z-index:1001;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            gap:4px;
+        }
+        .voice-corner-btn {
+            background:#ff9933;
+            width:50px;
+            height:50px;
+            border-radius:50%;
+            border:3px solid white;
+            cursor:pointer;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:26px;
+            box-shadow:0 3px 8px rgba(0,0,0,0.2);
+            transition:all 0.2s;
+        }
+        .voice-corner-btn:hover { background:#ffaa44; }
+        .voice-corner-btn.listening {
+            background:#28a745;
+            animation:pulse 1s infinite;
+            transform:scale(1.1);
+        }
+        @keyframes pulse {
+            0% { transform:scale(1); }
+            50% { transform:scale(1.1); }
+            100% { transform:scale(1); }
+        }
+        .voice-corner-text {
+            background:white;
+            padding:4px 10px;
+            border-radius:20px;
+            font-size:11px;
+            font-weight:600;
+            color:#ff9933;
+            border:1px solid #ff9933;
+        }
+
+        /* BACK BUTTON */
+        .back-btn {
+            position:fixed;
+            top:75px;
+            left:15px;
+            background:white;
+            border:2px solid #1e5fbf;
+            border-radius:40px;
+            padding:6px 20px;
+            font-size:20px;
+            font-weight:700;
+            cursor:pointer;
+            color:#1e5fbf;
+            box-shadow:0 4px 0 #0a3d7a;
+            z-index:1001;
+            transition:all 0.1s;
+            text-decoration:none;
+        }
+        .back-btn:hover { background:#1e5fbf; color:white; }
+        .back-btn:active { transform:translateY(4px); box-shadow:0 1px 0 #0a3d7a; }
+
+        /* TIMEOUT WARNING */
+        .timeout-warning {
+            position:fixed;
+            top:50%;
+            left:50%;
+            transform:translate(-50%,-50%);
+            background:white;
+            border:4px solid #ff9933;
+            border-radius:40px;
+            padding:30px;
+            text-align:center;
+            z-index:2000;
+            box-shadow:0 10px 30px rgba(0,0,0,0.3);
+            max-width:500px;
+            display:none;
+        }
+        .timeout-warning p {
+            font-size:28px;
+            color:#1e5fbf;
+            margin-bottom:20px;
+            font-weight:700;
+        }
+        .timeout-warning button {
+            background:#28a745;
+            color:white;
+            border:none;
+            border-radius:40px;
+            padding:15px 30px;
+            font-size:28px;
+            font-weight:700;
+            cursor:pointer;
+            margin:10px;
+            min-width:200px;
+            box-shadow:0 5px 0 #1e7e34;
+        }
+        .timeout-warning button:active { transform:translateY(5px); box-shadow:0 1px 0 #1e7e34; }
+        .timeout-warning .logout-btn { background:#dc3545; box-shadow:0 5px 0 #a71d2a; }
+
+        /* SUCCESS MESSAGE */
+        .success-message {
+            position:fixed;
+            top:75px;
+            left:15px;
+            background:#4CAF50;
+            color:white;
+            padding:12px 25px;
+            border-radius:50px;
+            font-size:18px;
+            font-weight:600;
+            z-index:1002;
+            border:3px solid white;
+            box-shadow:0 4px 15px rgba(76,175,80,0.3);
+            animation:slideInLeft 0.3s ease;
+            display:flex;
+            align-items:center;
+            gap:8px;
+            max-width:calc(100% - 130px);
+        }
+        .success-message::before { content:"✅"; font-size:20px; }
+        @keyframes slideInLeft {
+            from { transform:translateX(-100%); opacity:0; }
+            to { transform:translateX(0); opacity:1; }
+        }
+        @keyframes slideOutLeft {
+            from { transform:translateX(0); opacity:1; }
+            to { transform:translateX(-100%); opacity:0; }
+        }
+
+        /* MAIN CONTAINER */
+        .container {
+            position:fixed;
+            top:70px;
+            left:0;
+            right:0;
+            bottom:0;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            justify-content:flex-start;
+            padding:20px 10px 10px 10px;
+            overflow-y:auto;
+            z-index:1;
+        }
+        .content-wrapper {
+            width:100%;
+            max-width:600px;
+            display:flex;
+            flex-direction:column;
+            gap:15px;
+            padding:10px 0 20px 0;
+        }
+
         h1 { color:#1e5fbf; font-size:36px; font-weight:800; text-align:center; margin:0; }
+
+        /* Message styles */
+        .messages {
+            position:fixed;
+            top:75px;
+            left:50%;
+            transform:translateX(-50%);
+            z-index:1002;
+            width:90%;
+            max-width:600px;
+        }
+        .message {
+            padding:10px;
+            border-radius:5px;
+            margin-bottom:5px;
+            text-align:center;
+        }
+        .message.success { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
+        .message.error { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+        .message.info { background:#d1ecf1; color:#0c5460; border:1px solid #bee5eb; }
+
         .form-group { margin:15px 0; }
         label { display:block; font-size:22px; color:#1e5fbf; margin-bottom:5px; }
-        .large-input { width:100%; height:60px; border:3px solid #1e5fbf; border-radius:20px; font-size:26px; padding:0 15px; background:white; cursor:pointer; }
+        
+        .large-input {
+            width:100%;
+            height:60px;
+            border:3px solid #1e5fbf;
+            border-radius:20px;
+            font-size:26px;
+            padding:0 15px;
+            background:white;
+            cursor:pointer;
+        }
+        .large-input:focus { outline:none; border-color:#ff9933; }
         .large-input[readonly] { background:#f9f9f9; }
+
         select.large-input {
             appearance:none;
             background-image:url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
@@ -35,25 +235,69 @@
             padding-right:45px;
             cursor:pointer;
         }
-        .submit-btn { background:#28a745; color:white; font-size:32px; padding:12px; border-radius:40px; width:100%; border:none; box-shadow:0 5px 0 #1e7e34; cursor:pointer; margin-top:10px; }
+
+        .submit-btn {
+            background:#28a745;
+            color:white;
+            font-size:32px;
+            padding:12px;
+            border-radius:40px;
+            width:100%;
+            border:none;
+            box-shadow:0 5px 0 #1e7e34;
+            cursor:pointer;
+            margin-top:10px;
+            transition:all 0.1s;
+        }
         .submit-btn:active { transform:translateY(5px); box-shadow:0 1px 0 #1e7e34; }
-        .fee-info { background:#e3f2fd; border-radius:20px; padding:15px; margin:10px 0; font-size:20px; }
-        .messages { margin-bottom: 15px; }
-        .message { padding: 10px; border-radius: 5px; margin-bottom: 5px; }
-        .message.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .message.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-        .message.info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
-        
+        .submit-btn:hover { background:#2fcB4f; }
+
+        .fee-info {
+            background:#e3f2fd;
+            border-radius:20px;
+            padding:15px;
+            margin:10px 0;
+            font-size:20px;
+            border:2px solid #1e5fbf;
+        }
+
+        /* LOADING INDICATOR */
+        .loading {
+            display:none;
+            position:fixed;
+            top:0;
+            left:0;
+            right:0;
+            bottom:0;
+            background:rgba(0,0,0,0.5);
+            z-index:2000;
+            justify-content:center;
+            align-items:center;
+            color:white;
+            font-size:24px;
+        }
+        .loading.show { display:flex; }
+        .spinner {
+            border:4px solid rgba(255,255,255,0.3);
+            border-radius:50%;
+            border-top:4px solid white;
+            width:50px;
+            height:50px;
+            animation:spin 1s linear infinite;
+            margin-right:10px;
+        }
+        @keyframes spin { 0%{transform:rotate(0deg);} 100%{transform:rotate(360deg);} }
+
         /* FLOATING INPUT SYSTEM */
-        .overlay{
+        .overlay {
             position:fixed;
             inset:0;
             background:rgba(0,0,0,0.4);
             backdrop-filter:blur(3px);
             display:none;
-            z-index:900;
+            z-index:1400;
         }
-        .floating-input{
+        .floating-input {
             position:fixed;
             left:50%;
             top:35%;
@@ -64,17 +308,15 @@
             border:4px solid #ff9933;
             border-radius:20px;
             padding:12px;
-            z-index:1001;
+            z-index:1500;
             box-shadow:0 20px 50px rgba(0,0,0,0.4);
             transition:all 0.25s ease;
             display:none;
         }
-        .floating-input.show{
-            transform:translate(-50%,-50%) scale(1);
-        }
-        .floating-input:focus{outline:none;}
+        .floating-input.show { transform:translate(-50%,-50%) scale(1); }
+        .floating-input:focus { outline:none; }
 
-        .keyboard{
+        .keyboard {
             position:fixed;
             bottom:15px;
             left:50%;
@@ -84,10 +326,10 @@
             border-radius:15px;
             box-shadow:0 8px 25px rgba(0,0,0,0.3);
             display:none;
-            z-index:1000;
+            z-index:1500;
         }
-        .keyboard-row{display:flex;justify-content:center;}
-        .keyboard button{
+        .keyboard-row { display:flex; justify-content:center; }
+        .keyboard button {
             min-width:48px;
             height:42px;
             margin:3px;
@@ -98,13 +340,33 @@
             cursor:pointer;
             transition:all 0.2s;
         }
-        .keyboard button:hover{background:#1e5fbf;color:white;}
-        .keyboard .ok-btn{
+        .keyboard button:hover { background:#1e5fbf; color:white; }
+        .keyboard .ok-btn {
             background:#28a745;
             color:white;
             border:none;
         }
-        .keyboard .ok-btn:hover{background:#218838;}
+        .keyboard .ok-btn:hover { background:#218838; }
+
+        /* MOBILE RESPONSIVE */
+        @media (max-width: 480px) {
+            .voice-corner { top:75px; right:10px; }
+            .voice-corner-btn { width:45px; height:45px; font-size:24px; }
+            .back-btn { top:75px; left:10px; padding:4px 12px; font-size:16px; }
+            .success-message {
+                top:75px;
+                left:10px;
+                right:70px;
+                width:auto;
+                padding:8px 15px;
+                font-size:14px;
+                max-width:none;
+            }
+            h1 { font-size:28px; }
+            label { font-size:18px; }
+            .large-input { height:50px; font-size:22px; }
+            .submit-btn { font-size:28px; padding:10px; }
+        }
     </style>
 </head>
 <body>
@@ -118,8 +380,9 @@
         </div>
     </div>
     
+    <!-- Messages -->
     {% if messages %}
-    <div style="position: fixed; top: 80px; left: 50%; transform: translateX(-50%); z-index: 2000; width: 90%; max-width: 600px;">
+    <div class="messages">
         {% for message in messages %}
         <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
             {{ message }}
@@ -128,9 +391,38 @@
     </div>
     {% endif %}
     
-    <!-- Voice corner will be created dynamically by voice.js -->
+    <!-- Voice Button -->
+    <div class="voice-corner">
+        <div class="voice-corner-btn" id="voiceBtn" onclick="toggleVoiceInput()">🎤</div>
+        <div class="voice-corner-text" id="voiceStatus">{% trans "Click" %}</div>
+    </div>
     
-    <div class="back-btn" onclick="window.location='{% url 'municipal-services' %}'">← {% trans "Back" %}</div>
+    <!-- Back Button -->
+    <a href="{% url 'municipal-services' %}" class="back-btn">← {% trans "Back" %}</a>
+    
+    <!-- Timeout Warning -->
+    <div id="timeoutWarning" class="timeout-warning">
+        <p>⏰ {% trans "Session about to expire!" %}</p>
+        <button onclick="extendSession()">{% trans "Continue" %}</button>
+        <button class="logout-btn" onclick="window.location='{% url 'index' %}'">{% trans "Logout" %}</button>
+    </div>
+    
+    <!-- Success Messages -->
+    {% if messages %}
+        {% for message in messages %}
+            {% if message.tags == 'success' %}
+                <div class="success-message">
+                    {{ message }}
+                </div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+    
+    <!-- Loading Indicator -->
+    <div id="loadingIndicator" class="loading">
+        <div class="spinner"></div>
+        <div>{% trans "Processing..." %}</div>
+    </div>
     
     <div class="container">
         <div class="content-wrapper">
@@ -194,12 +486,81 @@
     <script src="{% static 'js/voice.js' %}"></script>
     
     <script>
-        // Floating input system
+        /* ================= LANGUAGE MAP ================= */
+        const languageMap = {
+            "en": "en-IN",
+            "hi": "hi-IN",
+            "ta": "ta-IN",
+            "te": "te-IN",
+            "bn": "bn-IN",
+            "or": "or-IN"
+        };
+
+        function getCurrentLang() {
+            let path = window.location.pathname.split('/');
+            const langCode = path[1] || "en";
+            return languageMap[langCode] || "en-IN";
+        }
+
+        function getCurrentLangCode() {
+            let path = window.location.pathname.split('/');
+            return path[1] || "en";
+        }
+
+        function speak(text) {
+            if(!('speechSynthesis' in window)) return;
+            speechSynthesis.cancel();
+            let u = new SpeechSynthesisUtterance(text);
+            u.lang = getCurrentLang();
+            u.rate = 1;
+            speechSynthesis.speak(u);
+        }
+
+        /* ================= SESSION TIMER ================= */
+        let sessionTimer;
+        let timeoutWarningTimer;
+        const SESSION_DURATION = 120000;
+        const WARNING_TIME = 10000;
+
+        function startSessionTimer() {
+            sessionTimer = setTimeout(() => {
+                showTimeoutWarning();
+            }, SESSION_DURATION - WARNING_TIME);
+        }
+
+        function showTimeoutWarning() {
+            const warning = document.getElementById('timeoutWarning');
+            if (warning) {
+                warning.style.display = 'block';
+                timeoutWarningTimer = setTimeout(() => {
+                    window.location.href = "{% url 'index' %}";
+                }, WARNING_TIME);
+            }
+        }
+
+        function extendSession() {
+            const warning = document.getElementById('timeoutWarning');
+            if (warning) {
+                warning.style.display = 'none';
+            }
+            clearTimeout(sessionTimer);
+            clearTimeout(timeoutWarningTimer);
+            startSessionTimer();
+        }
+
+        function resetSessionTimer() {
+            clearTimeout(sessionTimer);
+            clearTimeout(timeoutWarningTimer);
+            startSessionTimer();
+        }
+
+        /* ================= FLOATING KEYBOARD ================= */
         let activeInput = null;
         let isUpperCase = true;
         const overlay = document.getElementById("overlay");
         const floatingInput = document.getElementById("floatingInput");
         const keyboard = document.getElementById("keyboard");
+        const loadingIndicator = document.getElementById("loadingIndicator");
 
         function createKeyboard(){
             keyboard.innerHTML = "";
@@ -293,15 +654,35 @@
             });
         }, 5000);
         
-        // Optional: Calculate estimated fee based on business type
+        // Auto-hide success messages after 3 seconds
+        setTimeout(function() {
+            const successMsg = document.querySelector('.success-message');
+            if (successMsg) {
+                successMsg.style.animation = 'slideOutLeft 0.3s ease';
+                setTimeout(function() {
+                    if (successMsg) successMsg.remove();
+                }, 300);
+            }
+        }, 3000);
+        
+        // Business type change handler
         document.getElementById('businessType').addEventListener('change', function() {
             const businessType = this.value;
-            if(typeof speak === 'function') speak(businessType + " selected");
-            console.log('Business type selected:', businessType);
+            if(businessType && typeof speak === 'function') {
+                const langCode = getCurrentLangCode();
+                if (langCode === 'hi') {
+                    speak(businessType + " चयनित");
+                } else if (langCode === 'or') {
+                    speak(businessType + " ଚୟନ ହେଲା");
+                } else {
+                    speak(businessType + " selected");
+                }
+            }
         });
 
         function validateForm(e) {
             e.preventDefault();
+            resetSessionTimer();
             
             const businessName = document.getElementById('businessName').value;
             const businessType = document.getElementById('businessType').value;
@@ -309,60 +690,342 @@
             const address = document.getElementById('address').value;
             
             if(!businessName || !businessType || !ownerName || !address) {
-                if(typeof speak === 'function') speak("{% trans 'Please fill all required fields' %}");
+                const langCode = getCurrentLangCode();
+                if (langCode === 'hi') {
+                    speak("कृपया सभी आवश्यक फ़ील्ड भरें");
+                } else if (langCode === 'or') {
+                    speak("ଦୟାକରି ସମସ୍ତ ଆବଶ୍ୟକୀୟ କ୍ଷେତ୍ର ପୂରଣ କରନ୍ତୁ");
+                } else {
+                    speak("{% trans 'Please fill all required fields' %}");
+                }
                 return false;
             }
             
-            if(typeof speak === 'function') speak("{% trans 'Submitting license application' %}");
-            document.getElementById('licenseForm').submit();
+            loadingIndicator.classList.add('show');
+            
+            const langCode = getCurrentLangCode();
+            if (langCode === 'hi') {
+                speak("लाइसेंस आवेदन जमा किया जा रहा है");
+            } else if (langCode === 'or') {
+                speak("ଲାଇସେନ୍ସ ଆବେଦନ ଦାଖଲ ହେଉଛି");
+            } else {
+                speak("{% trans 'Submitting license application' %}");
+            }
+            
+            setTimeout(() => {
+                document.getElementById('licenseForm').submit();
+            }, 500);
             return false;
         }
         
-        /* ===================== OVERRIDE VOICE COMMANDS ===================== */
+        /* ================= VOICE INPUT ================= */
+        let recognition;
+        let isListening = false;
 
-        // Extend voice.js handleCommand for trade license
+        function toggleVoiceInput() {
+            resetSessionTimer();
+            
+            if(isListening) {
+                stopVoiceInput();
+                return;
+            }
+
+            const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if(!SR) {
+                alert("{% trans 'Speech not supported' %}");
+                return;
+            }
+
+            if (recognition) {
+                try {
+                    recognition.stop();
+                } catch(e) {}
+            }
+
+            recognition = new SR();
+            recognition.lang = getCurrentLang();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.maxAlternatives = 1;
+
+            recognition.onstart = function() {
+                isListening = true;
+                document.getElementById("voiceBtn").classList.add("listening");
+                document.getElementById("voiceStatus").innerText = "{% trans 'Listening...' %}";
+                
+                const langCode = getCurrentLangCode();
+                if (langCode === 'hi') {
+                    speak("कृपया आदेश बोलें... व्यवसाय का नाम, प्रकार, मालिक का नाम, पता, या जमा करें");
+                } else if (langCode === 'or') {
+                    speak("ଦୟାକରି ନିର୍ଦ୍ଦେଶ କୁହନ୍ତୁ... ବ୍ୟବସାୟ ନାମ, ପ୍ରକାର, ମାଲିକଙ୍କ ନାମ, ଠିକଣା, କିମ୍ବା ଦାଖଲ କରନ୍ତୁ");
+                } else {
+                    speak("{% trans 'Please say a command... business name, type, owner name, address, or submit' %}");
+                }
+            };
+
+            recognition.onresult = function(e) {
+                resetSessionTimer();
+                
+                let finalTranscript = '';
+                let interimTranscript = '';
+                
+                for (let i = 0; i < e.results.length; i++) {
+                    const result = e.results[i];
+                    if (result.isFinal) {
+                        finalTranscript += result[0].transcript;
+                    } else {
+                        interimTranscript += result[0].transcript;
+                    }
+                }
+                
+                const transcript = finalTranscript || interimTranscript;
+                const command = transcript.toLowerCase();
+                console.log("Trade license command:", command);
+                
+                // Business name input
+                if(command.includes("business name") || command.includes("व्यवसाय का नाम") || command.includes("ବ୍ୟବସାୟ ନାମ")) {
+                    let name = command.replace("business name", "").replace("व्यवसाय का नाम", "").replace("ବ୍ୟବସାୟ ନାମ", "").trim();
+                    if(name) {
+                        name = name.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+                        document.getElementById('businessName').value = name;
+                        const langCode = getCurrentLangCode();
+                        if (langCode === 'hi') {
+                            speak("व्यवसाय का नाम दर्ज किया गया");
+                        } else if (langCode === 'or') {
+                            speak("ବ୍ୟବସାୟ ନାମ ପ୍ରବେଶ ହେଲା");
+                        } else {
+                            speak("Business name entered");
+                        }
+                    }
+                    return;
+                }
+                
+                // Owner name input
+                if(command.includes("owner name") || command.includes("मालिक का नाम") || command.includes("ମାଲିକଙ୍କ ନାମ")) {
+                    let name = command.replace("owner name", "").replace("मालिक का नाम", "").replace("ମାଲିକଙ୍କ ନାମ", "").trim();
+                    if(name) {
+                        name = name.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+                        document.getElementById('ownerName').value = name;
+                        const langCode = getCurrentLangCode();
+                        if (langCode === 'hi') {
+                            speak("मालिक का नाम दर्ज किया गया");
+                        } else if (langCode === 'or') {
+                            speak("ମାଲିକଙ୍କ ନାମ ପ୍ରବେଶ ହେଲା");
+                        } else {
+                            speak("Owner name entered");
+                        }
+                    }
+                    return;
+                }
+                
+                // Address input
+                if(command.includes("address") || command.includes("पता") || command.includes("ଠିକଣା")) {
+                    let address = command.replace("address", "").replace("पता", "").replace("ଠିକଣା", "").trim();
+                    if(address) {
+                        address = address.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+                        document.getElementById('address').value = address;
+                        const langCode = getCurrentLangCode();
+                        if (langCode === 'hi') {
+                            speak("पता दर्ज किया गया");
+                        } else if (langCode === 'or') {
+                            speak("ଠିକଣା ପ୍ରବେଶ ହେଲା");
+                        } else {
+                            speak("Address entered");
+                        }
+                    }
+                    return;
+                }
+                
+                // GST number
+                const gstMatch = command.match(/[0-9]{2}[a-zA-Z]{5}[0-9]{4}[a-zA-Z][0-9]{1}[zZ][0-9a-zA-Z]{1}/i);
+                if(gstMatch) {
+                    document.getElementById('gst').value = gstMatch[0].toUpperCase();
+                    const langCode = getCurrentLangCode();
+                    if (langCode === 'hi') {
+                        speak("जीएसटी नंबर दर्ज किया गया");
+                    } else if (langCode === 'or') {
+                        speak("ଜିଏସଟି ନମ୍ବର ପ୍ରବେଶ ହେଲା");
+                    } else {
+                        speak("GST number entered");
+                    }
+                    return;
+                }
+                
+                // Business type selection
+                if(command.includes("retail") || command.includes("shop") || command.includes("रिटेल") || command.includes("ଦୋକାନ")) {
+                    document.getElementById('businessType').value = "Retail Shop";
+                    const langCode = getCurrentLangCode();
+                    if (langCode === 'hi') {
+                        speak("रिटेल शॉप चयनित");
+                    } else if (langCode === 'or') {
+                        speak("ରିଟେଲ୍ ଦୋକାନ ଚୟନ ହେଲା");
+                    } else {
+                        speak("Retail Shop selected");
+                    }
+                    return;
+                }
+                else if(command.includes("restaurant") || command.includes("hotel") || command.includes("food") || command.includes("रेस्टोरेंट") || command.includes("ରେଷ୍ଟୁରାଣ୍ଟ")) {
+                    document.getElementById('businessType').value = "Restaurant";
+                    const langCode = getCurrentLangCode();
+                    if (langCode === 'hi') {
+                        speak("रेस्टोरेंट चयनित");
+                    } else if (langCode === 'or') {
+                        speak("ରେଷ୍ଟୁରାଣ୍ଟ ଚୟନ ହେଲା");
+                    } else {
+                        speak("Restaurant selected");
+                    }
+                    return;
+                }
+                else if(command.includes("manufacturing") || command.includes("factory") || command.includes("मैन्युफैक्चरिंग") || command.includes("କାରଖାନା")) {
+                    document.getElementById('businessType').value = "Manufacturing";
+                    const langCode = getCurrentLangCode();
+                    if (langCode === 'hi') {
+                        speak("मैन्युफैक्चरिंग चयनित");
+                    } else if (langCode === 'or') {
+                        speak("ମାନୁଫାକ୍ଚରିଂ ଚୟନ ହେଲା");
+                    } else {
+                        speak("Manufacturing selected");
+                    }
+                    return;
+                }
+                else if(command.includes("service") || command.includes("provider") || command.includes("सेवा") || command.includes("ସେବା")) {
+                    document.getElementById('businessType').value = "Service Provider";
+                    const langCode = getCurrentLangCode();
+                    if (langCode === 'hi') {
+                        speak("सर्विस प्रोवाइडर चयनित");
+                    } else if (langCode === 'or') {
+                        speak("ସର୍ଭିସ୍ ପ୍ରୋଭାଇଡର୍ ଚୟନ ହେଲା");
+                    } else {
+                        speak("Service Provider selected");
+                    }
+                    return;
+                }
+                else if(command.includes("warehouse") || command.includes("गोदाम") || command.includes("ଗୋଦାମ")) {
+                    document.getElementById('businessType').value = "Warehouse";
+                    const langCode = getCurrentLangCode();
+                    if (langCode === 'hi') {
+                        speak("वेयरहाउस चयनित");
+                    } else if (langCode === 'or') {
+                        speak("ୱେରହାଉସ୍ ଚୟନ ହେଲା");
+                    } else {
+                        speak("Warehouse selected");
+                    }
+                    return;
+                }
+                else if(command.includes("other") || command.includes("अन्य") || command.includes("ଅନ୍ୟ")) {
+                    document.getElementById('businessType').value = "Other";
+                    const langCode = getCurrentLangCode();
+                    if (langCode === 'hi') {
+                        speak("अन्य चयनित");
+                    } else if (langCode === 'or') {
+                        speak("ଅନ୍ୟ ଚୟନ ହେଲା");
+                    } else {
+                        speak("Other selected");
+                    }
+                    return;
+                }
+                
+                // Submit command
+                if(command.includes("submit") || command.includes("apply") || command.includes("जमा") || command.includes("ଦାଖଲ")) {
+                    validateForm(event);
+                    return;
+                }
+                else if(command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
+                    window.location.href = "/" + getCurrentLangCode() + "/municipal-services/";
+                    return;
+                }
+                else if(command.includes("home") || command.includes("होम") || command.includes("ଘର")) {
+                    window.location.href = "/" + getCurrentLangCode() + "/";
+                    return;
+                }
+                else if(command.includes("stop listening") || command.includes("stop voice")) {
+                    stopVoiceInput();
+                    return;
+                }
+            };
+
+            recognition.onerror = function(event) {
+                console.error("Recognition error:", event.error);
+                if (event.error === 'no-speech') return;
+                stopVoiceInput();
+            };
+
+            recognition.onend = function() {
+                if (isListening) {
+                    try {
+                        recognition.start();
+                    } catch(e) {
+                        console.error("Failed to restart recognition:", e);
+                        stopVoiceInput();
+                    }
+                } else {
+                    document.getElementById("voiceBtn").classList.remove("listening");
+                    document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
+                }
+            };
+
+            try {
+                recognition.start();
+            } catch(e) {
+                console.error("Failed to start recognition:", e);
+                stopVoiceInput();
+            }
+        }
+
+        function stopVoiceInput() {
+            isListening = false;
+            if (recognition) {
+                try {
+                    recognition.stop();
+                } catch(e) {}
+            }
+            document.getElementById("voiceBtn").classList.remove("listening");
+            document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
+        }
+
+        /* ================= OVERRIDE VOICE COMMANDS ================= */
         const originalHandleCommand = window.handleCommand;
         window.handleCommand = function(command) {
             command = command.toLowerCase();
             console.log("Trade license command:", command);
             
             // Business name input
-            if(command.includes("business name") && command.length > 15) {
-                let name = command.replace("business name", "").trim();
+            if((command.includes("business name") || command.includes("व्यवसाय का नाम") || command.includes("ବ୍ୟବସାୟ ନାମ")) && command.length > 15) {
+                let name = command.replace("business name", "").replace("व्यवसाय का नाम", "").replace("ବ୍ୟବସାୟ ନାମ", "").trim();
                 if(name) {
                     name = name.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
                     document.getElementById('businessName').value = name;
                     if(typeof speak === 'function') speak("Business name entered");
-                    return;
                 }
+                return;
             }
             
             // Owner name input
-            if(command.includes("owner name") && command.length > 12) {
-                let name = command.replace("owner name", "").trim();
+            if((command.includes("owner name") || command.includes("मालिक का नाम") || command.includes("ମାଲିକଙ୍କ ନାମ")) && command.length > 12) {
+                let name = command.replace("owner name", "").replace("मालिक का नाम", "").replace("ମାଲିକଙ୍କ ନାମ", "").trim();
                 if(name) {
                     name = name.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
                     document.getElementById('ownerName').value = name;
                     if(typeof speak === 'function') speak("Owner name entered");
-                    return;
                 }
+                return;
             }
             
             // Address input
-            if(command.includes("address") && command.length > 15) {
-                let address = command.replace("address", "").trim();
+            if((command.includes("address") || command.includes("पता") || command.includes("ଠିକଣା")) && command.length > 15) {
+                let address = command.replace("address", "").replace("पता", "").replace("ଠିକଣା", "").trim();
                 if(address) {
                     address = address.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
                     document.getElementById('address').value = address;
                     if(typeof speak === 'function') speak("Address entered");
-                    return;
                 }
+                return;
             }
             
-            // GST number (alphanumeric pattern)
+            // GST number
             const gstMatch = command.match(/[0-9]{2}[a-zA-Z]{5}[0-9]{4}[a-zA-Z][0-9]{1}[zZ][0-9a-zA-Z]{1}/i);
             if(gstMatch) {
-                document.getElementById('gst').value = gstMatch[0];
+                document.getElementById('gst').value = gstMatch[0].toUpperCase();
                 if(typeof speak === 'function') speak("GST number entered");
                 return;
             }
@@ -393,14 +1056,14 @@
                 if(typeof speak === 'function') speak("Warehouse selected");
                 return;
             }
-            else if(command.includes("other")) {
+            else if(command.includes("other") || command.includes("अन्य") || command.includes("ଅନ୍ୟ")) {
                 document.getElementById('businessType').value = "Other";
                 if(typeof speak === 'function') speak("Other selected");
                 return;
             }
             
             // Submit command
-            if(command.includes("submit") || command.includes("apply")) {
+            if(command.includes("submit") || command.includes("apply") || command.includes("जमा") || command.includes("ଦାଖଲ")) {
                 validateForm(event);
                 return;
             }
@@ -412,8 +1075,11 @@
                 window.location.href = "/" + getCurrentLangCode() + "/";
                 return;
             }
+            else if(command.includes("stop listening") || command.includes("stop voice")) {
+                stopVoiceInput();
+                return;
+            }
             
-            // If not license-specific, pass to original handler
             if(originalHandleCommand) {
                 originalHandleCommand(command);
             }
@@ -425,10 +1091,35 @@
             if(originalAutoRead) originalAutoRead();
             setTimeout(() => {
                 if(typeof speak === 'function') {
-                    speak("{% trans 'Fill business name, type, owner name, address, then say submit to apply for license' %}");
+                    const langCode = getCurrentLangCode();
+                    if (langCode === 'hi') {
+                        speak("व्यापार लाइसेंस आवेदन पृष्ठ। व्यवसाय का नाम, प्रकार, मालिक का नाम, पता दर्ज करें, फिर जमा करें कहें।");
+                    } else if (langCode === 'or') {
+                        speak("ବାଣିଜ୍ୟ ଲାଇସେନ୍ସ ଆବେଦନ ପୃଷ୍ଠା। ବ୍ୟବସାୟ ନାମ, ପ୍ରକାର, ମାଲିକଙ୍କ ନାମ, ଠିକଣା ପ୍ରବେଶ କରନ୍ତୁ, ତାପରେ ଦାଖଲ କରନ୍ତୁ କୁହନ୍ତୁ।");
+                    } else {
+                        speak("{% trans 'Trade license application page. Enter business name, type, owner name, address, then say submit.' %}");
+                    }
                 }
             }, 2000);
         };
+
+        /* ================= INIT ================= */
+        document.addEventListener('DOMContentLoaded', function() {
+            startSessionTimer();
+            
+            document.addEventListener('click', resetSessionTimer);
+            document.addEventListener('keypress', resetSessionTimer);
+            document.addEventListener('touchstart', resetSessionTimer);
+            
+            setTimeout(autoReadPage, 2000);
+        });
+
+        window.addEventListener('beforeunload', function() {
+            if (sessionTimer) {
+                clearTimeout(sessionTimer);
+            }
+            stopVoiceInput();
+        });
     </script>
 </body>
 </html>

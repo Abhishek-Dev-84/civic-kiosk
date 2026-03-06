@@ -1,9 +1,8 @@
 {% load i18n %}
 {% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-
     <style>
         /* Hide Google Translate elements */
         .goog-te-banner-frame.skiptranslate,
@@ -19,6 +18,9 @@
         body {
             top: 0px !important;
             position: static !important;
+            overflow: hidden !important;
+            height: 100vh;
+            width: 100vw;
         }
         
         .goog-te-combo {
@@ -30,506 +32,989 @@
             height: 0 !important;
             overflow: hidden !important;
         }
+
+        /* Timeout warning popup */
+        .timeout-warning {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border: 4px solid #ff9933;
+            border-radius: 40px;
+            padding: 30px;
+            text-align: center;
+            z-index: 2000;
+            display: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .timeout-warning p {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .timeout-warning button {
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            padding: 15px 30px;
+            font-size: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            margin: 10px;
+            min-width: 150px;
+        }
+
+        .timeout-warning .logout-btn {
+            background: #dc3545;
+        }
+        
+        .timeout-warning button:active {
+            transform: translateY(3px);
+        }
+
+        /* Voice status indicator */
+        .voice-status-indicator {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-size: 16px;
+            font-weight: 600;
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            border: 2px solid #ff9933;
+        }
+
+        .voice-status-indicator.active {
+            display: flex;
+        }
+
+        .voice-pulse {
+            width: 12px;
+            height: 12px;
+            background: #28a745;
+            border-radius: 50%;
+            animation: voicePulse 1.5s infinite;
+        }
+
+        @keyframes voicePulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
     </style>
 
-    <!-- Load translate.js for multi-language support -->
+    <meta charset="UTF-8">
+    <title>{% trans "Solar Net Metering - Civic Kiosk" %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>{% trans "Solar Net Metering - Civic Kiosk" %}</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;user-select:none;}
+        body{width:100vw;height:100vh;overflow:hidden;background:#f0f7ff;}
 
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;user-select:none;}
-body{width:100vw;height:100vh;overflow:hidden;background:#f0f7ff;}
+        /* HEADER */
+        .header{
+            height:70px;
+            background:white;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            padding:0 20px;
+            border-bottom:2px solid #1e5fbf;
+            position:fixed;
+            top:0;
+            left:0;
+            right:0;
+            z-index:1000;
+        }
+        .header-left{display:flex;align-items:center;gap:10px;}
+        .header-left img{height:40px;}
+        .header-left div{font-size:12px;font-weight:600;color:#1e5fbf;line-height:1.2;}
+        .header-right img{height:35px;}
 
-/* HEADER */
-.header{
-height:70px;
-background:white;
-display:flex;
-align-items:center;
-justify-content:space-between;
-padding:0 20px;
-border-bottom:2px solid #1e5fbf;
-}
-.header-left{display:flex;align-items:center;gap:10px;}
-.header-left img{height:40px;}
-.header-left div{font-size:12px;font-weight:600;color:#1e5fbf;line-height:1.2;}
-.header-right img{height:35px;}
+        /* VOICE + BACK */
+        .voice-corner{
+            position:fixed;
+            top:80px;
+            right:15px;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            gap:3px;
+            z-index:1000;
+        }
+        .voice-corner-btn{
+            background:#ff9933;
+            width:45px;
+            height:45px;
+            border-radius:50%;
+            border:2px solid white;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:24px;
+            cursor:pointer;
+            transition:all 0.2s;
+        }
+        .voice-corner-btn:hover{background:#ffaa44;}
+        .voice-corner-btn.listening{
+            background:#28a745;
+            transform:scale(1.1);
+            animation:pulse 1s infinite;
+        }
+        @keyframes pulse{
+            0%{transform:scale(1);}
+            50%{transform:scale(1.1);}
+            100%{transform:scale(1);}
+        }
+        .voice-corner-text{
+            background:white;
+            padding:2px 8px;
+            border-radius:12px;
+            font-size:10px;
+            color:#ff9933;
+            border:1px solid #ff9933;
+        }
+        .back-btn{
+            position:fixed;
+            top:80px;
+            left:15px;
+            background:white;
+            border:2px solid #1e5fbf;
+            border-radius:30px;
+            padding:5px 15px;
+            font-size:18px;
+            font-weight:700;
+            color:#1e5fbf;
+            cursor:pointer;
+            z-index:1000;
+            box-shadow:0 3px 0 #0a3d7a;
+        }
+        .back-btn:hover{background:#1e5fbf;color:white;}
+        .back-btn:active{transform:translateY(3px);box-shadow:0 1px 0 #0a3d7a;}
 
-/* VOICE + BACK */
-.voice-corner{
-position:fixed;
-top:80px;
-right:15px;
-display:flex;
-flex-direction:column;
-align-items:center;
-gap:3px;
-}
-.voice-corner-btn{
-background:#ff9933;
-width:45px;
-height:45px;
-border-radius:50%;
-border:2px solid white;
-display:flex;
-align-items:center;
-justify-content:center;
-font-size:24px;
-cursor:pointer;
-}
-.voice-corner-btn.listening{
-background:#28a745;
-transform:scale(1.1);
-}
-.voice-corner-text{
-background:white;
-padding:2px 8px;
-border-radius:12px;
-font-size:10px;
-color:#ff9933;
-border:1px solid #ff9933;
-}
-.back-btn{
-position:fixed;
-top:80px;
-left:15px;
-background:white;
-border:2px solid #1e5fbf;
-border-radius:30px;
-padding:5px 15px;
-font-size:18px;
-font-weight:700;
-color:#1e5fbf;
-cursor:pointer;
-z-index:1000;
-}
-.back-btn:active{transform:translateY(2px);}
+        /* MAIN */
+        .container{
+            position:fixed;
+            top:70px;
+            left:0;
+            right:0;
+            bottom:0;
+            display:flex;
+            align-items:flex-start;
+            justify-content:center;
+            padding:15px;
+            overflow-y:auto;
+        }
+        .content-wrapper{
+            width:100%;
+            max-width:640px;
+            display:flex;
+            flex-direction:column;
+            gap:12px;
+            padding:20px 0;
+        }
 
-/* MAIN */
-.container{
-position:fixed;
-top:70px;
-left:0;
-right:0;
-bottom:0;
-display:flex;
-align-items:center;
-justify-content:center;
-padding:15px;
-}
-.content-wrapper{
-width:100%;
-max-width:640px;
-display:flex;
-flex-direction:column;
-gap:12px;
-}
+        h1{
+            color:#1e5fbf;
+            font-size:30px;
+            font-weight:800;
+            text-align:center;
+        }
 
-h1{
-color:#1e5fbf;
-font-size:30px;
-font-weight:800;
-text-align:center;
-}
+        .info-card{
+            background:#fff3cd;
+            border:2px solid #ffc107;
+            border-radius:18px;
+            padding:12px;
+            font-size:16px;
+        }
 
-.info-card{
-background:#fff3cd;
-border:2px solid #ffc107;
-border-radius:18px;
-padding:12px;
-font-size:16px;
-}
+        .solar-benefits{
+            display:grid;
+            grid-template-columns:repeat(2,1fr);
+            gap:8px;
+        }
+        .benefit{
+            background:#e8f5e9;
+            border-radius:16px;
+            padding:8px;
+            text-align:center;
+        }
+        .benefit .value{
+            font-size:20px;
+            font-weight:700;
+            color:#28a745;
+        }
 
-.solar-benefits{
-display:grid;
-grid-template-columns:repeat(2,1fr);
-gap:8px;
-}
-.benefit{
-background:#e8f5e9;
-border-radius:16px;
-padding:8px;
-text-align:center;
-}
-.benefit .value{
-font-size:20px;
-font-weight:700;
-color:#28a745;
-}
+        .form-group{margin:6px 0;}
+        label{
+            display:block;
+            font-size:18px;
+            color:#1e5fbf;
+            margin-bottom:5px;
+        }
+        .large-input{
+            width:100%;
+            height:50px;
+            border:3px solid #1e5fbf;
+            border-radius:18px;
+            font-size:20px;
+            padding:0 15px;
+            background:white;
+            cursor:pointer;
+        }
+        .large-input:focus{outline:none;border-color:#ff9933;}
+        .large-input[readonly]{background:#f9f9f9;}
 
-.form-group{margin:6px 0;}
-label{
-display:block;
-font-size:18px;
-color:#1e5fbf;
-margin-bottom:5px;
-}
-.large-input{
-width:100%;
-height:50px;
-border:3px solid #1e5fbf;
-border-radius:18px;
-font-size:20px;
-padding:0 15px;
-background:white;
-cursor:pointer;
-}
-.large-input:focus{outline:none;}
+        select.large-input{
+            appearance:none;
+            background-image:url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat:no-repeat;
+            background-position:right 15px center;
+            background-size:20px;
+            padding-right:45px;
+        }
 
-.submit-btn{
-background:#28a745;
-color:white;
-font-size:24px;
-font-weight:bold;
-padding:10px;
-border-radius:35px;
-width:100%;
-border:none;
-margin-top:8px;
-cursor:pointer;
-}
-.submit-btn:active{transform:translateY(2px);}
+        .submit-btn{
+            background:#28a745;
+            color:white;
+            font-size:24px;
+            font-weight:bold;
+            padding:10px;
+            border-radius:35px;
+            width:100%;
+            border:none;
+            margin-top:8px;
+            cursor:pointer;
+            box-shadow:0 4px 0 #1e7e34;
+        }
+        .submit-btn:active{transform:translateY(4px);box-shadow:0 1px 0 #1e7e34;}
 
-/* FLOATING INPUT */
-.overlay{
-position:fixed;
-inset:0;
-background:rgba(0,0,0,0.4);
-display:none;
-z-index:900;
-}
-.floating-input{
-position:fixed;
-left:50%;
-top:35%;
-transform:translate(-50%,-50%) scale(0.85);
-width:550px;
-height:75px;
-font-size:20px;
-border:4px solid #ff9933;
-border-radius:20px;
-padding:12px;
-z-index:1001;
-box-shadow:0 20px 50px rgba(0,0,0,0.4);
-transition:all 0.25s ease;
-display:none;
-}
-.floating-input.show{
-transform:translate(-50%,-50%) scale(1);
-}
+        /* FLOATING INPUT */
+        .overlay{
+            position:fixed;
+            inset:0;
+            background:rgba(0,0,0,0.4);
+            display:none;
+            z-index:900;
+        }
+        .floating-input{
+            position:fixed;
+            left:50%;
+            top:35%;
+            transform:translate(-50%,-50%) scale(0.85);
+            width:550px;
+            height:75px;
+            font-size:20px;
+            border:4px solid #ff9933;
+            border-radius:20px;
+            padding:12px;
+            z-index:1001;
+            box-shadow:0 20px 50px rgba(0,0,0,0.4);
+            transition:all 0.25s ease;
+            display:none;
+        }
+        .floating-input.show{
+            transform:translate(-50%,-50%) scale(1);
+        }
+        .floating-input:focus{outline:none;}
 
-/* KEYBOARD */
-.keyboard{
-position:fixed;
-bottom:15px;
-left:50%;
-transform:translateX(-50%);
-background:white;
-padding:10px;
-border-radius:15px;
-box-shadow:0 8px 25px rgba(0,0,0,0.3);
-display:none;
-z-index:1000;
-}
-.keyboard-row{display:flex;justify-content:center;}
-.keyboard button{
-min-width:50px;
-height:45px;
-margin:3px;
-font-size:15px;
-border-radius:8px;
-border:2px solid #1e5fbf;
-background:#f0f7ff;
-cursor:pointer;
-}
-.keyboard button:active{background:#1e5fbf;color:white;}
-.keyboard .ok-btn{
-background:#28a745;
-color:white;
-border:none;
-}
-</style>
+        /* KEYBOARD */
+        .keyboard{
+            position:fixed;
+            bottom:15px;
+            left:50%;
+            transform:translateX(-50%);
+            background:white;
+            padding:10px;
+            border-radius:15px;
+            box-shadow:0 8px 25px rgba(0,0,0,0.3);
+            display:none;
+            z-index:1000;
+        }
+        .keyboard-row{display:flex;justify-content:center;}
+        .keyboard button{
+            min-width:50px;
+            height:45px;
+            margin:3px;
+            font-size:15px;
+            border-radius:8px;
+            border:2px solid #1e5fbf;
+            background:#f0f7ff;
+            cursor:pointer;
+            transition:all 0.2s;
+        }
+        .keyboard button:hover{background:#1e5fbf;color:white;}
+        .keyboard button:active{background:#1e5fbf;color:white;}
+        .keyboard .ok-btn{
+            background:#28a745;
+            color:white;
+            border:none;
+        }
+        .keyboard .ok-btn:hover{background:#218838;}
+
+        /* Loading indicator */
+        .loading{
+            display:none;
+            position:fixed;
+            top:0;
+            left:0;
+            right:0;
+            bottom:0;
+            background:rgba(0,0,0,0.5);
+            z-index:2000;
+            justify-content:center;
+            align-items:center;
+            color:white;
+            font-size:24px;
+        }
+        .loading.show{display:flex;}
+        .spinner{
+            border:4px solid rgba(255,255,255,0.3);
+            border-radius:50%;
+            border-top:4px solid white;
+            width:50px;
+            height:50px;
+            animation:spin 1s linear infinite;
+            margin-right:10px;
+        }
+        @keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
+
+        /* Utility */
+        .hidden{display:none !important;}
+    </style>
 </head>
 <body>
+    <!-- Timeout Warning Popup -->
+    <div id="timeoutWarning" class="timeout-warning">
+        <p>⏰ {% trans "Session about to expire!" %}</p>
+        <button onclick="extendSession()">{% trans "Continue" %}</button>
+        <button class="logout-btn" onclick="window.location='{% url 'index' %}'">{% trans "Logout" %}</button>
+    </div>
 
-<div class="header">
-<div class="header-left">
-<img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India">
-<div>{% trans "Ministry of Electronics &" %}<br>{% trans "Information Technology" %}<br>{% trans "Government of India" %}</div>
-</div>
-<div class="header-right">
-<img src="https://www.cdac.in/img/cdac-logo.png" alt="CDAC Logo">
-</div>
-</div>
+    <!-- Voice Status Indicator -->
+    <div id="voiceStatusIndicator" class="voice-status-indicator">
+        <div class="voice-pulse"></div>
+        <span id="voiceStatusText">{% trans "Listening..." %}</span>
+    </div>
 
-<!-- Voice corner will be created dynamically by voice.js -->
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-left">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India">
+            <div>{% trans "Ministry of Electronics &" %}<br>{% trans "Information Technology" %}<br>{% trans "Government of India" %}</div>
+        </div>
+        <div class="header-right">
+            <img src="https://www.cdac.in/img/cdac-logo.png" alt="CDAC Logo">
+        </div>
+    </div>
 
-<div class="back-btn" onclick="window.location='{% url 'electricity-services' %}'">← {% trans "Back" %}</div>
+    <!-- Voice Button -->
+    <div class="voice-corner">
+        <div class="voice-corner-btn" id="voiceBtn" onclick="toggleVoiceInput()">🎤</div>
+        <div class="voice-corner-text" id="voiceStatus">{% trans "Click" %}</div>
+    </div>
 
-<div class="container">
-<div class="content-wrapper">
+    <!-- Back Button -->
+    <div class="back-btn" onclick="goBack()">← {% trans "Back" %}</div>
 
-<h1>☀️ {% trans "Solar Net Metering" %}</h1>
+    <!-- Main Container -->
+    <div class="container">
+        <div class="content-wrapper">
+            <h1>☀️ {% trans "Solar Net Metering" %}</h1>
 
-<div class="info-card">
-<strong>{% trans "Government Subsidy Available!" %}</strong><br>
-{% trans "Up to 40% subsidy on solar installations for residential consumers." %}
-</div>
+            <div class="info-card">
+                <strong>{% trans "Government Subsidy Available!" %}</strong><br>
+                {% trans "Up to 40% subsidy on solar installations for residential consumers." %}
+            </div>
 
-<div class="solar-benefits">
-<div class="benefit"><div class="value">{% trans "₹8,000/yr" %}</div>{% trans "Estimated Savings" %}</div>
-<div class="benefit"><div class="value">{% trans "5-7 years" %}</div>{% trans "Payback Period" %}</div>
-<div class="benefit"><div class="value">{% trans "25 years" %}</div>{% trans "Panel Life" %}</div>
-<div class="benefit"><div class="value">{% trans "40%" %}</div>{% trans "Subsidy" %}</div>
-</div>
+            <div class="solar-benefits">
+                <div class="benefit"><div class="value">{% trans "₹8,000/yr" %}</div>{% trans "Estimated Savings" %}</div>
+                <div class="benefit"><div class="value">{% trans "5-7 years" %}</div>{% trans "Payback Period" %}</div>
+                <div class="benefit"><div class="value">{% trans "25 years" %}</div>{% trans "Panel Life" %}</div>
+                <div class="benefit"><div class="value">{% trans "40%" %}</div>{% trans "Subsidy" %}</div>
+            </div>
 
-<form method="post" action="{% url 'electricity-solar' %}" onsubmit="event.preventDefault(); submitRequest()">
-{% csrf_token %}
+            <form id="solarForm" method="post" action="{% url 'electricity-solar' %}">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label>{% trans "Consumer Number" %}</label>
+                    <input type="text" class="large-input" name="consumer_number" id="consumerNumber" value="{{ consumer_number|default:'1234 5678 9012' }}" readonly>
+                </div>
 
-<div class="form-group">
-<label>{% trans "Consumer Number" %}</label>
-<input type="text" class="large-input" name="consumer_number" id="consumerNumber" value="{{ consumer_number|default:'1234 5678 9012' }}" readonly>
-</div>
+                <div class="form-group">
+                    <label>{% trans "Proposed Solar Capacity (kW)" %}</label>
+                    <select class="large-input" name="solar_capacity" id="solarCapacity">
+                        <option value="1">1 kW</option>
+                        <option value="2">2 kW</option>
+                        <option value="3">3 kW</option>
+                        <option value="4">4 kW</option>
+                        <option value="5">5 kW</option>
+                        <option value="6">{% trans "Above 5 kW" %}</option>
+                    </select>
+                </div>
 
-<div class="form-group">
-<label>{% trans "Proposed Solar Capacity (kW)" %}</label>
-<select class="large-input" name="solar_capacity" id="solarCapacity">
-<option value="1">1 kW</option>
-<option value="2">2 kW</option>
-<option value="3">3 kW</option>
-<option value="4">4 kW</option>
-<option value="5">5 kW</option>
-<option value="6">{% trans "Above 5 kW" %}</option>
-</select>
-</div>
+                <div class="form-group">
+                    <label>{% trans "Roof Area Available (sq ft)" %}</label>
+                    <input type="text" class="large-input" id="area" name="roof_area" readonly placeholder="{% trans "e.g., 500" %}" value="{{ roof_area|default:'' }}">
+                </div>
 
-<div class="form-group">
-<label>{% trans "Roof Area Available (sq ft)" %}</label>
-<input type="text" class="large-input" id="area" name="roof_area" readonly placeholder="{% trans "e.g., 500" %}" value="{{ roof_area|default:'' }}">
-</div>
+                <div class="form-group">
+                    <label>{% trans "Estimated Cost (After Subsidy)" %}</label>
+                    <div style="font-size:22px;color:#28a745;font-weight:700;" id="estimatedCost">{% trans "Select capacity to see estimate" %}</div>
+                </div>
 
-<div class="form-group">
-<label>{% trans "Estimated Cost (After Subsidy)" %}</label>
-<div style="font-size:22px;color:#28a745;font-weight:700;" id="estimatedCost">{% trans "₹ 45,000 - ₹ 2,10,000" %}</div>
-</div>
+                <button type="button" class="submit-btn" onclick="submitRequest()">{% trans "Apply for Net Metering" %}</button>
+            </form>
+        </div>
+    </div>
 
-<button type="submit" class="submit-btn">{% trans "Apply for Net Metering" %}</button>
+    <!-- Loading indicator -->
+    <div id="loadingIndicator" class="loading">
+        <div class="spinner"></div>
+        <div>{% trans "Processing..." %}</div>
+    </div>
 
-</form>
-</div>
-</div>
+    <!-- Floating Keyboard Elements -->
+    <div id="overlay" class="overlay"></div>
+    <textarea id="floatingInput" class="floating-input" placeholder="{% trans "Type here..." %}"></textarea>
+    <div id="keyboard" class="keyboard"></div>
 
-<div id="overlay" class="overlay"></div>
-<textarea id="floatingInput" class="floating-input" placeholder="{% trans "Type here..." %}"></textarea>
-<div id="keyboard" class="keyboard"></div>
+    <!-- Load voice.js - must be at bottom -->
+    <script src="{% static 'js/voice.js' %}"></script>
 
-<script src="{% static 'js/voice.js' %}"></script>
+    <script>
+        /* ================= LANGUAGE UTILITIES ================= */
+        function getCurrentLangCode() {
+            const path = window.location.pathname.split('/');
+            return path[1] || "en";
+        }
 
-<script>
-let activeInput = null;
-let isUpperCase = true;
-const overlay = document.getElementById("overlay");
-const floatingInput = document.getElementById("floatingInput");
-const keyboard = document.getElementById("keyboard");
-const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        function speak(text) {
+            if (!('speechSynthesis' in window)) return;
+            speechSynthesis.cancel();
+            let utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = window.getCurrentLang ? window.getCurrentLang() : 'en-IN';
+            utterance.rate = 1;
+            speechSynthesis.speak(utterance);
+        }
 
-function createKeyboard(){
-    keyboard.innerHTML = "";
-    let letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    if(!isUpperCase){ letters = letters.toLowerCase(); }
-    let keys = (letters + "0123456789 ").split("");
-    let row = document.createElement("div");
-    row.className = "keyboard-row";
-    keys.forEach((k, i) => {
-        if(i % 10 === 0 && i !== 0){
-            keyboard.appendChild(row);
-            row = document.createElement("div");
+        /* ================= SESSION TIMER ================= */
+        let sessionTimer;
+        let timeoutWarningTimer;
+        const SESSION_DURATION = 120000; // 2 minutes
+        const WARNING_TIME = 30000; // Warn 30 seconds before
+
+        function startSessionTimer() {
+            sessionTimer = setTimeout(() => {
+                showTimeoutWarning();
+            }, SESSION_DURATION - WARNING_TIME);
+        }
+
+        function showTimeoutWarning() {
+            const warning = document.getElementById('timeoutWarning');
+            if (warning) {
+                warning.style.display = 'block';
+                
+                const langCode = getCurrentLangCode();
+                const warnings = {
+                    'en': 'Your session is about to expire. Please continue to stay logged in.',
+                    'hi': 'आपका सत्र समाप्त होने वाला है। कृपया जारी रखें।',
+                    'or': 'ଆପଣଙ୍କର ସତ୍ର ସମାପ୍ତ ହେବାକୁ ଯାଉଛି। ଦୟାକରି ଜାରି ରଖନ୍ତୁ।',
+                    'bn': 'আপনার সেশন শেষ হতে চলেছে। অনুগ্রহ করে চালিয়ে যান।',
+                    'ta': 'உங்கள் அமர்வு காலாவதியாகிறது. தயவுசெய்து தொடரவும்.',
+                    'te': 'మీ సెషన్ ముగియబోతోంది. దయచేసి కొనసాగించండి.'
+                };
+                speak(warnings[langCode] || warnings['en']);
+                
+                timeoutWarningTimer = setTimeout(() => {
+                    window.location.href = "/" + langCode + "/";
+                }, WARNING_TIME);
+            }
+        }
+
+        function extendSession() {
+            const warning = document.getElementById('timeoutWarning');
+            if (warning) {
+                warning.style.display = 'none';
+            }
+            clearTimeout(sessionTimer);
+            clearTimeout(timeoutWarningTimer);
+            startSessionTimer();
+            
+            const langCode = getCurrentLangCode();
+            const messages = {
+                'en': 'Session extended. You may continue.',
+                'hi': 'सत्र बढ़ा दिया गया। आप जारी रख सकते हैं।',
+                'or': 'ସତ୍ର ବୃଦ୍ଧି କରାଯାଇଛି। ଆପଣ ଜାରି ରଖିପାରିବେ।',
+                'bn': 'সেশন বাড়ানো হয়েছে। আপনি চালিয়ে যেতে পারেন।',
+                'ta': 'அமர்வு நீட்டிக்கப்பட்டது. நீங்கள் தொடரலாம்.',
+                'te': 'సెషన్ పొడిగించబడింది. మీరు కొనసాగించవచ్చు.'
+            };
+            speak(messages[langCode] || messages['en']);
+        }
+
+        function resetSessionTimer() {
+            clearTimeout(sessionTimer);
+            clearTimeout(timeoutWarningTimer);
+            startSessionTimer();
+        }
+
+        function goBack() {
+            resetSessionTimer();
+            window.location.href = "/" + getCurrentLangCode() + "/electricity-services/";
+        }
+
+        /* ================= FLOATING KEYBOARD ================= */
+        let activeInput = null;
+        let isUpperCase = true;
+        const overlay = document.getElementById("overlay");
+        const floatingInput = document.getElementById("floatingInput");
+        const keyboard = document.getElementById("keyboard");
+        const loadingIndicator = document.getElementById("loadingIndicator");
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        function createKeyboard() {
+            keyboard.innerHTML = "";
+            let letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            if (!isUpperCase) { letters = letters.toLowerCase(); }
+            let keys = (letters + "0123456789 ").split("");
+            
+            let row = document.createElement("div");
             row.className = "keyboard-row";
+            
+            keys.forEach((k, i) => {
+                if (i % 10 === 0 && i !== 0) {
+                    keyboard.appendChild(row);
+                    row = document.createElement("div");
+                    row.className = "keyboard-row";
+                }
+                let btn = document.createElement("button");
+                btn.innerText = k === " " ? "{% trans "Space" %}" : k;
+                btn.onclick = () => floatingInput.value += k === " " ? " " : k;
+                btn.type = "button";
+                row.appendChild(btn);
+            });
+            keyboard.appendChild(row);
+            
+            let last = document.createElement("div");
+            last.className = "keyboard-row";
+            last.innerHTML = `
+                <button type="button" onclick="toggleCase()">⇧ {% trans "Shift" %}</button>
+                <button type="button" onclick="floatingInput.value = floatingInput.value.slice(0, -1)">⌫ {% trans "Back" %}</button>
+                <button type="button" onclick="floatingInput.value = ''">{% trans "Clear" %}</button>
+                <button type="button" class="ok-btn" onclick="finish()">✓ {% trans "OK" %}</button>
+            `;
+            keyboard.appendChild(last);
         }
-        let btn = document.createElement("button");
-        btn.innerText = k === " " ? "{% trans "Space" %}" : k;
-        btn.onclick = () => floatingInput.value += k === " " ? " " : k;
-        btn.type = "button";
-        row.appendChild(btn);
-    });
-    keyboard.appendChild(row);
-    
-    let last = document.createElement("div");
-    last.className = "keyboard-row";
-    last.innerHTML = `
-        <button type="button" onclick="toggleCase()">{% trans "Shift" %}</button>
-        <button type="button" onclick="floatingInput.value=''">{% trans "Clear" %}</button>
-        <button type="button" class="ok-btn" onclick="finish()">{% trans "OK" %}</button>
-    `;
-    keyboard.appendChild(last);
-}
 
-function toggleCase(){
-    isUpperCase = !isUpperCase;
-    createKeyboard();
-}
-
-function openKeyboard(id){
-    activeInput = document.getElementById(id);
-    floatingInput.value = activeInput.value;
-    overlay.style.display = "block";
-    floatingInput.style.display = "block";
-    keyboard.style.display = "block";
-    setTimeout(() => floatingInput.classList.add("show"), 10);
-}
-
-function finish(){
-    if(activeInput){
-        activeInput.value = floatingInput.value;
-        updateEstimatedCost();
-    }
-    closeKeyboard();
-}
-
-function closeKeyboard(){
-    floatingInput.classList.remove("show");
-    setTimeout(() => {
-        overlay.style.display = "none";
-        floatingInput.style.display = "none";
-        keyboard.style.display = "none";
-    }, 200);
-}
-
-function updateEstimatedCost() {
-    // Update estimated cost based on roof area if needed
-    const area = document.getElementById('area').value;
-    const capacity = document.querySelector('select[name="solar_capacity"]').value;
-    // You can add dynamic cost calculation here
-}
-
-function submitRequest(){
-    const formData = new FormData(document.querySelector('form'));
-    
-    if(typeof speak === 'function') speak("{% trans 'Submitting solar net metering application' %}");
-    
-    fetch('{% url "electricity-solar" %}', {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': csrftoken
-        },
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if(data.success) {
-            if(typeof speak === 'function') speak("{% trans 'Application submitted successfully' %}");
-            alert('{% trans "Solar net metering application submitted! Reference:" %} ' + data.reference);
-            window.location.href = '{% url "application-status" %}?ref=' + data.reference;
-        } else {
-            if(typeof speak === 'function') speak("{% trans 'Error in submission' %}");
-            alert('{% trans "Error:" %} ' + data.message);
+        function toggleCase() {
+            isUpperCase = !isUpperCase;
+            createKeyboard();
         }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        const ref = 'SOLAR' + Math.floor(100000 + Math.random() * 900000);
-        if(typeof speak === 'function') speak("{% trans 'Application submitted' %}");
-        alert('{% trans "Solar net metering application submitted! Reference: " %}' + ref);
-    });
-}
 
-/* ===================== OVERRIDE VOICE COMMANDS ===================== */
-
-// Extend voice.js handleCommand for solar-specific commands
-const originalHandleCommand = window.handleCommand;
-window.handleCommand = function(command) {
-    command = command.toLowerCase();
-    console.log("Solar net metering command:", command);
-    
-    // Check for numbers in command (roof area)
-    const numberMatch = command.match(/\d+/g);
-    if(numberMatch && (command.includes("area") || command.includes("roof") || command.includes("square"))) {
-        const value = numberMatch[0];
-        document.getElementById('area').value = value;
-        updateEstimatedCost();
-        if(typeof speak === 'function') speak("Roof area set to " + value + " square feet");
-        return;
-    }
-    
-    // Solar capacity selection
-    if(command.includes("1 kw") || command.includes("one kw")) {
-        document.getElementById('solarCapacity').value = "1";
-        updateEstimatedCost();
-        if(typeof speak === 'function') speak("1 kilowatt selected");
-        return;
-    }
-    else if(command.includes("2 kw") || command.includes("two kw")) {
-        document.getElementById('solarCapacity').value = "2";
-        updateEstimatedCost();
-        if(typeof speak === 'function') speak("2 kilowatt selected");
-        return;
-    }
-    else if(command.includes("3 kw") || command.includes("three kw")) {
-        document.getElementById('solarCapacity').value = "3";
-        updateEstimatedCost();
-        if(typeof speak === 'function') speak("3 kilowatt selected");
-        return;
-    }
-    else if(command.includes("4 kw") || command.includes("four kw")) {
-        document.getElementById('solarCapacity').value = "4";
-        updateEstimatedCost();
-        if(typeof speak === 'function') speak("4 kilowatt selected");
-        return;
-    }
-    else if(command.includes("5 kw") || command.includes("five kw")) {
-        document.getElementById('solarCapacity').value = "5";
-        updateEstimatedCost();
-        if(typeof speak === 'function') speak("5 kilowatt selected");
-        return;
-    }
-    else if(command.includes("above") || command.includes("more than")) {
-        document.getElementById('solarCapacity').value = "6";
-        updateEstimatedCost();
-        if(typeof speak === 'function') speak("Above 5 kilowatt selected");
-        return;
-    }
-    
-    // Submit command
-    if(command.includes("submit") || command.includes("apply")) {
-        submitRequest();
-        return;
-    }
-    else if(command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
-        window.location.href = "/" + getCurrentLangCode() + "/electricity-services/";
-        return;
-    }
-    else if(command.includes("home") || command.includes("होम") || command.includes("ଘର")) {
-        window.location.href = "/" + getCurrentLangCode() + "/";
-        return;
-    }
-    
-    // If not solar-specific, pass to original handler
-    if(originalHandleCommand) {
-        originalHandleCommand(command);
-    }
-};
-
-// Override autoReadPage to read solar net metering instructions
-const originalAutoRead = window.autoReadPage;
-window.autoReadPage = function() {
-    if(originalAutoRead) originalAutoRead();
-    setTimeout(() => {
-        if(typeof speak === 'function') {
-            speak("{% trans 'Select solar capacity, enter roof area, then say submit to apply for net metering' %}");
+        function openKeyboard(id) {
+            resetSessionTimer();
+            activeInput = document.getElementById(id);
+            floatingInput.value = activeInput.value;
+            overlay.style.display = "block";
+            floatingInput.style.display = "block";
+            keyboard.style.display = "block";
+            setTimeout(() => floatingInput.classList.add("show"), 10);
+            floatingInput.focus();
         }
-    }, 2000);
-};
 
-// Event Listeners
-document.getElementById("area").addEventListener("click", () => openKeyboard("area"));
-overlay.addEventListener("click", closeKeyboard);
+        function finish() {
+            if (activeInput) {
+                activeInput.value = floatingInput.value;
+                updateEstimatedCost();
+            }
+            closeKeyboard();
+        }
 
-// Capacity change listener
-document.querySelector('select[name="solar_capacity"]').addEventListener('change', updateEstimatedCost);
+        function closeKeyboard() {
+            floatingInput.classList.remove("show");
+            setTimeout(() => {
+                overlay.style.display = "none";
+                floatingInput.style.display = "none";
+                keyboard.style.display = "none";
+            }, 200);
+        }
 
-// Initialize
-createKeyboard();
-</script>
+        // Handle Enter key on floating input
+        floatingInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                finish();
+            }
+        });
 
+        function updateEstimatedCost() {
+            const capacity = document.getElementById('solarCapacity').value;
+            const area = document.getElementById('area').value;
+            const costDisplay = document.getElementById('estimatedCost');
+            
+            // Simple cost estimation logic
+            let costRange = '';
+            const langCode = getCurrentLangCode();
+            
+            if (capacity === '1') {
+                costRange = '₹ 45,000 - ₹ 55,000';
+            } else if (capacity === '2') {
+                costRange = '₹ 75,000 - ₹ 90,000';
+            } else if (capacity === '3') {
+                costRange = '₹ 1,05,000 - ₹ 1,25,000';
+            } else if (capacity === '4') {
+                costRange = '₹ 1,40,000 - ₹ 1,65,000';
+            } else if (capacity === '5') {
+                costRange = '₹ 1,70,000 - ₹ 2,00,000';
+            } else if (capacity === '6') {
+                costRange = '₹ 2,10,000 - ₹ 2,50,000';
+            }
+            
+            costDisplay.innerText = costRange;
+        }
+
+        function submitRequest() {
+            resetSessionTimer();
+            
+            const area = document.getElementById('area').value;
+            const langCode = getCurrentLangCode();
+            
+            if (!area) {
+                const messages = {
+                    'en': 'Please enter roof area',
+                    'hi': 'कृपया छत का क्षेत्रफल दर्ज करें',
+                    'or': 'ଦୟାକରି ଛାତ କ୍ଷେତ୍ରଫଳ ପ୍ରବେଶ କରନ୍ତୁ'
+                };
+                speak(messages[langCode] || messages['en']);
+                return;
+            }
+
+            if (isNaN(area) || parseFloat(area) <= 0) {
+                const messages = {
+                    'en': 'Please enter a valid roof area',
+                    'hi': 'कृपया मान्य छत क्षेत्रफल दर्ज करें',
+                    'or': 'ଦୟାକରି ଏକ ବୈଧ ଛାତ କ୍ଷେତ୍ରଫଳ ପ୍ରବେଶ କରନ୍ତୁ'
+                };
+                speak(messages[langCode] || messages['en']);
+                return;
+            }
+
+            // Show loading
+            loadingIndicator.classList.add('show');
+            
+            const messages = {
+                'en': 'Submitting solar net metering application',
+                'hi': 'सौर नेट मीटरिंग आवेदन भेजा जा रहा है',
+                'or': 'ସୋଲାର ନେଟ ମିଟରିଂ ଆବେଦନ ପଠାଯାଉଛି'
+            };
+            speak(messages[langCode] || messages['en']);
+            
+            // Submit form
+            setTimeout(() => {
+                document.getElementById('solarForm').submit();
+            }, 500);
+        }
+
+        /* ================= VOICE INPUT ================= */
+        let recognition;
+        let isListening = false;
+
+        function toggleVoiceInput() {
+            resetSessionTimer();
+            
+            if (isListening) {
+                stopVoiceInput();
+                return;
+            }
+
+            const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SR) {
+                alert("{% trans 'Speech not supported' %}");
+                return;
+            }
+
+            if (recognition) {
+                try {
+                    recognition.stop();
+                } catch (e) {}
+            }
+
+            recognition = new SR();
+            recognition.lang = window.getCurrentLang ? window.getCurrentLang() : 'en-IN';
+            recognition.continuous = true;
+            recognition.interimResults = true;
+
+            recognition.onstart = function() {
+                isListening = true;
+                document.getElementById("voiceBtn").classList.add("listening");
+                document.getElementById("voiceStatus").innerText = "{% trans 'Listening...' %}";
+                document.getElementById('voiceStatusIndicator').classList.add('active');
+                
+                const langCode = getCurrentLangCode();
+                const messages = {
+                    'en': 'Select solar capacity by saying 1 to 6 kilowatts, enter roof area, then say submit to apply.',
+                    'hi': '1 से 6 किलोवाट बोलकर सौर क्षमता चुनें, छत क्षेत्र दर्ज करें, फिर आवेदन के लिए सबमिट कहें।',
+                    'or': '1ରୁ 6 କିଲୋୱାଟ କହି ସୌର କ୍ଷମତା ଚୟନ କରନ୍ତୁ, ଛାତ କ୍ଷେତ୍ରଫଳ ପ୍ରବେଶ କରନ୍ତୁ, ତାପରେ ଆବେଦନ ପାଇଁ ସବମିଟ କୁହନ୍ତୁ।'
+                };
+                speak(messages[langCode] || messages['en']);
+            };
+
+            recognition.onresult = function(e) {
+                resetSessionTimer();
+                
+                let finalTranscript = '';
+                let interimTranscript = '';
+                
+                for (let i = 0; i < e.results.length; i++) {
+                    const result = e.results[i];
+                    if (result.isFinal) {
+                        finalTranscript += result[0].transcript;
+                    } else {
+                        interimTranscript += result[0].transcript;
+                    }
+                }
+                
+                const transcript = finalTranscript || interimTranscript;
+                const command = transcript.toLowerCase();
+                console.log("Solar net metering command:", command);
+                
+                const langCode = getCurrentLangCode();
+                
+                // Check for numbers in command (roof area)
+                const numberMatch = command.match(/\d+/g);
+                if (numberMatch && (command.includes("area") || command.includes("roof") || command.includes("square") ||
+                    command.includes("क्षेत्र") || command.includes("ଛାତ"))) {
+                    const value = numberMatch[0];
+                    document.getElementById('area').value = value;
+                    updateEstimatedCost();
+                    const messages = {
+                        'en': 'Roof area set to ' + value + ' square feet',
+                        'hi': 'छत क्षेत्र ' + value + ' वर्ग फुट सेट किया गया',
+                        'or': 'ଛାତ କ୍ଷେତ୍ରଫଳ ' + value + ' ବର୍ଗ ଫୁଟ ସେଟ୍ ହେଲା'
+                    };
+                    speak(messages[langCode] || messages['en']);
+                    return;
+                }
+                
+                // Solar capacity selection - English
+                if (command.includes("1 kw") || command.includes("one kw") || command.includes("1 kilowatt")) {
+                    document.getElementById('solarCapacity').value = "1";
+                    updateEstimatedCost();
+                    const messages = {
+                        'en': '1 kilowatt selected',
+                        'hi': '1 किलोवाट चयनित',
+                        'or': '1 କିଲୋୱାଟ ଚୟନ ହେଲା'
+                    };
+                    speak(messages[langCode] || messages['en']);
+                    return;
+                }
+                else if (command.includes("2 kw") || command.includes("two kw") || command.includes("2 kilowatt")) {
+                    document.getElementById('solarCapacity').value = "2";
+                    updateEstimatedCost();
+                    const messages = {
+                        'en': '2 kilowatt selected',
+                        'hi': '2 किलोवाट चयनित',
+                        'or': '2 କିଲୋୱାଟ ଚୟନ ହେଲା'
+                    };
+                    speak(messages[langCode] || messages['en']);
+                    return;
+                }
+                else if (command.includes("3 kw") || command.includes("three kw") || command.includes("3 kilowatt")) {
+                    document.getElementById('solarCapacity').value = "3";
+                    updateEstimatedCost();
+                    const messages = {
+                        'en': '3 kilowatt selected',
+                        'hi': '3 किलोवाट चयनित',
+                        'or': '3 କିଲୋୱାଟ ଚୟନ ହେଲା'
+                    };
+                    speak(messages[langCode] || messages['en']);
+                    return;
+                }
+                else if (command.includes("4 kw") || command.includes("four kw") || command.includes("4 kilowatt")) {
+                    document.getElementById('solarCapacity').value = "4";
+                    updateEstimatedCost();
+                    const messages = {
+                        'en': '4 kilowatt selected',
+                        'hi': '4 किलोवाट चयनित',
+                        'or': '4 କିଲୋୱାଟ ଚୟନ ହେଲା'
+                    };
+                    speak(messages[langCode] || messages['en']);
+                    return;
+                }
+                else if (command.includes("5 kw") || command.includes("five kw") || command.includes("5 kilowatt")) {
+                    document.getElementById('solarCapacity').value = "5";
+                    updateEstimatedCost();
+                    const messages = {
+                        'en': '5 kilowatt selected',
+                        'hi': '5 किलोवाट चयनित',
+                        'or': '5 କିଲୋୱାଟ ଚୟନ ହେଲା'
+                    };
+                    speak(messages[langCode] || messages['en']);
+                    return;
+                }
+                else if (command.includes("above") || command.includes("more than") || command.includes("6")) {
+                    document.getElementById('solarCapacity').value = "6";
+                    updateEstimatedCost();
+                    const messages = {
+                        'en': 'Above 5 kilowatt selected',
+                        'hi': '5 किलोवाट से अधिक चयनित',
+                        'or': '5 କିଲୋୱାଟରୁ ଅଧିକ ଚୟନ ହେଲା'
+                    };
+                    speak(messages[langCode] || messages['en']);
+                    return;
+                }
+                
+                // Hindi commands for capacity
+                else if (command.includes("एक किलोवाट") || command.includes("१ किलोवाट")) {
+                    document.getElementById('solarCapacity').value = "1";
+                    updateEstimatedCost();
+                    speak("एक किलोवाट चयनित");
+                    return;
+                }
+                else if (command.includes("दो किलोवाट") || command.includes("२ किलोवाट")) {
+                    document.getElementById('solarCapacity').value = "2";
+                    updateEstimatedCost();
+                    speak("दो किलोवाट चयनित");
+                    return;
+                }
+                else if (command.includes("तीन किलोवाट") || command.includes("३ किलोवाट")) {
+                    document.getElementById('solarCapacity').value = "3";
+                    updateEstimatedCost();
+                    speak("तीन किलोवाट चयनित");
+                    return;
+                }
+                
+                // Submit command
+                if (command.includes("submit") || command.includes("apply") || command.includes("जमा") || command.includes("ଦାଖଲ") || command.includes("आवेदन")) {
+                    submitRequest();
+                    return;
+                }
+                else if (command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ") || command.includes("পিছনে")) {
+                    goBack();
+                    return;
+                }
+                else if (command.includes("home") || command.includes("होम") || command.includes("ଘର") || command.includes("হোম")) {
+                    window.location.href = "/" + langCode + "/";
+                    return;
+                }
+                else if (command.includes("stop listening") || command.includes("stop voice")) {
+                    stopVoiceInput();
+                    return;
+                }
+            };
+
+            recognition.onerror = function(event) {
+                console.error("Recognition error:", event.error);
+                if (event.error === 'no-speech') return;
+                stopVoiceInput();
+            };
+
+            recognition.onend = function() {
+                if (isListening) {
+                    try {
+                        recognition.start();
+                    } catch (e) {
+                        console.error("Failed to restart recognition:", e);
+                        stopVoiceInput();
+                    }
+                } else {
+                    document.getElementById("voiceBtn").classList.remove("listening");
+                    document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
+                    document.getElementById('voiceStatusIndicator').classList.remove('active');
+                }
+            };
+
+            try {
+                recognition.start();
+            } catch (e) {
+                console.error("Failed to start recognition:", e);
+                stopVoiceInput();
+            }
+        }
+
+        function stopVoiceInput() {
+            isListening = false;
+            if (recognition) {
+                try {
+                    recognition.stop();
+                } catch (e) {}
+            }
+            document.getElementById("voiceBtn").classList.remove("listening");
+            document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
+            document.getElementById('voiceStatusIndicator').classList.remove('active');
+        }
+
+        // Auto-read page instructions
+        function autoReadPage() {
+            setTimeout(() => {
+                const langCode = getCurrentLangCode();
+                const messages = {
+                    'en': 'Solar net metering application. Select solar capacity, enter roof area in square feet, then say submit to apply.',
+                    'hi': 'सौर नेट मीटरिंग आवेदन। सौर क्षमता चुनें, छत क्षेत्र वर्ग फुट में दर्ज करें, फिर आवेदन के लिए सबमिट कहें।',
+                    'or': 'ସୋଲାର ନେଟ ମିଟରିଂ ଆବେଦନ। ସୌର କ୍ଷମତା ଚୟନ କରନ୍ତୁ, ଛାତ କ୍ଷେତ୍ରଫଳ ବର୍ଗ ଫୁଟରେ ପ୍ରବେଶ କରନ୍ତୁ, ତାପରେ ଆବେଦନ ପାଇଁ ସବମିଟ କୁହନ୍ତୁ।'
+                };
+                speak(messages[langCode] || messages['en']);
+            }, 2000);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            startSessionTimer();
+            
+            document.addEventListener('click', resetSessionTimer);
+            document.addEventListener('keypress', resetSessionTimer);
+            document.addEventListener('touchstart', resetSessionTimer);
+            
+            // Check if voice should auto-start
+            const autoStartVoice = sessionStorage.getItem('autoStartVoice');
+            if (autoStartVoice === 'true') {
+                sessionStorage.removeItem('autoStartVoice');
+                setTimeout(() => {
+                    toggleVoiceInput();
+                }, 1000);
+            }
+            
+            // Auto-read page
+            setTimeout(autoReadPage, 2000);
+            
+            // Initial cost update
+            updateEstimatedCost();
+        });
+
+        window.addEventListener('beforeunload', function() {
+            if (sessionTimer) {
+                clearTimeout(sessionTimer);
+            }
+            stopVoiceInput();
+        });
+
+        // Event Listeners
+        document.getElementById("area").addEventListener("click", () => openKeyboard("area"));
+        overlay.addEventListener("click", closeKeyboard);
+
+        // Capacity change listener
+        document.getElementById('solarCapacity').addEventListener('change', updateEstimatedCost);
+
+        // Override voice.js autoReadPage
+        window.autoReadPage = autoReadPage;
+        
+        // Initialize keyboard
+        createKeyboard();
+    </script>
 </body>
 </html>

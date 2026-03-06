@@ -1,438 +1,1061 @@
 <!DOCTYPE html>
 {% load i18n %}
 {% load static %}
-<html>
+<html lang="en">
 <head>
-<title>{% trans "New Gas Connection - Civic Kiosk" %}</title>
+    <style>
+        /* Hide Google Translate elements */
+        .goog-te-banner-frame.skiptranslate,
+        .goog-te-gadget-icon,
+        .goog-te-gadget-simple,
+        #goog-gt-tt,
+        .goog-te-balloon-frame,
+        .goog-te-menu-frame,
+        .goog-te-spinner-pos {
+            display: none !important;
+        }
+        
+        body {
+            top: 0px !important;
+            position: static !important;
+            overflow: hidden !important;
+            height: 100vh;
+            width: 100vw;
+        }
+        
+        .goog-te-combo {
+            display: none !important;
+        }
+        
+        .goog-te-gadget {
+            color: transparent !important;
+            height: 0 !important;
+            overflow: hidden !important;
+        }
 
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;user-select:none;}
-body{width:100vw;height:100vh;overflow:hidden;background:#f0f7ff;}
+        /* Timeout warning popup */
+        .timeout-warning {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border: 4px solid #ff9933;
+            border-radius: 40px;
+            padding: 30px;
+            text-align: center;
+            z-index: 2000;
+            display: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .timeout-warning p {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 20px;
+        }
 
-/* HEADER */
-.header{
-height:70px;background:white;display:flex;align-items:center;
-justify-content:space-between;padding:0 20px;
-border-bottom:2px solid #1e5fbf;
-}
-.header-left{display:flex;align-items:center;gap:10px;}
-.header-left img{height:40px;}
-.header-left div{font-size:12px;font-weight:600;color:#1e5fbf;line-height:1.2;}
-.header-right img{height:35px;}
+        .timeout-warning button {
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            padding: 15px 30px;
+            font-size: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            margin: 10px;
+            min-width: 150px;
+        }
 
-/* VOICE + BACK */
-.voice-corner{
-position:fixed;top:80px;right:15px;
-display:flex;flex-direction:column;align-items:center;gap:3px;
-}
-.voice-corner-btn{
-background:#ff9933;width:45px;height:45px;border-radius:50%;
-border:2px solid white;display:flex;align-items:center;
-justify-content:center;font-size:24px;cursor:pointer;
-}
-.voice-corner-btn.listening{
-background:#28a745;
-transform:scale(1.1);
-}
-.voice-corner-text{
-background:white;padding:2px 8px;border-radius:12px;
-font-size:10px;color:#ff9933;border:1px solid #ff9933;
-}
-.back-btn{
-position:fixed;top:80px;left:15px;
-background:white;border:2px solid #1e5fbf;
-border-radius:30px;padding:5px 15px;
-font-size:18px;font-weight:700;color:#1e5fbf;
-box-shadow:0 3px 0 #0a3d7a;cursor:pointer;z-index:1000;
-}
-.back-btn:active{transform:translateY(3px);box-shadow:0 1px 0 #0a3d7a;}
+        .timeout-warning .logout-btn {
+            background: #dc3545;
+        }
+        
+        .timeout-warning button:active {
+            transform: translateY(3px);
+        }
 
-/* MAIN */
-.container{
-position:fixed;top:70px;left:0;right:0;bottom:0;
-display:flex;align-items:center;justify-content:center;
-padding:15px;
-}
-.content-wrapper{width:100%;max-width:650px;}
+        /* Voice status indicator */
+        .voice-status-indicator {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-size: 16px;
+            font-weight: 600;
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            border: 2px solid #ff9933;
+        }
 
-h1{
-color:#1e5fbf;font-size:32px;font-weight:800;
-text-align:center;margin-bottom:15px;
-}
+        .voice-status-indicator.active {
+            display: flex;
+        }
 
-.security-note{
-background:#e8f5e9;border:1px solid #28a745;
-border-radius:20px;padding:6px 10px;
-font-size:12px;color:#1e5fbf;text-align:center;
-margin-bottom:10px;
-}
+        .voice-pulse {
+            width: 12px;
+            height: 12px;
+            background: #28a745;
+            border-radius: 50%;
+            animation: voicePulse 1.5s infinite;
+        }
 
-.form-group{margin:12px 0;}
-label{display:block;font-size:20px;color:#1e5fbf;margin-bottom:5px;}
+        @keyframes voicePulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
 
-.large-input{
-width:100%;height:60px;border:3px solid #1e5fbf;
-border-radius:25px;font-size:22px;
-padding:0 15px;background:white;cursor:pointer;
-}
+        /* Loading indicator */
+        .loading{
+            display:none;
+            position:fixed;
+            top:0;
+            left:0;
+            right:0;
+            bottom:0;
+            background:rgba(0,0,0,0.5);
+            z-index:2000;
+            justify-content:center;
+            align-items:center;
+            color:white;
+            font-size:24px;
+        }
+        .loading.show{display:flex;}
+        .spinner{
+            border:4px solid rgba(255,255,255,0.3);
+            border-radius:50%;
+            border-top:4px solid white;
+            width:50px;
+            height:50px;
+            animation:spin 1s linear infinite;
+            margin-right:10px;
+        }
+        @keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
+    </style>
 
-select.large-input{
-appearance:none;
-background-image:url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-background-repeat:no-repeat;
-background-position:right 15px center;
-background-size:20px;
-padding-right:45px;
-}
+    <meta charset="UTF-8">
+    <title>{% trans "New Gas Connection - Civic Kiosk" %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-.submit-btn{
-background:#28a745;color:white;border:none;
-border-radius:30px;padding:15px;font-size:22px;
-margin-top:10px;width:100%;
-box-shadow:0 5px 0 #1e7e34;cursor:pointer;
-}
-.submit-btn:active{transform:translateY(5px);box-shadow:0 1px 0 #1e7e34;}
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;user-select:none;}
+        body{width:100vw;height:100vh;overflow:hidden;background:#f0f7ff;}
 
-/* ===== NEW ANIMATION SYSTEM (SAME AS BOOKING PAGE) ===== */
+        /* HEADER */
+        .header{
+            height:70px;
+            background:white;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            padding:0 20px;
+            border-bottom:2px solid #1e5fbf;
+            position:fixed;
+            top:0;
+            left:0;
+            right:0;
+            z-index:1000;
+        }
+        .header-left{display:flex;align-items:center;gap:10px;}
+        .header-left img{height:40px;}
+        .header-left div{font-size:12px;font-weight:600;color:#1e5fbf;line-height:1.2;}
+        .header-right img{height:35px;}
 
-.overlay{
-position:fixed;inset:0;
-background:rgba(0,0,0,0.4);
-display:none;
-z-index:900;
-}
+        /* VOICE + BACK */
+        .voice-corner{
+            position:fixed;
+            top:80px;
+            right:15px;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            gap:3px;
+            z-index:1000;
+        }
+        .voice-corner-btn{
+            background:#ff9933;
+            width:45px;
+            height:45px;
+            border-radius:50%;
+            border:2px solid white;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:24px;
+            cursor:pointer;
+            transition:all 0.2s;
+        }
+        .voice-corner-btn:hover{background:#ffaa44;}
+        .voice-corner-btn.listening{
+            background:#28a745;
+            transform:scale(1.1);
+            animation:pulse 1s infinite;
+        }
+        @keyframes pulse{
+            0%{transform:scale(1);}
+            50%{transform:scale(1.1);}
+            100%{transform:scale(1);}
+        }
+        .voice-corner-text{
+            background:white;
+            padding:2px 8px;
+            border-radius:12px;
+            font-size:10px;
+            color:#ff9933;
+            border:1px solid #ff9933;
+        }
+        .back-btn{
+            position:fixed;
+            top:80px;
+            left:15px;
+            background:white;
+            border:2px solid #1e5fbf;
+            border-radius:30px;
+            padding:5px 15px;
+            font-size:18px;
+            font-weight:700;
+            color:#1e5fbf;
+            box-shadow:0 3px 0 #0a3d7a;
+            cursor:pointer;
+            z-index:1000;
+            text-decoration:none;
+        }
+        .back-btn:hover{background:#1e5fbf;color:white;}
+        .back-btn:active{transform:translateY(3px);box-shadow:0 1px 0 #0a3d7a;}
 
-.floating-input{
-position:fixed;
-left:50%;
-top:20%;
-transform:translate(-50%,-50%) scale(0.85);
-width:520px;
-height:70px;
-font-size:20px;
-border:4px solid #ff9933;
-border-radius:20px;
-padding:12px;
-z-index:1001;
-box-shadow:0 20px 50px rgba(0,0,0,0.4);
-transition:all 0.25s ease;
-display:none;
-}
-.floating-input.show{
-transform:translate(-50%,-50%) scale(1);
-}
+        /* MAIN */
+        .container{
+            position:fixed;
+            top:70px;
+            left:0;
+            right:0;
+            bottom:0;
+            display:flex;
+            align-items:flex-start;
+            justify-content:center;
+            padding:15px;
+            overflow-y:auto;
+        }
+        .content-wrapper{
+            width:100%;
+            max-width:650px;
+            padding:20px 0;
+        }
 
-.keyboard{
-position:fixed;
-bottom:15px;
-left:50%;
-transform:translateX(-50%);
-background:white;
-padding:10px;
-border-radius:15px;
-box-shadow:0 8px 25px rgba(0,0,0,0.3);
-display:none;
-z-index:1000;
-}
-.keyboard-row{display:flex;justify-content:center;}
-.keyboard button{
-min-width:48px;height:42px;margin:3px;
-font-size:14px;border-radius:8px;
-border:2px solid #1e5fbf;background:#f0f7ff;cursor:pointer;
-}
-.keyboard .ok-btn{
-background:#28a745;color:white;border:none;
-}
+        h1{
+            color:#1e5fbf;
+            font-size:32px;
+            font-weight:800;
+            text-align:center;
+            margin-bottom:15px;
+        }
 
-/* Messages */
-.messages{position:fixed;top:80px;left:50%;transform:translateX(-50%);z-index:2000;width:90%;max-width:650px;}
-.message{padding:10px;border-radius:8px;margin-bottom:5px;font-size:14px;}
-.message.success{background:#d4edda;color:#155724;border:1px solid #c3e6cb;}
-.message.error{background:#f8d7da;color:#721c24;border:1px solid #f5c6cb;}
-.message.info{background:#d1ecf1;color:#0c5460;border:1px solid #bee5eb;}
-</style>
+        .security-note{
+            background:#e8f5e9;
+            border:1px solid #28a745;
+            border-radius:20px;
+            padding:6px 10px;
+            font-size:12px;
+            color:#1e5fbf;
+            text-align:center;
+            margin-bottom:10px;
+        }
+
+        .form-group{margin:12px 0;}
+        label{display:block;font-size:20px;color:#1e5fbf;margin-bottom:5px;}
+
+        .large-input{
+            width:100%;
+            height:60px;
+            border:3px solid #1e5fbf;
+            border-radius:25px;
+            font-size:22px;
+            padding:0 15px;
+            background:white;
+            cursor:pointer;
+        }
+        .large-input:focus{outline:none;border-color:#ff9933;}
+        .large-input[readonly]{background:#f9f9f9;}
+
+        select.large-input{
+            appearance:none;
+            background-image:url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat:no-repeat;
+            background-position:right 15px center;
+            background-size:20px;
+            padding-right:45px;
+        }
+
+        .submit-btn{
+            background:#28a745;
+            color:white;
+            border:none;
+            border-radius:30px;
+            padding:15px;
+            font-size:22px;
+            margin-top:10px;
+            width:100%;
+            box-shadow:0 5px 0 #1e7e34;
+            cursor:pointer;
+            transition:all 0.1s;
+        }
+        .submit-btn:active{transform:translateY(5px);box-shadow:0 1px 0 #1e7e34;}
+
+        /* FLOATING KEYBOARD */
+        .overlay{
+            position:fixed;
+            inset:0;
+            background:rgba(0,0,0,0.4);
+            backdrop-filter:blur(3px);
+            display:none;
+            z-index:900;
+        }
+
+        .floating-input{
+            position:fixed;
+            left:50%;
+            top:20%;
+            transform:translate(-50%,-50%) scale(0.85);
+            width:520px;
+            height:70px;
+            font-size:20px;
+            border:4px solid #ff9933;
+            border-radius:20px;
+            padding:12px;
+            z-index:1001;
+            box-shadow:0 20px 50px rgba(0,0,0,0.4);
+            transition:all 0.25s ease;
+            display:none;
+        }
+        .floating-input.show{
+            transform:translate(-50%,-50%) scale(1);
+        }
+        .floating-input:focus{outline:none;}
+
+        .keyboard{
+            position:fixed;
+            bottom:15px;
+            left:50%;
+            transform:translateX(-50%);
+            background:white;
+            padding:10px;
+            border-radius:15px;
+            box-shadow:0 8px 25px rgba(0,0,0,0.3);
+            display:none;
+            z-index:1000;
+        }
+        .keyboard-row{display:flex;justify-content:center;}
+        .keyboard button{
+            min-width:48px;
+            height:42px;
+            margin:3px;
+            font-size:14px;
+            border-radius:8px;
+            border:2px solid #1e5fbf;
+            background:#f0f7ff;
+            cursor:pointer;
+            transition:all 0.2s;
+        }
+        .keyboard button:hover{background:#1e5fbf;color:white;}
+        .keyboard .ok-btn{
+            background:#28a745;
+            color:white;
+            border:none;
+        }
+        .keyboard .ok-btn:hover{background:#218838;}
+
+        /* Messages */
+        .messages{
+            position:fixed;
+            top:80px;
+            left:50%;
+            transform:translateX(-50%);
+            z-index:2000;
+            width:90%;
+            max-width:650px;
+        }
+        .message{
+            padding:10px;
+            border-radius:8px;
+            margin-bottom:5px;
+            font-size:14px;
+        }
+        .message.success{
+            background:#d4edda;
+            color:#155724;
+            border:1px solid #c3e6cb;
+        }
+        .message.error{
+            background:#f8d7da;
+            color:#721c24;
+            border:1px solid #f5c6cb;
+        }
+        .message.info{
+            background:#d1ecf1;
+            color:#0c5460;
+            border:1px solid #bee5eb;
+        }
+    </style>
 </head>
 
 <body>
-
-<div class="header">
-<div class="header-left">
-<img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India">
-<div>{% trans "Ministry of Electronics &" %}<br>{% trans "Information Technology" %}<br>{% trans "Government of India" %}</div>
-</div>
-<div class="header-right">
-<img src="https://www.cdac.in/img/cdac-logo.png" alt="CDAC Logo">
-</div>
-</div>
-
-<!-- Messages -->
-{% if messages %}
-<div class="messages">
-    {% for message in messages %}
-    <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
-        {{ message }}
-    </div>
-    {% endfor %}
-</div>
-{% endif %}
-
-<!-- Voice corner will be created dynamically by voice.js -->
-
-<div class="back-btn" onclick="window.location='{% url 'gas-services' %}'">← {% trans "Back" %}</div>
-
-<div class="container">
-<div class="content-wrapper">
-
-<h1>{% trans "New Gas Connection" %}</h1>
-<div class="security-note">🔒 {% trans "Your data is secure" %}</div>
-
-<form method="POST" action="{% url 'gas-new-connection' %}" id="connectionForm">
-    {% csrf_token %}
-    
-    <div class="form-group">
-    <label>{% trans "Full Name" %} *</label>
-    <input class="large-input" type="text" name="full_name" id="name" value="{{ form_data.full_name|default:'' }}" placeholder="{% trans "Enter Full Name" %}" readonly required>
+    <!-- Timeout Warning Popup -->
+    <div id="timeoutWarning" class="timeout-warning">
+        <p>⏰ {% trans "Session about to expire!" %}</p>
+        <button onclick="extendSession()">{% trans "Continue" %}</button>
+        <button class="logout-btn" onclick="window.location='{% url 'index' %}'">{% trans "Logout" %}</button>
     </div>
 
-    <div class="form-group">
-    <label>{% trans "Address" %} *</label>
-    <input class="large-input" type="text" name="address" id="address" value="{{ form_data.address|default:'' }}" placeholder="{% trans "Enter Address" %}" readonly required>
+    <!-- Voice Status Indicator -->
+    <div id="voiceStatusIndicator" class="voice-status-indicator">
+        <div class="voice-pulse"></div>
+        <span id="voiceStatusText">{% trans "Listening..." %}</span>
     </div>
 
-    <div class="form-group">
-    <label>{% trans "Mobile Number" %} *</label>
-    <input class="large-input" type="tel" name="mobile" id="mobile" value="{{ form_data.mobile|default:'' }}" placeholder="{% trans "Enter Mobile Number" %}" pattern="\d{10}" maxlength="10" title="{% trans "Please enter 10-digit mobile number" %}" readonly required>
+    <!-- Loading Indicator -->
+    <div id="loadingIndicator" class="loading">
+        <div class="spinner"></div>
+        <div>{% trans "Processing..." %}</div>
     </div>
 
-    <div class="form-group">
-    <label>{% trans "Document Type" %} *</label>
-    <select class="large-input" name="document_type" id="docType" required>
-        <option value="" {% if not form_data.document_type %}selected{% endif %}>{% trans "Select Document Type" %}</option>
-        <option value="Aadhaar Card" {% if form_data.document_type == 'Aadhaar Card' %}selected{% endif %}>{% trans "Aadhaar Card" %}</option>
-        <option value="Voter ID" {% if form_data.document_type == 'Voter ID' %}selected{% endif %}>{% trans "Voter ID" %}</option>
-        <option value="Passport" {% if form_data.document_type == 'Passport' %}selected{% endif %}>{% trans "Passport" %}</option>
-        <option value="Driving License" {% if form_data.document_type == 'Driving License' %}selected{% endif %}>{% trans "Driving License" %}</option>
-    </select>
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-left">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India">
+            <div>{% trans "Ministry of Electronics &" %}<br>{% trans "Information Technology" %}<br>{% trans "Government of India" %}</div>
+        </div>
+        <div class="header-right">
+            <img src="https://www.cdac.in/img/cdac-logo.png" alt="CDAC Logo">
+        </div>
     </div>
 
-    <button type="submit" class="submit-btn" name="submit_application">{% trans "Submit Application" %}</button>
-</form>
+    <!-- Messages -->
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
 
-</div>
-</div>
+    <!-- Voice Button -->
+    <div class="voice-corner">
+        <div class="voice-corner-btn" id="voiceBtn" onclick="toggleVoiceInput()">🎤</div>
+        <div class="voice-corner-text" id="voiceStatus">{% trans "Click" %}</div>
+    </div>
 
-<div id="overlay" class="overlay"></div>
-<textarea id="floatingInput" class="floating-input"></textarea>
-<div id="keyboard" class="keyboard"></div>
+    <!-- Back Button -->
+    <div class="back-btn" onclick="goBack()">← {% trans "Back" %}</div>
 
-<script src="{% static 'js/voice.js' %}"></script>
+    <!-- Main Container -->
+    <div class="container">
+        <div class="content-wrapper">
+            <h1>{% trans "New Gas Connection" %}</h1>
+            <div class="security-note">🔒 {% trans "Your data is secure" %}</div>
 
-<script>
-let activeInput=null;
-let isUpperCase=true;
+            <form method="POST" action="{% url 'gas-new-connection' %}" id="connectionForm">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label>{% trans "Full Name" %} *</label>
+                    <input class="large-input" type="text" name="full_name" id="name" value="{{ form_data.full_name|default:'' }}" placeholder="{% trans "Enter Full Name" %}" readonly required>
+                </div>
 
-const overlay=document.getElementById("overlay");
-const floatingInput=document.getElementById("floatingInput");
-const keyboard=document.getElementById("keyboard");
+                <div class="form-group">
+                    <label>{% trans "Address" %} *</label>
+                    <input class="large-input" type="text" name="address" id="address" value="{{ form_data.address|default:'' }}" placeholder="{% trans "Enter Address" %}" readonly required>
+                </div>
 
-function createKeyboard(){
-keyboard.innerHTML="";
-let letters="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-if(!isUpperCase){letters=letters.toLowerCase();}
-let keys=(letters+"0123456789").split("");
+                <div class="form-group">
+                    <label>{% trans "Mobile Number" %} *</label>
+                    <input class="large-input" type="tel" name="mobile" id="mobile" value="{{ form_data.mobile|default:'' }}" placeholder="{% trans "Enter Mobile Number" %}" pattern="\d{10}" maxlength="10" title="{% trans "Please enter 10-digit mobile number" %}" readonly required>
+                </div>
 
-let row=document.createElement("div");
-row.className="keyboard-row";
+                <div class="form-group">
+                    <label>{% trans "Document Type" %} *</label>
+                    <select class="large-input" name="document_type" id="docType" required>
+                        <option value="" {% if not form_data.document_type %}selected{% endif %}>{% trans "Select Document Type" %}</option>
+                        <option value="Aadhaar Card" {% if form_data.document_type == 'Aadhaar Card' %}selected{% endif %}>{% trans "Aadhaar Card" %}</option>
+                        <option value="Voter ID" {% if form_data.document_type == 'Voter ID' %}selected{% endif %}>{% trans "Voter ID" %}</option>
+                        <option value="Passport" {% if form_data.document_type == 'Passport' %}selected{% endif %}>{% trans "Passport" %}</option>
+                        <option value="Driving License" {% if form_data.document_type == 'Driving License' %}selected{% endif %}>{% trans "Driving License" %}</option>
+                    </select>
+                </div>
 
-keys.forEach((k,i)=>{
-if(i%10===0 && i!==0){
-keyboard.appendChild(row);
-row=document.createElement("div");
-row.className="keyboard-row";
-}
-let btn=document.createElement("button");
-btn.innerText=k;
-btn.type="button";
-btn.onclick=()=>floatingInput.value+=k;
-row.appendChild(btn);
-});
-keyboard.appendChild(row);
+                <button type="button" class="submit-btn" onclick="validateAndSubmit()">{% trans "Submit Application" %}</button>
+            </form>
+        </div>
+    </div>
 
-/* ---- LAST ROW WITH SPACE ---- */
-let last=document.createElement("div");
-last.className="keyboard-row";
+    <!-- Floating Keyboard Elements -->
+    <div id="overlay" class="overlay"></div>
+    <textarea id="floatingInput" class="floating-input" placeholder="{% trans "Type here..." %}"></textarea>
+    <div id="keyboard" class="keyboard"></div>
 
-last.innerHTML=`
-<button type="button" onclick="toggleCase()">{% trans "Shift" %}</button>
-<button type="button" onclick="floatingInput.value+=' '">{% trans "Space" %}</button>
-<button type="button" onclick="floatingInput.value=''">{% trans "Clear" %}</button>
-<button type="button" class="ok-btn" onclick="finish()">{% trans "OK" %}</button>
-`;
+    <!-- Load voice.js - must be at bottom -->
+    <script src="{% static 'js/voice.js' %}"></script>
 
-keyboard.appendChild(last);
-}
-
-function toggleCase(){isUpperCase=!isUpperCase;createKeyboard();}
-
-function openKeyboard(id){
-activeInput=document.getElementById(id);
-if(!activeInput) return;
-floatingInput.value=activeInput.value;
-overlay.style.display="block";
-floatingInput.style.display="block";
-keyboard.style.display="block";
-setTimeout(()=>floatingInput.classList.add("show"),10);
-}
-
-function finish(){
-if(activeInput){
-    activeInput.value=floatingInput.value;
-}
-closeKeyboard();
-}
-
-function closeKeyboard(){
-floatingInput.classList.remove("show");
-setTimeout(()=>{
-overlay.style.display="none";
-floatingInput.style.display="none";
-keyboard.style.display="none";
-},200);
-}
-
-document.getElementById("name").addEventListener("click",()=>openKeyboard("name"));
-document.getElementById("address").addEventListener("click",()=>openKeyboard("address"));
-document.getElementById("mobile").addEventListener("click",()=>openKeyboard("mobile"));
-overlay.addEventListener("click",closeKeyboard);
-
-createKeyboard();
-
-function submitForm(){
-    const name=document.getElementById('name').value;
-    const address=document.getElementById('address').value;
-    const mobile=document.getElementById('mobile').value;
-    const docType=document.getElementById('docType').value;
-    
-    if(!name || !address || !mobile || !docType){
-        if(typeof speak === 'function') speak("{% trans 'Please fill all required fields' %}");
-        return false;
-    }
-    if(mobile.length !== 10 || !/^\d+$/.test(mobile)){
-        if(typeof speak === 'function') speak("{% trans 'Please enter a valid 10-digit mobile number' %}");
-        return false;
-    }
-    return true;
-}
-
-/* ===================== OVERRIDE VOICE COMMANDS ===================== */
-
-// Extend voice.js handleCommand for new gas connection
-const originalHandleCommand = window.handleCommand;
-window.handleCommand = function(command) {
-    command = command.toLowerCase();
-    console.log("New gas connection command:", command);
-    
-    // Check for numbers in command (mobile)
-    const numberMatch = command.match(/\d+/g);
-    if(numberMatch && (command.includes("mobile") || command.includes("phone"))) {
-        const digits = numberMatch.join('').slice(0,10);
-        if(digits.length === 10) {
-            document.getElementById('mobile').value = digits;
-            if(typeof speak === 'function') speak("Mobile number entered");
-            return;
+    <script>
+        /* ================= LANGUAGE UTILITIES ================= */
+        function getCurrentLangCode() {
+            const path = window.location.pathname.split('/');
+            return path[1] || "en";
         }
-    }
-    
-    // Name input
-    if((command.includes("name") || command.includes("my name")) && command.length > 10) {
-        let name = command.replace("my name", "").replace("name", "").trim();
-        if(name) {
-            name = name.split(' ').map(word => 
-                word.charAt(0).toUpperCase() + word.slice(1)
-            ).join(' ');
-            document.getElementById('name').value = name;
-            if(typeof speak === 'function') speak("Name entered: " + name);
-            return;
-        }
-    }
-    
-    // Address input
-    if(command.includes("address") && command.length > 15) {
-        let address = command.replace("address", "").trim();
-        if(address) {
-            address = address.split(' ').map(word => 
-                word.charAt(0).toUpperCase() + word.slice(1)
-            ).join(' ');
-            document.getElementById('address').value = address;
-            if(typeof speak === 'function') speak("Address entered");
-            return;
-        }
-    }
-    
-    // Document type selection
-    if(command.includes("aadhaar")) {
-        document.getElementById('docType').value = "Aadhaar Card";
-        if(typeof speak === 'function') speak("Aadhaar Card selected");
-        return;
-    }
-    else if(command.includes("voter") || command.includes("voter id")) {
-        document.getElementById('docType').value = "Voter ID";
-        if(typeof speak === 'function') speak("Voter ID selected");
-        return;
-    }
-    else if(command.includes("passport")) {
-        document.getElementById('docType').value = "Passport";
-        if(typeof speak === 'function') speak("Passport selected");
-        return;
-    }
-    else if(command.includes("driving") || command.includes("license") || command.includes("licence")) {
-        document.getElementById('docType').value = "Driving License";
-        if(typeof speak === 'function') speak("Driving License selected");
-        return;
-    }
-    
-    // Submit command
-    if(command.includes("submit") || command.includes("apply")) {
-        if(submitForm()) {
-            if(typeof speak === 'function') speak("{% trans 'Submitting application' %}");
-            document.getElementById('connectionForm').submit();
-        }
-        return;
-    }
-    else if(command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
-        window.location.href = "/" + getCurrentLangCode() + "/gas-services/";
-        return;
-    }
-    else if(command.includes("home") || command.includes("होम") || command.includes("ଘର")) {
-        window.location.href = "/" + getCurrentLangCode() + "/";
-        return;
-    }
-    
-    // If not connection-specific, pass to original handler
-    if(originalHandleCommand) {
-        originalHandleCommand(command);
-    }
-};
 
-// Override autoReadPage to read new connection instructions
-const originalAutoRead = window.autoReadPage;
-window.autoReadPage = function() {
-    if(originalAutoRead) originalAutoRead();
-    setTimeout(() => {
-        if(typeof speak === 'function') {
-            speak("{% trans 'Enter your name, address, mobile number, select document type, then say submit to apply' %}");
+        function speak(text) {
+            if (!('speechSynthesis' in window)) return;
+            speechSynthesis.cancel();
+            let utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = window.getCurrentLang ? window.getCurrentLang() : 'en-IN';
+            utterance.rate = 1;
+            speechSynthesis.speak(utterance);
         }
-    }, 2000);
-};
 
-// Auto-hide messages after 5 seconds
-setTimeout(function() {
-    const messages = document.querySelectorAll('.message');
-    messages.forEach(function(message) {
-        message.style.display = 'none';
-    });
-}, 5000);
-</script>
+        /* ================= SESSION TIMER ================= */
+        let sessionTimer;
+        let timeoutWarningTimer;
+        const SESSION_DURATION = 120000; // 2 minutes
+        const WARNING_TIME = 30000; // Warn 30 seconds before
 
+        function startSessionTimer() {
+            sessionTimer = setTimeout(() => {
+                showTimeoutWarning();
+            }, SESSION_DURATION - WARNING_TIME);
+        }
+
+        function showTimeoutWarning() {
+            const warning = document.getElementById('timeoutWarning');
+            if (warning) {
+                warning.style.display = 'block';
+                
+                const langCode = getCurrentLangCode();
+                const warnings = {
+                    'en': 'Your session is about to expire. Please continue to stay logged in.',
+                    'hi': 'आपका सत्र समाप्त होने वाला है। कृपया जारी रखें।',
+                    'or': 'ଆପଣଙ୍କର ସତ୍ର ସମାପ୍ତ ହେବାକୁ ଯାଉଛି। ଦୟାକରି ଜାରି ରଖନ୍ତୁ।',
+                    'bn': 'আপনার সেশন শেষ হতে চলেছে। অনুগ্রহ করে চালিয়ে যান।',
+                    'ta': 'உங்கள் அமர்வு காலாவதியாகிறது. தயவுசெய்து தொடரவும்.',
+                    'te': 'మీ సెషన్ ముగియబోతోంది. దయచేసి కొనసాగించండి.'
+                };
+                speak(warnings[langCode] || warnings['en']);
+                
+                timeoutWarningTimer = setTimeout(() => {
+                    window.location.href = "/" + langCode + "/";
+                }, WARNING_TIME);
+            }
+        }
+
+        function extendSession() {
+            const warning = document.getElementById('timeoutWarning');
+            if (warning) {
+                warning.style.display = 'none';
+            }
+            clearTimeout(sessionTimer);
+            clearTimeout(timeoutWarningTimer);
+            startSessionTimer();
+            
+            const langCode = getCurrentLangCode();
+            const messages = {
+                'en': 'Session extended. You may continue.',
+                'hi': 'सत्र बढ़ा दिया गया। आप जारी रख सकते हैं।',
+                'or': 'ସତ୍ର ବୃଦ୍ଧି କରାଯାଇଛି। ଆପଣ ଜାରି ରଖିପାରିବେ।',
+                'bn': 'সেশন বাড়ানো হয়েছে। আপনি চালিয়ে যেতে পারেন।',
+                'ta': 'அமர்வு நீட்டிக்கப்பட்டது. நீங்கள் தொடரலாம்.',
+                'te': 'సెషన్ పొడిగించబడింది. మీరు కొనసాగించవచ్చు.'
+            };
+            speak(messages[langCode] || messages['en']);
+        }
+
+        function resetSessionTimer() {
+            clearTimeout(sessionTimer);
+            clearTimeout(timeoutWarningTimer);
+            startSessionTimer();
+        }
+
+        function goBack() {
+            resetSessionTimer();
+            window.location.href = "/" + getCurrentLangCode() + "/gas-services/";
+        }
+
+        /* ================= FLOATING KEYBOARD ================= */
+        let activeInput = null;
+        let isUpperCase = true;
+
+        const overlay = document.getElementById("overlay");
+        const floatingInput = document.getElementById("floatingInput");
+        const keyboard = document.getElementById("keyboard");
+        const loadingIndicator = document.getElementById("loadingIndicator");
+
+        function createKeyboard() {
+            keyboard.innerHTML = "";
+            let letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            if (!isUpperCase) { letters = letters.toLowerCase(); }
+            let keys = (letters + "0123456789").split("");
+
+            let row = document.createElement("div");
+            row.className = "keyboard-row";
+
+            keys.forEach((k, i) => {
+                if (i % 10 === 0 && i !== 0) {
+                    keyboard.appendChild(row);
+                    row = document.createElement("div");
+                    row.className = "keyboard-row";
+                }
+                let btn = document.createElement("button");
+                btn.innerText = k;
+                btn.type = "button";
+                btn.onclick = () => floatingInput.value += k;
+                row.appendChild(btn);
+            });
+            keyboard.appendChild(row);
+
+            /* ---- LAST ROW WITH SPACE ---- */
+            let last = document.createElement("div");
+            last.className = "keyboard-row";
+
+            last.innerHTML = `
+                <button type="button" onclick="toggleCase()">⇧ {% trans "Shift" %}</button>
+                <button type="button" onclick="floatingInput.value += ' '">{% trans "Space" %}</button>
+                <button type="button" onclick="floatingInput.value = floatingInput.value.slice(0, -1)">⌫ {% trans "Back" %}</button>
+                <button type="button" onclick="floatingInput.value = ''">{% trans "Clear" %}</button>
+                <button type="button" class="ok-btn" onclick="finish()">✓ {% trans "OK" %}</button>
+            `;
+
+            keyboard.appendChild(last);
+        }
+
+        function toggleCase() {
+            isUpperCase = !isUpperCase;
+            createKeyboard();
+        }
+
+        function openKeyboard(id) {
+            resetSessionTimer();
+            activeInput = document.getElementById(id);
+            if (!activeInput) return;
+            floatingInput.value = activeInput.value;
+            overlay.style.display = "block";
+            floatingInput.style.display = "block";
+            keyboard.style.display = "block";
+            setTimeout(() => floatingInput.classList.add("show"), 10);
+            floatingInput.focus();
+        }
+
+        function finish() {
+            if (activeInput) {
+                activeInput.value = floatingInput.value;
+            }
+            closeKeyboard();
+        }
+
+        function closeKeyboard() {
+            floatingInput.classList.remove("show");
+            setTimeout(() => {
+                overlay.style.display = "none";
+                floatingInput.style.display = "none";
+                keyboard.style.display = "none";
+            }, 200);
+        }
+
+        // Handle Enter key on floating input
+        floatingInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                finish();
+            }
+        });
+
+        document.getElementById("name").addEventListener("click", () => openKeyboard("name"));
+        document.getElementById("address").addEventListener("click", () => openKeyboard("address"));
+        document.getElementById("mobile").addEventListener("click", () => openKeyboard("mobile"));
+        overlay.addEventListener("click", closeKeyboard);
+
+        createKeyboard();
+
+        /* ================= FORM VALIDATION AND SUBMISSION ================= */
+        function validateAndSubmit() {
+            resetSessionTimer();
+            
+            const name = document.getElementById('name').value;
+            const address = document.getElementById('address').value;
+            const mobile = document.getElementById('mobile').value;
+            const docType = document.getElementById('docType').value;
+            const langCode = getCurrentLangCode();
+            
+            if (!name) {
+                const messages = {
+                    'en': 'Please enter your full name',
+                    'hi': 'कृपया अपना पूरा नाम दर्ज करें',
+                    'or': 'ଦୟାକରି ଆପଣଙ୍କର ପୂରା ନାମ ପ୍ରବେଶ କରନ୍ତୁ'
+                };
+                speak(messages[langCode] || messages['en']);
+                return false;
+            }
+            
+            if (!address) {
+                const messages = {
+                    'en': 'Please enter your address',
+                    'hi': 'कृपया अपना पता दर्ज करें',
+                    'or': 'ଦୟାକରି ଆପଣଙ୍କର ଠିକଣା ପ୍ରବେଶ କରନ୍ତୁ'
+                };
+                speak(messages[langCode] || messages['en']);
+                return false;
+            }
+            
+            if (!mobile) {
+                const messages = {
+                    'en': 'Please enter mobile number',
+                    'hi': 'कृपया मोबाइल नंबर दर्ज करें',
+                    'or': 'ଦୟାକରି ମୋବାଇଲ୍ ନମ୍ବର ପ୍ରବେଶ କରନ୍ତୁ'
+                };
+                speak(messages[langCode] || messages['en']);
+                return false;
+            }
+            
+            if (mobile.length !== 10 || !/^\d+$/.test(mobile)) {
+                const messages = {
+                    'en': 'Please enter a valid 10-digit mobile number',
+                    'hi': 'कृपया 10 अंकों का मान्य मोबाइल नंबर दर्ज करें',
+                    'or': 'ଦୟାକରି 10 ଅଙ୍କ ବିଶିଷ୍ଟ ବୈଧ ମୋବାଇଲ୍ ନମ୍ବର ପ୍ରବେଶ କରନ୍ତୁ'
+                };
+                speak(messages[langCode] || messages['en']);
+                return false;
+            }
+            
+            if (!docType) {
+                const messages = {
+                    'en': 'Please select document type',
+                    'hi': 'कृपया दस्तावेज़ प्रकार चुनें',
+                    'or': 'ଦୟାକରି ଦଲିଲ ପ୍ରକାର ଚୟନ କରନ୍ତୁ'
+                };
+                speak(messages[langCode] || messages['en']);
+                return false;
+            }
+
+            // Show loading
+            loadingIndicator.classList.add('show');
+            
+            const messages = {
+                'en': 'Submitting application',
+                'hi': 'आवेदन भेजा जा रहा है',
+                'or': 'ଆବେଦନ ପଠାଯାଉଛି'
+            };
+            speak(messages[langCode] || messages['en']);
+
+            // Submit form
+            setTimeout(() => {
+                document.getElementById('connectionForm').submit();
+            }, 500);
+        }
+
+        /* ================= VOICE INPUT ================= */
+        let recognition;
+        let isListening = false;
+
+        function toggleVoiceInput() {
+            resetSessionTimer();
+            
+            if (isListening) {
+                stopVoiceInput();
+                return;
+            }
+
+            const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SR) {
+                alert("{% trans 'Speech not supported' %}");
+                return;
+            }
+
+            if (recognition) {
+                try {
+                    recognition.stop();
+                } catch (e) {}
+            }
+
+            recognition = new SR();
+            recognition.lang = window.getCurrentLang ? window.getCurrentLang() : 'en-IN';
+            recognition.continuous = true;
+            recognition.interimResults = true;
+
+            recognition.onstart = function() {
+                isListening = true;
+                document.getElementById("voiceBtn").classList.add("listening");
+                document.getElementById("voiceStatus").innerText = "{% trans 'Listening...' %}";
+                document.getElementById('voiceStatusIndicator').classList.add('active');
+                
+                const langCode = getCurrentLangCode();
+                const messages = {
+                    'en': 'Say your name, address, mobile number, document type, then say submit to apply.',
+                    'hi': 'अपना नाम, पता, मोबाइल नंबर, दस्तावेज़ प्रकार बोलें, फिर आवेदन के लिए सबमिट कहें।',
+                    'or': 'ଆପଣଙ୍କ ନାମ, ଠିକଣା, ମୋବାଇଲ୍ ନମ୍ବର, ଦଲିଲ ପ୍ରକାର କୁହନ୍ତୁ, ତାପରେ ଆବେଦନ ପାଇଁ ସବମିଟ କୁହନ୍ତୁ।'
+                };
+                speak(messages[langCode] || messages['en']);
+            };
+
+            recognition.onresult = function(e) {
+                resetSessionTimer();
+                
+                let finalTranscript = '';
+                let interimTranscript = '';
+                
+                for (let i = 0; i < e.results.length; i++) {
+                    const result = e.results[i];
+                    if (result.isFinal) {
+                        finalTranscript += result[0].transcript;
+                    } else {
+                        interimTranscript += result[0].transcript;
+                    }
+                }
+                
+                const transcript = finalTranscript || interimTranscript;
+                const command = transcript.toLowerCase();
+                console.log("New gas connection command:", command);
+                
+                const langCode = getCurrentLangCode();
+                
+                // Check for numbers in command (mobile)
+                const numberMatch = command.match(/\d+/g);
+                if (numberMatch && (command.includes("mobile") || command.includes("phone") || 
+                    command.includes("मोबाइल") || command.includes("ମୋବାଇଲ୍"))) {
+                    const digits = numberMatch.join('').slice(0, 10);
+                    if (digits.length === 10) {
+                        document.getElementById('mobile').value = digits;
+                        const messages = {
+                            'en': 'Mobile number entered',
+                            'hi': 'मोबाइल नंबर दर्ज किया गया',
+                            'or': 'ମୋବାଇଲ୍ ନମ୍ବର ପ୍ରବେଶ ହେଲା'
+                        };
+                        speak(messages[langCode] || messages['en']);
+                    }
+                    return;
+                }
+                
+                // Name input
+                if ((command.includes("name") || command.includes("my name") || command.includes("नाम") || command.includes("ନାମ")) && command.length > 10) {
+                    let name = command.replace("my name", "").replace("name", "").replace("नाम", "").replace("ନାମ", "").trim();
+                    if (name) {
+                        name = name.split(' ').map(word => 
+                            word.charAt(0).toUpperCase() + word.slice(1)
+                        ).join(' ');
+                        document.getElementById('name').value = name;
+                        const messages = {
+                            'en': 'Name entered: ' + name,
+                            'hi': 'नाम दर्ज किया गया: ' + name,
+                            'or': 'ନାମ ପ୍ରବେଶ ହେଲା: ' + name
+                        };
+                        speak(messages[langCode] || messages['en']);
+                    }
+                    return;
+                }
+                
+                // Address input
+                if ((command.includes("address") || command.includes("पता") || command.includes("ଠିକଣା")) && command.length > 15) {
+                    let address = command.replace("address", "").replace("पता", "").replace("ଠିକଣା", "").trim();
+                    if (address) {
+                        address = address.split(' ').map(word => 
+                            word.charAt(0).toUpperCase() + word.slice(1)
+                        ).join(' ');
+                        document.getElementById('address').value = address;
+                        const messages = {
+                            'en': 'Address entered',
+                            'hi': 'पता दर्ज किया गया',
+                            'or': 'ଠିକଣା ପ୍ରବେଶ ହେଲା'
+                        };
+                        speak(messages[langCode] || messages['en']);
+                    }
+                    return;
+                }
+                
+                // Document type selection - English
+                if (command.includes("aadhaar") || command.includes("aadhar")) {
+                    document.getElementById('docType').value = "Aadhaar Card";
+                    const messages = {
+                        'en': 'Aadhaar Card selected',
+                        'hi': 'आधार कार्ड चयनित',
+                        'or': 'ଆଧାର କାର୍ଡ ଚୟନ ହେଲା'
+                    };
+                    speak(messages[langCode] || messages['en']);
+                    return;
+                }
+                else if (command.includes("voter") || command.includes("voter id")) {
+                    document.getElementById('docType').value = "Voter ID";
+                    const messages = {
+                        'en': 'Voter ID selected',
+                        'hi': 'वोटर आईडी चयनित',
+                        'or': 'ଭୋଟର୍ ଆଇଡି ଚୟନ ହେଲା'
+                    };
+                    speak(messages[langCode] || messages['en']);
+                    return;
+                }
+                else if (command.includes("passport")) {
+                    document.getElementById('docType').value = "Passport";
+                    const messages = {
+                        'en': 'Passport selected',
+                        'hi': 'पासपोर्ट चयनित',
+                        'or': 'ପାସପୋର୍ଟ ଚୟନ ହେଲା'
+                    };
+                    speak(messages[langCode] || messages['en']);
+                    return;
+                }
+                else if (command.includes("driving") || command.includes("license") || command.includes("licence")) {
+                    document.getElementById('docType').value = "Driving License";
+                    const messages = {
+                        'en': 'Driving License selected',
+                        'hi': 'ड्राइविंग लाइसेंस चयनित',
+                        'or': 'ଡ୍ରାଇଭିଂ ଲାଇସେନ୍ସ ଚୟନ ହେଲା'
+                    };
+                    speak(messages[langCode] || messages['en']);
+                    return;
+                }
+                
+                // Hindi document types
+                if (command.includes("आधार")) {
+                    document.getElementById('docType').value = "Aadhaar Card";
+                    speak("आधार कार्ड चयनित");
+                    return;
+                }
+                else if (command.includes("वोटर") || command.includes("मतदाता")) {
+                    document.getElementById('docType').value = "Voter ID";
+                    speak("वोटर आईडी चयनित");
+                    return;
+                }
+                
+                // Odia document types
+                if (command.includes("ଆଧାର")) {
+                    document.getElementById('docType').value = "Aadhaar Card";
+                    speak("ଆଧାର କାର୍ଡ ଚୟନ ହେଲା");
+                    return;
+                }
+                else if (command.includes("ଭୋଟର୍")) {
+                    document.getElementById('docType').value = "Voter ID";
+                    speak("ଭୋଟର୍ ଆଇଡି ଚୟନ ହେଲା");
+                    return;
+                }
+                
+                // Submit command
+                if (command.includes("submit") || command.includes("apply") || command.includes("जमा") || command.includes("ଦାଖଲ") || command.includes("आवेदन")) {
+                    validateAndSubmit();
+                    return;
+                }
+                else if (command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ") || 
+                    command.includes("পিছনে") || command.includes("பின்") || command.includes("వెనుకకు")) {
+                    goBack();
+                    return;
+                }
+                else if (command.includes("home") || command.includes("होम") || command.includes("ଘର") || 
+                    command.includes("হোম") || command.includes("முகப்பு") || command.includes("హోమ్")) {
+                    window.location.href = "/" + langCode + "/";
+                    return;
+                }
+                else if (command.includes("stop listening") || command.includes("stop voice")) {
+                    stopVoiceInput();
+                    return;
+                }
+            };
+
+            recognition.onerror = function(event) {
+                console.error("Recognition error:", event.error);
+                if (event.error === 'no-speech') return;
+                stopVoiceInput();
+            };
+
+            recognition.onend = function() {
+                if (isListening) {
+                    try {
+                        recognition.start();
+                    } catch (e) {
+                        console.error("Failed to restart recognition:", e);
+                        stopVoiceInput();
+                    }
+                } else {
+                    document.getElementById("voiceBtn").classList.remove("listening");
+                    document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
+                    document.getElementById('voiceStatusIndicator').classList.remove('active');
+                }
+            };
+
+            try {
+                recognition.start();
+            } catch (e) {
+                console.error("Failed to start recognition:", e);
+                stopVoiceInput();
+            }
+        }
+
+        function stopVoiceInput() {
+            isListening = false;
+            if (recognition) {
+                try {
+                    recognition.stop();
+                } catch (e) {}
+            }
+            document.getElementById("voiceBtn").classList.remove("listening");
+            document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
+            document.getElementById('voiceStatusIndicator').classList.remove('active');
+        }
+
+        // Auto-read page instructions
+        function autoReadPage() {
+            setTimeout(() => {
+                const langCode = getCurrentLangCode();
+                const messages = {
+                    'en': 'New gas connection. Enter your name, address, mobile number, select document type, then say submit to apply.',
+                    'hi': 'नया गैस कनेक्शन। अपना नाम, पता, मोबाइल नंबर दर्ज करें, दस्तावेज़ प्रकार चुनें, फिर आवेदन के लिए सबमिट कहें।',
+                    'or': 'ନୂତନ ଗ୍ୟାସ୍ ସଂଯୋଗ। ଆପଣଙ୍କ ନାମ, ଠିକଣା, ମୋବାଇଲ୍ ନମ୍ବର ପ୍ରବେଶ କରନ୍ତୁ, ଦଲିଲ ପ୍ରକାର ଚୟନ କରନ୍ତୁ, ତାପରେ ଆବେଦନ ପାଇଁ ସବମିଟ କୁହନ୍ତୁ।'
+                };
+                speak(messages[langCode] || messages['en']);
+            }, 2000);
+        }
+
+        // Auto-hide messages after 5 seconds
+        setTimeout(function() {
+            const messages = document.querySelectorAll('.message');
+            messages.forEach(function(message) {
+                message.style.display = 'none';
+            });
+        }, 5000);
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            startSessionTimer();
+            
+            document.addEventListener('click', resetSessionTimer);
+            document.addEventListener('keypress', resetSessionTimer);
+            document.addEventListener('touchstart', resetSessionTimer);
+            
+            // Check if voice should auto-start
+            const autoStartVoice = sessionStorage.getItem('autoStartVoice');
+            if (autoStartVoice === 'true') {
+                sessionStorage.removeItem('autoStartVoice');
+                setTimeout(() => {
+                    toggleVoiceInput();
+                }, 1000);
+            }
+            
+            // Auto-read page
+            setTimeout(autoReadPage, 2000);
+        });
+
+        window.addEventListener('beforeunload', function() {
+            if (sessionTimer) {
+                clearTimeout(sessionTimer);
+            }
+            stopVoiceInput();
+        });
+
+        // Override voice.js autoReadPage
+        window.autoReadPage = autoReadPage;
+    </script>
 </body>
 </html>

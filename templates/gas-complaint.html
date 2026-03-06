@@ -1,590 +1,1032 @@
 {% load i18n %}
 {% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>{% trans "Gas Complaint - Civic Kiosk" %}</title>
+    <style>
+        /* Hide Google Translate elements */
+        .goog-te-banner-frame.skiptranslate,
+        .goog-te-gadget-icon,
+        .goog-te-gadget-simple,
+        #goog-gt-tt,
+        .goog-te-balloon-frame,
+        .goog-te-menu-frame,
+        .goog-te-spinner-pos {
+            display: none !important;
+        }
+        
+        body {
+            top: 0px !important;
+            position: static !important;
+            overflow: hidden !important;
+            height: 100vh;
+            width: 100vw;
+        }
+        
+        .goog-te-combo {
+            display: none !important;
+        }
+        
+        .goog-te-gadget {
+            color: transparent !important;
+            height: 0 !important;
+            overflow: hidden !important;
+        }
 
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;user-select:none;}
-body{width:100vw;height:100vh;overflow:hidden;background:#f0f7ff;}
+        /* Timeout warning popup */
+        .timeout-warning {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border: 4px solid #ff9933;
+            border-radius: 40px;
+            padding: 30px;
+            text-align: center;
+            z-index: 2000;
+            display: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .timeout-warning p {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 20px;
+        }
 
-/* HEADER */
-.header{
-height:75px;
-background:white;
-display:flex;
-align-items:center;
-justify-content:space-between;
-padding:0 25px;
-border-bottom:3px solid #1e5fbf;
-}
-.header-left{display:flex;align-items:center;gap:12px;}
-.header-left img{height:45px;}
-.header-left div{font-size:13px;font-weight:600;color:#1e5fbf;line-height:1.2;}
-.header-right img{height:40px;}
+        .timeout-warning button {
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            padding: 15px 30px;
+            font-size: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            margin: 10px;
+            min-width: 150px;
+        }
 
-/* VOICE + BACK */
-.voice-corner{
-position:fixed;
-top:90px;
-right:20px;
-display:flex;
-flex-direction:column;
-align-items:center;
-gap:4px;
-z-index:1000;
-}
-.voice-corner-btn{
-background:#ff9933;
-width:55px;
-height:55px;
-border-radius:50%;
-border:3px solid white;
-display:flex;
-align-items:center;
-justify-content:center;
-font-size:26px;
-cursor:pointer;
-}
-.voice-corner-btn:hover{background:#ffaa44;}
-.voice-corner-btn.listening{
-background:#28a745;
-transform:scale(1.1);
-}
-.voice-corner-text{
-background:white;
-padding:4px 10px;
-border-radius:15px;
-font-size:12px;
-color:#ff9933;
-border:1px solid #ff9933;
-}
-.back-btn{
-position:fixed;
-top:90px;
-left:20px;
-background:white;
-border:3px solid #1e5fbf;
-border-radius:35px;
-padding:8px 20px;
-font-size:20px;
-font-weight:700;
-color:#1e5fbf;
-text-decoration:none;
-z-index:1000;
-display:inline-block;
-}
-.back-btn:hover{background:#1e5fbf;color:white;}
-.back-btn:active{transform:translateY(2px);}
+        .timeout-warning .logout-btn {
+            background: #dc3545;
+        }
+        
+        .timeout-warning button:active {
+            transform: translateY(3px);
+        }
 
-/* MAIN */
-.container{
-position:fixed;
-top:75px;
-left:0;
-right:0;
-bottom:0;
-display:flex;
-align-items:center;
-justify-content:center;
-padding:20px;
-overflow-y:auto;
-}
-.content-wrapper{
-width:100%;
-max-width:750px;
-display:flex;
-flex-direction:column;
-gap:14px;
-padding:20px 0;
-}
+        /* Voice status indicator */
+        .voice-status-indicator {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-size: 16px;
+            font-weight: 600;
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            border: 2px solid #ff9933;
+        }
 
-/* Message styles */
-.messages{width:100%;margin-bottom:15px;}
-.message{padding:12px;border-radius:12px;margin-bottom:8px;text-align:center;font-size:16px;}
-.message.success{background:#d4edda;color:#155724;border:1px solid #c3e6cb;}
-.message.error{background:#f8d7da;color:#721c24;border:1px solid #f5c6cb;}
-.message.info{background:#d1ecf1;color:#0c5460;border:1px solid #bee5eb;}
+        .voice-status-indicator.active {
+            display: flex;
+        }
 
-h1{
-color:#1e5fbf;
-font-size:38px;
-font-weight:800;
-text-align:center;
-}
+        .voice-pulse {
+            width: 12px;
+            height: 12px;
+            background: #28a745;
+            border-radius: 50%;
+            animation: voicePulse 1.5s infinite;
+        }
 
-/* FORM */
-.form-group{margin:8px 0;}
-label{
-display:block;
-font-size:22px;
-color:#1e5fbf;
-margin-bottom:6px;
-}
-.large-input{
-width:100%;
-height:65px;
-border:3px solid #1e5fbf;
-border-radius:22px;
-font-size:24px;
-padding:0 20px;
-background:white;
-cursor:pointer;
-}
-.large-input:focus{outline:none;border-color:#ff9933;}
-.large-input[readonly]{background:#f9f9f9;}
+        @keyframes voicePulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
 
-textarea.large-input{
-height:130px;
-padding:15px;
-resize:none;
-cursor:pointer;
-font-family:'Segoe UI',sans-serif;
-}
+    <meta charset="UTF-8">
+    <title>{% trans "Gas Complaint - Civic Kiosk" %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-.submit-btn{
-background:#28a745;
-color:white;
-font-size:30px;
-padding:14px;
-border-radius:45px;
-width:100%;
-border:none;
-margin-top:12px;
-cursor:pointer;
-box-shadow:0 5px 0 #1e7e34;
-transition:all 0.1s;
-}
-.submit-btn:active{transform:translateY(5px);box-shadow:0 1px 0 #1e7e34;}
-.submit-btn:hover{background:#2fcB4f;}
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;user-select:none;}
+        body{width:100vw;height:100vh;overflow:hidden;background:#f0f7ff;}
 
-/* Complaint grid bigger */
-.complaint-type{
-display:grid;
-grid-template-columns:repeat(2,1fr);
-gap:12px;
-}
-.type-btn{
-background:white;
-border:3px solid #1e5fbf;
-border-radius:35px;
-padding:16px;
-font-size:20px;
-text-align:center;
-cursor:pointer;
-transition:all 0.2s;
-}
-.type-btn:hover{background:#e3f2fd;}
-.type-btn.selected{
-background:#1e5fbf;
-color:white;
-}
+        /* HEADER */
+        .header{
+            height:75px;
+            background:white;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            padding:0 25px;
+            border-bottom:3px solid #1e5fbf;
+            position:fixed;
+            top:0;
+            left:0;
+            right:0;
+            z-index:1000;
+        }
+        .header-left{display:flex;align-items:center;gap:12px;}
+        .header-left img{height:45px;}
+        .header-left div{font-size:13px;font-weight:600;color:#1e5fbf;line-height:1.2;}
+        .header-right img{height:40px;}
 
-/* Loading indicator */
-.loading{
-display:none;
-position:fixed;
-top:0;
-left:0;
-right:0;
-bottom:0;
-background:rgba(0,0,0,0.5);
-z-index:2000;
-justify-content:center;
-align-items:center;
-color:white;
-font-size:24px;
-}
-.loading.show{display:flex;}
-.spinner{
-border:4px solid rgba(255,255,255,0.3);
-border-radius:50%;
-border-top:4px solid white;
-width:50px;
-height:50px;
-animation:spin 1s linear infinite;
-margin-right:10px;
-}
-@keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
+        /* VOICE + BACK */
+        .voice-corner{
+            position:fixed;
+            top:90px;
+            right:20px;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            gap:4px;
+            z-index:1000;
+        }
+        .voice-corner-btn{
+            background:#ff9933;
+            width:55px;
+            height:55px;
+            border-radius:50%;
+            border:3px solid white;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:26px;
+            cursor:pointer;
+            transition:all 0.2s;
+        }
+        .voice-corner-btn:hover{background:#ffaa44;}
+        .voice-corner-btn.listening{
+            background:#28a745;
+            transform:scale(1.1);
+            animation:pulse 1s infinite;
+        }
+        @keyframes pulse{
+            0%{transform:scale(1);}
+            50%{transform:scale(1.1);}
+            100%{transform:scale(1);}
+        }
+        .voice-corner-text{
+            background:white;
+            padding:4px 10px;
+            border-radius:15px;
+            font-size:12px;
+            color:#ff9933;
+            border:1px solid #ff9933;
+        }
+        .back-btn{
+            position:fixed;
+            top:90px;
+            left:20px;
+            background:white;
+            border:3px solid #1e5fbf;
+            border-radius:35px;
+            padding:8px 20px;
+            font-size:20px;
+            font-weight:700;
+            color:#1e5fbf;
+            text-decoration:none;
+            z-index:1000;
+            display:inline-block;
+            box-shadow:0 4px 0 #0a3d7a;
+            cursor:pointer;
+        }
+        .back-btn:hover{background:#1e5fbf;color:white;}
+        .back-btn:active{transform:translateY(4px);box-shadow:0 1px 0 #0a3d7a;}
 
-/* FLOATING INPUT BIGGER */
-.overlay{
-position:fixed;
-inset:0;
-background:rgba(0,0,0,0.4);
-backdrop-filter:blur(3px);
-display:none;
-z-index:900;
-}
-.floating-input{
-position:fixed;
-left:50%;
-top:35%;
-transform:translate(-50%,-50%) scale(0.85);
-width:650px;
-height:100px;
-font-size:22px;
-border:5px solid #ff9933;
-border-radius:25px;
-padding:15px;
-z-index:1001;
-box-shadow:0 25px 60px rgba(0,0,0,0.4);
-transition:all 0.25s ease;
-display:none;
-}
-.floating-input.show{
-transform:translate(-50%,-50%) scale(1);
-}
-.floating-input:focus{outline:none;}
+        /* MAIN */
+        .container{
+            position:fixed;
+            top:75px;
+            left:0;
+            right:0;
+            bottom:0;
+            display:flex;
+            align-items:flex-start;
+            justify-content:center;
+            padding:20px;
+            overflow-y:auto;
+        }
+        .content-wrapper{
+            width:100%;
+            max-width:750px;
+            display:flex;
+            flex-direction:column;
+            gap:14px;
+            padding:20px 0;
+        }
 
-/* KEYBOARD BIGGER */
-.keyboard{
-position:fixed;
-bottom:20px;
-left:50%;
-transform:translateX(-50%);
-background:white;
-padding:15px;
-border-radius:20px;
-box-shadow:0 10px 30px rgba(0,0,0,0.3);
-display:none;
-z-index:1000;
-}
-.keyboard-row{display:flex;justify-content:center;}
-.keyboard button{
-min-width:55px;
-height:50px;
-margin:4px;
-font-size:16px;
-border-radius:10px;
-border:2px solid #1e5fbf;
-background:#f0f7ff;
-cursor:pointer;
-transition:all 0.2s;
-}
-.keyboard button:hover{background:#1e5fbf;color:white;}
-.keyboard .ok-btn{
-background:#28a745;
-color:white;
-border:none;
-}
-.keyboard .ok-btn:hover{background:#218838;}
+        /* Message styles */
+        .messages{width:100%;margin-bottom:15px;}
+        .message{padding:12px;border-radius:12px;margin-bottom:8px;text-align:center;font-size:16px;}
+        .message.success{background:#d4edda;color:#155724;border:1px solid #c3e6cb;}
+        .message.error{background:#f8d7da;color:#721c24;border:1px solid #f5c6cb;}
+        .message.info{background:#d1ecf1;color:#0c5460;border:1px solid #bee5eb;}
 
-@media (max-width:768px){
-.complaint-type{grid-template-columns:1fr;}
-.floating-input{width:90%;}
-}
-</style>
+        h1{
+            color:#1e5fbf;
+            font-size:38px;
+            font-weight:800;
+            text-align:center;
+        }
+
+        /* FORM */
+        .form-group{margin:8px 0;}
+        label{
+            display:block;
+            font-size:22px;
+            color:#1e5fbf;
+            margin-bottom:6px;
+        }
+        .large-input{
+            width:100%;
+            height:65px;
+            border:3px solid #1e5fbf;
+            border-radius:22px;
+            font-size:24px;
+            padding:0 20px;
+            background:white;
+            cursor:pointer;
+        }
+        .large-input:focus{outline:none;border-color:#ff9933;}
+        .large-input[readonly]{background:#f9f9f9;}
+
+        textarea.large-input{
+            height:130px;
+            padding:15px;
+            resize:none;
+            cursor:pointer;
+            font-family:'Segoe UI',sans-serif;
+        }
+
+        .submit-btn{
+            background:#28a745;
+            color:white;
+            font-size:30px;
+            padding:14px;
+            border-radius:45px;
+            width:100%;
+            border:none;
+            margin-top:12px;
+            cursor:pointer;
+            box-shadow:0 5px 0 #1e7e34;
+            transition:all 0.1s;
+        }
+        .submit-btn:active{transform:translateY(5px);box-shadow:0 1px 0 #1e7e34;}
+        .submit-btn:hover{background:#2fcB4f;}
+
+        /* Complaint grid bigger */
+        .complaint-type{
+            display:grid;
+            grid-template-columns:repeat(2,1fr);
+            gap:12px;
+        }
+        .type-btn{
+            background:white;
+            border:3px solid #1e5fbf;
+            border-radius:35px;
+            padding:16px;
+            font-size:20px;
+            text-align:center;
+            cursor:pointer;
+            transition:all 0.2s;
+        }
+        .type-btn:hover{background:#e3f2fd;}
+        .type-btn.selected{
+            background:#1e5fbf;
+            color:white;
+        }
+
+        /* Loading indicator */
+        .loading{
+            display:none;
+            position:fixed;
+            top:0;
+            left:0;
+            right:0;
+            bottom:0;
+            background:rgba(0,0,0,0.5);
+            z-index:2000;
+            justify-content:center;
+            align-items:center;
+            color:white;
+            font-size:24px;
+        }
+        .loading.show{display:flex;}
+        .spinner{
+            border:4px solid rgba(255,255,255,0.3);
+            border-radius:50%;
+            border-top:4px solid white;
+            width:50px;
+            height:50px;
+            animation:spin 1s linear infinite;
+            margin-right:10px;
+        }
+        @keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
+
+        /* FLOATING INPUT BIGGER */
+        .overlay{
+            position:fixed;
+            inset:0;
+            background:rgba(0,0,0,0.4);
+            backdrop-filter:blur(3px);
+            display:none;
+            z-index:900;
+        }
+        .floating-input{
+            position:fixed;
+            left:50%;
+            top:35%;
+            transform:translate(-50%,-50%) scale(0.85);
+            width:650px;
+            height:100px;
+            font-size:22px;
+            border:5px solid #ff9933;
+            border-radius:25px;
+            padding:15px;
+            z-index:1001;
+            box-shadow:0 25px 60px rgba(0,0,0,0.4);
+            transition:all 0.25s ease;
+            display:none;
+        }
+        .floating-input.show{
+            transform:translate(-50%,-50%) scale(1);
+        }
+        .floating-input:focus{outline:none;}
+
+        /* KEYBOARD BIGGER */
+        .keyboard{
+            position:fixed;
+            bottom:20px;
+            left:50%;
+            transform:translateX(-50%);
+            background:white;
+            padding:15px;
+            border-radius:20px;
+            box-shadow:0 10px 30px rgba(0,0,0,0.3);
+            display:none;
+            z-index:1000;
+        }
+        .keyboard-row{display:flex;justify-content:center;}
+        .keyboard button{
+            min-width:55px;
+            height:50px;
+            margin:4px;
+            font-size:16px;
+            border-radius:10px;
+            border:2px solid #1e5fbf;
+            background:#f0f7ff;
+            cursor:pointer;
+            transition:all 0.2s;
+        }
+        .keyboard button:hover{background:#1e5fbf;color:white;}
+        .keyboard .ok-btn{
+            background:#28a745;
+            color:white;
+            border:none;
+        }
+        .keyboard .ok-btn:hover{background:#218838;}
+
+        @media (max-width:768px){
+            .complaint-type{grid-template-columns:1fr;}
+            .floating-input{width:90%;}
+        }
+    </style>
 </head>
 <body>
+    <!-- Timeout Warning Popup -->
+    <div id="timeoutWarning" class="timeout-warning">
+        <p>⏰ {% trans "Session about to expire!" %}</p>
+        <button onclick="extendSession()">{% trans "Continue" %}</button>
+        <button class="logout-btn" onclick="window.location='{% url 'index' %}'">{% trans "Logout" %}</button>
+    </div>
 
-<div class="header">
-<div class="header-left">
-<img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India">
-<div>{% trans "Ministry of Electronics &" %}<br>{% trans "Information Technology" %}<br>{% trans "Government of India" %}</div>
-</div>
-<div class="header-right">
-<img src="https://www.cdac.in/img/cdac-logo.png" alt="CDAC Logo">
-</div>
-</div>
+    <!-- Voice Status Indicator -->
+    <div id="voiceStatusIndicator" class="voice-status-indicator">
+        <div class="voice-pulse"></div>
+        <span id="voiceStatusText">{% trans "Listening..." %}</span>
+    </div>
 
-<!-- Voice corner will be created dynamically by voice.js -->
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-left">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India">
+            <div>{% trans "Ministry of Electronics &" %}<br>{% trans "Information Technology" %}<br>{% trans "Government of India" %}</div>
+        </div>
+        <div class="header-right">
+            <img src="https://www.cdac.in/img/cdac-logo.png" alt="CDAC Logo">
+        </div>
+    </div>
 
-<a href="{% url 'gas-services' %}" class="back-btn">← {% trans "Back" %}</a>
+    <!-- Voice Button -->
+    <div class="voice-corner">
+        <div class="voice-corner-btn" id="voiceBtn" onclick="toggleVoiceInput()">🎤</div>
+        <div class="voice-corner-text" id="voiceStatus">{% trans "Click" %}</div>
+    </div>
 
-<div class="container">
-<div class="content-wrapper">
+    <!-- Back Button -->
+    <div class="back-btn" onclick="goBack()">← {% trans "Back" %}</div>
 
-<!-- Display Django messages -->
-{% if messages %}
-<div class="messages">
-    {% for message in messages %}
-    <div class="message {{ message.tags }}">{{ message }}</div>
-    {% endfor %}
-</div>
-{% endif %}
+    <!-- Main Container -->
+    <div class="container">
+        <div class="content-wrapper">
 
-<h1>⚠️ {% trans "Lodge Complaint" %}</h1>
+            <!-- Display Django messages -->
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <div class="message {{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
 
-<!-- Django form for complaint submission -->
-<form id="complaintForm" method="post" action="{% url 'gas-complaint' %}">
-    {% csrf_token %}
-    <input type="hidden" name="consumer_number" id="consumerNumber" value="{{ request.POST.consumer_number|default:'123456789012' }}">
-    <input type="hidden" name="complaint_type" id="complaintType" value="{% if request.POST.complaint_type %}{{ request.POST.complaint_type }}{% else %}Leakage{% endif %}">
-    <input type="hidden" name="description" id="descriptionField" value="{{ request.POST.description }}">
-</form>
+            <h1>⚠️ {% trans "Lodge Complaint" %}</h1>
 
-<div class="form-group">
-<label>{% trans "Consumer Number" %}</label>
-<input class="large-input" id="consumerDisplay" value="{% if request.POST.consumer_number %}{{ request.POST.consumer_number|slice:":4" }} {{ request.POST.consumer_number|slice:"4:8" }} {{ request.POST.consumer_number|slice:"8:12" }}{% else %}1234 5678 9012{% endif %}" readonly>
-</div>
+            <!-- Django form for complaint submission -->
+            <form id="complaintForm" method="post" action="{% url 'gas-complaint' %}">
+                {% csrf_token %}
+                <input type="hidden" name="consumer_number" id="consumerNumber" value="{{ request.POST.consumer_number|default:'123456789012' }}">
+                <input type="hidden" name="complaint_type" id="complaintType" value="{% if request.POST.complaint_type %}{{ request.POST.complaint_type }}{% else %}Leakage{% endif %}">
+                <input type="hidden" name="description" id="descriptionField" value="{{ request.POST.description }}">
+            </form>
 
-<div class="form-group">
-<label>{% trans "Complaint Type" %}</label>
-<div class="complaint-type">
-<div class="type-btn {% if request.POST.complaint_type == 'Leakage' or not request.POST.complaint_type %}selected{% endif %}" onclick="selectType(this,'Leakage')">{% trans "Gas Leakage" %}</div>
-<div class="type-btn {% if request.POST.complaint_type == 'Cylinder' %}selected{% endif %}" onclick="selectType(this,'Cylinder')">{% trans "Cylinder Issue" %}</div>
-<div class="type-btn {% if request.POST.complaint_type == 'Regulator' %}selected{% endif %}" onclick="selectType(this,'Regulator')">{% trans "Regulator Fault" %}</div>
-<div class="type-btn {% if request.POST.complaint_type == 'Billing' %}selected{% endif %}" onclick="selectType(this,'Billing')">{% trans "Billing Issue" %}</div>
-<div class="type-btn {% if request.POST.complaint_type == 'Delivery' %}selected{% endif %}" onclick="selectType(this,'Delivery')">{% trans "Delivery Delay" %}</div>
-<div class="type-btn {% if request.POST.complaint_type == 'Other' %}selected{% endif %}" onclick="selectType(this,'Other')">{% trans "Other" %}</div>
-</div>
-</div>
+            <div class="form-group">
+                <label>{% trans "Consumer Number" %}</label>
+                <input class="large-input" id="consumerDisplay" value="{% if request.POST.consumer_number %}{{ request.POST.consumer_number|slice:":4" }} {{ request.POST.consumer_number|slice:"4:8" }} {{ request.POST.consumer_number|slice:"8:12" }}{% else %}1234 5678 9012{% endif %}" readonly>
+            </div>
 
-<div class="form-group">
-<label>{% trans "Description" %}</label>
-<textarea class="large-input" id="description" readonly placeholder="{% trans "Describe your complaint in detail" %}">{% if request.POST.description %}{{ request.POST.description }}{% endif %}</textarea>
-</div>
+            <div class="form-group">
+                <label>{% trans "Complaint Type" %}</label>
+                <div class="complaint-type">
+                    <div class="type-btn {% if request.POST.complaint_type == 'Leakage' or not request.POST.complaint_type %}selected{% endif %}" onclick="selectType(this,'Leakage')">{% trans "Gas Leakage" %}</div>
+                    <div class="type-btn {% if request.POST.complaint_type == 'Cylinder' %}selected{% endif %}" onclick="selectType(this,'Cylinder')">{% trans "Cylinder Issue" %}</div>
+                    <div class="type-btn {% if request.POST.complaint_type == 'Regulator' %}selected{% endif %}" onclick="selectType(this,'Regulator')">{% trans "Regulator Fault" %}</div>
+                    <div class="type-btn {% if request.POST.complaint_type == 'Billing' %}selected{% endif %}" onclick="selectType(this,'Billing')">{% trans "Billing Issue" %}</div>
+                    <div class="type-btn {% if request.POST.complaint_type == 'Delivery' %}selected{% endif %}" onclick="selectType(this,'Delivery')">{% trans "Delivery Delay" %}</div>
+                    <div class="type-btn {% if request.POST.complaint_type == 'Other' %}selected{% endif %}" onclick="selectType(this,'Other')">{% trans "Other" %}</div>
+                </div>
+            </div>
 
-<button class="submit-btn" onclick="submitComplaint()">{% trans "Submit Complaint" %}</button>
+            <div class="form-group">
+                <label>{% trans "Description" %}</label>
+                <textarea class="large-input" id="description" readonly placeholder="{% trans "Describe your complaint in detail" %}">{% if request.POST.description %}{{ request.POST.description }}{% endif %}</textarea>
+            </div>
 
-</div>
-</div>
+            <button class="submit-btn" onclick="submitComplaint()">{% trans "Submit Complaint" %}</button>
 
-<!-- Loading indicator -->
-<div id="loadingIndicator" class="loading">
-    <div class="spinner"></div>
-    <div>{% trans "Submitting..." %}</div>
-</div>
+        </div>
+    </div>
 
-<div id="overlay" class="overlay"></div>
-<textarea id="floatingInput" class="floating-input" placeholder="{% trans "Type your complaint here..." %}"></textarea>
-<div id="keyboard" class="keyboard"></div>
+    <!-- Loading indicator -->
+    <div id="loadingIndicator" class="loading">
+        <div class="spinner"></div>
+        <div>{% trans "Submitting..." %}</div>
+    </div>
 
-<script src="{% static 'js/voice.js' %}"></script>
+    <!-- Floating Keyboard Elements -->
+    <div id="overlay" class="overlay"></div>
+    <textarea id="floatingInput" class="floating-input" placeholder="{% trans "Type your complaint here..." %}"></textarea>
+    <div id="keyboard" class="keyboard"></div>
 
-<script>
-let selectedType='{% if request.POST.complaint_type %}{{ request.POST.complaint_type }}{% else %}Leakage{% endif %}';
-let activeInput=null;
-let isUpperCase=true;
+    <!-- Load voice.js - must be at bottom -->
+    <script src="{% static 'js/voice.js' %}"></script>
 
-function selectType(element,type){
-document.querySelectorAll('.type-btn').forEach(btn=>btn.classList.remove('selected'));
-element.classList.add('selected');
-selectedType=type;
-document.getElementById('complaintType').value = type;
-if(typeof speak === 'function') speak(type + " selected");
-}
-
-const overlay=document.getElementById("overlay");
-const floatingInput=document.getElementById("floatingInput");
-const keyboard=document.getElementById("keyboard");
-const loadingIndicator = document.getElementById("loadingIndicator");
-
-function createKeyboard(){
-keyboard.innerHTML="";
-let letters="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-if(!isUpperCase){letters=letters.toLowerCase();}
-let keys=(letters+"0123456789 .,!?-").split("");
-
-let row=document.createElement("div");
-row.className="keyboard-row";
-keys.forEach((k,i)=>{
-if(i%10===0 && i!==0){
-keyboard.appendChild(row);
-row=document.createElement("div");
-row.className="keyboard-row";
-}
-let btn=document.createElement("button");
-btn.innerText=k===" "?"{% trans "Space" %}":k;
-btn.type="button";
-btn.onclick=()=>floatingInput.value+=k;
-row.appendChild(btn);
-});
-keyboard.appendChild(row);
-
-let last=document.createElement("div");
-last.className="keyboard-row";
-last.innerHTML=`
-<button type="button" onclick="toggleCase()">⇧ {% trans "Shift" %}</button>
-<button type="button" onclick="floatingInput.value=floatingInput.value.slice(0,-1)">⌫ {% trans "Back" %}</button>
-<button type="button" onclick="floatingInput.value=''">{% trans "Clear" %}</button>
-<button type="button" class="ok-btn" onclick="finish()">✓ {% trans "OK" %}</button>
-`;
-keyboard.appendChild(last);
-}
-
-function toggleCase(){isUpperCase=!isUpperCase;createKeyboard();}
-
-function openKeyboard(id){
-activeInput=document.getElementById(id);
-floatingInput.value=activeInput.value;
-overlay.style.display="block";
-floatingInput.style.display="block";
-keyboard.style.display="block";
-setTimeout(()=>{
-floatingInput.classList.add("show");
-floatingInput.focus();
-},10);
-}
-
-function finish(){
-if(activeInput){
-activeInput.value=floatingInput.value;
-document.getElementById('descriptionField').value = floatingInput.value;
-}
-closeKeyboard();
-}
-
-function closeKeyboard(){
-floatingInput.classList.remove("show");
-setTimeout(()=>{
-overlay.style.display="none";
-floatingInput.style.display="none";
-keyboard.style.display="none";
-},200);
-}
-
-// Handle Enter key on floating input (Shift+Enter for new line, Enter for done)
-floatingInput.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        finish();
-    }
-});
-
-document.getElementById("description").addEventListener("click",()=>openKeyboard("description"));
-overlay.addEventListener("click",closeKeyboard);
-
-createKeyboard();
-
-function submitComplaint(){
-const desc = document.getElementById('description').value;
-const complaintType = document.getElementById('complaintType').value;
-
-if(!desc || desc.trim() === ''){
-    if(typeof speak === 'function') speak("{% trans 'Please describe your complaint' %}");
-    return;
-}
-
-if(desc.length < 10){
-    if(typeof speak === 'function') speak("{% trans 'Please provide a more detailed description' %}");
-    return;
-}
-
-// Show loading
-loadingIndicator.classList.add('show');
-if(typeof speak === 'function') speak("{% trans 'Submitting complaint' %}");
-
-// Submit form
-setTimeout(() => {
-    document.getElementById('complaintForm').submit();
-}, 500);
-}
-
-/* ===================== OVERRIDE VOICE COMMANDS ===================== */
-
-// Extend voice.js handleCommand for gas complaint-specific commands
-const originalHandleCommand = window.handleCommand;
-window.handleCommand = function(command) {
-    command = command.toLowerCase();
-    console.log("Gas complaint command:", command);
-    
-    // Check for numbers in command (consumer number)
-    const numberMatch = command.match(/\d+/g);
-    if(numberMatch && (command.includes("consumer") || command.includes("number"))) {
-        const digits = numberMatch.join('').slice(0,12);
-        if(digits.length >= 6) {
-            // Format consumer number display
-            const formatted = digits.match(/.{1,4}/g).join(' ');
-            document.getElementById('consumerDisplay').value = formatted;
-            document.getElementById('consumerNumber').value = digits;
-            if(typeof speak === 'function') speak("Consumer number entered");
-            return;
+    <script>
+        /* ================= LANGUAGE UTILITIES ================= */
+        function getCurrentLangCode() {
+            const path = window.location.pathname.split('/');
+            return path[1] || "en";
         }
-    }
-    
-    // Complaint type selection
-    if(command.includes("leakage") || command.includes("gas leak")) {
-        let btn = Array.from(document.querySelectorAll('.type-btn')).find(b => 
-            b.innerText.includes('Gas Leakage'));
-        if(btn) selectType(btn, 'Leakage');
-        return;
-    }
-    else if(command.includes("cylinder")) {
-        let btn = Array.from(document.querySelectorAll('.type-btn')).find(b => 
-            b.innerText.includes('Cylinder'));
-        if(btn) selectType(btn, 'Cylinder');
-        return;
-    }
-    else if(command.includes("regulator")) {
-        let btn = Array.from(document.querySelectorAll('.type-btn')).find(b => 
-            b.innerText.includes('Regulator'));
-        if(btn) selectType(btn, 'Regulator');
-        return;
-    }
-    else if(command.includes("billing") || command.includes("bill")) {
-        let btn = Array.from(document.querySelectorAll('.type-btn')).find(b => 
-            b.innerText.includes('Billing'));
-        if(btn) selectType(btn, 'Billing');
-        return;
-    }
-    else if(command.includes("delivery") || command.includes("delay")) {
-        let btn = Array.from(document.querySelectorAll('.type-btn')).find(b => 
-            b.innerText.includes('Delivery'));
-        if(btn) selectType(btn, 'Delivery');
-        return;
-    }
-    else if(command.includes("other")) {
-        let btn = Array.from(document.querySelectorAll('.type-btn')).find(b => 
-            b.innerText.includes('Other'));
-        if(btn) selectType(btn, 'Other');
-        return;
-    }
-    
-    // Description command
-    if(command.includes("describe") || command.includes("description")) {
-        openKeyboard("description");
-        if(typeof speak === 'function') speak("{% trans 'Type your complaint description' %}");
-        return;
-    }
-    
-    // Submit command
-    if(command.includes("submit") || command.includes("lodge")) {
-        submitComplaint();
-        return;
-    }
-    else if(command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
-        window.location.href = "/" + getCurrentLangCode() + "/gas-services/";
-        return;
-    }
-    else if(command.includes("home") || command.includes("होम") || command.includes("ଘର")) {
-        window.location.href = "/" + getCurrentLangCode() + "/";
-        return;
-    }
-    
-    // If not gas complaint-specific, pass to original handler
-    if(originalHandleCommand) {
-        originalHandleCommand(command);
-    }
-};
 
-// Override autoReadPage to read gas complaint instructions
-const originalAutoRead = window.autoReadPage;
-window.autoReadPage = function() {
-    if(originalAutoRead) originalAutoRead();
-    setTimeout(() => {
-        if(typeof speak === 'function') {
-            speak("{% trans 'Select complaint type, describe your issue, then say submit to lodge complaint' %}");
+        function speak(text) {
+            if (!('speechSynthesis' in window)) return;
+            speechSynthesis.cancel();
+            let utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = window.getCurrentLang ? window.getCurrentLang() : 'en-IN';
+            utterance.rate = 1;
+            speechSynthesis.speak(utterance);
         }
-    }, 2000);
-};
 
-// Auto-hide messages after 5 seconds
-setTimeout(function() {
-    document.querySelectorAll('.message').forEach(function(message) {
-        message.style.display = 'none';
-    });
-}, 5000);
+        /* ================= SESSION TIMER ================= */
+        let sessionTimer;
+        let timeoutWarningTimer;
+        const SESSION_DURATION = 120000; // 2 minutes
+        const WARNING_TIME = 30000; // Warn 30 seconds before
 
-// Prevent form submission on Enter key
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
-        e.preventDefault();
-    }
-});
-</script>
+        function startSessionTimer() {
+            sessionTimer = setTimeout(() => {
+                showTimeoutWarning();
+            }, SESSION_DURATION - WARNING_TIME);
+        }
 
+        function showTimeoutWarning() {
+            const warning = document.getElementById('timeoutWarning');
+            if (warning) {
+                warning.style.display = 'block';
+                
+                const langCode = getCurrentLangCode();
+                const warnings = {
+                    'en': 'Your session is about to expire. Please continue to stay logged in.',
+                    'hi': 'आपका सत्र समाप्त होने वाला है। कृपया जारी रखें।',
+                    'or': 'ଆପଣଙ୍କର ସତ୍ର ସମାପ୍ତ ହେବାକୁ ଯାଉଛି। ଦୟାକରି ଜାରି ରଖନ୍ତୁ।',
+                    'bn': 'আপনার সেশন শেষ হতে চলেছে। অনুগ্রহ করে চালিয়ে যান।',
+                    'ta': 'உங்கள் அமர்வு காலாவதியாகிறது. தயவுசெய்து தொடரவும்.',
+                    'te': 'మీ సెషన్ ముగియబోతోంది. దయచేసి కొనసాగించండి.'
+                };
+                speak(warnings[langCode] || warnings['en']);
+                
+                timeoutWarningTimer = setTimeout(() => {
+                    window.location.href = "/" + langCode + "/";
+                }, WARNING_TIME);
+            }
+        }
+
+        function extendSession() {
+            const warning = document.getElementById('timeoutWarning');
+            if (warning) {
+                warning.style.display = 'none';
+            }
+            clearTimeout(sessionTimer);
+            clearTimeout(timeoutWarningTimer);
+            startSessionTimer();
+            
+            const langCode = getCurrentLangCode();
+            const messages = {
+                'en': 'Session extended. You may continue.',
+                'hi': 'सत्र बढ़ा दिया गया। आप जारी रख सकते हैं।',
+                'or': 'ସତ୍ର ବୃଦ୍ଧି କରାଯାଇଛି। ଆପଣ ଜାରି ରଖିପାରିବେ।',
+                'bn': 'সেশন বাড়ানো হয়েছে। আপনি চালিয়ে যেতে পারেন।',
+                'ta': 'அமர்வு நீட்டிக்கப்பட்டது. நீங்கள் தொடரலாம்.',
+                'te': 'సెషన్ పొడిగించబడింది. మీరు కొనసాగించవచ్చు.'
+            };
+            speak(messages[langCode] || messages['en']);
+        }
+
+        function resetSessionTimer() {
+            clearTimeout(sessionTimer);
+            clearTimeout(timeoutWarningTimer);
+            startSessionTimer();
+        }
+
+        function goBack() {
+            resetSessionTimer();
+            window.location.href = "/" + getCurrentLangCode() + "/gas-services/";
+        }
+
+        /* ================= COMPLAINT FUNCTIONS ================= */
+        let selectedType = '{% if request.POST.complaint_type %}{{ request.POST.complaint_type }}{% else %}Leakage{% endif %}';
+        let activeInput = null;
+        let isUpperCase = true;
+
+        function selectType(element, type) {
+            resetSessionTimer();
+            
+            document.querySelectorAll('.type-btn').forEach(btn => btn.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedType = type;
+            document.getElementById('complaintType').value = type;
+            
+            const langCode = getCurrentLangCode();
+            const typeNames = {
+                'Leakage': {'en': 'Gas Leakage', 'hi': 'गैस रिसाव', 'or': 'ଗ୍ୟାସ୍ ଲିକେଜ୍'},
+                'Cylinder': {'en': 'Cylinder Issue', 'hi': 'सिलेंडर समस्या', 'or': 'ସିଲିଣ୍ଡର ସମସ୍ୟା'},
+                'Regulator': {'en': 'Regulator Fault', 'hi': 'रेगुलेटर खराबी', 'or': 'ରେଗୁଲେଟର ତ୍ରୁଟି'},
+                'Billing': {'en': 'Billing Issue', 'hi': 'बिलिंग समस्या', 'or': 'ବିଲିଂ ସମସ୍ୟା'},
+                'Delivery': {'en': 'Delivery Delay', 'hi': 'डिलीवरी में देरी', 'or': 'ଡେଲିଭରି ବିଳମ୍ବ'},
+                'Other': {'en': 'Other', 'hi': 'अन्य', 'or': 'ଅନ୍ୟ'}
+            };
+            const displayName = typeNames[type][langCode] || typeNames[type]['en'];
+            speak(displayName + " " + (langCode === 'hi' ? 'चयनित' : (langCode === 'or' ? 'ଚୟନ ହେଲା' : 'selected')));
+        }
+
+        /* ================= FLOATING KEYBOARD ================= */
+        const overlay = document.getElementById("overlay");
+        const floatingInput = document.getElementById("floatingInput");
+        const keyboard = document.getElementById("keyboard");
+        const loadingIndicator = document.getElementById("loadingIndicator");
+
+        function createKeyboard() {
+            keyboard.innerHTML = "";
+            let letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            if (!isUpperCase) { letters = letters.toLowerCase(); }
+            let keys = (letters + "0123456789 .,!?-").split("");
+
+            let row = document.createElement("div");
+            row.className = "keyboard-row";
+            
+            keys.forEach((k, i) => {
+                if (i % 10 === 0 && i !== 0) {
+                    keyboard.appendChild(row);
+                    row = document.createElement("div");
+                    row.className = "keyboard-row";
+                }
+                let btn = document.createElement("button");
+                btn.innerText = k === " " ? "{% trans "Space" %}" : k;
+                btn.type = "button";
+                btn.onclick = () => floatingInput.value += k;
+                row.appendChild(btn);
+            });
+            keyboard.appendChild(row);
+
+            let last = document.createElement("div");
+            last.className = "keyboard-row";
+            last.innerHTML = `
+                <button type="button" onclick="toggleCase()">⇧ {% trans "Shift" %}</button>
+                <button type="button" onclick="floatingInput.value = floatingInput.value.slice(0, -1)">⌫ {% trans "Back" %}</button>
+                <button type="button" onclick="floatingInput.value = ''">{% trans "Clear" %}</button>
+                <button type="button" class="ok-btn" onclick="finish()">✓ {% trans "OK" %}</button>
+            `;
+            keyboard.appendChild(last);
+        }
+
+        function toggleCase() {
+            isUpperCase = !isUpperCase;
+            createKeyboard();
+        }
+
+        function openKeyboard(id) {
+            resetSessionTimer();
+            activeInput = document.getElementById(id);
+            floatingInput.value = activeInput.value;
+            overlay.style.display = "block";
+            floatingInput.style.display = "block";
+            keyboard.style.display = "block";
+            setTimeout(() => {
+                floatingInput.classList.add("show");
+                floatingInput.focus();
+            }, 10);
+        }
+
+        function finish() {
+            if (activeInput) {
+                activeInput.value = floatingInput.value;
+                document.getElementById('descriptionField').value = floatingInput.value;
+            }
+            closeKeyboard();
+        }
+
+        function closeKeyboard() {
+            floatingInput.classList.remove("show");
+            setTimeout(() => {
+                overlay.style.display = "none";
+                floatingInput.style.display = "none";
+                keyboard.style.display = "none";
+            }, 200);
+        }
+
+        // Handle Enter key on floating input (Shift+Enter for new line, Enter for done)
+        floatingInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                finish();
+            }
+        });
+
+        document.getElementById("description").addEventListener("click", () => openKeyboard("description"));
+        overlay.addEventListener("click", closeKeyboard);
+
+        createKeyboard();
+
+        function submitComplaint() {
+            resetSessionTimer();
+            
+            const desc = document.getElementById('description').value;
+            const complaintType = document.getElementById('complaintType').value;
+            const langCode = getCurrentLangCode();
+
+            if (!desc || desc.trim() === '') {
+                const messages = {
+                    'en': 'Please describe your complaint',
+                    'hi': 'कृपया अपनी शिकायत का वर्णन करें',
+                    'or': 'ଦୟାକରି ଆପଣଙ୍କ ଅଭିଯୋଗ ବର୍ଣ୍ଣନା କରନ୍ତୁ'
+                };
+                speak(messages[langCode] || messages['en']);
+                return;
+            }
+
+            if (desc.length < 10) {
+                const messages = {
+                    'en': 'Please provide a more detailed description',
+                    'hi': 'कृपया अधिक विस्तृत विवरण प्रदान करें',
+                    'or': 'ଦୟାକରି ଅଧିକ ବିସ୍ତୃତ ବର୍ଣ୍ଣନା ପ୍ରଦାନ କରନ୍ତୁ'
+                };
+                speak(messages[langCode] || messages['en']);
+                return;
+            }
+
+            // Show loading
+            loadingIndicator.classList.add('show');
+            
+            const messages = {
+                'en': 'Submitting complaint',
+                'hi': 'शिकायत भेजी जा रही है',
+                'or': 'ଅଭିଯୋଗ ପଠାଯାଉଛି'
+            };
+            speak(messages[langCode] || messages['en']);
+
+            // Submit form
+            setTimeout(() => {
+                document.getElementById('complaintForm').submit();
+            }, 500);
+        }
+
+        /* ================= VOICE INPUT ================= */
+        let recognition;
+        let isListening = false;
+
+        function toggleVoiceInput() {
+            resetSessionTimer();
+            
+            if (isListening) {
+                stopVoiceInput();
+                return;
+            }
+
+            const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SR) {
+                alert("{% trans 'Speech not supported' %}");
+                return;
+            }
+
+            if (recognition) {
+                try {
+                    recognition.stop();
+                } catch (e) {}
+            }
+
+            recognition = new SR();
+            recognition.lang = window.getCurrentLang ? window.getCurrentLang() : 'en-IN';
+            recognition.continuous = true;
+            recognition.interimResults = true;
+
+            recognition.onstart = function() {
+                isListening = true;
+                document.getElementById("voiceBtn").classList.add("listening");
+                document.getElementById("voiceStatus").innerText = "{% trans 'Listening...' %}";
+                document.getElementById('voiceStatusIndicator').classList.add('active');
+                
+                const langCode = getCurrentLangCode();
+                const messages = {
+                    'en': 'Select complaint type, describe your issue, then say submit to lodge complaint.',
+                    'hi': 'शिकायत प्रकार चुनें, अपनी समस्या का वर्णन करें, फिर शिकायत दर्ज करने के लिए सबमिट कहें।',
+                    'or': 'ଅଭିଯୋଗ ପ୍ରକାର ଚୟନ କରନ୍ତୁ, ଆପଣଙ୍କ ସମସ୍ୟା ବର୍ଣ୍ଣନା କରନ୍ତୁ, ତାପରେ ଅଭିଯୋଗ ଦାଖଲ ପାଇଁ ସବମିଟ କୁହନ୍ତୁ।'
+                };
+                speak(messages[langCode] || messages['en']);
+            };
+
+            recognition.onresult = function(e) {
+                resetSessionTimer();
+                
+                let finalTranscript = '';
+                let interimTranscript = '';
+                
+                for (let i = 0; i < e.results.length; i++) {
+                    const result = e.results[i];
+                    if (result.isFinal) {
+                        finalTranscript += result[0].transcript;
+                    } else {
+                        interimTranscript += result[0].transcript;
+                    }
+                }
+                
+                const transcript = finalTranscript || interimTranscript;
+                const command = transcript.toLowerCase();
+                console.log("Gas complaint command:", command);
+                
+                const langCode = getCurrentLangCode();
+                
+                // Check for numbers in command (consumer number)
+                const numberMatch = command.match(/\d+/g);
+                if (numberMatch && (command.includes("consumer") || command.includes("number") || 
+                    command.includes("उपभोक्ता") || command.includes("ଗ୍ରାହକ"))) {
+                    const digits = numberMatch.join('').slice(0, 12);
+                    if (digits.length >= 6) {
+                        // Format consumer number display
+                        const formatted = digits.match(/.{1,4}/g).join(' ');
+                        document.getElementById('consumerDisplay').value = formatted;
+                        document.getElementById('consumerNumber').value = digits;
+                        const messages = {
+                            'en': 'Consumer number entered',
+                            'hi': 'उपभोक्ता संख्या दर्ज की गई',
+                            'or': 'ଗ୍ରାହକ ନମ୍ବର ପ୍ରବେଶ ହେଲା'
+                        };
+                        speak(messages[langCode] || messages['en']);
+                    }
+                    return;
+                }
+                
+                // Complaint type selection - English
+                if (command.includes("leakage") || command.includes("gas leak")) {
+                    let btn = Array.from(document.querySelectorAll('.type-btn')).find(b => 
+                        b.innerText.includes('Gas Leakage') || b.innerText.includes('गैस रिसाव'));
+                    if (btn) selectType(btn, 'Leakage');
+                    return;
+                }
+                else if (command.includes("cylinder")) {
+                    let btn = Array.from(document.querySelectorAll('.type-btn')).find(b => 
+                        b.innerText.includes('Cylinder') || b.innerText.includes('सिलेंडर'));
+                    if (btn) selectType(btn, 'Cylinder');
+                    return;
+                }
+                else if (command.includes("regulator")) {
+                    let btn = Array.from(document.querySelectorAll('.type-btn')).find(b => 
+                        b.innerText.includes('Regulator') || b.innerText.includes('रेगुलेटर'));
+                    if (btn) selectType(btn, 'Regulator');
+                    return;
+                }
+                else if (command.includes("billing") || command.includes("bill")) {
+                    let btn = Array.from(document.querySelectorAll('.type-btn')).find(b => 
+                        b.innerText.includes('Billing') || b.innerText.includes('बिलिंग'));
+                    if (btn) selectType(btn, 'Billing');
+                    return;
+                }
+                else if (command.includes("delivery") || command.includes("delay")) {
+                    let btn = Array.from(document.querySelectorAll('.type-btn')).find(b => 
+                        b.innerText.includes('Delivery') || b.innerText.includes('डिलीवरी'));
+                    if (btn) selectType(btn, 'Delivery');
+                    return;
+                }
+                else if (command.includes("other")) {
+                    let btn = Array.from(document.querySelectorAll('.type-btn')).find(b => 
+                        b.innerText.includes('Other') || b.innerText.includes('अन्य'));
+                    if (btn) selectType(btn, 'Other');
+                    return;
+                }
+                
+                // Hindi complaint types
+                if (command.includes("रिसाव")) {
+                    let btn = Array.from(document.querySelectorAll('.type-btn')).find(b => 
+                        b.innerText.includes('Gas Leakage') || b.innerText.includes('गैस रिसाव'));
+                    if (btn) selectType(btn, 'Leakage');
+                    return;
+                }
+                else if (command.includes("सिलेंडर")) {
+                    let btn = Array.from(document.querySelectorAll('.type-btn')).find(b => 
+                        b.innerText.includes('Cylinder') || b.innerText.includes('सिलेंडर'));
+                    if (btn) selectType(btn, 'Cylinder');
+                    return;
+                }
+                
+                // Odia complaint types
+                if (command.includes("ଲିକେଜ୍") || command.includes("ଗ୍ୟାସ୍ ଲିକେଜ୍")) {
+                    let btn = Array.from(document.querySelectorAll('.type-btn')).find(b => 
+                        b.innerText.includes('Gas Leakage'));
+                    if (btn) selectType(btn, 'Leakage');
+                    return;
+                }
+                else if (command.includes("ସିଲିଣ୍ଡର")) {
+                    let btn = Array.from(document.querySelectorAll('.type-btn')).find(b => 
+                        b.innerText.includes('Cylinder'));
+                    if (btn) selectType(btn, 'Cylinder');
+                    return;
+                }
+                
+                // Description command
+                if (command.includes("describe") || command.includes("description") || 
+                    command.includes("वर्णन") || command.includes("ବର୍ଣ୍ଣନା")) {
+                    openKeyboard("description");
+                    const messages = {
+                        'en': 'Type your complaint description',
+                        'hi': 'अपनी शिकायत का विवरण टाइप करें',
+                        'or': 'ଆପଣଙ୍କ ଅଭିଯୋଗ ବର୍ଣ୍ଣନା ଟାଇପ୍ କରନ୍ତୁ'
+                    };
+                    speak(messages[langCode] || messages['en']);
+                    return;
+                }
+                
+                // Submit command - all languages
+                if (command.includes("submit") || command.includes("lodge") || command.includes("जमा") || 
+                    command.includes("ଦାଖଲ") || command.includes("শিক্ষা") || command.includes("சமர்ப்பி") || 
+                    command.includes("సమర్పించు")) {
+                    submitComplaint();
+                    return;
+                }
+                else if (command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ") || 
+                    command.includes("পিছনে") || command.includes("பின்") || command.includes("వెనుకకు")) {
+                    goBack();
+                    return;
+                }
+                else if (command.includes("home") || command.includes("होम") || command.includes("ଘର") || 
+                    command.includes("হোম") || command.includes("முகப்பு") || command.includes("హోమ్")) {
+                    window.location.href = "/" + langCode + "/";
+                    return;
+                }
+                else if (command.includes("stop listening") || command.includes("stop voice")) {
+                    stopVoiceInput();
+                    return;
+                }
+            };
+
+            recognition.onerror = function(event) {
+                console.error("Recognition error:", event.error);
+                if (event.error === 'no-speech') return;
+                stopVoiceInput();
+            };
+
+            recognition.onend = function() {
+                if (isListening) {
+                    try {
+                        recognition.start();
+                    } catch (e) {
+                        console.error("Failed to restart recognition:", e);
+                        stopVoiceInput();
+                    }
+                } else {
+                    document.getElementById("voiceBtn").classList.remove("listening");
+                    document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
+                    document.getElementById('voiceStatusIndicator').classList.remove('active');
+                }
+            };
+
+            try {
+                recognition.start();
+            } catch (e) {
+                console.error("Failed to start recognition:", e);
+                stopVoiceInput();
+            }
+        }
+
+        function stopVoiceInput() {
+            isListening = false;
+            if (recognition) {
+                try {
+                    recognition.stop();
+                } catch (e) {}
+            }
+            document.getElementById("voiceBtn").classList.remove("listening");
+            document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
+            document.getElementById('voiceStatusIndicator').classList.remove('active');
+        }
+
+        // Auto-read page instructions
+        function autoReadPage() {
+            setTimeout(() => {
+                const langCode = getCurrentLangCode();
+                const messages = {
+                    'en': 'Gas complaint. Select complaint type, describe your issue, then say submit to lodge complaint.',
+                    'hi': 'गैस शिकायत। शिकायत प्रकार चुनें, अपनी समस्या का वर्णन करें, फिर शिकायत दर्ज करने के लिए सबमिट कहें।',
+                    'or': 'ଗ୍ୟାସ୍ ଅଭିଯୋଗ। ଅଭିଯୋଗ ପ୍ରକାର ଚୟନ କରନ୍ତୁ, ଆପଣଙ୍କ ସମସ୍ୟା ବର୍ଣ୍ଣନା କରନ୍ତୁ, ତାପରେ ଅଭିଯୋଗ ଦାଖଲ ପାଇଁ ସବମିଟ କୁହନ୍ତୁ।'
+                };
+                speak(messages[langCode] || messages['en']);
+            }, 2000);
+        }
+
+        // Auto-hide messages after 5 seconds
+        setTimeout(function() {
+            document.querySelectorAll('.message').forEach(function(message) {
+                message.style.display = 'none';
+            });
+        }, 5000);
+
+        // Prevent form submission on Enter key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
+                e.preventDefault();
+            }
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            startSessionTimer();
+            
+            document.addEventListener('click', resetSessionTimer);
+            document.addEventListener('keypress', resetSessionTimer);
+            document.addEventListener('touchstart', resetSessionTimer);
+            
+            // Check if voice should auto-start
+            const autoStartVoice = sessionStorage.getItem('autoStartVoice');
+            if (autoStartVoice === 'true') {
+                sessionStorage.removeItem('autoStartVoice');
+                setTimeout(() => {
+                    toggleVoiceInput();
+                }, 1000);
+            }
+            
+            // Auto-read page
+            setTimeout(autoReadPage, 2000);
+        });
+
+        window.addEventListener('beforeunload', function() {
+            if (sessionTimer) {
+                clearTimeout(sessionTimer);
+            }
+            stopVoiceInput();
+        });
+
+        // Override voice.js autoReadPage
+        window.autoReadPage = autoReadPage;
+    </script>
 </body>
 </html>

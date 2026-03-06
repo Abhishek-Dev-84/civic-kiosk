@@ -1,592 +1,1012 @@
 {% load i18n %}
 {% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>{% trans "Gas Booking Status - Civic Kiosk" %}</title>
+    <style>
+        /* Hide Google Translate elements */
+        .goog-te-banner-frame.skiptranslate,
+        .goog-te-gadget-icon,
+        .goog-te-gadget-simple,
+        #goog-gt-tt,
+        .goog-te-balloon-frame,
+        .goog-te-menu-frame,
+        .goog-te-spinner-pos {
+            display: none !important;
+        }
+        
+        body {
+            top: 0px !important;
+            position: static !important;
+            overflow: hidden !important;
+            height: 100vh;
+            width: 100vw;
+        }
+        
+        .goog-te-combo {
+            display: none !important;
+        }
+        
+        .goog-te-gadget {
+            color: transparent !important;
+            height: 0 !important;
+            overflow: hidden !important;
+        }
 
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;user-select:none;}
-body{width:100vw;height:100vh;overflow:hidden;background:#f0f7ff;}
+        /* Timeout warning popup */
+        .timeout-warning {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border: 4px solid #ff9933;
+            border-radius: 40px;
+            padding: 30px;
+            text-align: center;
+            z-index: 2000;
+            display: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .timeout-warning p {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 20px;
+        }
 
-/* HEADER */
-.header{
-height:70px;
-background:white;
-display:flex;
-align-items:center;
-justify-content:space-between;
-padding:0 20px;
-border-bottom:2px solid #1e5fbf;
-}
-.header-left{display:flex;align-items:center;gap:10px;}
-.header-left img{height:40px;}
-.header-left div{font-size:12px;font-weight:600;color:#1e5fbf;line-height:1.2;}
-.header-right img{height:35px;}
+        .timeout-warning button {
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            padding: 15px 30px;
+            font-size: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            margin: 10px;
+            min-width: 150px;
+        }
 
-/* VOICE + BACK */
-.voice-corner{
-position:fixed;
-top:80px;
-right:15px;
-display:flex;
-flex-direction:column;
-align-items:center;
-gap:3px;
-z-index:1000;
-}
-.voice-corner-btn{
-background:#ff9933;
-width:45px;
-height:45px;
-border-radius:50%;
-border:2px solid white;
-display:flex;
-align-items:center;
-justify-content:center;
-font-size:24px;
-cursor:pointer;
-}
-.voice-corner-btn:hover{background:#ffaa44;}
-.voice-corner-btn.listening{
-background:#28a745;
-transform:scale(1.1);
-}
-.voice-corner-text{
-background:white;
-padding:2px 8px;
-border-radius:12px;
-font-size:10px;
-color:#ff9933;
-border:1px solid #ff9933;
-}
-.back-btn{
-position:fixed;
-top:80px;
-left:15px;
-background:white;
-border:2px solid #1e5fbf;
-border-radius:30px;
-padding:5px 15px;
-font-size:18px;
-font-weight:700;
-color:#1e5fbf;
-text-decoration:none;
-z-index:1000;
-display:inline-block;
-}
-.back-btn:hover{background:#1e5fbf;color:white;}
-.back-btn:active{transform:translateY(2px);}
+        .timeout-warning .logout-btn {
+            background: #dc3545;
+        }
+        
+        .timeout-warning button:active {
+            transform: translateY(3px);
+        }
 
-/* MAIN */
-.container{
-position:fixed;
-top:70px;
-left:0;
-right:0;
-bottom:0;
-display:flex;
-align-items:center;
-justify-content:center;
-padding:15px;
-overflow-y:auto;
-}
-.content-wrapper{
-width:100%;
-max-width:650px;
-padding:20px 0;
-}
+        /* Voice status indicator */
+        .voice-status-indicator {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-size: 16px;
+            font-weight: 600;
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            border: 2px solid #ff9933;
+        }
 
-/* Message styles */
-.messages{width:100%;margin-bottom:15px;}
-.message{padding:10px;border-radius:10px;margin-bottom:5px;text-align:center;}
-.message.success{background:#d4edda;color:#155724;border:1px solid #c3e6cb;}
-.message.error{background:#f8d7da;color:#721c24;border:1px solid #f5c6cb;}
-.message.info{background:#d1ecf1;color:#0c5460;border:1px solid #bee5eb;}
+        .voice-status-indicator.active {
+            display: flex;
+        }
 
-h1{
-color:#1e5fbf;
-font-size:32px;
-font-weight:800;
-text-align:center;
-margin-bottom:15px;
-}
+        .voice-pulse {
+            width: 12px;
+            height: 12px;
+            background: #28a745;
+            border-radius: 50%;
+            animation: voicePulse 1.5s infinite;
+        }
 
-.search-box{
-display:flex;
-gap:10px;
-margin:15px 0;
-}
-.search-input{
-flex:1;
-height:60px;
-border:3px solid #1e5fbf;
-border-radius:25px;
-font-size:22px;
-padding:0 15px;
-background:white;
-cursor:pointer;
-}
-.search-input:focus{outline:none;border-color:#ff9933;}
-.search-input[readonly]{background:#f9f9f9;}
+        @keyframes voicePulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
 
-.search-btn{
-background:#1e5fbf;
-color:white;
-border:none;
-border-radius:25px;
-padding:0 20px;
-font-size:22px;
-cursor:pointer;
-box-shadow:0 4px 0 #0a3d7a;
-transition:all 0.1s;
-}
-.search-btn:active{transform:translateY(4px);box-shadow:0 1px 0 #0a3d7a;}
-.search-btn:hover{background:#2f6fcf;}
+    <meta charset="UTF-8">
+    <title>{% trans "Gas Booking Status - Civic Kiosk" %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-.status-card{
-background:white;
-border:3px solid #1e5fbf;
-border-radius:25px;
-padding:20px;
-margin-top:15px;
-}
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;user-select:none;}
+        body{width:100vw;height:100vh;overflow:hidden;background:#f0f7ff;}
 
-.timeline{
-display:flex;
-justify-content:space-between;
-margin:20px 0;
-position:relative;
-}
-.timeline::before{
-content:'';
-position:absolute;
-top:18px;
-left:10%;
-right:10%;
-height:4px;
-background:#e0e0e0;
-z-index:1;
-}
-.step{text-align:center;position:relative;z-index:2;background:white;}
-.step .dot{
-width:35px;
-height:35px;
-background:#e0e0e0;
-border-radius:50%;
-margin:0 auto 5px;
-display:flex;
-align-items:center;
-justify-content:center;
-font-size:18px;
-}
-.step.completed .dot{
-background:#28a745;
-color:white;
-}
-.step.active .dot{
-background:#ff9933;
-color:white;
-}
-.step-label{font-size:13px;}
-.delivery-info{
-background:#e8f5e9;
-border-radius:18px;
-padding:12px;
-margin:10px 0;
-font-size:16px;
-}
-.hidden{display:none;}
+        /* HEADER */
+        .header{
+            height:70px;
+            background:white;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            padding:0 20px;
+            border-bottom:2px solid #1e5fbf;
+            position:fixed;
+            top:0;
+            left:0;
+            right:0;
+            z-index:1000;
+        }
+        .header-left{display:flex;align-items:center;gap:10px;}
+        .header-left img{height:40px;}
+        .header-left div{font-size:12px;font-weight:600;color:#1e5fbf;line-height:1.2;}
+        .header-right img{height:35px;}
 
-/* Loading indicator */
-.loading{
-display:none;
-position:fixed;
-top:0;
-left:0;
-right:0;
-bottom:0;
-background:rgba(0,0,0,0.5);
-z-index:2000;
-justify-content:center;
-align-items:center;
-color:white;
-font-size:24px;
-}
-.loading.show{display:flex;}
-.spinner{
-border:4px solid rgba(255,255,255,0.3);
-border-radius:50%;
-border-top:4px solid white;
-width:50px;
-height:50px;
-animation:spin 1s linear infinite;
-margin-right:10px;
-}
-@keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
+        /* VOICE + BACK */
+        .voice-corner{
+            position:fixed;
+            top:80px;
+            right:15px;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            gap:3px;
+            z-index:1000;
+        }
+        .voice-corner-btn{
+            background:#ff9933;
+            width:45px;
+            height:45px;
+            border-radius:50%;
+            border:2px solid white;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:24px;
+            cursor:pointer;
+            transition:all 0.2s;
+        }
+        .voice-corner-btn:hover{background:#ffaa44;}
+        .voice-corner-btn.listening{
+            background:#28a745;
+            transform:scale(1.1);
+            animation:pulse 1s infinite;
+        }
+        @keyframes pulse{
+            0%{transform:scale(1);}
+            50%{transform:scale(1.1);}
+            100%{transform:scale(1);}
+        }
+        .voice-corner-text{
+            background:white;
+            padding:2px 8px;
+            border-radius:12px;
+            font-size:10px;
+            color:#ff9933;
+            border:1px solid #ff9933;
+        }
+        .back-btn{
+            position:fixed;
+            top:80px;
+            left:15px;
+            background:white;
+            border:2px solid #1e5fbf;
+            border-radius:30px;
+            padding:5px 15px;
+            font-size:18px;
+            font-weight:700;
+            color:#1e5fbf;
+            text-decoration:none;
+            z-index:1000;
+            display:inline-block;
+            box-shadow:0 3px 0 #0a3d7a;
+            cursor:pointer;
+        }
+        .back-btn:hover{background:#1e5fbf;color:white;}
+        .back-btn:active{transform:translateY(3px);box-shadow:0 1px 0 #0a3d7a;}
 
-/* FLOATING INPUT */
-.overlay{
-position:fixed;
-inset:0;
-background:rgba(0,0,0,0.4);
-backdrop-filter:blur(3px);
-display:none;
-z-index:900;
-}
-.floating-input{
-position:fixed;
-left:50%;
-top:35%;
-transform:translate(-50%,-50%) scale(0.85);
-width:520px;
-height:70px;
-font-size:20px;
-border:4px solid #ff9933;
-border-radius:20px;
-padding:12px;
-z-index:1001;
-box-shadow:0 20px 50px rgba(0,0,0,0.4);
-transition:all 0.25s ease;
-display:none;
-}
-.floating-input.show{
-transform:translate(-50%,-50%) scale(1);
-}
-.floating-input:focus{outline:none;}
+        /* MAIN */
+        .container{
+            position:fixed;
+            top:70px;
+            left:0;
+            right:0;
+            bottom:0;
+            display:flex;
+            align-items:flex-start;
+            justify-content:center;
+            padding:15px;
+            overflow-y:auto;
+        }
+        .content-wrapper{
+            width:100%;
+            max-width:650px;
+            padding:20px 0;
+        }
 
-/* KEYBOARD */
-.keyboard{
-position:fixed;
-bottom:15px;
-left:50%;
-transform:translateX(-50%);
-background:white;
-padding:10px;
-border-radius:15px;
-box-shadow:0 8px 25px rgba(0,0,0,0.3);
-display:none;
-z-index:1000;
-}
-.keyboard-row{display:flex;justify-content:center;}
-.keyboard button{
-min-width:48px;
-height:42px;
-margin:3px;
-font-size:14px;
-border-radius:8px;
-border:2px solid #1e5fbf;
-background:#f0f7ff;
-cursor:pointer;
-transition:all 0.2s;
-}
-.keyboard button:hover{background:#1e5fbf;color:white;}
-.keyboard .ok-btn{
-background:#28a745;
-color:white;
-border:none;
-}
-.keyboard .ok-btn:hover{background:#218838;}
-</style>
+        /* Message styles */
+        .messages{width:100%;margin-bottom:15px;}
+        .message{padding:10px;border-radius:10px;margin-bottom:5px;text-align:center;}
+        .message.success{background:#d4edda;color:#155724;border:1px solid #c3e6cb;}
+        .message.error{background:#f8d7da;color:#721c24;border:1px solid #f5c6cb;}
+        .message.info{background:#d1ecf1;color:#0c5460;border:1px solid #bee5eb;}
+
+        h1{
+            color:#1e5fbf;
+            font-size:32px;
+            font-weight:800;
+            text-align:center;
+            margin-bottom:15px;
+        }
+
+        .search-box{
+            display:flex;
+            gap:10px;
+            margin:15px 0;
+        }
+        .search-input{
+            flex:1;
+            height:60px;
+            border:3px solid #1e5fbf;
+            border-radius:25px;
+            font-size:22px;
+            padding:0 15px;
+            background:white;
+            cursor:pointer;
+        }
+        .search-input:focus{outline:none;border-color:#ff9933;}
+        .search-input[readonly]{background:#f9f9f9;}
+
+        .search-btn{
+            background:#1e5fbf;
+            color:white;
+            border:none;
+            border-radius:25px;
+            padding:0 20px;
+            font-size:22px;
+            cursor:pointer;
+            box-shadow:0 4px 0 #0a3d7a;
+            transition:all 0.1s;
+        }
+        .search-btn:active{transform:translateY(4px);box-shadow:0 1px 0 #0a3d7a;}
+        .search-btn:hover{background:#2f6fcf;}
+
+        .status-card{
+            background:white;
+            border:3px solid #1e5fbf;
+            border-radius:25px;
+            padding:20px;
+            margin-top:15px;
+        }
+
+        .timeline{
+            display:flex;
+            justify-content:space-between;
+            margin:20px 0;
+            position:relative;
+        }
+        .timeline::before{
+            content:'';
+            position:absolute;
+            top:18px;
+            left:10%;
+            right:10%;
+            height:4px;
+            background:#e0e0e0;
+            z-index:1;
+        }
+        .step{text-align:center;position:relative;z-index:2;background:white;}
+        .step .dot{
+            width:35px;
+            height:35px;
+            background:#e0e0e0;
+            border-radius:50%;
+            margin:0 auto 5px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:18px;
+        }
+        .step.completed .dot{
+            background:#28a745;
+            color:white;
+        }
+        .step.active .dot{
+            background:#ff9933;
+            color:white;
+        }
+        .step-label{font-size:13px;}
+        .delivery-info{
+            background:#e8f5e9;
+            border-radius:18px;
+            padding:12px;
+            margin:10px 0;
+            font-size:16px;
+        }
+        .hidden{display:none;}
+
+        /* Loading indicator */
+        .loading{
+            display:none;
+            position:fixed;
+            top:0;
+            left:0;
+            right:0;
+            bottom:0;
+            background:rgba(0,0,0,0.5);
+            z-index:2000;
+            justify-content:center;
+            align-items:center;
+            color:white;
+            font-size:24px;
+        }
+        .loading.show{display:flex;}
+        .spinner{
+            border:4px solid rgba(255,255,255,0.3);
+            border-radius:50%;
+            border-top:4px solid white;
+            width:50px;
+            height:50px;
+            animation:spin 1s linear infinite;
+            margin-right:10px;
+        }
+        @keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
+
+        /* FLOATING INPUT */
+        .overlay{
+            position:fixed;
+            inset:0;
+            background:rgba(0,0,0,0.4);
+            backdrop-filter:blur(3px);
+            display:none;
+            z-index:900;
+        }
+        .floating-input{
+            position:fixed;
+            left:50%;
+            top:35%;
+            transform:translate(-50%,-50%) scale(0.85);
+            width:520px;
+            height:70px;
+            font-size:20px;
+            border:4px solid #ff9933;
+            border-radius:20px;
+            padding:12px;
+            z-index:1001;
+            box-shadow:0 20px 50px rgba(0,0,0,0.4);
+            transition:all 0.25s ease;
+            display:none;
+        }
+        .floating-input.show{
+            transform:translate(-50%,-50%) scale(1);
+        }
+        .floating-input:focus{outline:none;}
+
+        /* KEYBOARD */
+        .keyboard{
+            position:fixed;
+            bottom:15px;
+            left:50%;
+            transform:translateX(-50%);
+            background:white;
+            padding:10px;
+            border-radius:15px;
+            box-shadow:0 8px 25px rgba(0,0,0,0.3);
+            display:none;
+            z-index:1000;
+        }
+        .keyboard-row{display:flex;justify-content:center;}
+        .keyboard button{
+            min-width:48px;
+            height:42px;
+            margin:3px;
+            font-size:14px;
+            border-radius:8px;
+            border:2px solid #1e5fbf;
+            background:#f0f7ff;
+            cursor:pointer;
+            transition:all 0.2s;
+        }
+        .keyboard button:hover{background:#1e5fbf;color:white;}
+        .keyboard .ok-btn{
+            background:#28a745;
+            color:white;
+            border:none;
+        }
+        .keyboard .ok-btn:hover{background:#218838;}
+
+        /* Utility */
+        .hidden{display:none !important;}
+    </style>
 </head>
 <body>
+    <!-- Timeout Warning Popup -->
+    <div id="timeoutWarning" class="timeout-warning">
+        <p>⏰ {% trans "Session about to expire!" %}</p>
+        <button onclick="extendSession()">{% trans "Continue" %}</button>
+        <button class="logout-btn" onclick="window.location='{% url 'index' %}'">{% trans "Logout" %}</button>
+    </div>
 
-<div class="header">
-<div class="header-left">
-<img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India">
-<div>{% trans "Ministry of Electronics &" %}<br>{% trans "Information Technology" %}<br>{% trans "Government of India" %}</div>
-</div>
-<div class="header-right">
-<img src="https://www.cdac.in/img/cdac-logo.png" alt="CDAC Logo">
-</div>
-</div>
+    <!-- Voice Status Indicator -->
+    <div id="voiceStatusIndicator" class="voice-status-indicator">
+        <div class="voice-pulse"></div>
+        <span id="voiceStatusText">{% trans "Listening..." %}</span>
+    </div>
 
-<!-- Voice corner will be created dynamically by voice.js -->
-
-<a href="{% url 'gas-services' %}" class="back-btn">← {% trans "Back" %}</a>
-
-<div class="container">
-<div class="content-wrapper">
-
-<!-- Display Django messages -->
-{% if messages %}
-<div class="messages">
-    {% for message in messages %}
-    <div class="message {{ message.tags }}">{{ message }}</div>
-    {% endfor %}
-</div>
-{% endif %}
-
-<h1>📦 {% trans "Booking Status" %}</h1>
-
-<!-- Django form for status check -->
-<form id="statusForm" method="post" action="{% url 'gas-booking-status' %}">
-    {% csrf_token %}
-    <input type="hidden" name="reference_number" id="referenceNumber" value="{{ request.POST.reference_number }}">
-</form>
-
-<div class="search-box">
-<input class="search-input" id="refNo" readonly placeholder="{% trans "Enter Reference No. (e.g., CYL251234)" %}" 
-       value="{{ request.POST.reference_number }}">
-<button class="search-btn" onclick="checkStatus()">{% trans "Search" %}</button>
-</div>
-
-<div id="statusDisplay" class="status-card {% if not booking %}hidden{% endif %}">
-    {% if booking %}
-    <div style="font-size:20px;font-weight:700;color:#1e5fbf;margin-bottom:10px;">{% trans "Booking #" %}{{ booking.reference_number }}</div>
-
-    <div class="timeline">
-        <div class="step {% if booking.status != 'pending' %}completed{% endif %}">
-            <div class="dot">✓</div>
-            <div class="step-label">{% trans "Booked" %}</div>
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-left">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India">
+            <div>{% trans "Ministry of Electronics &" %}<br>{% trans "Information Technology" %}<br>{% trans "Government of India" %}</div>
         </div>
-        <div class="step {% if booking.status == 'processed' or booking.status == 'out_for_delivery' or booking.status == 'delivered' %}completed{% endif %}">
-            <div class="dot">✓</div>
-            <div class="step-label">{% trans "Processed" %}</div>
-        </div>
-        <div class="step {% if booking.status == 'out_for_delivery' or booking.status == 'delivered' %}completed{% endif %} {% if booking.status == 'out_for_delivery' %}active{% endif %}">
-            <div class="dot">{% if booking.status == 'out_for_delivery' %}⏳{% else %}○{% endif %}</div>
-            <div class="step-label">{% trans "Out for Delivery" %}</div>
-        </div>
-        <div class="step {% if booking.status == 'delivered' %}completed{% endif %}">
-            <div class="dot">{% if booking.status == 'delivered' %}✓{% else %}○{% endif %}</div>
-            <div class="step-label">{% trans "Delivered" %}</div>
+        <div class="header-right">
+            <img src="https://www.cdac.in/img/cdac-logo.png" alt="CDAC Logo">
         </div>
     </div>
 
-    <div class="delivery-info">
-        <div>📅 {% trans "Booked on:" %} {{ booking.booked_date }}</div>
-        <div>🚚 {% trans "Expected delivery:" %} {{ booking.expected_delivery }}</div>
-        {% if booking.delivery_person %}
-        <div>👤 {% trans "Delivery person:" %} {{ booking.delivery_person }}</div>
-        {% endif %}
-        {% if booking.actual_delivery %}
-        <div>✅ {% trans "Delivered on:" %} {{ booking.actual_delivery }}</div>
-        {% endif %}
+    <!-- Voice Button -->
+    <div class="voice-corner">
+        <div class="voice-corner-btn" id="voiceBtn" onclick="toggleVoiceInput()">🎤</div>
+        <div class="voice-corner-text" id="voiceStatus">{% trans "Click" %}</div>
     </div>
 
-    <div style="text-align:center;font-size:18px;color:#1e5fbf;">
-        {{ booking.cylinder_type }}
+    <!-- Back Button -->
+    <div class="back-btn" onclick="goBack()">← {% trans "Back" %}</div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <div class="content-wrapper">
+
+            <!-- Display Django messages -->
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <div class="message {{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <h1>📦 {% trans "Booking Status" %}</h1>
+
+            <!-- Django form for status check -->
+            <form id="statusForm" method="post" action="{% url 'gas-booking-status' %}">
+                {% csrf_token %}
+                <input type="hidden" name="reference_number" id="referenceNumber" value="{{ request.POST.reference_number }}">
+            </form>
+
+            <div class="search-box">
+                <input class="search-input" id="refNo" readonly placeholder="{% trans "Enter Reference No. (e.g., CYL251234)" %}" 
+                       value="{{ request.POST.reference_number }}">
+                <button class="search-btn" onclick="checkStatus()">{% trans "Search" %}</button>
+            </div>
+
+            <div id="statusDisplay" class="status-card {% if not booking %}hidden{% endif %}">
+                {% if booking %}
+                <div style="font-size:20px;font-weight:700;color:#1e5fbf;margin-bottom:10px;">{% trans "Booking #" %}{{ booking.reference_number }}</div>
+
+                <div class="timeline">
+                    <div class="step {% if booking.status != 'pending' %}completed{% endif %}">
+                        <div class="dot">✓</div>
+                        <div class="step-label">{% trans "Booked" %}</div>
+                    </div>
+                    <div class="step {% if booking.status == 'processed' or booking.status == 'out_for_delivery' or booking.status == 'delivered' %}completed{% endif %}">
+                        <div class="dot">✓</div>
+                        <div class="step-label">{% trans "Processed" %}</div>
+                    </div>
+                    <div class="step {% if booking.status == 'out_for_delivery' or booking.status == 'delivered' %}completed{% endif %} {% if booking.status == 'out_for_delivery' %}active{% endif %}">
+                        <div class="dot">{% if booking.status == 'out_for_delivery' %}⏳{% else %}○{% endif %}</div>
+                        <div class="step-label">{% trans "Out for Delivery" %}</div>
+                    </div>
+                    <div class="step {% if booking.status == 'delivered' %}completed{% endif %}">
+                        <div class="dot">{% if booking.status == 'delivered' %}✓{% else %}○{% endif %}</div>
+                        <div class="step-label">{% trans "Delivered" %}</div>
+                    </div>
+                </div>
+
+                <div class="delivery-info">
+                    <div>📅 {% trans "Booked on:" %} {{ booking.booked_date }}</div>
+                    <div>🚚 {% trans "Expected delivery:" %} {{ booking.expected_delivery }}</div>
+                    {% if booking.delivery_person %}
+                    <div>👤 {% trans "Delivery person:" %} {{ booking.delivery_person }}</div>
+                    {% endif %}
+                    {% if booking.actual_delivery %}
+                    <div>✅ {% trans "Delivered on:" %} {{ booking.actual_delivery }}</div>
+                    {% endif %}
+                </div>
+
+                <div style="text-align:center;font-size:18px;color:#1e5fbf;">
+                    {{ booking.cylinder_type }}
+                </div>
+                {% else %}
+                <!-- Default demo status -->
+                <div style="font-size:20px;font-weight:700;color:#1e5fbf;margin-bottom:10px;">{% trans "Booking #CYL251234" %}</div>
+
+                <div class="timeline">
+                    <div class="step completed"><div class="dot">✓</div><div class="step-label">{% trans "Booked" %}</div></div>
+                    <div class="step completed"><div class="dot">✓</div><div class="step-label">{% trans "Processed" %}</div></div>
+                    <div class="step active"><div class="dot">⏳</div><div class="step-label">{% trans "Out for Delivery" %}</div></div>
+                    <div class="step"><div class="dot">○</div><div class="step-label">{% trans "Delivered" %}</div></div>
+                </div>
+
+                <div class="delivery-info">
+                    <div>📅 {% trans "Booked on:" %} 22 Feb 2026, 10:30 AM</div>
+                    <div>🚚 {% trans "Expected delivery:" %} {% trans "Today (25 Feb) by 6 PM" %}</div>
+                    <div>👤 {% trans "Delivery person:" %} Ramesh (98765 43210)</div>
+                </div>
+
+                <div style="text-align:center;font-size:18px;color:#1e5fbf;">
+                    14.2 kg {% trans "Domestic Cylinder" %}
+                </div>
+                {% endif %}
+            </div>
+
+        </div>
     </div>
-    {% else %}
-    <!-- Default demo status -->
-    <div style="font-size:20px;font-weight:700;color:#1e5fbf;margin-bottom:10px;">{% trans "Booking #CYL251234" %}</div>
 
-    <div class="timeline">
-        <div class="step completed"><div class="dot">✓</div><div class="step-label">{% trans "Booked" %}</div></div>
-        <div class="step completed"><div class="dot">✓</div><div class="step-label">{% trans "Processed" %}</div></div>
-        <div class="step active"><div class="dot">⏳</div><div class="step-label">{% trans "Out for Delivery" %}</div></div>
-        <div class="step"><div class="dot">○</div><div class="step-label">{% trans "Delivered" %}</div></div>
+    <!-- Loading indicator -->
+    <div id="loadingIndicator" class="loading">
+        <div class="spinner"></div>
+        <div>{% trans "Searching..." %}</div>
     </div>
 
-    <div class="delivery-info">
-        <div>📅 {% trans "Booked on:" %} 22 Feb 2026, 10:30 AM</div>
-        <div>🚚 {% trans "Expected delivery:" %} {% trans "Today (25 Feb) by 6 PM" %}</div>
-        <div>👤 {% trans "Delivery person:" %} Ramesh (98765 43210)</div>
-    </div>
+    <!-- Floating Keyboard Elements -->
+    <div id="overlay" class="overlay"></div>
+    <input id="floatingInput" class="floating-input" placeholder="{% trans "Enter reference number" %}">
+    <div id="keyboard" class="keyboard"></div>
 
-    <div style="text-align:center;font-size:18px;color:#1e5fbf;">
-        14.2 kg {% trans "Domestic Cylinder" %}
-    </div>
-    {% endif %}
-</div>
+    <!-- Load voice.js - must be at bottom -->
+    <script src="{% static 'js/voice.js' %}"></script>
 
-</div>
-</div>
-
-<!-- Loading indicator -->
-<div id="loadingIndicator" class="loading">
-    <div class="spinner"></div>
-    <div>{% trans "Searching..." %}</div>
-</div>
-
-<div id="overlay" class="overlay"></div>
-<input id="floatingInput" class="floating-input" placeholder="{% trans "Enter reference number" %}">
-<div id="keyboard" class="keyboard"></div>
-
-<script src="{% static 'js/voice.js' %}"></script>
-
-<script>
-let activeInput=null;
-let isUpperCase=true;
-
-const overlay=document.getElementById("overlay");
-const floatingInput=document.getElementById("floatingInput");
-const keyboard=document.getElementById("keyboard");
-const loadingIndicator = document.getElementById("loadingIndicator");
-
-function createKeyboard(){
-keyboard.innerHTML="";
-let letters="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-if(!isUpperCase){letters=letters.toLowerCase();}
-let keys=(letters+"0123456789").split("");
-
-let row=document.createElement("div");
-row.className="keyboard-row";
-keys.forEach((k,i)=>{
-if(i%10===0 && i!==0){
-keyboard.appendChild(row);
-row=document.createElement("div");
-row.className="keyboard-row";
-}
-let btn=document.createElement("button");
-btn.innerText=k;
-btn.type="button";
-btn.onclick=()=>floatingInput.value+=k;
-row.appendChild(btn);
-});
-keyboard.appendChild(row);
-
-let last=document.createElement("div");
-last.className="keyboard-row";
-last.innerHTML=`
-<button type="button" onclick="toggleCase()">⇧ {% trans "Shift" %}</button>
-<button type="button" onclick="floatingInput.value=floatingInput.value.slice(0,-1)">⌫ {% trans "Back" %}</button>
-<button type="button" onclick="floatingInput.value=''">{% trans "Clear" %}</button>
-<button type="button" class="ok-btn" onclick="finish()">✓ {% trans "OK" %}</button>
-`;
-keyboard.appendChild(last);
-}
-
-function toggleCase(){isUpperCase=!isUpperCase;createKeyboard();}
-
-function openKeyboard(id){
-activeInput=document.getElementById(id);
-floatingInput.value=activeInput.value;
-overlay.style.display="block";
-floatingInput.style.display="block";
-keyboard.style.display="block";
-setTimeout(()=>{
-floatingInput.classList.add("show");
-floatingInput.focus();
-},10);
-}
-
-function finish(){
-if(activeInput){
-activeInput.value=floatingInput.value;
-document.getElementById('referenceNumber').value = floatingInput.value;
-}
-closeKeyboard();
-}
-
-function closeKeyboard(){
-floatingInput.classList.remove("show");
-setTimeout(()=>{
-overlay.style.display="none";
-floatingInput.style.display="none";
-keyboard.style.display="none";
-},200);
-}
-
-// Handle Enter key on floating input
-floatingInput.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') {
-        e.preventDefault();
-        finish();
-    }
-});
-
-document.getElementById("refNo").addEventListener("click",()=>openKeyboard("refNo"));
-overlay.addEventListener("click",closeKeyboard);
-
-createKeyboard();
-
-function checkStatus(){
-const ref = document.getElementById('refNo').value;
-if(!ref){
-    if(typeof speak === 'function') speak("{% trans 'Please enter reference number' %}");
-    return;
-}
-
-// Show loading
-loadingIndicator.classList.add('show');
-if(typeof speak === 'function') speak("{% trans 'Searching for booking status' %}");
-
-// Submit form
-setTimeout(() => {
-    document.getElementById('statusForm').submit();
-}, 500);
-}
-
-/* ===================== OVERRIDE VOICE COMMANDS ===================== */
-
-// Extend voice.js handleCommand for gas booking status
-const originalHandleCommand = window.handleCommand;
-window.handleCommand = function(command) {
-    command = command.toLowerCase();
-    console.log("Gas booking command:", command);
-    
-    // Check for reference number pattern (CYL followed by numbers)
-    const refMatch = command.match(/cyl[-\s]?(\d+)/i) || command.match(/cylinder[-\s]?(\d+)/i);
-    if(refMatch) {
-        const ref = "CYL" + refMatch[1];
-        document.getElementById('refNo').value = ref;
-        document.getElementById('referenceNumber').value = ref;
-        if(typeof speak === 'function') speak("Reference number " + ref + " entered");
-        return;
-    }
-    
-    // Check for just numbers (assume CYL prefix)
-    const numberMatch = command.match(/\d+/g);
-    if(numberMatch && (command.includes("ref") || command.includes("reference"))) {
-        const ref = "CYL" + numberMatch.join('');
-        document.getElementById('refNo').value = ref;
-        document.getElementById('referenceNumber').value = ref;
-        if(typeof speak === 'function') speak("Reference number " + ref + " entered");
-        return;
-    }
-    
-    // Search command
-    if(command.includes("search") || command.includes("check") || command.includes("status")) {
-        checkStatus();
-        return;
-    }
-    else if(command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
-        window.location.href = "/" + getCurrentLangCode() + "/gas-services/";
-        return;
-    }
-    else if(command.includes("home") || command.includes("होम") || command.includes("ଘର")) {
-        window.location.href = "/" + getCurrentLangCode() + "/";
-        return;
-    }
-    
-    // If not gas booking-specific, pass to original handler
-    if(originalHandleCommand) {
-        originalHandleCommand(command);
-    }
-};
-
-// Override autoReadPage to read gas booking instructions
-const originalAutoRead = window.autoReadPage;
-window.autoReadPage = function() {
-    if(originalAutoRead) originalAutoRead();
-    setTimeout(() => {
-        if(typeof speak === 'function') {
-            speak("{% trans 'Enter reference number starting with CYL, then say search to check booking status' %}");
+    <script>
+        /* ================= LANGUAGE UTILITIES ================= */
+        function getCurrentLangCode() {
+            const path = window.location.pathname.split('/');
+            return path[1] || "en";
         }
-    }, 2000);
-};
 
-// Auto-hide messages after 5 seconds
-setTimeout(function() {
-    document.querySelectorAll('.message').forEach(function(message) {
-        message.style.display = 'none';
-    });
-}, 5000);
+        function speak(text) {
+            if (!('speechSynthesis' in window)) return;
+            speechSynthesis.cancel();
+            let utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = window.getCurrentLang ? window.getCurrentLang() : 'en-IN';
+            utterance.rate = 1;
+            speechSynthesis.speak(utterance);
+        }
 
-// Prevent form submission on Enter key
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'INPUT') {
-        e.preventDefault();
-    }
-});
+        /* ================= SESSION TIMER ================= */
+        let sessionTimer;
+        let timeoutWarningTimer;
+        const SESSION_DURATION = 120000; // 2 minutes
+        const WARNING_TIME = 30000; // Warn 30 seconds before
 
-// If booking exists, make sure it's visible
-{% if booking %}
-document.getElementById('statusDisplay').classList.remove('hidden');
-{% endif %}
-</script>
+        function startSessionTimer() {
+            sessionTimer = setTimeout(() => {
+                showTimeoutWarning();
+            }, SESSION_DURATION - WARNING_TIME);
+        }
 
+        function showTimeoutWarning() {
+            const warning = document.getElementById('timeoutWarning');
+            if (warning) {
+                warning.style.display = 'block';
+                
+                const langCode = getCurrentLangCode();
+                const warnings = {
+                    'en': 'Your session is about to expire. Please continue to stay logged in.',
+                    'hi': 'आपका सत्र समाप्त होने वाला है। कृपया जारी रखें।',
+                    'or': 'ଆପଣଙ୍କର ସତ୍ର ସମାପ୍ତ ହେବାକୁ ଯାଉଛି। ଦୟାକରି ଜାରି ରଖନ୍ତୁ।',
+                    'bn': 'আপনার সেশন শেষ হতে চলেছে। অনুগ্রহ করে চালিয়ে যান।',
+                    'ta': 'உங்கள் அமர்வு காலாவதியாகிறது. தயவுசெய்து தொடரவும்.',
+                    'te': 'మీ సెషన్ ముగియబోతోంది. దయచేసి కొనసాగించండి.'
+                };
+                speak(warnings[langCode] || warnings['en']);
+                
+                timeoutWarningTimer = setTimeout(() => {
+                    window.location.href = "/" + langCode + "/";
+                }, WARNING_TIME);
+            }
+        }
+
+        function extendSession() {
+            const warning = document.getElementById('timeoutWarning');
+            if (warning) {
+                warning.style.display = 'none';
+            }
+            clearTimeout(sessionTimer);
+            clearTimeout(timeoutWarningTimer);
+            startSessionTimer();
+            
+            const langCode = getCurrentLangCode();
+            const messages = {
+                'en': 'Session extended. You may continue.',
+                'hi': 'सत्र बढ़ा दिया गया। आप जारी रख सकते हैं।',
+                'or': 'ସତ୍ର ବୃଦ୍ଧି କରାଯାଇଛି। ଆପଣ ଜାରି ରଖିପାରିବେ।',
+                'bn': 'সেশন বাড়ানো হয়েছে। আপনি চালিয়ে যেতে পারেন।',
+                'ta': 'அமர்வு நீட்டிக்கப்பட்டது. நீங்கள் தொடரலாம்.',
+                'te': 'సెషన్ పొడిగించబడింది. మీరు కొనసాగించవచ్చు.'
+            };
+            speak(messages[langCode] || messages['en']);
+        }
+
+        function resetSessionTimer() {
+            clearTimeout(sessionTimer);
+            clearTimeout(timeoutWarningTimer);
+            startSessionTimer();
+        }
+
+        function goBack() {
+            resetSessionTimer();
+            window.location.href = "/" + getCurrentLangCode() + "/gas-services/";
+        }
+
+        /* ================= FLOATING KEYBOARD ================= */
+        let activeInput = null;
+        let isUpperCase = true;
+
+        const overlay = document.getElementById("overlay");
+        const floatingInput = document.getElementById("floatingInput");
+        const keyboard = document.getElementById("keyboard");
+        const loadingIndicator = document.getElementById("loadingIndicator");
+
+        function createKeyboard() {
+            keyboard.innerHTML = "";
+            let letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            if (!isUpperCase) { letters = letters.toLowerCase(); }
+            let keys = (letters + "0123456789").split("");
+
+            let row = document.createElement("div");
+            row.className = "keyboard-row";
+            
+            keys.forEach((k, i) => {
+                if (i % 10 === 0 && i !== 0) {
+                    keyboard.appendChild(row);
+                    row = document.createElement("div");
+                    row.className = "keyboard-row";
+                }
+                let btn = document.createElement("button");
+                btn.innerText = k;
+                btn.type = "button";
+                btn.onclick = () => floatingInput.value += k;
+                row.appendChild(btn);
+            });
+            keyboard.appendChild(row);
+
+            let last = document.createElement("div");
+            last.className = "keyboard-row";
+            last.innerHTML = `
+                <button type="button" onclick="toggleCase()">⇧ {% trans "Shift" %}</button>
+                <button type="button" onclick="floatingInput.value = floatingInput.value.slice(0, -1)">⌫ {% trans "Back" %}</button>
+                <button type="button" onclick="floatingInput.value = ''">{% trans "Clear" %}</button>
+                <button type="button" class="ok-btn" onclick="finish()">✓ {% trans "OK" %}</button>
+            `;
+            keyboard.appendChild(last);
+        }
+
+        function toggleCase() {
+            isUpperCase = !isUpperCase;
+            createKeyboard();
+        }
+
+        function openKeyboard(id) {
+            resetSessionTimer();
+            activeInput = document.getElementById(id);
+            floatingInput.value = activeInput.value;
+            overlay.style.display = "block";
+            floatingInput.style.display = "block";
+            keyboard.style.display = "block";
+            setTimeout(() => {
+                floatingInput.classList.add("show");
+                floatingInput.focus();
+            }, 10);
+        }
+
+        function finish() {
+            if (activeInput) {
+                activeInput.value = floatingInput.value;
+                document.getElementById('referenceNumber').value = floatingInput.value;
+            }
+            closeKeyboard();
+        }
+
+        function closeKeyboard() {
+            floatingInput.classList.remove("show");
+            setTimeout(() => {
+                overlay.style.display = "none";
+                floatingInput.style.display = "none";
+                keyboard.style.display = "none";
+            }, 200);
+        }
+
+        // Handle Enter key on floating input
+        floatingInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                finish();
+            }
+        });
+
+        document.getElementById("refNo").addEventListener("click", () => openKeyboard("refNo"));
+        overlay.addEventListener("click", closeKeyboard);
+
+        createKeyboard();
+
+        function checkStatus() {
+            resetSessionTimer();
+            
+            const ref = document.getElementById('refNo').value;
+            const langCode = getCurrentLangCode();
+            
+            if (!ref) {
+                const messages = {
+                    'en': 'Please enter reference number',
+                    'hi': 'कृपया संदर्भ संख्या दर्ज करें',
+                    'or': 'ଦୟାକରି ରେଫରେନ୍ସ ନମ୍ବର ପ୍ରବେଶ କରନ୍ତୁ',
+                    'bn': 'অনুগ্রহ করে রেফারেন্স নম্বর লিখুন',
+                    'ta': 'குறிப்பு எண்ணை உள்ளிடவும்',
+                    'te': 'దయచేసి రిఫరెన్స్ నంబర్ నమోదు చేయండి'
+                };
+                speak(messages[langCode] || messages['en']);
+                return;
+            }
+
+            // Show loading
+            loadingIndicator.classList.add('show');
+            
+            const messages = {
+                'en': 'Searching for booking status',
+                'hi': 'बुकिंग स्थिति खोज रहा है',
+                'or': 'ବୁକିଂ ସ୍ଥିତି ଖୋଜୁଛି',
+                'bn': 'বুকিং অবস্থা অনুসন্ধান করা হচ্ছে',
+                'ta': 'பதிவு நிலையைத் தேடுகிறது',
+                'te': 'బుకింగ్ స్థితి కోసం శోధిస్తోంది'
+            };
+            speak(messages[langCode] || messages['en']);
+
+            // Submit form
+            setTimeout(() => {
+                document.getElementById('statusForm').submit();
+            }, 500);
+        }
+
+        /* ================= VOICE INPUT ================= */
+        let recognition;
+        let isListening = false;
+
+        function toggleVoiceInput() {
+            resetSessionTimer();
+            
+            if (isListening) {
+                stopVoiceInput();
+                return;
+            }
+
+            const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SR) {
+                alert("{% trans 'Speech not supported' %}");
+                return;
+            }
+
+            if (recognition) {
+                try {
+                    recognition.stop();
+                } catch (e) {}
+            }
+
+            recognition = new SR();
+            recognition.lang = window.getCurrentLang ? window.getCurrentLang() : 'en-IN';
+            recognition.continuous = true;
+            recognition.interimResults = true;
+
+            recognition.onstart = function() {
+                isListening = true;
+                document.getElementById("voiceBtn").classList.add("listening");
+                document.getElementById("voiceStatus").innerText = "{% trans 'Listening...' %}";
+                document.getElementById('voiceStatusIndicator').classList.add('active');
+                
+                const langCode = getCurrentLangCode();
+                const messages = {
+                    'en': 'Say your reference number starting with CYL, or say search to check status.',
+                    'hi': 'CYL से शुरू होने वाला अपना संदर्भ संख्या बोलें, या स्थिति जांचने के लिए खोज कहें।',
+                    'or': 'CYL ରୁ ଆରମ୍ଭ ହେଉଥିବା ଆପଣଙ୍କ ରେଫରେନ୍ସ ନମ୍ବର କୁହନ୍ତୁ, କିମ୍ବା ସ୍ଥିତି ଯାଞ୍ଚ ପାଇଁ ଖୋଜ କୁହନ୍ତୁ।'
+                };
+                speak(messages[langCode] || messages['en']);
+            };
+
+            recognition.onresult = function(e) {
+                resetSessionTimer();
+                
+                let finalTranscript = '';
+                let interimTranscript = '';
+                
+                for (let i = 0; i < e.results.length; i++) {
+                    const result = e.results[i];
+                    if (result.isFinal) {
+                        finalTranscript += result[0].transcript;
+                    } else {
+                        interimTranscript += result[0].transcript;
+                    }
+                }
+                
+                const transcript = finalTranscript || interimTranscript;
+                const command = transcript.toLowerCase();
+                console.log("Gas booking command:", command);
+                
+                const langCode = getCurrentLangCode();
+                
+                // Check for reference number pattern (CYL followed by numbers)
+                const cylMatch = command.match(/cyl[-\s]?(\d+)/i) || command.match(/cylinder[-\s]?(\d+)/i);
+                if (cylMatch) {
+                    const ref = "CYL" + cylMatch[1];
+                    document.getElementById('refNo').value = ref;
+                    document.getElementById('referenceNumber').value = ref;
+                    const messages = {
+                        'en': 'Reference number ' + ref + ' entered',
+                        'hi': 'संदर्भ संख्या ' + ref + ' दर्ज की गई',
+                        'or': 'ରେଫରେନ୍ସ ନମ୍ବର ' + ref + ' ପ୍ରବେଶ ହେଲା'
+                    };
+                    speak(messages[langCode] || messages['en']);
+                    return;
+                }
+                
+                // Check for just numbers (assume CYL prefix if it sounds like a reference)
+                const numberMatch = command.match(/\d+/g);
+                if (numberMatch && (command.includes("ref") || command.includes("reference") || 
+                    command.includes("संदर्भ") || command.includes("ରେଫରେନ୍ସ"))) {
+                    const ref = "CYL" + numberMatch.join('');
+                    document.getElementById('refNo').value = ref;
+                    document.getElementById('referenceNumber').value = ref;
+                    const messages = {
+                        'en': 'Reference number ' + ref + ' entered',
+                        'hi': 'संदर्भ संख्या ' + ref + ' दर्ज की गई',
+                        'or': 'ରେଫରେନ୍ସ ନମ୍ବର ' + ref + ' ପ୍ରବେଶ ହେଲା'
+                    };
+                    speak(messages[langCode] || messages['en']);
+                    return;
+                }
+                
+                // Search command - English
+                if (command.includes("search") || command.includes("check") || command.includes("status")) {
+                    checkStatus();
+                    return;
+                }
+                
+                // Search command - Hindi
+                if (command.includes("खोज") || command.includes("स्थिति") || command.includes("चेक")) {
+                    checkStatus();
+                    return;
+                }
+                
+                // Search command - Odia
+                if (command.includes("ଖୋଜ") || command.includes("ସ୍ଥିତି")) {
+                    checkStatus();
+                    return;
+                }
+                
+                // Back command - all languages
+                if (command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ") || 
+                    command.includes("পিছনে") || command.includes("பின்") || command.includes("వెనుకకు")) {
+                    goBack();
+                    return;
+                }
+                
+                // Home command - all languages
+                if (command.includes("home") || command.includes("होम") || command.includes("ଘର") || 
+                    command.includes("হোম") || command.includes("முகப்பு") || command.includes("హోమ్")) {
+                    window.location.href = "/" + langCode + "/";
+                    return;
+                }
+                
+                // Stop listening
+                if (command.includes("stop listening") || command.includes("stop voice")) {
+                    stopVoiceInput();
+                    return;
+                }
+            };
+
+            recognition.onerror = function(event) {
+                console.error("Recognition error:", event.error);
+                if (event.error === 'no-speech') return;
+                stopVoiceInput();
+            };
+
+            recognition.onend = function() {
+                if (isListening) {
+                    try {
+                        recognition.start();
+                    } catch (e) {
+                        console.error("Failed to restart recognition:", e);
+                        stopVoiceInput();
+                    }
+                } else {
+                    document.getElementById("voiceBtn").classList.remove("listening");
+                    document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
+                    document.getElementById('voiceStatusIndicator').classList.remove('active');
+                }
+            };
+
+            try {
+                recognition.start();
+            } catch (e) {
+                console.error("Failed to start recognition:", e);
+                stopVoiceInput();
+            }
+        }
+
+        function stopVoiceInput() {
+            isListening = false;
+            if (recognition) {
+                try {
+                    recognition.stop();
+                } catch (e) {}
+            }
+            document.getElementById("voiceBtn").classList.remove("listening");
+            document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
+            document.getElementById('voiceStatusIndicator').classList.remove('active');
+        }
+
+        // Auto-read page instructions
+        function autoReadPage() {
+            setTimeout(() => {
+                const langCode = getCurrentLangCode();
+                const messages = {
+                    'en': 'Gas booking status. Enter your reference number starting with CYL, then say search to check your booking status.',
+                    'hi': 'गैस बुकिंग स्थिति। CYL से शुरू होने वाला अपना संदर्भ संख्या दर्ज करें, फिर अपनी बुकिंग स्थिति जांचने के लिए खोज कहें।',
+                    'or': 'ଗ୍ୟାସ୍ ବୁକିଂ ସ୍ଥିତି। CYL ରୁ ଆରମ୍ଭ ହେଉଥିବା ଆପଣଙ୍କ ରେଫରେନ୍ସ ନମ୍ବର ପ୍ରବେଶ କରନ୍ତୁ, ତାପରେ ଆପଣଙ୍କ ବୁକିଂ ସ୍ଥିତି ଯାଞ୍ଚ ପାଇଁ ଖୋଜ କୁହନ୍ତୁ।'
+                };
+                speak(messages[langCode] || messages['en']);
+            }, 2000);
+        }
+
+        // Auto-hide messages after 5 seconds
+        setTimeout(function() {
+            document.querySelectorAll('.message').forEach(function(message) {
+                message.style.display = 'none';
+            });
+        }, 5000);
+
+        // Prevent form submission on Enter key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'INPUT') {
+                e.preventDefault();
+            }
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            startSessionTimer();
+            
+            document.addEventListener('click', resetSessionTimer);
+            document.addEventListener('keypress', resetSessionTimer);
+            document.addEventListener('touchstart', resetSessionTimer);
+            
+            // Check if voice should auto-start
+            const autoStartVoice = sessionStorage.getItem('autoStartVoice');
+            if (autoStartVoice === 'true') {
+                sessionStorage.removeItem('autoStartVoice');
+                setTimeout(() => {
+                    toggleVoiceInput();
+                }, 1000);
+            }
+            
+            // Auto-read page
+            setTimeout(autoReadPage, 2000);
+        });
+
+        window.addEventListener('beforeunload', function() {
+            if (sessionTimer) {
+                clearTimeout(sessionTimer);
+            }
+            stopVoiceInput();
+        });
+
+        // If booking exists, make sure it's visible
+        {% if booking %}
+        document.getElementById('statusDisplay').classList.remove('hidden');
+        {% endif %}
+
+        // Override voice.js autoReadPage
+        window.autoReadPage = autoReadPage;
+    </script>
 </body>
 </html>

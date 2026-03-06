@@ -1,648 +1,1105 @@
 {% load i18n %}
 {% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>{% trans "New Electricity Connection - Civic Kiosk" %}</title>
+    <style>
+        /* Hide Google Translate elements */
+        .goog-te-banner-frame.skiptranslate,
+        .goog-te-gadget-icon,
+        .goog-te-gadget-simple,
+        #goog-gt-tt,
+        .goog-te-balloon-frame,
+        .goog-te-menu-frame,
+        .goog-te-spinner-pos {
+            display: none !important;
+        }
+        
+        body {
+            top: 0px !important;
+            position: static !important;
+            overflow: hidden !important;
+            height: 100vh;
+            width: 100vw;
+        }
+        
+        .goog-te-combo {
+            display: none !important;
+        }
+        
+        .goog-te-gadget {
+            color: transparent !important;
+            height: 0 !important;
+            overflow: hidden !important;
+        }
 
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;user-select:none;}
-body{width:100vw;height:100vh;overflow:hidden;background:#f0f7ff;}
+        /* Timeout warning popup */
+        .timeout-warning {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border: 4px solid #ff9933;
+            border-radius: 40px;
+            padding: 30px;
+            text-align: center;
+            z-index: 2000;
+            display: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .timeout-warning p {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 20px;
+        }
 
-/* HEADER */
-.header{
-height:70px;
-background:white;
-display:flex;
-align-items:center;
-justify-content:space-between;
-padding:0 20px;
-border-bottom:2px solid #1e5fbf;
-}
-.header-left{display:flex;align-items:center;gap:10px;}
-.header-left img{height:40px;}
-.header-left div{font-size:12px;font-weight:600;color:#1e5fbf;line-height:1.2;}
-.header-right img{height:35px;}
+        .timeout-warning button {
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            padding: 15px 30px;
+            font-size: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            margin: 10px;
+            min-width: 150px;
+        }
 
-/* VOICE + BACK */
-.voice-corner{
-position:fixed;
-top:80px;
-right:15px;
-display:flex;
-flex-direction:column;
-align-items:center;
-gap:3px;
-z-index:1000;
-}
-.voice-corner-btn{
-background:#ff9933;
-width:45px;
-height:45px;
-border-radius:50%;
-border:2px solid white;
-display:flex;
-align-items:center;
-justify-content:center;
-font-size:24px;
-cursor:pointer;
-}
-.voice-corner-btn:hover{background:#ffaa44;}
-.voice-corner-btn.listening{background:#28a745;transform:scale(1.1);}
-.voice-corner-text{
-background:white;
-padding:2px 8px;
-border-radius:12px;
-font-size:10px;
-color:#ff9933;
-border:1px solid #ff9933;
-}
+        .timeout-warning .logout-btn {
+            background: #dc3545;
+        }
+        
+        .timeout-warning button:active {
+            transform: translateY(3px);
+        }
 
-.back-btn{
-position:fixed;
-top:80px;
-left:15px;
-background:white;
-border:2px solid #1e5fbf;
-border-radius:30px;
-padding:5px 15px;
-font-size:18px;
-font-weight:700;
-color:#1e5fbf;
-text-decoration:none;
-z-index:1000;
-display:inline-block;
-}
-.back-btn:hover{background:#1e5fbf;color:white;}
-.back-btn:active{transform:translateY(2px);}
+        /* Voice status indicator */
+        .voice-status-indicator {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-size: 16px;
+            font-weight: 600;
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            border: 2px solid #ff9933;
+        }
 
-/* MAIN CONTAINER */
-.container{
-position:fixed;
-top:70px;
-left:0;
-right:0;
-bottom:0;
-display:flex;
-align-items:center;
-justify-content:center;
-padding:15px;
-overflow-y:auto;
-}
-.content-wrapper{
-width:100%;
-max-width:620px;
-display:flex;
-flex-direction:column;
-gap:12px;
-padding:20px 0;
-}
+        .voice-status-indicator.active {
+            display: flex;
+        }
 
-/* Message styles */
-.messages{width:100%;margin-bottom:10px;}
-.message{padding:10px;border-radius:10px;margin-bottom:5px;text-align:center;}
-.message.success{background:#d4edda;color:#155724;border:1px solid #c3e6cb;}
-.message.error{background:#f8d7da;color:#721c24;border:1px solid #f5c6cb;}
-.message.info{background:#d1ecf1;color:#0c5460;border:1px solid #bee5eb;}
+        .voice-pulse {
+            width: 12px;
+            height: 12px;
+            background: #28a745;
+            border-radius: 50%;
+            animation: voicePulse 1.5s infinite;
+        }
 
-/* TITLE */
-h1{
-color:#1e5fbf;
-font-size:32px;
-font-weight:800;
-text-align:center;
-}
+        @keyframes voicePulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
 
-.security-note{
-background:#e8f5e9;
-border:1px solid #28a745;
-border-radius:18px;
-padding:6px 12px;
-font-size:14px;
-color:#1e5fbf;
-text-align:center;
-}
+    <meta charset="UTF-8">
+    <title>{% trans "New Electricity Connection - Civic Kiosk" %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;user-select:none;}
+        body{width:100vw;height:100vh;overflow:hidden;background:#f0f7ff;}
 
-/* FORM */
-.form-group{margin:8px 0;}
-label{
-display:block;
-font-size:20px;
-color:#1e5fbf;
-margin-bottom:5px;
-}
-.large-input{
-width:100%;
-height:55px;
-border:3px solid #1e5fbf;
-border-radius:20px;
-font-size:22px;
-padding:0 15px;
-background:white;
-cursor:pointer;
-}
-.large-input:focus{outline:none;border-color:#ff9933;}
-.large-input[readonly]{background:#f9f9f9;}
+        /* HEADER */
+        .header{
+            height:70px;
+            background:white;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            padding:0 20px;
+            border-bottom:2px solid #1e5fbf;
+            position:fixed;
+            top:0;
+            left:0;
+            right:0;
+            z-index:1000;
+        }
+        .header-left{display:flex;align-items:center;gap:10px;}
+        .header-left img{height:40px;}
+        .header-left div{font-size:12px;font-weight:600;color:#1e5fbf;line-height:1.2;}
+        .header-right img{height:35px;}
 
-select.large-input{
-appearance:none;
-background-image:url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-background-repeat:no-repeat;
-background-position:right 15px center;
-background-size:20px;
-padding-right:45px;
-}
+        /* VOICE CORNER - keep our own for consistency */
+        .voice-corner{
+            position:fixed;
+            top:80px;
+            right:15px;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            gap:3px;
+            z-index:1000;
+        }
+        .voice-corner-btn{
+            background:#ff9933;
+            width:45px;
+            height:45px;
+            border-radius:50%;
+            border:2px solid white;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:24px;
+            cursor:pointer;
+            transition:all 0.2s;
+        }
+        .voice-corner-btn:hover{background:#ffaa44;}
+        .voice-corner-btn.listening{
+            background:#28a745;
+            transform:scale(1.1);
+            animation:pulse 1s infinite;
+        }
+        @keyframes pulse{
+            0%{transform:scale(1);}
+            50%{transform:scale(1.1);}
+            100%{transform:scale(1);}
+        }
+        .voice-corner-text{
+            background:white;
+            padding:2px 8px;
+            border-radius:12px;
+            font-size:10px;
+            color:#ff9933;
+            border:1px solid #ff9933;
+        }
 
-.submit-btn{
-background:#28a745;
-color:white;
-font-size:26px;
-padding:12px;
-border-radius:40px;
-width:100%;
-border:none;
-margin-top:10px;
-cursor:pointer;
-box-shadow:0 4px 0 #1e7e34;
-transition:all 0.1s;
-}
-.submit-btn:active{transform:translateY(4px);box-shadow:0 1px 0 #1e7e34;}
-.submit-btn:hover{background:#2fcB4f;}
+        /* BACK BUTTON */
+        .back-btn{
+            position:fixed;
+            top:80px;
+            left:15px;
+            background:white;
+            border:2px solid #1e5fbf;
+            border-radius:30px;
+            padding:5px 15px;
+            font-size:18px;
+            font-weight:700;
+            color:#1e5fbf;
+            text-decoration:none;
+            z-index:1000;
+            display:inline-block;
+            box-shadow:0 3px 0 #0a3d7a;
+            cursor:pointer;
+        }
+        .back-btn:hover{background:#1e5fbf;color:white;}
+        .back-btn:active{transform:translateY(3px);box-shadow:0 1px 0 #0a3d7a;}
 
-/* Loading indicator */
-.loading{
-display:none;
-position:fixed;
-top:0;
-left:0;
-right:0;
-bottom:0;
-background:rgba(0,0,0,0.5);
-z-index:2000;
-justify-content:center;
-align-items:center;
-color:white;
-font-size:24px;
-}
-.loading.show{display:flex;}
-.spinner{
-border:4px solid rgba(255,255,255,0.3);
-border-radius:50%;
-border-top:4px solid white;
-width:50px;
-height:50px;
-animation:spin 1s linear infinite;
-margin-right:10px;
-}
-@keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
+        /* MAIN CONTAINER */
+        .container{
+            position:fixed;
+            top:70px;
+            left:0;
+            right:0;
+            bottom:0;
+            display:flex;
+            align-items:flex-start;
+            justify-content:center;
+            padding:15px;
+            overflow-y:auto;
+        }
+        .content-wrapper{
+            width:100%;
+            max-width:620px;
+            display:flex;
+            flex-direction:column;
+            gap:12px;
+            padding:20px 0;
+        }
 
-/* FLOATING INPUT (balanced height) */
-.overlay{
-position:fixed;
-inset:0;
-background:rgba(0,0,0,0.4);
-backdrop-filter:blur(3px);
-display:none;
-z-index:900;
-}
+        /* Message styles */
+        .messages{width:100%;margin-bottom:10px;}
+        .message{padding:10px;border-radius:10px;margin-bottom:5px;text-align:center;}
+        .message.success{background:#d4edda;color:#155724;border:1px solid #c3e6cb;}
+        .message.error{background:#f8d7da;color:#721c24;border:1px solid #f5c6cb;}
+        .message.info{background:#d1ecf1;color:#0c5460;border:1px solid #bee5eb;}
 
-.floating-input{
-position:fixed;
-left:50%;
-top:35%;
-transform:translate(-50%,-50%) scale(0.85);
-width:600px;
-height:85px;
-font-size:22px;
-border:4px solid #ff9933;
-border-radius:25px;
-padding:15px;
-z-index:1001;
-box-shadow:0 20px 50px rgba(0,0,0,0.4);
-transition:all 0.25s ease;
-display:none;
-}
-.floating-input.show{transform:translate(-50%,-50%) scale(1);}
-.floating-input:focus{outline:none;}
+        /* TITLE */
+        h1{
+            color:#1e5fbf;
+            font-size:32px;
+            font-weight:800;
+            text-align:center;
+        }
 
-/* KEYBOARD */
-.keyboard{
-position:fixed;
-bottom:20px;
-left:50%;
-transform:translateX(-50%);
-background:white;
-padding:12px;
-border-radius:18px;
-box-shadow:0 8px 25px rgba(0,0,0,0.3);
-display:none;
-z-index:1000;
-}
-.keyboard-row{display:flex;justify-content:center;}
-.keyboard button{
-min-width:55px;
-height:50px;
-margin:4px;
-font-size:16px;
-border-radius:10px;
-border:2px solid #1e5fbf;
-background:#f0f7ff;
-cursor:pointer;
-transition:all 0.2s;
-}
-.keyboard button:hover{background:#1e5fbf;color:white;}
-.keyboard .ok-btn{
-background:#28a745;
-color:white;
-border:none;
-}
-.keyboard .ok-btn:hover{background:#218838;}
+        .security-note{
+            background:#e8f5e9;
+            border:1px solid #28a745;
+            border-radius:18px;
+            padding:6px 12px;
+            font-size:14px;
+            color:#1e5fbf;
+            text-align:center;
+        }
 
-</style>
+        /* FORM */
+        .form-group{margin:8px 0;}
+        label{
+            display:block;
+            font-size:20px;
+            color:#1e5fbf;
+            margin-bottom:5px;
+        }
+        .large-input{
+            width:100%;
+            height:55px;
+            border:3px solid #1e5fbf;
+            border-radius:20px;
+            font-size:22px;
+            padding:0 15px;
+            background:white;
+            cursor:pointer;
+        }
+        .large-input:focus{outline:none;border-color:#ff9933;}
+        .large-input[readonly]{background:#f9f9f9;}
+
+        select.large-input{
+            appearance:none;
+            background-image:url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat:no-repeat;
+            background-position:right 15px center;
+            background-size:20px;
+            padding-right:45px;
+        }
+
+        .submit-btn{
+            background:#28a745;
+            color:white;
+            font-size:26px;
+            padding:12px;
+            border-radius:40px;
+            width:100%;
+            border:none;
+            margin-top:10px;
+            cursor:pointer;
+            box-shadow:0 4px 0 #1e7e34;
+            transition:all 0.1s;
+        }
+        .submit-btn:active{transform:translateY(4px);box-shadow:0 1px 0 #1e7e34;}
+        .submit-btn:hover{background:#2fcB4f;}
+
+        /* Loading indicator */
+        .loading{
+            display:none;
+            position:fixed;
+            top:0;
+            left:0;
+            right:0;
+            bottom:0;
+            background:rgba(0,0,0,0.5);
+            z-index:2000;
+            justify-content:center;
+            align-items:center;
+            color:white;
+            font-size:24px;
+        }
+        .loading.show{display:flex;}
+        .spinner{
+            border:4px solid rgba(255,255,255,0.3);
+            border-radius:50%;
+            border-top:4px solid white;
+            width:50px;
+            height:50px;
+            animation:spin 1s linear infinite;
+            margin-right:10px;
+        }
+        @keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
+
+        /* FLOATING INPUT */
+        .overlay{
+            position:fixed;
+            inset:0;
+            background:rgba(0,0,0,0.4);
+            backdrop-filter:blur(3px);
+            display:none;
+            z-index:900;
+        }
+
+        .floating-input{
+            position:fixed;
+            left:50%;
+            top:35%;
+            transform:translate(-50%,-50%) scale(0.85);
+            width:600px;
+            height:85px;
+            font-size:22px;
+            border:4px solid #ff9933;
+            border-radius:25px;
+            padding:15px;
+            z-index:1001;
+            box-shadow:0 20px 50px rgba(0,0,0,0.4);
+            transition:all 0.25s ease;
+            display:none;
+        }
+        .floating-input.show{transform:translate(-50%,-50%) scale(1);}
+        .floating-input:focus{outline:none;}
+
+        /* KEYBOARD */
+        .keyboard{
+            position:fixed;
+            bottom:20px;
+            left:50%;
+            transform:translateX(-50%);
+            background:white;
+            padding:12px;
+            border-radius:18px;
+            box-shadow:0 8px 25px rgba(0,0,0,0.3);
+            display:none;
+            z-index:1000;
+        }
+        .keyboard-row{display:flex;justify-content:center;}
+        .keyboard button{
+            min-width:55px;
+            height:50px;
+            margin:4px;
+            font-size:16px;
+            border-radius:10px;
+            border:2px solid #1e5fbf;
+            background:#f0f7ff;
+            cursor:pointer;
+            transition:all 0.2s;
+        }
+        .keyboard button:hover{background:#1e5fbf;color:white;}
+        .keyboard .ok-btn{
+            background:#28a745;
+            color:white;
+            border:none;
+        }
+        .keyboard .ok-btn:hover{background:#218838;}
+
+        /* Utility */
+        .hidden{display:none !important;}
+    </style>
 </head>
 <body>
 
-<div class="header">
-<div class="header-left">
-<img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India">
-<div>{% trans "Ministry of Electronics &" %}<br>{% trans "Information Technology" %}<br>{% trans "Government of India" %}</div>
-</div>
-<div class="header-right">
-<img src="https://www.cdac.in/img/cdac-logo.png" alt="CDAC Logo">
-</div>
-</div>
+    <!-- Timeout Warning Popup -->
+    <div id="timeoutWarning" class="timeout-warning">
+        <p>⏰ {% trans "Session about to expire!" %}</p>
+        <button onclick="extendSession()">{% trans "Continue" %}</button>
+        <button class="logout-btn" onclick="window.location='{% url 'index' %}'">{% trans "Logout" %}</button>
+    </div>
 
-<!-- Voice corner will be created dynamically by voice.js -->
+    <!-- Voice Status Indicator -->
+    <div id="voiceStatusIndicator" class="voice-status-indicator">
+        <div class="voice-pulse"></div>
+        <span id="voiceStatusText">{% trans "Listening..." %}</span>
+    </div>
 
-<a href="{% url 'electricity-services' %}" class="back-btn">← {% trans "Back" %}</a>
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-left">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India">
+            <div>
+                {% trans "Ministry of Electronics &" %}<br>
+                {% trans "Information Technology" %}<br>
+                {% trans "Government of India" %}
+            </div>
+        </div>
+        <div class="header-right">
+            <img src="https://www.cdac.in/img/cdac-logo.png" alt="CDAC Logo">
+        </div>
+    </div>
 
-<div class="container">
-<div class="content-wrapper">
+    <!-- Voice Button -->
+    <div class="voice-corner">
+        <div class="voice-corner-btn" id="voiceBtn" onclick="toggleVoiceInput()">🎤</div>
+        <div class="voice-corner-text" id="voiceStatus">{% trans "Click" %}</div>
+    </div>
 
-<!-- Display Django messages -->
-{% if messages %}
-<div class="messages">
-    {% for message in messages %}
-    <div class="message {{ message.tags }}">{{ message }}</div>
-    {% endfor %}
-</div>
-{% endif %}
+    <!-- Back Button -->
+    <div class="back-btn" onclick="goBack()">← {% trans "Back" %}</div>
 
-<h1>{% trans "New Electricity Connection" %}</h1>
-<div class="security-note">🔒 {% trans "Your data is secure" %}</div>
+    <!-- Main Container -->
+    <div class="container">
+        <div class="content-wrapper">
 
-<!-- Django form for new connection -->
-<form id="connectionForm" method="post" action="{% url 'electricity-new-connection' %}">
-    {% csrf_token %}
-    <input type="hidden" name="full_name" id="fullName" value="{{ request.POST.full_name }}">
-    <input type="hidden" name="address" id="addressField" value="{{ request.POST.address }}">
-    <input type="hidden" name="property_type" id="propertyTypeField" value="{% if request.POST.property_type %}{{ request.POST.property_type }}{% else %}Residential{% endif %}">
-    <input type="hidden" name="load_required" id="loadField" value="{{ request.POST.load_required }}">
-    <input type="hidden" name="mobile_number" id="mobileField" value="{{ request.POST.mobile_number }}">
-</form>
+            <!-- Display Django messages -->
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <div class="message {{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
 
-<div class="form-group">
-<label>{% trans "Full Name" %} *</label>
-<input class="large-input" id="name" readonly placeholder="{% trans "Enter your full name" %}" 
-       value="{{ request.POST.full_name }}">
-</div>
+            <h1>{% trans "New Electricity Connection" %}</h1>
+            <div class="security-note">🔒 {% trans "Your data is secure" %}</div>
 
-<div class="form-group">
-<label>{% trans "Address" %} *</label>
-<input class="large-input" id="address" readonly placeholder="{% trans "Enter complete address" %}" 
-       value="{{ request.POST.address }}">
-</div>
+            <!-- Django form for new connection -->
+            <form id="connectionForm" method="post" action="{% url 'electricity-new-connection' %}">
+                {% csrf_token %}
+                <input type="hidden" name="full_name" id="fullName" value="{{ request.POST.full_name }}">
+                <input type="hidden" name="address" id="addressField" value="{{ request.POST.address }}">
+                <input type="hidden" name="property_type" id="propertyTypeField" value="{% if request.POST.property_type %}{{ request.POST.property_type }}{% else %}Residential{% endif %}">
+                <input type="hidden" name="load_required" id="loadField" value="{{ request.POST.load_required }}">
+                <input type="hidden" name="mobile_number" id="mobileField" value="{{ request.POST.mobile_number }}">
+            </form>
 
-<div class="form-group">
-<label>{% trans "Property Type" %} *</label>
-<select class="large-input" id="propertyType" onchange="updatePropertyType()">
-    <option value="Residential" {% if request.POST.property_type == 'Residential' or not request.POST.property_type %}selected{% endif %}>{% trans "Residential" %}</option>
-    <option value="Commercial" {% if request.POST.property_type == 'Commercial' %}selected{% endif %}>{% trans "Commercial" %}</option>
-    <option value="Industrial" {% if request.POST.property_type == 'Industrial' %}selected{% endif %}>{% trans "Industrial" %}</option>
-    <option value="Agricultural" {% if request.POST.property_type == 'Agricultural' %}selected{% endif %}>{% trans "Agricultural" %}</option>
-</select>
-</div>
+            <div class="form-group">
+                <label>{% trans "Full Name" %} *</label>
+                <input class="large-input" id="name" readonly placeholder="{% trans "Enter your full name" %}" 
+                       value="{{ request.POST.full_name }}">
+            </div>
 
-<div class="form-group">
-<label>{% trans "Load Required (kW)" %} *</label>
-<input class="large-input" id="load" readonly placeholder="{% trans "e.g., 5" %}" 
-       value="{{ request.POST.load_required }}">
-</div>
+            <div class="form-group">
+                <label>{% trans "Address" %} *</label>
+                <input class="large-input" id="address" readonly placeholder="{% trans "Enter complete address" %}" 
+                       value="{{ request.POST.address }}">
+            </div>
 
-<div class="form-group">
-<label>{% trans "Mobile Number" %} *</label>
-<input class="large-input" id="mobile" readonly placeholder="{% trans "10 digit mobile" %}" maxlength="10"
-       value="{{ request.POST.mobile_number }}">
-</div>
+            <div class="form-group">
+                <label>{% trans "Property Type" %} *</label>
+                <select class="large-input" id="propertyType" onchange="updatePropertyType()">
+                    <option value="Residential" {% if request.POST.property_type == 'Residential' or not request.POST.property_type %}selected{% endif %}>{% trans "Residential" %}</option>
+                    <option value="Commercial" {% if request.POST.property_type == 'Commercial' %}selected{% endif %}>{% trans "Commercial" %}</option>
+                    <option value="Industrial" {% if request.POST.property_type == 'Industrial' %}selected{% endif %}>{% trans "Industrial" %}</option>
+                    <option value="Agricultural" {% if request.POST.property_type == 'Agricultural' %}selected{% endif %}>{% trans "Agricultural" %}</option>
+                </select>
+            </div>
 
-<button class="submit-btn" onclick="submitForm()">{% trans "Submit Application" %}</button>
+            <div class="form-group">
+                <label>{% trans "Load Required (kW)" %} *</label>
+                <input class="large-input" id="load" readonly placeholder="{% trans "e.g., 5" %}" 
+                       value="{{ request.POST.load_required }}">
+            </div>
 
-</div>
-</div>
+            <div class="form-group">
+                <label>{% trans "Mobile Number" %} *</label>
+                <input class="large-input" id="mobile" readonly placeholder="{% trans "10 digit mobile" %}" maxlength="10"
+                       value="{{ request.POST.mobile_number }}">
+            </div>
 
-<!-- Loading indicator -->
-<div id="loadingIndicator" class="loading">
-    <div class="spinner"></div>
-    <div>{% trans "Processing..." %}</div>
-</div>
+            <button class="submit-btn" onclick="submitForm()">{% trans "Submit Application" %}</button>
 
-<div id="overlay" class="overlay"></div>
-<textarea id="floatingInput" class="floating-input" placeholder="{% trans "Type here..." %}"></textarea>
-<div id="keyboard" class="keyboard"></div>
+        </div>
+    </div>
 
-<script src="{% static 'js/voice.js' %}"></script>
+    <!-- Loading indicator -->
+    <div id="loadingIndicator" class="loading">
+        <div class="spinner"></div>
+        <div>{% trans "Processing..." %}</div>
+    </div>
 
-<script>
-let activeInput=null;
-let isUpperCase=true;
+    <!-- Floating Keyboard Elements -->
+    <div id="overlay" class="overlay"></div>
+    <textarea id="floatingInput" class="floating-input" placeholder="{% trans "Type here..." %}"></textarea>
+    <div id="keyboard" class="keyboard"></div>
 
-const overlay=document.getElementById("overlay");
-const floatingInput=document.getElementById("floatingInput");
-const keyboard=document.getElementById("keyboard");
-const loadingIndicator = document.getElementById("loadingIndicator");
+    <!-- Load voice.js - must be at bottom -->
+    <script src="{% static 'js/voice.js' %}"></script>
 
-function createKeyboard(){
-keyboard.innerHTML="";
-let letters="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-if(!isUpperCase){letters=letters.toLowerCase();}
-let keys=(letters+"0123456789 .-,").split("");
-
-let row=document.createElement("div");
-row.className="keyboard-row";
-
-keys.forEach((k,i)=>{
-if(i%10===0 && i!==0){
-keyboard.appendChild(row);
-row=document.createElement("div");
-row.className="keyboard-row";
-}
-let btn=document.createElement("button");
-btn.innerText=k===" "?"{% trans "Space" %}":k;
-btn.type="button";
-btn.onclick=()=>floatingInput.value+=k;
-row.appendChild(btn);
-});
-keyboard.appendChild(row);
-
-let last=document.createElement("div");
-last.className="keyboard-row";
-last.innerHTML=`
-<button type="button" onclick="toggleCase()">⇧ {% trans "Shift" %}</button>
-<button type="button" onclick="floatingInput.value=floatingInput.value.slice(0,-1)">⌫ {% trans "Back" %}</button>
-<button type="button" onclick="floatingInput.value=''">{% trans "Clear" %}</button>
-<button type="button" class="ok-btn" onclick="finish()">✓ {% trans "OK" %}</button>
-`;
-keyboard.appendChild(last);
-}
-
-function toggleCase(){
-isUpperCase=!isUpperCase;
-createKeyboard();
-}
-
-function openKeyboard(id){
-activeInput=document.getElementById(id);
-floatingInput.value=activeInput.value;
-overlay.style.display="block";
-floatingInput.style.display="block";
-keyboard.style.display="block";
-setTimeout(()=>{
-floatingInput.classList.add("show");
-floatingInput.focus();
-},10);
-}
-
-function finish(){
-if(activeInput){
-activeInput.value=floatingInput.value;
-// Update hidden field based on which input was active
-if(activeInput.id === 'name') {
-    document.getElementById('fullName').value = floatingInput.value;
-} else if(activeInput.id === 'address') {
-    document.getElementById('addressField').value = floatingInput.value;
-} else if(activeInput.id === 'load') {
-    document.getElementById('loadField').value = floatingInput.value;
-} else if(activeInput.id === 'mobile') {
-    document.getElementById('mobileField').value = floatingInput.value;
-}
-}
-closeKeyboard();
-}
-
-function closeKeyboard(){
-floatingInput.classList.remove("show");
-setTimeout(()=>{
-overlay.style.display="none";
-floatingInput.style.display="none";
-keyboard.style.display="none";
-},200);
-}
-
-// Handle Enter key on floating input
-floatingInput.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') {
-        e.preventDefault();
-        finish();
+    <script>
+    /* ================= LANGUAGE UTILITIES ================= */
+    function getCurrentLangCode() {
+        const path = window.location.pathname.split('/');
+        return path[1] || "en";
     }
-});
 
-document.getElementById("name").addEventListener("click",()=>openKeyboard("name"));
-document.getElementById("address").addEventListener("click",()=>openKeyboard("address"));
-document.getElementById("load").addEventListener("click",()=>openKeyboard("load"));
-document.getElementById("mobile").addEventListener("click",()=>openKeyboard("mobile"));
-overlay.addEventListener("click",closeKeyboard);
+    function speak(text) {
+        if (!('speechSynthesis' in window)) return;
+        speechSynthesis.cancel();
+        let utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = window.getCurrentLang ? window.getCurrentLang() : 'en-IN';
+        utterance.rate = 1;
+        speechSynthesis.speak(utterance);
+    }
 
-createKeyboard();
+    /* ================= SESSION TIMER ================= */
+    let sessionTimer;
+    let timeoutWarningTimer;
+    const SESSION_DURATION = 120000; // 2 minutes
+    const WARNING_TIME = 30000; // Warn 30 seconds before
 
-function updatePropertyType() {
-    const propertyType = document.getElementById('propertyType').value;
-    document.getElementById('propertyTypeField').value = propertyType;
-}
+    function startSessionTimer() {
+        sessionTimer = setTimeout(() => {
+            showTimeoutWarning();
+        }, SESSION_DURATION - WARNING_TIME);
+    }
 
-function submitForm(){
-const name = document.getElementById('name').value;
-const address = document.getElementById('address').value;
-const load = document.getElementById('load').value;
-const mobile = document.getElementById('mobile').value;
-
-if(!name){
-    if(typeof speak === 'function') speak("{% trans 'Please enter your full name' %}");
-    return;
-}
-
-if(!address){
-    if(typeof speak === 'function') speak("{% trans 'Please enter your address' %}");
-    return;
-}
-
-if(!load){
-    if(typeof speak === 'function') speak("{% trans 'Please enter load required' %}");
-    return;
-}
-
-// Validate load (should be a positive number)
-if(isNaN(load) || parseFloat(load) <= 0){
-    if(typeof speak === 'function') speak("{% trans 'Please enter a valid load value' %}");
-    return;
-}
-
-if(!mobile){
-    if(typeof speak === 'function') speak("{% trans 'Please enter mobile number' %}");
-    return;
-}
-
-// Validate mobile (10 digits)
-if(!/^\d{10}$/.test(mobile)){
-    if(typeof speak === 'function') speak("{% trans 'Please enter a valid 10-digit mobile number' %}");
-    return;
-}
-
-// Update property type before submission
-updatePropertyType();
-
-// Show loading
-loadingIndicator.classList.add('show');
-if(typeof speak === 'function') speak("{% trans 'Submitting application' %}");
-
-// Submit form
-setTimeout(() => {
-    document.getElementById('connectionForm').submit();
-}, 500);
-}
-
-/* ===================== OVERRIDE VOICE COMMANDS ===================== */
-
-// Extend voice.js handleCommand for new connection-specific commands
-const originalHandleCommand = window.handleCommand;
-window.handleCommand = function(command) {
-    command = command.toLowerCase();
-    console.log("New connection command:", command);
-    
-    // Check for numbers in command (mobile or load)
-    const numberMatch = command.match(/\d+/g);
-    
-    // Mobile number detection
-    if(numberMatch && (command.includes("mobile") || command.includes("phone"))) {
-        const digits = numberMatch.join('').slice(0,10);
-        if(digits.length === 10) {
-            document.getElementById('mobile').value = digits;
-            document.getElementById('mobileField').value = digits;
-            if(typeof speak === 'function') speak("Mobile number entered");
-            return;
+    function showTimeoutWarning() {
+        const warning = document.getElementById('timeoutWarning');
+        if (warning) {
+            warning.style.display = 'block';
+            
+            const langCode = getCurrentLangCode();
+            const warnings = {
+                'en': 'Your session is about to expire. Please continue to stay logged in.',
+                'hi': 'आपका सत्र समाप्त होने वाला है। कृपया जारी रखें।',
+                'or': 'ଆପଣଙ୍କର ସତ୍ର ସମାପ୍ତ ହେବାକୁ ଯାଉଛି। ଦୟାକରି ଜାରି ରଖନ୍ତୁ।',
+                'bn': 'আপনার সেশন শেষ হতে চলেছে। অনুগ্রহ করে চালিয়ে যান।',
+                'ta': 'உங்கள் அமர்வு காலாவதியாகிறது. தயவுசெய்து தொடரவும்.',
+                'te': 'మీ సెషన్ ముగియబోతోంది. దయచేసి కొనసాగించండి.'
+            };
+            speak(warnings[langCode] || warnings['en']);
+            
+            timeoutWarningTimer = setTimeout(() => {
+                window.location.href = "/" + langCode + "/";
+            }, WARNING_TIME);
         }
     }
-    
-    // Load value detection
-    if(numberMatch && (command.includes("load") || command.includes("kilowatt") || command.includes("kw"))) {
-        const value = numberMatch[0];
-        document.getElementById('load').value = value;
-        document.getElementById('loadField').value = value;
-        if(typeof speak === 'function') speak("Load set to " + value + " kilowatt");
-        return;
-    }
-    
-    // Name input
-    if((command.includes("name") || command.includes("my name")) && command.length > 10) {
-        // Extract name part (remove command word)
-        let name = command.replace("my name", "").replace("name", "").trim();
-        if(name) {
-            // Capitalize first letter of each word
-            name = name.split(' ').map(word => 
-                word.charAt(0).toUpperCase() + word.slice(1)
-            ).join(' ');
-            document.getElementById('name').value = name;
-            document.getElementById('fullName').value = name;
-            if(typeof speak === 'function') speak("Name entered: " + name);
-            return;
+
+    function extendSession() {
+        const warning = document.getElementById('timeoutWarning');
+        if (warning) {
+            warning.style.display = 'none';
         }
+        clearTimeout(sessionTimer);
+        clearTimeout(timeoutWarningTimer);
+        startSessionTimer();
+        
+        const langCode = getCurrentLangCode();
+        const messages = {
+            'en': 'Session extended. You may continue.',
+            'hi': 'सत्र बढ़ा दिया गया। आप जारी रख सकते हैं।',
+            'or': 'ସତ୍ର ବୃଦ୍ଧି କରାଯାଇଛି। ଆପଣ ଜାରି ରଖିପାରିବେ।',
+            'bn': 'সেশন বাড়ানো হয়েছে। আপনি চালিয়ে যেতে পারেন।',
+            'ta': 'அமர்வு நீட்டிக்கப்பட்டது. நீங்கள் தொடரலாம்.',
+            'te': 'సెషన్ పొడిగించబడింది. మీరు కొనసాగించవచ్చు.'
+        };
+        speak(messages[langCode] || messages['en']);
     }
-    
-    // Address input
-    if(command.includes("address") && command.length > 15) {
-        let address = command.replace("address", "").trim();
-        if(address) {
-            // Capitalize first letter of each word
-            address = address.split(' ').map(word => 
-                word.charAt(0).toUpperCase() + word.slice(1)
-            ).join(' ');
-            document.getElementById('address').value = address;
-            document.getElementById('addressField').value = address;
-            if(typeof speak === 'function') speak("Address entered");
-            return;
-        }
+
+    function resetSessionTimer() {
+        clearTimeout(sessionTimer);
+        clearTimeout(timeoutWarningTimer);
+        startSessionTimer();
     }
-    
-    // Property type selection
-    if(command.includes("residential")) {
-        document.getElementById('propertyType').value = "Residential";
-        updatePropertyType();
-        if(typeof speak === 'function') speak("Residential selected");
-        return;
-    }
-    else if(command.includes("commercial")) {
-        document.getElementById('propertyType').value = "Commercial";
-        updatePropertyType();
-        if(typeof speak === 'function') speak("Commercial selected");
-        return;
-    }
-    else if(command.includes("industrial")) {
-        document.getElementById('propertyType').value = "Industrial";
-        updatePropertyType();
-        if(typeof speak === 'function') speak("Industrial selected");
-        return;
-    }
-    else if(command.includes("agricultural") || command.includes("agriculture")) {
-        document.getElementById('propertyType').value = "Agricultural";
-        updatePropertyType();
-        if(typeof speak === 'function') speak("Agricultural selected");
-        return;
-    }
-    
-    // Submit command
-    if(command.includes("submit") || command.includes("apply")) {
-        submitForm();
-        return;
-    }
-    else if(command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
+
+    function goBack() {
+        resetSessionTimer();
         window.location.href = "/" + getCurrentLangCode() + "/electricity-services/";
-        return;
     }
-    else if(command.includes("home") || command.includes("होम") || command.includes("ଘର")) {
-        window.location.href = "/" + getCurrentLangCode() + "/";
-        return;
-    }
-    
-    // If not connection-specific, pass to original handler
-    if(originalHandleCommand) {
-        originalHandleCommand(command);
-    }
-};
 
-// Override autoReadPage to read new connection instructions
-const originalAutoRead = window.autoReadPage;
-window.autoReadPage = function() {
-    if(originalAutoRead) originalAutoRead();
-    setTimeout(() => {
-        if(typeof speak === 'function') {
-            speak("{% trans 'Enter your name, address, property type, load, mobile number, then say submit to apply' %}");
+    /* ================= FLOATING KEYBOARD ================= */
+    let activeInput = null;
+    let isUpperCase = true;
+
+    const overlay = document.getElementById("overlay");
+    const floatingInput = document.getElementById("floatingInput");
+    const keyboard = document.getElementById("keyboard");
+    const loadingIndicator = document.getElementById("loadingIndicator");
+
+    function createKeyboard() {
+        keyboard.innerHTML = "";
+        let letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        if (!isUpperCase) { letters = letters.toLowerCase(); }
+        let keys = (letters + "0123456789 .-,").split("");
+
+        let row = document.createElement("div");
+        row.className = "keyboard-row";
+
+        keys.forEach((k, i) => {
+            if (i % 10 === 0 && i !== 0) {
+                keyboard.appendChild(row);
+                row = document.createElement("div");
+                row.className = "keyboard-row";
+            }
+            let btn = document.createElement("button");
+            btn.innerText = k === " " ? "{% trans "Space" %}" : k;
+            btn.type = "button";
+            btn.onclick = () => floatingInput.value += k;
+            row.appendChild(btn);
+        });
+        keyboard.appendChild(row);
+
+        let last = document.createElement("div");
+        last.className = "keyboard-row";
+        last.innerHTML = `
+            <button type="button" onclick="toggleCase()">⇧ {% trans "Shift" %}</button>
+            <button type="button" onclick="floatingInput.value = floatingInput.value.slice(0, -1)">⌫ {% trans "Back" %}</button>
+            <button type="button" onclick="floatingInput.value = ''">{% trans "Clear" %}</button>
+            <button type="button" class="ok-btn" onclick="finish()">✓ {% trans "OK" %}</button>
+        `;
+        keyboard.appendChild(last);
+    }
+
+    function toggleCase() {
+        isUpperCase = !isUpperCase;
+        createKeyboard();
+    }
+
+    function openKeyboard(id) {
+        resetSessionTimer();
+        activeInput = document.getElementById(id);
+        floatingInput.value = activeInput.value;
+        overlay.style.display = "block";
+        floatingInput.style.display = "block";
+        keyboard.style.display = "block";
+        setTimeout(() => {
+            floatingInput.classList.add("show");
+            floatingInput.focus();
+        }, 10);
+    }
+
+    function finish() {
+        if (activeInput) {
+            activeInput.value = floatingInput.value;
+            // Update hidden field based on which input was active
+            if (activeInput.id === 'name') {
+                document.getElementById('fullName').value = floatingInput.value;
+            } else if (activeInput.id === 'address') {
+                document.getElementById('addressField').value = floatingInput.value;
+            } else if (activeInput.id === 'load') {
+                document.getElementById('loadField').value = floatingInput.value;
+            } else if (activeInput.id === 'mobile') {
+                document.getElementById('mobileField').value = floatingInput.value;
+            }
         }
-    }, 2000);
-};
-
-// Auto-hide messages after 5 seconds
-setTimeout(function() {
-    document.querySelectorAll('.message').forEach(function(message) {
-        message.style.display = 'none';
-    });
-}, 5000);
-
-// Prevent form submission on Enter key
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
-        e.preventDefault();
+        closeKeyboard();
     }
-});
-</script>
+
+    function closeKeyboard() {
+        floatingInput.classList.remove("show");
+        setTimeout(() => {
+            overlay.style.display = "none";
+            floatingInput.style.display = "none";
+            keyboard.style.display = "none";
+        }, 200);
+    }
+
+    // Handle Enter key on floating input
+    floatingInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            finish();
+        }
+    });
+
+    document.getElementById("name").addEventListener("click", () => openKeyboard("name"));
+    document.getElementById("address").addEventListener("click", () => openKeyboard("address"));
+    document.getElementById("load").addEventListener("click", () => openKeyboard("load"));
+    document.getElementById("mobile").addEventListener("click", () => openKeyboard("mobile"));
+    overlay.addEventListener("click", closeKeyboard);
+
+    createKeyboard();
+
+    function updatePropertyType() {
+        const propertyType = document.getElementById('propertyType').value;
+        document.getElementById('propertyTypeField').value = propertyType;
+    }
+
+    function submitForm() {
+        resetSessionTimer();
+        
+        const name = document.getElementById('name').value;
+        const address = document.getElementById('address').value;
+        const load = document.getElementById('load').value;
+        const mobile = document.getElementById('mobile').value;
+
+        const langCode = getCurrentLangCode();
+
+        if (!name) {
+            const messages = {
+                'en': 'Please enter your full name',
+                'hi': 'कृपया अपना पूरा नाम दर्ज करें',
+                'or': 'ଦୟାକରି ଆପଣଙ୍କର ପୂରା ନାମ ପ୍ରବେଶ କରନ୍ତୁ',
+                'bn': 'অনুগ্রহ করে আপনার পুরো নাম লিখুন',
+                'ta': 'உங்கள் முழுப் பெயரை உள்ளிடவும்',
+                'te': 'దయచేసి మీ పూర్తి పేరును నమోదు చేయండి'
+            };
+            speak(messages[langCode] || messages['en']);
+            return;
+        }
+
+        if (!address) {
+            const messages = {
+                'en': 'Please enter your address',
+                'hi': 'कृपया अपना पता दर्ज करें',
+                'or': 'ଦୟାକରି ଆପଣଙ୍କର ଠିକଣା ପ୍ରବେଶ କରନ୍ତୁ'
+            };
+            speak(messages[langCode] || messages['en']);
+            return;
+        }
+
+        if (!load) {
+            const messages = {
+                'en': 'Please enter load required',
+                'hi': 'कृपया आवश्यक लोड दर्ज करें',
+                'or': 'ଦୟାକରି ଆବଶ୍ୟକ ଲୋଡ୍ ପ୍ରବେଶ କରନ୍ତୁ'
+            };
+            speak(messages[langCode] || messages['en']);
+            return;
+        }
+
+        // Validate load (should be a positive number)
+        if (isNaN(load) || parseFloat(load) <= 0) {
+            const messages = {
+                'en': 'Please enter a valid load value',
+                'hi': 'कृपया मान्य लोड मान दर्ज करें',
+                'or': 'ଦୟାକରି ଏକ ବୈଧ ଲୋଡ୍ ମୂଲ୍ୟ ପ୍ରବେଶ କରନ୍ତୁ'
+            };
+            speak(messages[langCode] || messages['en']);
+            return;
+        }
+
+        if (!mobile) {
+            const messages = {
+                'en': 'Please enter mobile number',
+                'hi': 'कृपया मोबाइल नंबर दर्ज करें',
+                'or': 'ଦୟାକରି ମୋବାଇଲ୍ ନମ୍ବର ପ୍ରବେଶ କରନ୍ତୁ'
+            };
+            speak(messages[langCode] || messages['en']);
+            return;
+        }
+
+        // Validate mobile (10 digits)
+        if (!/^\d{10}$/.test(mobile)) {
+            const messages = {
+                'en': 'Please enter a valid 10-digit mobile number',
+                'hi': 'कृपया 10 अंकों का मोबाइल नंबर दर्ज करें',
+                'or': 'ଦୟାକରି 10 ଅଙ୍କ ବିଶିଷ୍ଟ ମୋବାଇଲ୍ ନମ୍ବର ପ୍ରବେଶ କରନ୍ତୁ'
+            };
+            speak(messages[langCode] || messages['en']);
+            return;
+        }
+
+        // Update property type before submission
+        updatePropertyType();
+
+        // Show loading
+        loadingIndicator.classList.add('show');
+        
+        const messages = {
+            'en': 'Submitting application',
+            'hi': 'आवेदन भेजा जा रहा है',
+            'or': 'ଆବେଦନ ପଠାଯାଉଛି'
+        };
+        speak(messages[langCode] || messages['en']);
+
+        // Submit form
+        setTimeout(() => {
+            document.getElementById('connectionForm').submit();
+        }, 500);
+    }
+
+    /* ================= VOICE INPUT ================= */
+    let recognition;
+    let isListening = false;
+
+    function toggleVoiceInput() {
+        resetSessionTimer();
+        
+        if (isListening) {
+            stopVoiceInput();
+            return;
+        }
+
+        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SR) {
+            alert("{% trans 'Speech not supported' %}");
+            return;
+        }
+
+        if (recognition) {
+            try {
+                recognition.stop();
+            } catch (e) {}
+        }
+
+        recognition = new SR();
+        recognition.lang = window.getCurrentLang ? window.getCurrentLang() : 'en-IN';
+        recognition.continuous = true;
+        recognition.interimResults = true;
+
+        recognition.onstart = function() {
+            isListening = true;
+            document.getElementById("voiceBtn").classList.add("listening");
+            document.getElementById("voiceStatus").innerText = "{% trans 'Listening...' %}";
+            document.getElementById('voiceStatusIndicator').classList.add('active');
+            
+            const langCode = getCurrentLangCode();
+            const messages = {
+                'en': 'Please say your name, address, property type, load, mobile number, or say submit',
+                'hi': 'कृपया अपना नाम, पता, संपत्ति प्रकार, लोड, मोबाइल नंबर बोलें, या सबमिट कहें',
+                'or': 'ଦୟାକରି ଆପଣଙ୍କ ନାମ, ଠିକଣା, ସମ୍ପତ୍ତି ପ୍ରକାର, ଲୋଡ୍, ମୋବାଇଲ୍ ନମ୍ବର କୁହନ୍ତୁ, କିମ୍ବା ସବମିଟ କୁହନ୍ତୁ'
+            };
+            speak(messages[langCode] || messages['en']);
+        };
+
+        recognition.onresult = function(e) {
+            resetSessionTimer();
+            
+            let finalTranscript = '';
+            let interimTranscript = '';
+            
+            for (let i = 0; i < e.results.length; i++) {
+                const result = e.results[i];
+                if (result.isFinal) {
+                    finalTranscript += result[0].transcript;
+                } else {
+                    interimTranscript += result[0].transcript;
+                }
+            }
+            
+            const transcript = finalTranscript || interimTranscript;
+            const command = transcript.toLowerCase();
+            console.log("New connection command:", command);
+            
+            const langCode = getCurrentLangCode();
+            
+            // Check for numbers in command (mobile or load)
+            const numberMatch = command.match(/\d+/g);
+            
+            // Mobile number detection
+            if (numberMatch && (command.includes("mobile") || command.includes("phone") || 
+                command.includes("मोबाइल") || command.includes("ମୋବାଇଲ୍"))) {
+                const digits = numberMatch.join('').slice(0, 10);
+                if (digits.length === 10) {
+                    document.getElementById('mobile').value = digits;
+                    document.getElementById('mobileField').value = digits;
+                    const messages = {
+                        'en': 'Mobile number entered',
+                        'hi': 'मोबाइल नंबर दर्ज किया गया',
+                        'or': 'ମୋବାଇଲ୍ ନମ୍ବର ପ୍ରବେଶ ହେଲା'
+                    };
+                    speak(messages[langCode] || messages['en']);
+                }
+                return;
+            }
+            
+            // Load value detection
+            if (numberMatch && (command.includes("load") || command.includes("kilowatt") || command.includes("kw") ||
+                command.includes("लोड") || command.includes("କିଲୋୱାଟ"))) {
+                const value = numberMatch[0];
+                document.getElementById('load').value = value;
+                document.getElementById('loadField').value = value;
+                const messages = {
+                    'en': 'Load set to ' + value + ' kilowatt',
+                    'hi': 'लोड ' + value + ' किलोवाट सेट किया गया',
+                    'or': 'ଲୋଡ୍ ' + value + ' କିଲୋୱାଟ ସେଟ୍ ହେଲା'
+                };
+                speak(messages[langCode] || messages['en']);
+                return;
+            }
+            
+            // Name input
+            if ((command.includes("name") || command.includes("my name") || command.includes("नाम") || command.includes("ନାମ")) && command.length > 10) {
+                // Extract name part
+                let name = command.replace("my name", "").replace("name", "").replace("नाम", "").replace("ନାମ", "").trim();
+                if (name) {
+                    // Capitalize first letter of each word
+                    name = name.split(' ').map(word => 
+                        word.charAt(0).toUpperCase() + word.slice(1)
+                    ).join(' ');
+                    document.getElementById('name').value = name;
+                    document.getElementById('fullName').value = name;
+                    const messages = {
+                        'en': 'Name entered: ' + name,
+                        'hi': 'नाम दर्ज किया गया: ' + name,
+                        'or': 'ନାମ ପ୍ରବେଶ ହେଲା: ' + name
+                    };
+                    speak(messages[langCode] || messages['en']);
+                }
+                return;
+            }
+            
+            // Address input
+            if ((command.includes("address") || command.includes("पता") || command.includes("ଠିକଣା")) && command.length > 15) {
+                let address = command.replace("address", "").replace("पता", "").replace("ଠିକଣା", "").trim();
+                if (address) {
+                    // Capitalize first letter of each word
+                    address = address.split(' ').map(word => 
+                        word.charAt(0).toUpperCase() + word.slice(1)
+                    ).join(' ');
+                    document.getElementById('address').value = address;
+                    document.getElementById('addressField').value = address;
+                    const messages = {
+                        'en': 'Address entered',
+                        'hi': 'पता दर्ज किया गया',
+                        'or': 'ଠିକଣା ପ୍ରବେଶ ହେଲା'
+                    };
+                    speak(messages[langCode] || messages['en']);
+                }
+                return;
+            }
+            
+            // Property type selection
+            if (command.includes("residential") || command.includes("आवासीय") || command.includes("ଆବାସିକ")) {
+                document.getElementById('propertyType').value = "Residential";
+                updatePropertyType();
+                const messages = {
+                    'en': 'Residential selected',
+                    'hi': 'आवासीय चयनित',
+                    'or': 'ଆବାସିକ ଚୟନ ହେଲା'
+                };
+                speak(messages[langCode] || messages['en']);
+                return;
+            }
+            else if (command.includes("commercial") || command.includes("वाणिज्यिक") || command.includes("ବାଣିଜ୍ୟିକ")) {
+                document.getElementById('propertyType').value = "Commercial";
+                updatePropertyType();
+                const messages = {
+                    'en': 'Commercial selected',
+                    'hi': 'वाणिज्यिक चयनित',
+                    'or': 'ବାଣିଜ୍ୟିକ ଚୟନ ହେଲା'
+                };
+                speak(messages[langCode] || messages['en']);
+                return;
+            }
+            else if (command.includes("industrial") || command.includes("औद्योगिक") || command.includes("ଔଦ୍ୟୋଗିକ")) {
+                document.getElementById('propertyType').value = "Industrial";
+                updatePropertyType();
+                const messages = {
+                    'en': 'Industrial selected',
+                    'hi': 'औद्योगिक चयनित',
+                    'or': 'ଔଦ୍ୟୋଗିକ ଚୟନ ହେଲା'
+                };
+                speak(messages[langCode] || messages['en']);
+                return;
+            }
+            else if (command.includes("agricultural") || command.includes("agriculture") || command.includes("कृषि") || command.includes("କୃଷି")) {
+                document.getElementById('propertyType').value = "Agricultural";
+                updatePropertyType();
+                const messages = {
+                    'en': 'Agricultural selected',
+                    'hi': 'कृषि चयनित',
+                    'or': 'କୃଷି ଚୟନ ହେଲା'
+                };
+                speak(messages[langCode] || messages['en']);
+                return;
+            }
+            
+            // Submit command
+            if (command.includes("submit") || command.includes("apply") || command.includes("जमा") || command.includes("ଦାଖଲ") || command.includes("आवेदन")) {
+                submitForm();
+                return;
+            }
+            else if (command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ") || command.includes("পিছনে")) {
+                goBack();
+                return;
+            }
+            else if (command.includes("home") || command.includes("होम") || command.includes("ଘର") || command.includes("হোম")) {
+                window.location.href = "/" + langCode + "/";
+                return;
+            }
+            else if (command.includes("stop listening") || command.includes("stop voice")) {
+                stopVoiceInput();
+                return;
+            }
+        };
+
+        recognition.onerror = function(event) {
+            console.error("Recognition error:", event.error);
+            if (event.error === 'no-speech') return;
+            stopVoiceInput();
+        };
+
+        recognition.onend = function() {
+            if (isListening) {
+                try {
+                    recognition.start();
+                } catch (e) {
+                    console.error("Failed to restart recognition:", e);
+                    stopVoiceInput();
+                }
+            } else {
+                document.getElementById("voiceBtn").classList.remove("listening");
+                document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
+                document.getElementById('voiceStatusIndicator').classList.remove('active');
+            }
+        };
+
+        try {
+            recognition.start();
+        } catch (e) {
+            console.error("Failed to start recognition:", e);
+            stopVoiceInput();
+        }
+    }
+
+    function stopVoiceInput() {
+        isListening = false;
+        if (recognition) {
+            try {
+                recognition.stop();
+            } catch (e) {}
+        }
+        document.getElementById("voiceBtn").classList.remove("listening");
+        document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
+        document.getElementById('voiceStatusIndicator').classList.remove('active');
+    }
+
+    // Auto-read page instructions
+    function autoReadPage() {
+        setTimeout(() => {
+            const langCode = getCurrentLangCode();
+            const messages = {
+                'en': 'New electricity connection application. Enter your name, address, property type, load in kilowatts, and mobile number. Then say submit to apply.',
+                'hi': 'नया बिजली कनेक्शन आवेदन। अपना नाम, पता, संपत्ति प्रकार, किलोवाट में लोड, और मोबाइल नंबर दर्ज करें। फिर आवेदन करने के लिए सबमिट कहें।',
+                'or': 'ନୂତନ ବିଦ୍ୟୁତ୍ ସଂଯୋଗ ଆବେଦନ। ଆପଣଙ୍କ ନାମ, ଠିକଣା, ସମ୍ପତ୍ତି ପ୍ରକାର, କିଲୋୱାଟରେ ଲୋଡ୍, ଏବଂ ମୋବାଇଲ୍ ନମ୍ବର ପ୍ରବେଶ କରନ୍ତୁ। ତାପରେ ଆବେଦନ ପାଇଁ ସବମିଟ କୁହନ୍ତୁ।'
+            };
+            speak(messages[langCode] || messages['en']);
+        }, 2000);
+    }
+
+    // Auto-hide messages after 5 seconds
+    setTimeout(function() {
+        document.querySelectorAll('.message').forEach(function(message) {
+            message.style.display = 'none';
+        });
+    }, 5000);
+
+    // Prevent form submission on Enter key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
+            e.preventDefault();
+        }
+    });
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+        startSessionTimer();
+        
+        document.addEventListener('click', resetSessionTimer);
+        document.addEventListener('keypress', resetSessionTimer);
+        document.addEventListener('touchstart', resetSessionTimer);
+        
+        // Check if voice should auto-start
+        const autoStartVoice = sessionStorage.getItem('autoStartVoice');
+        if (autoStartVoice === 'true') {
+            sessionStorage.removeItem('autoStartVoice');
+            setTimeout(() => {
+                toggleVoiceInput();
+            }, 1000);
+        }
+        
+        // Auto-read page
+        setTimeout(autoReadPage, 2000);
+    });
+
+    window.addEventListener('beforeunload', function() {
+        if (sessionTimer) {
+            clearTimeout(sessionTimer);
+        }
+        stopVoiceInput();
+    });
+
+    // Override voice.js autoReadPage if needed
+    window.autoReadPage = autoReadPage;
+    </script>
 
 </body>
 </html>
