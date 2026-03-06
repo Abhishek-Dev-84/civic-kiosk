@@ -94,9 +94,12 @@ WSGI_APPLICATION = "Kiosk.wsgi.application"
 # -------------------------------------------------
 # DATABASE
 # -------------------------------------------------
+NEON_DATABASE_URL = "postgresql://neondb_owner:npg_w9m4nRrUMxVZ@ep-tiny-term-a1aqdt87-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+
+# Configure database
 DATABASES = {
-    "default": dj_database_url.config(
-        default=os.environ.get("DATABASE_URL"),
+    'default': dj_database_url.config(
+        default=NEON_DATABASE_URL,
         conn_max_age=600,
         ssl_require=True
     )
