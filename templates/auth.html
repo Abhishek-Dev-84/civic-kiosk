@@ -666,6 +666,8 @@ function proceedToOTP() {
 
 let recognition;
 let isListening = false;
+let lastProcessedLength = 0;
+let voiceTimeout = null;
 
 // Auto-start voice from session storage (set by index.html)
 document.addEventListener('DOMContentLoaded', function() {
@@ -702,12 +704,13 @@ function toggleVoiceInput() {
 
     recognition = new SpeechRecognition();
     recognition.lang = getCurrentLang();
-    recognition.continuous = true; // Enable continuous listening
-    recognition.interimResults = true; // Get interim results for real-time writing
+    recognition.continuous = true;
+    recognition.interimResults = true;
     recognition.maxAlternatives = 1;
 
     recognition.onstart = function() {
         isListening = true;
+        lastProcessedLength = 0;
         document.getElementById("voiceBtn").classList.add("listening");
         document.getElementById("voiceStatus").innerText = "{% trans 'Listening...' %}";
         
@@ -724,11 +727,28 @@ function toggleVoiceInput() {
     recognition.onresult = function(event) {
         resetSessionTimer();
         
-        // Get the latest result
-        const lastResult = event.results[event.results.length - 1];
-        const transcript = lastResult[0].transcript;
+        // Clear any pending timeout
+        if (voiceTimeout) {
+            clearTimeout(voiceTimeout);
+        }
         
-        // Extract digits in real-time
+        // Get the final result if available, otherwise the latest interim
+        let finalTranscript = '';
+        let interimTranscript = '';
+        
+        for (let i = 0; i < event.results.length; i++) {
+            const result = event.results[i];
+            if (result.isFinal) {
+                finalTranscript += result[0].transcript;
+            } else {
+                interimTranscript += result[0].transcript;
+            }
+        }
+        
+        // Use final if available, otherwise interim
+        const transcript = finalTranscript || interimTranscript;
+        
+        // Extract digits - handle both English and Hindi numbers
         let digits = '';
         for (let i = 0; i < transcript.length; i++) {
             const char = transcript[i];
@@ -744,7 +764,7 @@ function toggleVoiceInput() {
             }
         }
         
-        // Also try to extract numbers using regex
+        // Also try to extract numbers using regex for grouped digits
         if (digits.length === 0) {
             const matches = transcript.match(/\d+/g);
             if (matches) {
@@ -752,11 +772,17 @@ function toggleVoiceInput() {
             }
         }
         
-        console.log("Transcript:", transcript, "Digits:", digits);
+        console.log("Transcript:", transcript, "Digits:", digits, "Length:", digits.length);
         
-        // Update Aadhaar boxes in real-time
+        // Only update if we have new digits and they're different from what we already have
         if (digits.length > 0) {
-            // Clear current but preserve position logic
+            // Check if this is a completely new utterance (reset if it's shorter than current)
+            if (digits.length < aadhaarPos && digits.length > 0) {
+                // New shorter utterance - likely a correction, clear and start fresh
+                clearAll();
+            }
+            
+            // Update Aadhaar boxes
             for(let i = 0; i < Math.min(digits.length, 12); i++) {
                 if (i < aadhaarBoxes.length) {
                     aadhaarBoxes[i].textContent = digits[i];
@@ -764,22 +790,29 @@ function toggleVoiceInput() {
                 }
             }
             
+            // Clear any boxes beyond the current digits
+            for(let i = digits.length; i < aadhaarBoxes.length; i++) {
+                aadhaarBoxes[i].textContent = '';
+                aadhaarBoxes[i].classList.remove('filled');
+            }
+            
             // Update position
             aadhaarPos = Math.min(digits.length, 12);
             highlightCurrentBox();
             
-            // If we have 12 digits, auto-submit
+            // If we have 12 digits, auto-submit after a short delay
             if (digits.length >= 12) {
-                setTimeout(proceedToOTP, 500);
+                voiceTimeout = setTimeout(proceedToOTP, 800);
             }
         }
+        
+        lastProcessedLength = digits.length;
     };
 
     recognition.onerror = function(event) {
         console.error("Recognition error:", event.error);
-        // Don't stop on minor errors, let it continue
         if (event.error === 'no-speech') {
-            // Ignore no-speech errors, just continue listening
+            // Ignore no-speech errors
             return;
         }
         stopVoiceInput();
@@ -817,6 +850,9 @@ function stopVoiceInput() {
     }
     document.getElementById("voiceBtn").classList.remove("listening");
     document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
+    if (voiceTimeout) {
+        clearTimeout(voiceTimeout);
+    }
 }
 
 /* ================= OVERRIDE VOICE COMMANDS ================= */
@@ -826,6 +862,17 @@ const originalHandleCommand = window.handleCommand;
 window.handleCommand = function(command) {
     command = command.toLowerCase();
     console.log("Auth command:", command);
+    
+    // Voice control commands
+    if(command.includes("stop listening") || command.includes("stop voice")) {
+        stopVoiceInput();
+        return;
+    }
+    
+    if(command.includes("start listening") || command.includes("start voice")) {
+        toggleVoiceInput();
+        return;
+    }
     
     // Check for numbers in command (Aadhaar digits)
     const numberMatch = command.match(/\d+/g);
@@ -840,17 +887,6 @@ window.handleCommand = function(command) {
             }
             return;
         }
-    }
-    
-    // Voice control commands
-    if(command.includes("stop listening") || command.includes("stop voice")) {
-        stopVoiceInput();
-        return;
-    }
-    
-    if(command.includes("start listening") || command.includes("start voice")) {
-        toggleVoiceInput();
-        return;
     }
     
     // Clear command
