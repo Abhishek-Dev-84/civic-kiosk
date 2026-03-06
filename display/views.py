@@ -143,12 +143,36 @@ def electricity_bill_payment(request):
         consumer_number = request.POST.get('consumer_number')
         bill_amount = request.POST.get('bill_amount')
         
+        # NEW FIELDS for payment method
+        payment_method = request.POST.get('payment_method')  # 'upi' or 'atm'
+        upi_id = request.POST.get('upi_id')
+        card_number = request.POST.get('card_number')
+        cvv = request.POST.get('cvv')
+        pin = request.POST.get('pin')
+        
         if action == 'pay':
             if not consumer_number or not bill_amount:
                 messages.error(request, 'Invalid bill details')
                 return render(request, 'electricity-bill-payment.html', context)
             
-            messages.success(request, f'Payment of ₹{bill_amount} for consumer {consumer_number} successful!')
+            # Validate based on payment method
+            if payment_method == 'upi':
+                if not upi_id:
+                    messages.error(request, 'Please provide UPI ID for payment')
+                    return render(request, 'electricity-bill-payment.html', context)
+                payment_details = f"UPI ID: {upi_id}"
+            elif payment_method == 'atm':
+                if not card_number or not cvv or not pin:
+                    messages.error(request, 'Please provide complete card details')
+                    return render(request, 'electricity-bill-payment.html', context)
+                # Mask card number for display
+                masked_card = 'XXXX XXXX XXXX ' + card_number[-4:] if len(card_number) >= 4 else 'XXXX'
+                payment_details = f"Card: {masked_card}"
+            else:
+                messages.error(request, 'Please select a payment method')
+                return render(request, 'electricity-bill-payment.html', context)
+            
+            messages.success(request, f'Payment of ₹{bill_amount} for consumer {consumer_number} successful! ({payment_details})')
             return redirect('electricity-services')
         
         elif action == 'fetch':
@@ -176,6 +200,12 @@ def electricity_duplicate_bill(request):
             
             return redirect('electricity-duplicate-bill')
         
+        elif action == 'pay':
+            # Redirect to payment page with bill details
+            bill_month = request.POST.get('bill_month')
+            bill_amount = request.POST.get('bill_amount')
+            return redirect(f'/electricity-bill-payment/?amount={bill_amount}&month={bill_month}')
+        
         else:  # Search action
             consumer_number = request.POST.get('consumer_number')
             
@@ -196,7 +226,9 @@ def electricity_duplicate_bill(request):
                     'year': bill_date.year,
                     'bill_date': bill_date.strftime('%d %b %Y'),
                     'due_date': due_date.strftime('%d %b %Y'),
-                    'amount': f"{1200 + (i * 70):,}"
+                    'amount': f"{1200 + (i * 70):,}",
+                    'bill_number': f"EB/{bill_date.year}/{random.randint(1000, 9999)}",
+                    'units': 200 + (i * 25)
                 })
             
             context['bills'] = bills
@@ -209,6 +241,16 @@ def electricity_solar(request):
     if not request.session.get('aadhaar_verified'):
         messages.error(request, 'Please verify OTP first')
         return redirect('auth')
+    
+    if request.method == 'POST':
+        consumer_number = request.POST.get('consumer_number')
+        solar_capacity = request.POST.get('solar_capacity')
+        roof_area = request.POST.get('roof_area')
+        
+        ref_number = f"SOLAR{random.randint(100000, 999999)}"
+        messages.success(request, f'Solar net metering application submitted! Reference: {ref_number}')
+        return redirect('electricity-services')
+    
     return render(request, 'electricity-solar.html')
 
 def electricity_new_connection(request):
@@ -270,6 +312,17 @@ def electricity_name_transfer(request):
         new_owner_aadhaar = request.POST.get('new_owner_aadhaar')
         relationship = request.POST.get('relationship')
         
+        # NEW FIELDS
+        new_owner_phone = request.POST.get('new_owner_phone')
+        new_owner_email = request.POST.get('new_owner_email')
+        transfer_fee = request.POST.get('transfer_fee', 500)
+        
+        # File uploads
+        sale_deed = request.FILES.get('sale_deed')
+        noc = request.FILES.get('noc')
+        id_proof = request.FILES.get('id_proof')
+        address_proof = request.FILES.get('address_proof')
+        
         if not new_owner_name:
             messages.error(request, 'Please enter new owner name')
             return render(request, 'electricity-name-transfer.html', context)
@@ -283,6 +336,29 @@ def electricity_name_transfer(request):
             messages.error(request, 'Please enter a valid 12-digit Aadhaar number')
             return render(request, 'electricity-name-transfer.html', context)
         
+        # Validate phone if provided
+        if new_owner_phone and (not new_owner_phone.isdigit() or len(new_owner_phone) != 10):
+            messages.error(request, 'Please enter a valid 10-digit mobile number')
+            return render(request, 'electricity-name-transfer.html', context)
+        
+        # Validate email if provided
+        if new_owner_email and '@' not in new_owner_email:
+            messages.error(request, 'Please enter a valid email address')
+            return render(request, 'electricity-name-transfer.html', context)
+        
+        # Validate required documents
+        required_docs = [sale_deed, noc, id_proof, address_proof]
+        doc_names = ['Sale Deed', 'NOC', 'ID Proof', 'Address Proof']
+        missing_docs = []
+        
+        for i, doc in enumerate(required_docs):
+            if not doc:
+                missing_docs.append(doc_names[i])
+        
+        if missing_docs:
+            messages.error(request, f'Please upload all required documents. Missing: {", ".join(missing_docs)}')
+            return render(request, 'electricity-name-transfer.html', context)
+        
         ref_number = f"TRAN{random.randint(100000, 999999)}"
         messages.success(request, f'Name transfer request submitted successfully! Reference: {ref_number}')
         return redirect('electricity-services')
@@ -290,6 +366,9 @@ def electricity_name_transfer(request):
     context['current_owner'] = 'Rajesh Kumar'
     context['consumer_number'] = '123456789012'
     context['address'] = '123, Gandhi Nagar'
+    context['transfer_fee'] = 500
+    context['document_fee'] = 200
+    context['total_fee'] = 826  # 500 + 200 + 18% GST
     
     return render(request, 'electricity-name-transfer.html', context)
 
@@ -305,6 +384,10 @@ def electricity_meter_replacement(request):
         reason = request.POST.get('reason')
         preferred_date = request.POST.get('preferred_date')
         
+        # NEW FIELDS
+        preferred_time = request.POST.get('preferred_time', '09:00-12:00')
+        additional_services = request.POST.get('additional_services', '')
+        
         if not all([meter_type, reason, preferred_date]):
             messages.error(request, 'Please fill in all required fields')
             return render(request, 'electricity-meter-replacement.html')
@@ -318,6 +401,26 @@ def electricity_meter_replacement(request):
         except ValueError:
             messages.error(request, 'Invalid date format')
             return render(request, 'electricity-meter-replacement.html')
+        
+        # Calculate total with additional services
+        try:
+            meter_price_float = float(meter_price) if meter_price else 1200
+        except ValueError:
+            meter_price_float = 1200
+            
+        installation_fee = 500
+        additional_cost = 0
+        additional_services_list = additional_services.split(',') if additional_services else []
+        
+        if 'calibration' in additional_services_list:
+            additional_cost += 300
+        if 'wiring' in additional_services_list:
+            additional_cost += 500
+        if 'seal' in additional_services_list:
+            additional_cost += 100
+        
+        subtotal = meter_price_float + installation_fee + additional_cost
+        total_with_gst = subtotal * 1.18
         
         ref_number = f"METER{random.randint(100000, 999999)}"
         messages.success(request, f'Meter replacement request submitted successfully! Reference: {ref_number}')
@@ -335,6 +438,9 @@ def electricity_load_enhancement(request):
         current_load = request.POST.get('current_load', '3')
         requested_load = request.POST.get('requested_load')
         reason = request.POST.get('reason')
+        
+        # NEW FIELD
+        reason_details = request.POST.get('reason_details', '')
         
         if not requested_load:
             messages.error(request, 'Please enter requested load')
@@ -356,6 +462,11 @@ def electricity_load_enhancement(request):
             messages.error(request, 'Please enter a valid load value')
             return render(request, 'electricity-load-enhancement.html')
         
+        # Validate reason details for 'Other' or 'EV Charger'
+        if reason in ['Other', 'EV Charger'] and not reason_details:
+            messages.error(request, f'Please provide details for {reason} reason')
+            return render(request, 'electricity-load-enhancement.html')
+        
         ref_number = f"LOAD{random.randint(100000, 999999)}"
         messages.success(request, f'Load enhancement request submitted successfully! Reference: {ref_number}')
         return redirect('electricity-services')
@@ -373,6 +484,10 @@ def electricity_complaint(request):
         complaint_type = request.POST.get('complaint_type')
         complaint_description = request.POST.get('complaint_description')
         
+        # NEW FIELDS
+        complaint_priority = request.POST.get('complaint_priority', 'Normal')
+        contact_phone = request.POST.get('contact_phone')
+        
         if not all([complaint_type, complaint_description]):
             messages.error(request, 'Please fill in all required fields')
             return render(request, 'electricity-complaint.html')
@@ -382,8 +497,21 @@ def electricity_complaint(request):
             messages.error(request, 'Please enter a valid consumer number')
             return render(request, 'electricity-complaint.html')
         
+        # Validate phone if provided
+        if contact_phone and (not contact_phone.isdigit() or len(contact_phone) != 10):
+            messages.error(request, 'Please enter a valid 10-digit mobile number')
+            return render(request, 'electricity-complaint.html')
+        
+        # Priority-based response message
+        response_times = {
+            'Normal': '24 hours',
+            'Urgent': '4 hours',
+            'Emergency': '30 minutes'
+        }
+        response_time = response_times.get(complaint_priority, '24 hours')
+        
         ref_number = f"ELC{random.randint(100000, 999999)}"
-        messages.success(request, f'Complaint registered successfully! Reference: {ref_number}')
+        messages.success(request, f'Complaint registered successfully! Reference: {ref_number}. Expected response time: {response_time}')
         return redirect('electricity-services')
     
     return render(request, 'electricity-complaint.html')
@@ -395,6 +523,29 @@ def water_bill(request):
     if not request.session.get('aadhaar_verified'):
         messages.error(request, 'Please verify OTP first')
         return redirect('auth')
+    
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        
+        if action == 'pay':
+            consumer_no = request.POST.get('consumer_no')
+            bill_amount = request.POST.get('bill_amount')
+            messages.success(request, f'Water bill payment of ₹{bill_amount} successful!')
+            return redirect('municipal-services')
+        
+        elif action == 'fetch':
+            context = {
+                'show_bill': True,
+                'consumer_no': request.POST.get('consumer_no'),
+                'consumer_name': 'Rajesh Kumar',
+                'bill_number': f'WATER/{datetime.datetime.now().year}/{random.randint(1000, 9999)}',
+                'bill_date': datetime.datetime.now().strftime('%d %b %Y'),
+                'due_date': (datetime.datetime.now() + datetime.timedelta(days=15)).strftime('%d %b %Y'),
+                'units_consumed': random.randint(20, 30),
+                'bill_amount': random.randint(400, 600)
+            }
+            return render(request, 'water-bill.html', context)
+    
     return render(request, 'water-bill.html')
 
 
@@ -411,6 +562,22 @@ def trade_license(request):
     if not request.session.get('aadhaar_verified'):
         messages.error(request, 'Please verify OTP first')
         return redirect('auth')
+    
+    if request.method == 'POST':
+        business_name = request.POST.get('business_name')
+        business_type = request.POST.get('business_type')
+        owner_name = request.POST.get('owner_name')
+        address = request.POST.get('address')
+        gst_number = request.POST.get('gst_number')
+        
+        if not all([business_name, business_type, owner_name, address]):
+            messages.error(request, 'Please fill in all required fields')
+            return render(request, 'trade-license.html')
+        
+        ref_number = f"TL{random.randint(100000, 999999)}"
+        messages.success(request, f'Trade license application submitted! Reference: {ref_number}')
+        return redirect('municipal-services')
+    
     return render(request, 'trade-license.html')
 
 
@@ -418,6 +585,29 @@ def property_tax(request):
     if not request.session.get('aadhaar_verified'):
         messages.error(request, 'Please verify OTP first')
         return redirect('auth')
+    
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        
+        if action == 'pay':
+            property_id = request.POST.get('property_id')
+            tax_amount = request.POST.get('tax_amount')
+            messages.success(request, f'Property tax of ₹{tax_amount} paid successfully!')
+            return redirect('municipal-services')
+        
+        elif action == 'fetch':
+            context = {
+                'show_tax': True,
+                'property_id': request.POST.get('property_id'),
+                'owner_name': 'Rajesh Kumar',
+                'property_type': 'Residential',
+                'area': '1,200',
+                'assessment_year': '2025-26',
+                'due_date': '31 Mar 2026',
+                'amount': '3,450.00'
+            }
+            return render(request, 'property-tax.html', context)
+    
     return render(request, 'property-tax.html')
 
 
@@ -425,6 +615,30 @@ def professional_tax(request):
     if not request.session.get('aadhaar_verified'):
         messages.error(request, 'Please verify OTP first')
         return redirect('auth')
+    
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        
+        if action == 'pay':
+            ptin = request.POST.get('ptin')
+            tax_amount = request.POST.get('tax_amount')
+            messages.success(request, f'Professional tax of ₹{tax_amount} paid successfully!')
+            return redirect('municipal-services')
+        
+        elif action == 'fetch':
+            context = {
+                'show_tax': True,
+                'ptin': request.POST.get('ptin'),
+                'name': 'Rajesh Kumar',
+                'profession': 'Self Employed',
+                'assessment_year': '2025-26',
+                'due_date': '31 Mar 2026',
+                'half_yearly_tax': '1,250',
+                'penalty': '0',
+                'amount': '1,250.00'
+            }
+            return render(request, 'professional-tax.html', context)
+    
     return render(request, 'professional-tax.html')
 
 
@@ -486,6 +700,24 @@ def gas_subsidy(request):
     if not request.session.get('aadhaar_verified'):
         messages.error(request, 'Please verify OTP first')
         return redirect('auth')
+    
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        
+        if action == 'fetch':
+            consumer_no = request.POST.get('consumer_no')
+            context = {
+                'show_subsidy': True,
+                'consumer_no': consumer_no,
+                'status': 'Active',
+                'amount_per_cylinder': '200',
+                'total_cylinders': '12',
+                'remaining_cylinders': '3',
+                'next_eligibility': '01 Apr 2026',
+                'bank_account': 'XXXXXX1234'
+            }
+            return render(request, 'gas-subsidy.html', context)
+    
     return render(request, 'gas-subsidy.html')
 
 
@@ -493,6 +725,25 @@ def gas_new_connection(request):
     if not request.session.get('aadhaar_verified'):
         messages.error(request, 'Please verify OTP first')
         return redirect('auth')
+    
+    if request.method == 'POST':
+        full_name = request.POST.get('full_name')
+        address = request.POST.get('address')
+        mobile = request.POST.get('mobile')
+        document_type = request.POST.get('document_type')
+        
+        if not all([full_name, address, mobile, document_type]):
+            messages.error(request, 'Please fill in all required fields')
+            return render(request, 'gas-new-connection.html')
+        
+        if not mobile.isdigit() or len(mobile) != 10:
+            messages.error(request, 'Please enter a valid 10-digit mobile number')
+            return render(request, 'gas-new-connection.html')
+        
+        ref_number = f"GAS{random.randint(100000, 999999)}"
+        messages.success(request, f'New gas connection application submitted! Reference: {ref_number}')
+        return redirect('gas-services')
+    
     return render(request, 'gas-new-connection.html')
 
 
@@ -500,6 +751,19 @@ def gas_cylinder_booking(request):
     if not request.session.get('aadhaar_verified'):
         messages.error(request, 'Please verify OTP first')
         return redirect('auth')
+    
+    if request.method == 'POST':
+        cylinder_type = request.POST.get('cylinder_type')
+        cylinder_price = request.POST.get('cylinder_price_hidden')
+        
+        if not cylinder_type:
+            messages.error(request, 'Please select a cylinder type')
+            return render(request, 'gas-cylinder-booking.html')
+        
+        ref_number = f"BOOK{random.randint(100000, 999999)}"
+        messages.success(request, f'Cylinder booked successfully! Reference: {ref_number}')
+        return redirect('gas-services')
+    
     return render(request, 'gas-cylinder-booking.html')
 
 
@@ -507,6 +771,28 @@ def gas_consumer_lookup(request):
     if not request.session.get('aadhaar_verified'):
         messages.error(request, 'Please verify OTP first')
         return redirect('auth')
+    
+    if request.method == 'POST':
+        aadhaar_number = request.POST.get('aadhaar_number')
+        
+        if not aadhaar_number or len(aadhaar_number) != 12:
+            messages.error(request, 'Please enter a valid 12-digit Aadhaar number')
+            return render(request, 'gas-consumer-lookup.html')
+        
+        # Simulate consumer lookup
+        context = {
+            'show_result': True,
+            'consumer': {
+                'consumer_no': '1234 5678 9012',
+                'name': 'Rajesh Kumar',
+                'address': '123, Gandhi Nagar',
+                'distributor': 'HP Gas - Indane',
+                'status': 'Active',
+                'last_booking': '15 Feb 2026'
+            }
+        }
+        return render(request, 'gas-consumer-lookup.html', context)
+    
     return render(request, 'gas-consumer-lookup.html')
 
 
@@ -600,6 +886,11 @@ def gas_bill_payment(request):
     if not request.session.get('aadhaar_verified'):
         messages.error(request, 'Please verify OTP first')
         return redirect('auth')
+    
+    if request.method == 'POST':
+        messages.success(request, 'Gas bill payment successful!')
+        return redirect('gas-services')
+    
     return render(request, 'gas-bill-payment.html')
 
 
@@ -625,14 +916,72 @@ def payment_history(request):
     if not request.session.get('aadhaar_verified'):
         messages.error(request, 'Please verify OTP first')
         return redirect('auth')
-    return render(request, 'payment-history.html')
+    
+    filter_param = request.GET.get('filter', 'all')
+    
+    # Sample payment data
+    payments = [
+        {
+            'reference_no': 'PAY123456',
+            'service': 'electricity',
+            'service_name': 'Electricity Bill',
+            'date': datetime.datetime.now() - datetime.timedelta(days=2),
+            'amount': 1250.00,
+            'status': 'success'
+        },
+        {
+            'reference_no': 'PAY123457',
+            'service': 'water',
+            'service_name': 'Water Bill',
+            'date': datetime.datetime.now() - datetime.timedelta(days=5),
+            'amount': 450.00,
+            'status': 'success'
+        },
+        {
+            'reference_no': 'PAY123458',
+            'service': 'gas',
+            'service_name': 'Gas Bill',
+            'date': datetime.datetime.now() - datetime.timedelta(days=7),
+            'amount': 856.00,
+            'status': 'success'
+        }
+    ]
+    
+    # Filter payments
+    if filter_param != 'all':
+        payments = [p for p in payments if p['service'] == filter_param]
+    
+    context = {
+        'payments': payments,
+        'filter': filter_param
+    }
+    
+    return render(request, 'payment-history.html', context)
 
 
 def receipt_print(request):
     if not request.session.get('aadhaar_verified'):
         messages.error(request, 'Please verify OTP first')
         return redirect('auth')
-    return render(request, 'receipt-print.html')
+    
+    if request.method == 'POST':
+        receipt_ref = request.POST.get('receipt_ref')
+        
+        # Sample receipt data
+        receipt = {
+            'receipt_no': receipt_ref or 'RCPT123456',
+            'datetime': datetime.datetime.now().strftime('%d %b %Y, %I:%M %p'),
+            'service': '⚡ Electricity Bill',
+            'consumer_no': '1234 5678 9012',
+            'bill_period': 'Jan 2026',
+            'payment_mode': 'UPI',
+            'transaction_id': f'TXN{datetime.datetime.now().strftime("%y%m%d%H%M")}',
+            'amount': '1,250.00'
+        }
+        
+        return render(request, 'receipt-print.html', {'receipt': receipt})
+    
+    return redirect('payment-history')
 
 
 # ================= OTHER SERVICES / PAGES =================
@@ -671,17 +1020,13 @@ def death_certificate(request):
         date_of_death = request.POST.get('date_of_death')
         place_of_death = request.POST.get('place_of_death')
         gender = request.POST.get('gender')
-        relative_name = request.POST.get('relative_name')
-        informant_name = request.POST.get('informant_name')
-        informant_aadhaar = request.POST.get('informant_aadhaar')
+        father_name = request.POST.get('father_name')
+        mother_name = request.POST.get('mother_name')
+        permanent_address = request.POST.get('permanent_address')
         cause_of_death = request.POST.get('cause_of_death')
         
-        if not all([deceased_name, date_of_death, place_of_death, gender, informant_name, informant_aadhaar]):
+        if not all([deceased_name, date_of_death, place_of_death, gender, father_name, mother_name, permanent_address, cause_of_death]):
             messages.error(request, 'Please fill in all required fields')
-            return render(request, 'death-certificate.html')
-        
-        if informant_aadhaar and (not informant_aadhaar.isdigit() or len(informant_aadhaar) != 12):
-            messages.error(request, 'Please enter a valid 12-digit Aadhaar number')
             return render(request, 'death-certificate.html')
         
         from datetime import date
@@ -701,6 +1046,28 @@ def marriage_registration(request):
     if not request.session.get('aadhaar_verified'):
         messages.error(request, 'Please verify OTP first')
         return redirect('auth')
+    
+    if request.method == 'POST':
+        groom_name = request.POST.get('groom_name')
+        groom_dob = request.POST.get('groom_dob')
+        groom_aadhaar = request.POST.get('groom_aadhaar')
+        groom_father_name = request.POST.get('groom_father_name')
+        bride_name = request.POST.get('bride_name')
+        bride_dob = request.POST.get('bride_dob')
+        bride_aadhaar = request.POST.get('bride_aadhaar')
+        bride_father_name = request.POST.get('bride_father_name')
+        marriage_date = request.POST.get('marriage_date')
+        marriage_place = request.POST.get('marriage_place')
+        marriage_type = request.POST.get('marriage_type')
+        
+        if not all([groom_name, bride_name, marriage_date, marriage_place, marriage_type]):
+            messages.error(request, 'Please fill in all required fields')
+            return render(request, 'marriage-registration.html')
+        
+        ref_number = f"MAR{random.randint(100000, 999999)}"
+        messages.success(request, f'Marriage registration submitted successfully! Reference: {ref_number}')
+        return redirect('municipal-services')
+    
     return render(request, 'marriage-registration.html')
 
 
@@ -829,6 +1196,26 @@ def grievance(request):
     if not request.session.get('aadhaar_verified'):
         messages.error(request, 'Please verify OTP first')
         return redirect('auth')
+    
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        mobile = request.POST.get('mobile')
+        location = request.POST.get('location')
+        description = request.POST.get('description')
+        department = request.POST.get('department')
+        
+        if not all([name, mobile, location, description, department]):
+            messages.error(request, 'Please fill in all required fields')
+            return render(request, 'grievance.html')
+        
+        if not mobile.isdigit() or len(mobile) != 10:
+            messages.error(request, 'Please enter a valid 10-digit mobile number')
+            return render(request, 'grievance.html')
+        
+        ref_number = f"GRV{random.randint(100000, 999999)}"
+        messages.success(request, f'Grievance registered successfully! Reference: {ref_number}')
+        return redirect('municipal-services')
+    
     return render(request, 'grievance.html')
 
 # ================= ERROR HANDLERS =================
