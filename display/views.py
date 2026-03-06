@@ -42,46 +42,62 @@ def send_otp_via_twilio(phone_number, otp, aadhaar_number):
         logger.warning(f"No phone number found for Aadhaar {aadhaar_number[-4:]}")
         return False, "No phone number registered"
     
-    # Format phone number for India (add +91 if not present)
-    if not phone_number.startswith('+'):
-        # Remove any leading zeros
-        phone_number = phone_number.lstrip('0')
-        # Add India country code
-        phone_number = '+91' + phone_number
+    # IMPORTANT: Format the recipient's phone number correctly
+    # Remove any non-digit characters
+    digits_only = ''.join(filter(str.isdigit, phone_number))
+    
+    # For Indian numbers, ensure it's 10 digits
+    if len(digits_only) == 10:
+        formatted_recipient = '+91' + digits_only
+    elif len(digits_only) == 12 and digits_only.startswith('91'):
+        formatted_recipient = '+' + digits_only
+    else:
+        formatted_recipient = '+' + digits_only
+    
+    # Your Twilio number (sender) - this should NOT change
+    twilio_from_number = settings.TWILIO_PHONE_NUMBER
+    
+    # Debug logging
+    logger.info(f"DEBUG - Original phone from DB: {phone_number}")
+    logger.info(f"DEBUG - Digits only: {digits_only}")
+    logger.info(f"DEBUG - Formatted recipient: {formatted_recipient}")
+    logger.info(f"DEBUG - Twilio sender: {twilio_from_number}")
     
     try:
         # For development/testing - log to console
         if settings.OTP_CONSOLE_LOGGING:
             log_message = f"""
             ===== OTP for Aadhaar {aadhaar_number[-4:]} =====
-            Phone: {phone_number}
+            Recipient: {formatted_recipient}
+            Sender: {twilio_from_number}
             OTP: {otp}
             ============================================
             """
             print(log_message)
-            logger.info(f"OTP sent via console to {phone_number[-4:]}")
+            logger.info(f"OTP sent via console to {formatted_recipient[-4:]}")
             return True, "OTP logged to console"
         
         # Production - send via Twilio
-        if not all([settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN, settings.TWILIO_PHONE_NUMBER]):
+        if not all([settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN, twilio_from_number]):
             logger.error("Twilio credentials not configured")
             return False, "SMS service not configured"
         
         client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
+        
+        # CRITICAL: from_ is YOUR Twilio number, to is the RECIPIENT
         message = client.messages.create(
             body=f"Your OTP for Civic Kiosk is: {otp}. Valid for 5 minutes.",
-            from_=settings.TWILIO_PHONE_NUMBER,
-            to=phone_number
+            from_=twilio_from_number,      # This should be +919692205580
+            to=formatted_recipient          # This should be +919692059049
         )
         
-        logger.info(f"OTP sent via SMS to {phone_number[-4:]}, SID: {message.sid}")
+        logger.info(f"✅ OTP sent via SMS to {formatted_recipient[-4:]}, SID: {message.sid}")
         return True, "OTP sent successfully"
         
     except Exception as e:
-        logger.error(f"Failed to send OTP to {phone_number[-4:]}: {str(e)}")
+        logger.error(f"❌ Failed to send OTP to {formatted_recipient[-4:]}: {str(e)}")
         return False, f"Failed to send OTP: {str(e)}"
-
-
+    
 def verify_otp(stored_otp, entered_otp, otp_timestamp):
     """
     Verify OTP and check expiry (5 minutes)
