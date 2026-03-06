@@ -2,26 +2,177 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
 from django.contrib import messages
 import random
-from django.contrib.auth.decorators import login_required
 import os
 import json
 import base64
+import logging
+import requests
 from django.core.files.base import ContentFile
 import datetime
 from dateutil.relativedelta import relativedelta
-from django.http import HttpResponseRedirect
 from django.urls import reverse
-from urllib.parse import urlparse, urlunparse
 from django.views.decorators.csrf import csrf_exempt
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
+from django.conf import settings
+
+# Import models
+from .models import (
+    Consumer, UserSession, AuditLog, Notification,
+    ElectricityConsumer, ElectricityBill, ElectricityPayment, ElectricityComplaint,
+    LoadEnhancementRequest, MeterReplacementRequest, NameTransferRequest,
+    GasConsumer, GasCylinderBooking, GasComplaint, GasSubsidy,
+    WaterConsumer, WaterBill,
+    Property, PropertyTax, ProfessionalTax, TradeLicense,
+    BuildingPlanApplication, Grievance,
+    BirthCertificateApplication, DeathCertificateApplication,
+    MarriageRegistration, DocumentUpload
+)
+
+logger = logging.getLogger(__name__)
+
+
+# ================= OTP UTILITY FUNCTIONS =================
+
+def generate_otp(length=6):
+    """Generate a random OTP of specified length"""
+    return ''.join([str(random.randint(0, 9)) for _ in range(length)])
+
+
+def send_otp_via_circuitdigest(phone_number, otp, aadhaar_number):
+    """
+    Send OTP via CircuitDigest Cloud SMS API (100% free for India)
+    Uses Template ID: 101 - "Your {#var1#} is currently at {#var2#}."
+    """
+    if not phone_number:
+        logger.warning(f"No phone number found for Aadhaar {aadhaar_number[-4:]}")
+        return False, "No phone number registered"
+    
+    # Clean phone number - must be 10 digits
+    digits_only = ''.join(filter(str.isdigit, phone_number))
+    
+    # Format as 91XXXXXXXXXX for API
+    if len(digits_only) == 10:
+        formatted_phone = '91' + digits_only
+    elif len(digits_only) == 12 and digits_only.startswith('91'):
+        formatted_phone = digits_only
+    else:
+        logger.error(f"Invalid phone number format: {phone_number}")
+        return False, "Invalid phone number format"
+    
+    # Get API key from settings
+    api_key = settings.CIRCUITDIGEST_API_KEY
+    template_id = getattr(settings, 'CIRCUITDIGEST_TEMPLATE_ID', '101')
+    
+    if not api_key:
+        logger.error("CircuitDigest API key not configured")
+        return False, "SMS service not configured"
+    
+    try:
+        # For development/testing - log to console
+        if settings.OTP_CONSOLE_LOGGING:
+            log_message = f"""
+            ===== OTP for Aadhaar {aadhaar_number[-4:]} =====
+            Phone: {formatted_phone}
+            OTP: {otp}
+            Template ID: {template_id}
+            ============================================
+            """
+            print(log_message)
+            logger.info(f"OTP sent via console to {formatted_phone[-4:]}")
+            return True, "OTP logged to console"
+        
+        # Prepare API request
+        url = "https://www.circuitdigest.cloud/api/v1/send_sms"
+        
+        headers = {
+            "Authorization": api_key,
+            "Content-Type": "application/json"
+        }
+        
+        # Payload - Template 101 expects var1 and var2
+        payload = {
+            "mobiles": formatted_phone,
+            "var1": "OTP",
+            "var2": otp
+        }
+        
+        # Add template ID as query parameter
+        full_url = f"{url}?ID={template_id}"
+        
+        print(f"\n📤 Sending OTP via CircuitDigest...")
+        print(f"Phone: {formatted_phone}")
+        print(f"OTP: {otp}")
+        
+        # Send request with timeout
+        response = requests.post(
+            full_url, 
+            headers=headers, 
+            json=payload, 
+            timeout=15
+        )
+        
+        print(f"📥 Response Status: {response.status_code}")
+        print(f"📥 Response Body: {response.text}")
+        
+        # Check response
+        if response.status_code == 200:
+            try:
+                result = response.json()
+                if result.get('status') == 'success' or 'success' in str(result).lower():
+                    logger.info(f"✅ OTP sent via CircuitDigest to {formatted_phone[-4:]}")
+                    return True, "OTP sent successfully"
+                else:
+                    error_msg = result.get('message', 'Unknown error')
+                    logger.error(f"CircuitDigest API error: {error_msg}")
+                    return False, f"Failed to send OTP: {error_msg}"
+            except:
+                # If response is not JSON but 200, assume success
+                logger.info(f"✅ OTP sent (non-JSON response)")
+                return True, "OTP sent successfully"
+        else:
+            logger.error(f"CircuitDigest HTTP error: {response.status_code}")
+            return False, f"Failed to send OTP: HTTP {response.status_code}"
+            
+    except requests.exceptions.Timeout:
+        logger.error(f"Timeout error")
+        return False, "Failed to send OTP: Request timeout"
+    except requests.exceptions.ConnectionError:
+        logger.error(f"Connection error")
+        return False, "Failed to send OTP: Network connection error"
+    except Exception as e:
+        logger.error(f"Unexpected error: {str(e)}")
+        return False, f"Failed to send OTP: {str(e)}"
+
+
+def verify_otp(stored_otp, entered_otp, otp_timestamp):
+    """
+    Verify OTP and check expiry (5 minutes)
+    """
+    from datetime import datetime
+    
+    if not stored_otp or not entered_otp:
+        return False, "OTP missing"
+    
+    if stored_otp != entered_otp:
+        return False, "Invalid OTP"
+    
+    # Check if OTP is expired (5 minutes)
+    expiry_time = otp_timestamp + datetime.timedelta(minutes=5)
+    if datetime.now() > expiry_time:
+        return False, "OTP expired"
+    
+    return True, "OTP verified"
 
 
 # ================= CORE / AUTH =================
+
 def index(request):
     return render(request, 'index.html')
 
+
 def auth(request):
+    """Aadhaar authentication page"""
     # Clear any existing messages
     storage = messages.get_messages(request)
     storage.used = True
@@ -33,89 +184,272 @@ def auth(request):
     if request.method == 'POST':
         aadhaar_number = request.POST.get('aadhaar_number')
         
-        if aadhaar_number and len(aadhaar_number) == 12 and aadhaar_number.isdigit():
-            request.session['aadhaar_number'] = aadhaar_number
+        # Validate Aadhaar format
+        if not aadhaar_number or len(aadhaar_number) != 12 or not aadhaar_number.isdigit():
+            messages.error(request, 'Please enter a valid 12-digit Aadhaar number')
+            return render(request, 'auth.html')
+        
+        try:
+            # Check if consumer exists in database
+            consumer = Consumer.objects.get(aadhaar_number=aadhaar_number, is_active=True)
             
-            # Generate OTP (still generates but won't be checked)
-            otp = ''.join([str(random.randint(0, 9)) for _ in range(6)])
+            # Store in session
+            request.session['aadhaar_number'] = aadhaar_number
+            request.session['consumer_id'] = consumer.id
+            
+            # Generate OTP
+            otp = generate_otp(6)
             request.session['otp'] = otp
             request.session['otp_attempts'] = 0
+            request.session['otp_timestamp'] = datetime.datetime.now().isoformat()
             
-            print("\n" + "="*50)
-            print(f"OTP for Aadhaar {aadhaar_number}: {otp}")
-            print("="*50 + "\n")
+            # Send OTP via CircuitDigest
+            print(f"\n🔐 Generated OTP for {consumer.name}: {otp}")
+            print(f"📱 Sending to: {consumer.mobile}")
             
-            messages.success(request, 'OTP sent successfully')
-            return redirect('otp')
-        else:
-            messages.error(request, 'Please enter a valid 12-digit Aadhaar number')
+            success, message = send_otp_via_circuitdigest(
+                consumer.mobile,
+                otp,
+                aadhaar_number
+            )
+            
+            if success:
+                messages.success(request, 'OTP sent successfully to your registered mobile number')
+                
+                # Create audit log
+                AuditLog.objects.create(
+                    consumer=consumer,
+                    action='OTP_SENT',
+                    model_name='Consumer',
+                    object_id=consumer.id,
+                    changes={'aadhaar': aadhaar_number[-4:]},
+                    ip_address=request.META.get('REMOTE_ADDR', ''),
+                    user_agent=request.META.get('HTTP_USER_AGENT', '')
+                )
+                
+                return redirect('otp')
+            else:
+                messages.error(request, f'Failed to send OTP: {message}')
+                # Fallback - show OTP in console for testing
+                messages.info(request, f'OTP for testing: {otp} (Check console)')
+                print(f"\n⚠️ FALLBACK OTP: {otp}")
+                return redirect('otp')
+                
+        except Consumer.DoesNotExist:
+            messages.error(request, 'Aadhaar number not found in our records. Please contact support.')
+            
+            # Log failed attempt
+            AuditLog.objects.create(
+                consumer=None,
+                action='AUTH_FAILED',
+                model_name='Consumer',
+                object_id='',
+                changes={'aadhaar': aadhaar_number[-4:]},
+                ip_address=request.META.get('REMOTE_ADDR', ''),
+                user_agent=request.META.get('HTTP_USER_AGENT', '')
+            )
+            
+            return render(request, 'auth.html')
+        except Exception as e:
+            logger.error(f"Error during authentication: {str(e)}")
+            messages.error(request, 'An error occurred. Please try again.')
             return render(request, 'auth.html')
     
     # GET request - show the Aadhaar entry page
     return render(request, 'auth.html')
 
 
-# ================= SIMPLIFIED OTP - ANY OTP WORKS =================
 def otp(request):
+    """OTP verification page"""
     # Check if aadhaar is in session
     aadhaar_number = request.session.get('aadhaar_number')
+    consumer_id = request.session.get('consumer_id')
+    stored_otp = request.session.get('otp')
+    otp_timestamp_str = request.session.get('otp_timestamp')
     
-    if not aadhaar_number:
+    if not aadhaar_number or not consumer_id or not stored_otp:
         messages.error(request, 'Session expired. Please enter Aadhaar again.')
         return redirect('auth')
+    
+    # Parse timestamp
+    try:
+        from datetime import datetime
+        otp_timestamp = datetime.fromisoformat(otp_timestamp_str)
+    except:
+        otp_timestamp = datetime.datetime.now() - datetime.timedelta(minutes=6)  # Force expiry
     
     if request.method == 'POST':
         entered_otp = request.POST.get('otp')
         
-        # SIMPLIFIED BYPASS: ANY NON-EMPTY OTP IS ACCEPTED
-        if entered_otp and len(entered_otp) > 0:
-            # OTP verified successfully - no checking!
+        # Get attempt count
+        attempts = request.session.get('otp_attempts', 0)
+        request.session['otp_attempts'] = attempts + 1
+        
+        if attempts >= 3:
+            messages.error(request, 'Too many failed attempts. Please request new OTP.')
+            return redirect('resend-otp')
+        
+        # Verify OTP
+        is_valid, message = verify_otp(stored_otp, entered_otp, otp_timestamp)
+        
+        if is_valid:
+            # OTP verified successfully
             request.session['aadhaar_verified'] = True
-            messages.success(request, 'OTP verified successfully!')
+            request.session['otp_verified'] = True
+            
+            # Update consumer last login
+            try:
+                consumer = Consumer.objects.get(id=consumer_id)
+                consumer.last_login = datetime.datetime.now()
+                consumer.save()
+                
+                # Create user session
+                UserSession.objects.create(
+                    consumer=consumer,
+                    session_key=request.session.session_key,
+                    ip_address=request.META.get('REMOTE_ADDR', ''),
+                    user_agent=request.META.get('HTTP_USER_AGENT', '')
+                )
+                
+                # Create notification
+                Notification.objects.create(
+                    consumer=consumer,
+                    notification_type='GENERAL',
+                    title='Login Successful',
+                    message=f'You have successfully logged in to Civic Kiosk at {datetime.datetime.now().strftime("%d %b %Y %I:%M %p")}'
+                )
+                
+                # Clear OTP from session
+                request.session.pop('otp', None)
+                request.session.pop('otp_timestamp', None)
+                
+                messages.success(request, 'OTP verified successfully!')
+                
+            except Consumer.DoesNotExist:
+                messages.error(request, 'Consumer record not found.')
+                return redirect('auth')
+            
             return redirect('menu')
         else:
-            messages.error(request, 'Please enter OTP')
+            messages.error(request, message)
     
-    # Mask Aadhaar for display (show only last 4 digits)
+    # Mask Aadhaar for display
     masked_aadhaar = 'XXXX XXXX ' + aadhaar_number[-4:]
     
-    return render(request, 'otp.html', {'aadhaar': masked_aadhaar})
+    # Get consumer details for display
+    try:
+        consumer = Consumer.objects.get(id=consumer_id)
+        consumer_name = consumer.name
+        consumer_phone = consumer.mobile
+        # Mask phone number for display (show only last 4 digits)
+        masked_phone = consumer_phone[-4:] if consumer_phone else ''
+    except:
+        consumer_name = ''
+        masked_phone = ''
+    
+    context = {
+        'aadhaar': masked_aadhaar,
+        'consumer_name': consumer_name,
+        'masked_phone': masked_phone,
+        'attempts': request.session.get('otp_attempts', 0)
+    }
+    
+    return render(request, 'otp.html', context)
+
 
 def resend_otp(request):
+    """Resend OTP"""
     if request.method == 'POST':
-        # Get aadhaar from session
         aadhaar_number = request.session.get('aadhaar_number')
+        consumer_id = request.session.get('consumer_id')
         
-        if aadhaar_number:
-            # Generate new OTP
-            otp = ''.join([str(random.randint(0, 9)) for _ in range(6)])
-            request.session['otp'] = otp
-            request.session['otp_attempts'] = 0  # Reset attempts
-            
-            # Print to console for testing
-            print("\n" + "="*50)
-            print(f"RESEND OTP for Aadhaar {aadhaar_number}: {otp}")
-            print("="*50 + "\n")
-            
-            messages.success(request, 'New OTP sent successfully')
-        else:
+        if not aadhaar_number or not consumer_id:
             messages.error(request, 'Session expired. Please login again.')
             return redirect('auth')
+        
+        try:
+            consumer = Consumer.objects.get(id=consumer_id, aadhaar_number=aadhaar_number)
+            
+            # Generate new OTP
+            otp = generate_otp(6)
+            request.session['otp'] = otp
+            request.session['otp_attempts'] = 0
+            request.session['otp_timestamp'] = datetime.datetime.now().isoformat()
+            
+            # Send OTP via CircuitDigest
+            success, message = send_otp_via_circuitdigest(consumer.mobile, otp, aadhaar_number)
+            
+            if success:
+                messages.success(request, 'New OTP sent successfully to your registered mobile number')
+                
+                # Create audit log
+                AuditLog.objects.create(
+                    consumer=consumer,
+                    action='OTP_RESENT',
+                    model_name='Consumer',
+                    object_id=consumer.id,
+                    changes={'aadhaar': aadhaar_number[-4:]},
+                    ip_address=request.META.get('REMOTE_ADDR', ''),
+                    user_agent=request.META.get('HTTP_USER_AGENT', '')
+                )
+            else:
+                messages.error(request, f'Failed to send OTP: {message}')
+                # Fallback
+                messages.info(request, f'New OTP: {otp}')
+                print(f"\n⚠️ FALLBACK RESEND OTP: {otp}")
+                
+        except Consumer.DoesNotExist:
+            messages.error(request, 'Consumer record not found.')
+            return redirect('auth')
+        except Exception as e:
+            logger.error(f"Error resending OTP: {str(e)}")
+            messages.error(request, 'An error occurred. Please try again.')
     
     return redirect('otp')
 
 
-def menu(request):
-    # Debug: Check Django auth
-    print(f"User authenticated: {request.user.is_authenticated}")
-    print(f"User: {request.user}")
+def logout(request):
+    """Logout user"""
+    consumer_id = request.session.get('consumer_id')
     
-    # Check if user is verified with Aadhaar
-    if not request.session.get('aadhaar_verified'):
-        messages.error(request, 'Please verify OTP first')
+    if consumer_id:
+        try:
+            # Update session as inactive
+            UserSession.objects.filter(
+                consumer_id=consumer_id,
+                session_key=request.session.session_key,
+                is_active=True
+            ).update(is_active=False)
+        except:
+            pass
+    
+    # Clear session
+    request.session.flush()
+    messages.success(request, 'You have been logged out successfully.')
+    return redirect('index')
+
+
+def menu(request):
+    """Main menu after authentication"""
+    # Check if user is verified
+    if not request.session.get('aadhaar_verified') or not request.session.get('otp_verified'):
+        messages.error(request, 'Please login first')
         return redirect('auth')
     
-    return render(request, 'menu.html')
+    # Get consumer info for display
+    consumer_id = request.session.get('consumer_id')
+    try:
+        consumer = Consumer.objects.get(id=consumer_id)
+        context = {
+            'consumer_name': consumer.name,
+            'consumer_aadhaar': consumer.aadhaar_number[-4:],
+            'consumer_phone': consumer.mobile[-4:],
+            'notifications': Notification.objects.filter(consumer=consumer, is_read=False).count()
+        }
+    except:
+        context = {}
+    
+    return render(request, 'menu.html', context)
 
 
 # ================= ELECTRICITY =================
@@ -146,7 +480,7 @@ def electricity_bill_payment(request):
         consumer_number = request.POST.get('consumer_number')
         bill_amount = request.POST.get('bill_amount')
         
-        # NEW FIELDS for payment method
+        # FIELDS for payment method
         payment_method = request.POST.get('payment_method')  # 'upi' or 'atm'
         upi_id = request.POST.get('upi_id')
         card_number = request.POST.get('card_number')

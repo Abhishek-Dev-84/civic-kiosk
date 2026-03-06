@@ -105,6 +105,10 @@ DATABASES = {
     )
 }
 
+# CircuitDigest Configuration
+CIRCUITDIGEST_API_KEY = os.environ.get('CIRCUITDIGEST_API_KEY', '')
+CIRCUITDIGEST_TEMPLATE_ID = os.environ.get('CIRCUITDIGEST_TEMPLATE_ID', '101')
+OTP_PROVIDER = os.environ.get('OTP_PROVIDER', 'CIRCUITDIGEST')
 
 
 # -------------------------------------------------
