@@ -8,15 +8,13 @@ import base64
 import logging
 import requests
 from django.core.files.base import ContentFile
-import datetime
-from datetime import timedelta  # IMPORTANT: Import timedelta separately
+from datetime import datetime, timedelta  # Fixed import
 from dateutil.relativedelta import relativedelta
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.conf import settings
-from datetime import datetime,timedelta
 
 # Import models
 from .models import (
@@ -159,7 +157,7 @@ def verify_otp(stored_otp, entered_otp, otp_timestamp):
     if stored_otp != entered_otp:
         return False, "Invalid OTP"
     
-    # Check if OTP is expired (5 minutes) - FIXED: Use timedelta correctly
+    # Check if OTP is expired (5 minutes)
     expiry_time = otp_timestamp + timedelta(minutes=5)
     if datetime.now() > expiry_time:
         return False, "OTP expired"
@@ -304,16 +302,39 @@ def otp(request):
                 consumer.last_login = datetime.now()
                 consumer.save()
                 
-                # Create user session
-                UserSession.objects.create(
+                # FIX: Handle UserSession creation properly
+                session_key = request.session.session_key
+                
+                # Deactivate any existing active sessions for this consumer
+                UserSession.objects.filter(
                     consumer=consumer,
-                    session_key=request.session.session_key,
-                    ip_address=request.META.get('REMOTE_ADDR', ''),
-                    user_agent=request.META.get('HTTP_USER_AGENT', '')
-                )
+                    is_active=True
+                ).update(is_active=False)
+                
+                # Check if this session key already exists
+                existing_session = UserSession.objects.filter(
+                    session_key=session_key
+                ).first()
+                
+                if existing_session:
+                    # Update existing session
+                    existing_session.consumer = consumer
+                    existing_session.ip_address = request.META.get('REMOTE_ADDR', '')
+                    existing_session.user_agent = request.META.get('HTTP_USER_AGENT', '')
+                    existing_session.is_active = True
+                    existing_session.save()
+                    logger.info(f"✅ Updated existing session: {session_key}")
+                else:
+                    # Create new session
+                    UserSession.objects.create(
+                        consumer=consumer,
+                        session_key=session_key,
+                        ip_address=request.META.get('REMOTE_ADDR', ''),
+                        user_agent=request.META.get('HTTP_USER_AGENT', '')
+                    )
+                    logger.info(f"✅ Created new session: {session_key}")
                 
                 # Create notification
-                
                 Notification.objects.create(
                     consumer=consumer,
                     notification_type='GENERAL',
@@ -357,6 +378,7 @@ def otp(request):
     }
     
     return render(request, 'otp.html', context)
+
 
 def resend_otp(request):
     """Resend OTP"""
@@ -410,19 +432,20 @@ def resend_otp(request):
 
 
 def logout(request):
-    """Logout user"""
+    """Logout user - properly clean up session"""
     consumer_id = request.session.get('consumer_id')
+    session_key = request.session.session_key
     
-    if consumer_id:
+    if consumer_id and session_key:
         try:
-            # Update session as inactive
+            # Mark this specific session as inactive
             UserSession.objects.filter(
                 consumer_id=consumer_id,
-                session_key=request.session.session_key,
-                is_active=True
+                session_key=session_key
             ).update(is_active=False)
-        except:
-            pass
+            logger.info(f"✅ Session {session_key} deactivated for consumer {consumer_id}")
+        except Exception as e:
+            logger.error(f"Error deactivating session: {e}")
     
     # Clear session
     request.session.flush()
@@ -464,7 +487,7 @@ def electricity_services(request):
     # Add some context data to ensure the page renders
     context = {
         'page_title': 'Electricity Services',
-        'current_date': datetime.datetime.now().strftime('%d %b %Y'),
+        'current_date': datetime.now().strftime('%d %b %Y'),
     }
     return render(request, 'electricity-services.html', context)
 
@@ -528,7 +551,7 @@ def electricity_bill_payment(request):
                 return render(request, 'electricity-bill-payment.html', context)
             
             # Generate transaction ID
-            transaction_id = f"TXN{datetime.datetime.now().strftime('%y%m%d%H%M%S')}{random.randint(100, 999)}"
+            transaction_id = f"TXN{datetime.now().strftime('%y%m%d%H%M%S')}{random.randint(100, 999)}"
             
             messages.success(request, f'Payment of ₹{bill_amount} for consumer {consumer_number} successful! Transaction ID: {transaction_id}')
             return redirect('payment-history')
@@ -583,7 +606,7 @@ def electricity_duplicate_bill(request):
                 messages.error(request, 'Please enter a valid consumer number')
                 return render(request, 'electricity-duplicate-bill.html', context)
             
-            today = datetime.date.today()
+            today = datetime.now().date()
             bills = []
             
             for i in range(3):
@@ -919,7 +942,7 @@ def water_bill(request):
                 return render(request, 'water-bill.html')
             
             # Generate transaction ID
-            transaction_id = f"WTR{datetime.datetime.now().strftime('%y%m%d%H%M%S')}{random.randint(100, 999)}"
+            transaction_id = f"WTR{datetime.now().strftime('%y%m%d%H%M%S')}{random.randint(100, 999)}"
             
             messages.success(request, f'Water bill payment of ₹{bill_amount} for consumer {consumer_no} successful! Transaction ID: {transaction_id}')
             return redirect('municipal-services')
@@ -933,9 +956,9 @@ def water_bill(request):
                 'show_bill': True,
                 'consumer_no': consumer_no,
                 'consumer_name': 'Rajesh Kumar',
-                'bill_number': f'WATER/{datetime.datetime.now().year}/{random.randint(1000, 9999)}',
-                'bill_date': datetime.datetime.now().strftime('%d %b %Y'),
-                'due_date': (datetime.datetime.now() + datetime.timedelta(days=15)).strftime('%d %b %Y'),
+                'bill_number': f'WATER/{datetime.now().year}/{random.randint(1000, 9999)}',
+                'bill_date': datetime.now().strftime('%d %b %Y'),
+                'due_date': (datetime.now() + timedelta(days=15)).strftime('%d %b %Y'),
                 'units_consumed': random.randint(20, 30),
                 'bill_amount': random.randint(400, 600)
             }
@@ -998,7 +1021,7 @@ def property_tax(request):
                 return render(request, 'property-tax.html')
             
             # Generate transaction ID
-            transaction_id = f"PTX{datetime.datetime.now().strftime('%y%m%d%H%M%S')}{random.randint(100, 999)}"
+            transaction_id = f"PTX{datetime.now().strftime('%y%m%d%H%M%S')}{random.randint(100, 999)}"
             
             messages.success(request, f'Property tax of ₹{tax_amount} for property {property_id} paid successfully! Transaction ID: {transaction_id}')
             return redirect('municipal-services')
@@ -1041,7 +1064,7 @@ def professional_tax(request):
                 return render(request, 'professional-tax.html')
             
             # Generate transaction ID
-            transaction_id = f"PRF{datetime.datetime.now().strftime('%y%m%d%H%M%S')}{random.randint(100, 999)}"
+            transaction_id = f"PRF{datetime.now().strftime('%y%m%d%H%M%S')}{random.randint(100, 999)}"
             
             messages.success(request, f'Professional tax of ₹{tax_amount} for PTIN {ptin} paid successfully! Transaction ID: {transaction_id}')
             return redirect('municipal-services')
@@ -1077,17 +1100,17 @@ def application_status(request):
         'application': {
             'application_id': 'APP123456',
             'department': 'Electricity',
-            'submitted_date': datetime.date.today() - datetime.timedelta(days=5),
+            'submitted_date': datetime.now().date() - timedelta(days=5),
             'current_stage': 'Document Verification',
             'assigned_officer': 'Mr. Sharma',
-            'expected_completion': datetime.date.today() + datetime.timedelta(days=10)
+            'expected_completion': datetime.now().date() + timedelta(days=10)
         },
         'complaint': {
             'complaint_id': 'CMP789012',
             'status': 'In Progress',
             'work_completed': 60,
             'officer_remark': 'Site visit scheduled',
-            'deadline': datetime.date.today() + datetime.timedelta(days=7)
+            'deadline': datetime.now().date() + timedelta(days=7)
         }
     }
     
@@ -1164,7 +1187,7 @@ def gas_subsidy(request):
                 'amount_per_cylinder': '200',
                 'total_cylinders': '12',
                 'remaining_cylinders': random.randint(0, 12),
-                'next_eligibility': (datetime.date.today() + datetime.timedelta(days=30)).strftime('%d %b %Y'),
+                'next_eligibility': (datetime.now().date() + timedelta(days=30)).strftime('%d %b %Y'),
                 'bank_account': 'XXXXXX1234'
             }
             return render(request, 'gas-subsidy.html', context)
@@ -1290,7 +1313,7 @@ def gas_bookings_status(request):
             messages.error(request, 'Please enter a reference number')
             return render(request, 'gas-booking-status.html', context)
         
-        today = datetime.date.today()
+        today = datetime.now().date()
         
         # Simulate different booking statuses
         if reference_number.upper() == 'CYL251234':
@@ -1325,7 +1348,7 @@ def gas_bookings_status(request):
             booking = {
                 'reference_number': reference_number,
                 'booked_date': today.strftime('%d %b %Y') + ', 10:30 AM',
-                'expected_delivery': (today + datetime.timedelta(days=2)).strftime('%d %b %Y') + ' by 6 PM',
+                'expected_delivery': (today + timedelta(days=2)).strftime('%d %b %Y') + ' by 6 PM',
                 'delivery_person': 'Delivery team will be assigned soon',
                 'cylinder_type': '14.2 kg Domestic Cylinder',
                 'status': random.choice(['pending', 'processed', 'out_for_delivery'])
@@ -1346,7 +1369,7 @@ def gas_bill_payment(request):
         amount = request.POST.get('amount')
         payment_method = request.POST.get('payment_method', 'upi')
         
-        transaction_id = f"GAS{datetime.datetime.now().strftime('%y%m%d%H%M%S')}{random.randint(100, 999)}"
+        transaction_id = f"GAS{datetime.now().strftime('%y%m%d%H%M%S')}{random.randint(100, 999)}"
         messages.success(request, f'Gas bill payment of ₹{amount} successful! Transaction ID: {transaction_id}')
         return redirect('gas-services')
     
@@ -1384,7 +1407,7 @@ def payment_history(request):
             'reference_no': 'PAY123456',
             'service': 'electricity',
             'service_name': 'Electricity Bill',
-            'date': datetime.datetime.now() - datetime.timedelta(days=2),
+            'date': datetime.now() - timedelta(days=2),
             'amount': 1250.00,
             'status': 'success'
         },
@@ -1392,7 +1415,7 @@ def payment_history(request):
             'reference_no': 'PAY123457',
             'service': 'water',
             'service_name': 'Water Bill',
-            'date': datetime.datetime.now() - datetime.timedelta(days=5),
+            'date': datetime.now() - timedelta(days=5),
             'amount': 450.00,
             'status': 'success'
         },
@@ -1400,7 +1423,7 @@ def payment_history(request):
             'reference_no': 'PAY123458',
             'service': 'gas',
             'service_name': 'Gas Bill',
-            'date': datetime.datetime.now() - datetime.timedelta(days=7),
+            'date': datetime.now() - timedelta(days=7),
             'amount': 856.00,
             'status': 'success'
         },
@@ -1408,7 +1431,7 @@ def payment_history(request):
             'reference_no': 'PAY123459',
             'service': 'property_tax',
             'service_name': 'Property Tax',
-            'date': datetime.datetime.now() - datetime.timedelta(days=10),
+            'date': datetime.now() - timedelta(days=10),
             'amount': 3450.00,
             'status': 'success'
         },
@@ -1416,7 +1439,7 @@ def payment_history(request):
             'reference_no': 'PAY123460',
             'service': 'professional_tax',
             'service_name': 'Professional Tax',
-            'date': datetime.datetime.now() - datetime.timedelta(days=12),
+            'date': datetime.now() - timedelta(days=12),
             'amount': 1250.00,
             'status': 'success'
         }
@@ -1446,12 +1469,12 @@ def receipt_print(request):
         receipt = {
             'id': random.randint(1000, 9999),
             'receipt_no': receipt_ref or f'RCPT{random.randint(100000, 999999)}',
-            'datetime': datetime.datetime.now().strftime('%d %b %Y, %I:%M %p'),
+            'datetime': datetime.now().strftime('%d %b %Y, %I:%M %p'),
             'service': '⚡ Electricity Bill',
             'consumer_no': '1234 5678 9012',
             'bill_period': 'Jan 2026',
             'payment_mode': 'UPI',
-            'transaction_id': f'TXN{datetime.datetime.now().strftime("%y%m%d%H%M%S")}',
+            'transaction_id': f'TXN{datetime.now().strftime("%y%m%d%H%M%S")}',
             'amount': '1,250.00'
         }
         
