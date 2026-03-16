@@ -3,6 +3,16 @@
 {% load static %}
 <html lang="en">
 <head>
+    <!-- Security Meta Tags -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://upload.wikimedia.org https://www.cdac.in; font-src 'self';">
+    <meta name="referrer" content="same-origin">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Cache Control -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
 
     <style>
         /* Hide Google Translate elements */
@@ -30,6 +40,72 @@
             height: 0 !important;
             overflow: hidden !important;
         }
+
+        /* Timeout warning popup */
+        .timeout-warning {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border: 4px solid #ff9933;
+            border-radius: 40px;
+            padding: 30px;
+            text-align: center;
+            z-index: 2000;
+            display: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .timeout-warning p {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .timeout-warning button {
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            padding: 15px 30px;
+            font-size: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            margin: 10px;
+            min-width: 150px;
+        }
+
+        .timeout-warning .logout-btn {
+            background: #dc3545;
+        }
+        
+        .timeout-warning button:active {
+            transform: translateY(3px);
+        }
+
+        /* Security note */
+        .security-note {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            font-size: 10px;
+            color: #666;
+            background: rgba(255,255,255,0.8);
+            padding: 3px 8px;
+            border-radius: 12px;
+            z-index: 999;
+        }
+
+        /* Attempts remaining */
+        .attempts-info {
+            text-align: center;
+            font-size: 16px;
+            color: #1e5fbf;
+            margin: 10px 0;
+            font-weight: 600;
+        }
     </style>
 
     <meta charset="UTF-8">
@@ -44,6 +120,7 @@
             box-sizing: border-box;
             font-family: 'Segoe UI', system-ui, sans-serif;
             user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -322,6 +399,13 @@
             box-shadow: 0 5px 0 #b35900;
         }
 
+        .key:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 5px 0 #0a3d7a;
+        }
+
         /* Error message */
         .error {
             color: #dc3545;
@@ -390,6 +474,16 @@
     </style>
 </head>
 <body>
+    <!-- CSRF Token for JavaScript -->
+    {% csrf_token %}
+    <input type="hidden" id="csrf_token" value="{{ csrf_token }}">
+
+    <!-- Timeout Warning Popup -->
+    <div id="timeoutWarning" class="timeout-warning">
+        <p>⏰ {% trans "Session about to expire!" %}</p>
+        <button onclick="extendSession()">{% trans "Continue" %}</button>
+        <button class="logout-btn" onclick="window.location='{% url 'index' %}'">{% trans "Logout" %}</button>
+    </div>
 
     <div class="header">
         <div class="header-left">
@@ -405,8 +499,7 @@
         </div>
     </div>
 
-    <!-- Voice corner will be created dynamically by voice.js -->
-    <!-- Note: voice.js will create the mic button, but we'll also add one explicitly -->
+    <!-- Voice corner -->
     <div class="voice-corner">
         <div class="voice-corner-btn" id="voiceBtn" onclick="toggleVoiceInput()">🎤</div>
         <div class="voice-corner-text" id="voiceStatus">{% trans "Click" %}</div>
@@ -432,6 +525,14 @@
             <!-- Loader - visible initially -->
             <div id="loader" class="loader"></div>
             <div id="loaderText" style="text-align: center; color: #1e5fbf; font-weight: 600; margin: 10px 0;">{% trans "Sending OTP..." %}</div>
+            
+            <!-- Attempts remaining display -->
+            {% if attempts is not None %}
+            <div class="attempts-info">
+                {% trans "Attempts remaining" %}: {{ attempts|add:"3"|add:"-3"|add:"3" }}
+                <!-- This shows remaining attempts out of 3 -->
+            </div>
+            {% endif %}
             
             <!-- Error Messages - Display inline -->
             {% if messages %}
@@ -480,10 +581,15 @@
                 </form>
 
                 <!-- Resend OTP Form -->
-                <form method="POST" action="{% url 'resend-otp' %}" id="resendForm">
+                <form method="POST" action="{% url 'resend-otp' %}" id="resendForm" onsubmit="return validateResendOTP()">
                     {% csrf_token %}
-                    <button type="submit" class="resend-btn" id="resendBtn">{% trans "Resend OTP" %}</button>
+                    <button type="submit" class="resend-btn" id="resendBtn" disabled>{% trans "Resend OTP" %}</button>
                 </form>
+            </div>
+            
+            <!-- Security Note -->
+            <div class="security-note">
+                🔒 {% trans "Secured by Government of India" %}
             </div>
         </div>
     </div>
@@ -491,6 +597,52 @@
     <script src="{% static 'js/voice.js' %}"></script>
 
     <script>
+        // ================= SECURITY ENHANCEMENTS =================
+
+        // Prevent form double submission
+        let isSubmitting = false;
+        let isResending = false;
+
+        // Disable keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
+            if (e.key === 'F12' || 
+                (e.ctrlKey && e.shiftKey && e.key === 'I') ||
+                (e.ctrlKey && e.shiftKey && e.key === 'J') ||
+                (e.ctrlKey && e.key === 'U')) {
+                e.preventDefault();
+                return false;
+            }
+            
+            // Prevent backspace from navigating back
+            if (e.key === 'Backspace' && !e.target.matches('input, textarea')) {
+                e.preventDefault();
+            }
+        });
+
+        // Disable right-click
+        document.addEventListener('contextmenu', event => event.preventDefault());
+
+        // Auto-hide cursor on touch devices
+        let cursorTimeout;
+        document.addEventListener('touchstart', function() {
+            document.body.style.cursor = 'default';
+            clearTimeout(cursorTimeout);
+            cursorTimeout = setTimeout(function() {
+                document.body.style.cursor = 'none';
+            }, 3000);
+        });
+
+        // Prevent page zoom on double tap
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function(event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+
         // ================= LANGUAGE MAP =================
         const languageMap = {
             "en": "en-IN",
@@ -522,6 +674,27 @@
             speechSynthesis.speak(utterance);
         }
 
+        // ================= SESSION TIMER =================
+        let sessionTimer;
+        const SESSION_DURATION = 240000; // 4 minutes
+
+        function startSessionTimer() {
+            clearTimeout(sessionTimer);
+            sessionTimer = setTimeout(() => {
+                document.getElementById('timeoutWarning').style.display = 'block';
+            }, SESSION_DURATION);
+        }
+
+        function extendSession() {
+            document.getElementById('timeoutWarning').style.display = 'none';
+            startSessionTimer();
+        }
+
+        function resetSessionTimer() {
+            clearTimeout(sessionTimer);
+            startSessionTimer();
+        }
+
         // ================= OTP PAGE JAVASCRIPT =================
         let otpBoxes = [];
         let otpPos = 0;
@@ -533,6 +706,8 @@
 
         // Auto-start voice from session storage (set by auth.html)
         document.addEventListener('DOMContentLoaded', function() {
+            startSessionTimer();
+            
             const autoStartVoice = sessionStorage.getItem('autoStartVoice');
             if (autoStartVoice === 'true') {
                 sessionStorage.removeItem('autoStartVoice');
@@ -540,6 +715,11 @@
                     toggleVoiceInput();
                 }, 2500); // Wait for OTP form to appear
             }
+            
+            // Add activity listeners
+            document.addEventListener('click', resetSessionTimer);
+            document.addEventListener('keypress', resetSessionTimer);
+            document.addEventListener('touchstart', resetSessionTimer);
         });
 
         // Auto-hide success message after 3 seconds
@@ -615,6 +795,10 @@
         }
 
         function pressKey(n) {
+            if (isSubmitting) return;
+            
+            resetSessionTimer();
+            
             if(otpPos < 6) {
                 if (otpBoxes[otpPos]) {
                     otpBoxes[otpPos].textContent = n;
@@ -632,6 +816,9 @@
         }
 
         function backspace() {
+            if (isSubmitting) return;
+            resetSessionTimer();
+            
             if(otpPos > 0) {
                 otpPos--;
                 if (otpBoxes[otpPos]) {
@@ -643,6 +830,9 @@
         }
 
         function clearAll() {
+            if (isSubmitting) return;
+            resetSessionTimer();
+            
             otpBoxes.forEach(box => {
                 if (box) {
                     box.textContent = '';
@@ -662,6 +852,8 @@
         }
 
         function verifyOTP() {
+            if (isSubmitting) return;
+            
             const otp = getOTP();
             console.log('Verifying OTP:', otp);
             
@@ -670,9 +862,28 @@
                 return;
             }
 
+            isSubmitting = true;
+            
+            // Disable all keys
+            document.querySelectorAll('.key').forEach(key => {
+                key.style.opacity = '0.5';
+                key.style.pointerEvents = 'none';
+            });
+            
             if (typeof speak === 'function') speak("{% trans 'Verifying OTP' %}");
             document.getElementById('otpHidden').value = otp;
             document.getElementById('otpForm').submit();
+        }
+
+        function validateResendOTP() {
+            if (isResending) return false;
+            isResending = true;
+            
+            const resendBtn = document.getElementById('resendBtn');
+            resendBtn.disabled = true;
+            resendBtn.textContent = "{% trans 'Sending...' %}";
+            
+            return true;
         }
 
         function startTimer() {
@@ -707,6 +918,8 @@
 
         // ================= VOICE INPUT =================
         function toggleVoiceInput() {
+            resetSessionTimer();
+            
             if(isListening) {
                 stopVoiceInput();
                 return;
@@ -746,6 +959,8 @@
             };
 
             recognition.onresult = function(event) {
+                resetSessionTimer();
+                
                 // Show loading buffer
                 document.getElementById('voiceLoadingBuffer').classList.remove('hidden');
                 
@@ -790,7 +1005,7 @@
                 console.log("OTP Transcript:", transcript, "Digits:", digits);
                 
                 // Update OTP boxes in real-time
-                if (digits.length > 0) {
+                if (digits.length > 0 && !isSubmitting) {
                     if (digits.length < otpPos && digits.length > 0) {
                         clearAll();
                     }
@@ -815,9 +1030,13 @@
                         document.getElementById('voiceLoadingBuffer').classList.add('hidden');
                     }, 500);
                     
-                    if (digits.length >= 6) {
+                    if (digits.length >= 6 && !isSubmitting) {
                         voiceTimeout = setTimeout(verifyOTP, 800);
                     }
+                } else {
+                    voiceTimeout = setTimeout(() => {
+                        document.getElementById('voiceLoadingBuffer').classList.add('hidden');
+                    }, 500);
                 }
             };
 
@@ -894,8 +1113,10 @@
             }
             
             if (command.includes("resend") || command.includes("new otp")) {
-                if (typeof speak === 'function') speak("{% trans 'Requesting new OTP' %}");
-                document.getElementById('resendForm').submit();
+                if (!isResending) {
+                    if (typeof speak === 'function') speak("{% trans 'Requesting new OTP' %}");
+                    document.getElementById('resendForm').submit();
+                }
                 return;
             }
             else if (command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
@@ -926,6 +1147,13 @@
                 }
             }, 2500);
         };
+
+        // Cleanup
+        window.addEventListener('beforeunload', function() {
+            if (timerInterval) clearInterval(timerInterval);
+            if (sessionTimer) clearTimeout(sessionTimer);
+            stopVoiceInput();
+        });
     </script>
 
 </body>

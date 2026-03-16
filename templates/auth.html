@@ -3,7 +3,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
+    <!-- Security Meta Tags -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://upload.wikimedia.org https://www.cdac.in; font-src 'self';">
+    <meta name="referrer" content="same-origin">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Cache Control -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
     <style>
         /* Hide Google Translate elements */
         .goog-te-banner-frame.skiptranslate,
@@ -74,6 +84,19 @@
         .timeout-warning button:active {
             transform: translateY(3px);
         }
+
+        /* Kiosk Security Styles */
+        .security-note {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            font-size: 10px;
+            color: #666;
+            background: rgba(255,255,255,0.8);
+            padding: 3px 8px;
+            border-radius: 12px;
+            z-index: 999;
+        }
     </style>
 
     <meta charset="UTF-8">
@@ -87,6 +110,7 @@
             box-sizing: border-box;
             font-family: 'Segoe UI', system-ui, sans-serif;
             user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -326,6 +350,13 @@
             box-shadow: 0 1px 0 #1e7e34;
         }
 
+        .btn-proceed:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 5px 0 #1e7e34;
+        }
+
         /* Status */
         .error {
             color: #dc3545;
@@ -393,9 +424,20 @@
             border-radius: 25px;
             border: 1px solid #28a745;
         }
+
+        /* Rate limit info */
+        .rate-limit-info {
+            font-size: 14px;
+            color: #666;
+            text-align: center;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
+    <!-- CSRF Token for JavaScript -->
+    {% csrf_token %}
+    <input type="hidden" id="csrf_token" value="{{ csrf_token }}">
 
     <!-- Timeout Warning Popup -->
     <div id="timeoutWarning" class="timeout-warning">
@@ -407,7 +449,7 @@
     <!-- HEADER -->
     <div class="header">
         <div class="header-left">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India">
             <div>
                 {% trans "Ministry of Electronics &" %}<br>
                 {% trans "Information Technology" %}<br>
@@ -415,7 +457,7 @@
             </div>
         </div>
         <div class="header-right">
-            <img src="https://www.cdac.in/img/cdac-logo.png">
+            <img src="https://www.cdac.in/img/cdac-logo.png" alt="CDAC Logo">
         </div>
     </div>
 
@@ -463,18 +505,79 @@
                 <div class="key special" onclick="clearAll()">C</div>
             </div>
 
-            <button class="btn-proceed" onclick="proceedToOTP()">
+            <button class="btn-proceed" onclick="proceedToOTP()" id="proceedBtn">
                 {% trans "Proceed" %} →
             </button>
 
             <div id="loader" class="loader hidden"></div>
-            <p id="error" class="error hidden"></p>
-
-            {% csrf_token %}
+            <div id="error" class="error hidden"></div>
+            
+            <!-- Rate limit info (optional) -->
+            {% if request.rate_limit_remaining is not None %}
+            <div class="rate-limit-info">
+                {% trans "Attempts remaining" %}: {{ request.rate_limit_remaining }}
+            </div>
+            {% endif %}
+            
+            <!-- Security Note -->
+            <div class="security-note">
+                🔒 {% trans "Secured by Government of India" %}
+            </div>
         </div>
     </div>
 
+    <!-- Hidden form for CSRF fallback -->
+    <form id="authForm" method="POST" action="{% url 'auth' %}" style="display: none;">
+        {% csrf_token %}
+        <input type="hidden" name="aadhaar_number" id="aadhaarInput">
+    </form>
+
 <script>
+/* ================= SECURITY ENHANCEMENTS ================= */
+
+// Prevent form double submission
+let isSubmitting = false;
+
+// Disable keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+    // F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
+    if (e.key === 'F12' || 
+        (e.ctrlKey && e.shiftKey && e.key === 'I') ||
+        (e.ctrlKey && e.shiftKey && e.key === 'J') ||
+        (e.ctrlKey && e.key === 'U')) {
+        e.preventDefault();
+        return false;
+    }
+    
+    // Prevent backspace from navigating back
+    if (e.key === 'Backspace' && !e.target.matches('input, textarea')) {
+        e.preventDefault();
+    }
+});
+
+// Disable right-click
+document.addEventListener('contextmenu', event => event.preventDefault());
+
+// Auto-hide cursor on touch devices
+let cursorTimeout;
+document.addEventListener('touchstart', function() {
+    document.body.style.cursor = 'default';
+    clearTimeout(cursorTimeout);
+    cursorTimeout = setTimeout(function() {
+        document.body.style.cursor = 'none';
+    }, 3000);
+});
+
+// Prevent page zoom on double tap
+let lastTouchEnd = 0;
+document.addEventListener('touchend', function(event) {
+    const now = (new Date()).getTime();
+    if (now - lastTouchEnd <= 300) {
+        event.preventDefault();
+    }
+    lastTouchEnd = now;
+}, false);
+
 /* ================= LANGUAGE MAP ================= */
 
 const languageMap = {
@@ -517,9 +620,10 @@ function speak(text) {
 /* ================= SESSION TIMER ================= */
 
 let sessionTimer;
-const SESSION_DURATION = 120000; // 2 minutes
+const SESSION_DURATION = 240000; // 4 minutes (increased from 2)
 
 function startSessionTimer() {
+    clearTimeout(sessionTimer);
     sessionTimer = setTimeout(() => {
         document.getElementById('timeoutWarning').style.display = 'block';
     }, SESSION_DURATION);
@@ -527,7 +631,6 @@ function startSessionTimer() {
 
 function extendSession() {
     document.getElementById('timeoutWarning').style.display = 'none';
-    clearTimeout(sessionTimer);
     startSessionTimer();
 }
 
@@ -562,6 +665,8 @@ function highlightCurrentBox() {
 }
 
 function pressKey(n) {
+    if (isSubmitting) return; // Prevent input during submission
+    
     resetSessionTimer();
     if(aadhaarPos < 12) {
         aadhaarBoxes[aadhaarPos].textContent = n;
@@ -577,6 +682,8 @@ function pressKey(n) {
 }
 
 function backspace() {
+    if (isSubmitting) return; // Prevent input during submission
+    
     resetSessionTimer();
     if(aadhaarPos > 0) {
         aadhaarPos--;
@@ -587,6 +694,8 @@ function backspace() {
 }
 
 function clearAll() {
+    if (isSubmitting) return; // Prevent input during submission
+    
     resetSessionTimer();
     aadhaarBoxes.forEach(b => {
         b.textContent = '';
@@ -608,6 +717,9 @@ function goBack() {
 function proceedToOTP() {
     resetSessionTimer();
     
+    // Prevent double submission
+    if (isSubmitting) return;
+    
     if(aadhaarPos !== 12) {
         document.getElementById("error").innerText = "{% trans 'Please enter 12 digits' %}";
         document.getElementById("error").classList.remove("hidden");
@@ -628,6 +740,12 @@ function proceedToOTP() {
         return;
     }
 
+    // Disable proceed button and set submitting flag
+    isSubmitting = true;
+    const proceedBtn = document.getElementById("proceedBtn");
+    proceedBtn.disabled = true;
+    proceedBtn.innerHTML = '{% trans "Processing..." %}';
+    
     document.getElementById("error").classList.add("hidden");
     document.getElementById("loader").classList.remove("hidden");
     
@@ -641,25 +759,50 @@ function proceedToOTP() {
         speak("{% trans 'Processing' %}");
     }
     
-    // Submit form via POST
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = '{% url "auth" %}';
+    // Get CSRF token
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const aadhaarNumber = getAadhaarNumber();
     
-    const csrf = document.createElement('input');
-    csrf.type = 'hidden';
-    csrf.name = 'csrfmiddlewaretoken';
-    csrf.value = '{{ csrf_token }}';
-    form.appendChild(csrf);
-    
-    const input = document.createElement('input');
-    input.type = 'hidden';
-    input.name = 'aadhaar_number';
-    input.value = getAadhaarNumber();
-    form.appendChild(input);
-    
-    document.body.appendChild(form);
-    form.submit();
+    // Submit via fetch API for better error handling
+    fetch('{% url "auth" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': csrfToken
+        },
+        body: new URLSearchParams({
+            'csrfmiddlewaretoken': csrfToken,
+            'aadhaar_number': aadhaarNumber
+        })
+    })
+    .then(response => {
+        if (response.redirected) {
+            window.location.href = response.url;
+        } else {
+            return response.text();
+        }
+    })
+    .then(html => {
+        // If we get HTML back, there was an error
+        document.getElementById("loader").classList.add("hidden");
+        proceedBtn.disabled = false;
+        proceedBtn.innerHTML = '{% trans "Proceed" %} →';
+        isSubmitting = false;
+        
+        // Reload page to show error
+        window.location.reload();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        document.getElementById("loader").classList.add("hidden");
+        proceedBtn.disabled = false;
+        proceedBtn.innerHTML = '{% trans "Proceed" %} →';
+        isSubmitting = false;
+        
+        // Fallback to form submit
+        document.getElementById('aadhaarInput').value = aadhaarNumber;
+        document.getElementById('authForm').submit();
+    });
 }
 
 /* ================= VOICE INPUT ================= */
@@ -678,6 +821,18 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(() => {
             toggleVoiceInput();
         }, 1000); // Small delay to let page load
+    }
+    
+    startSessionTimer();
+    
+    // Add activity listeners
+    document.addEventListener('click', resetSessionTimer);
+    document.addEventListener('keypress', resetSessionTimer);
+    document.addEventListener('touchstart', resetSessionTimer);
+    
+    // Highlight first box
+    if (aadhaarBoxes[0]) {
+        aadhaarBoxes[0].classList.add('highlight');
     }
 });
 
@@ -945,22 +1100,7 @@ window.autoReadPage = function() {
     }, 2000);
 };
 
-/* ================= INIT ================= */
-
-// Highlight first box on load
-setTimeout(() => {
-    if (aadhaarBoxes[0]) {
-        aadhaarBoxes[0].classList.add('highlight');
-    }
-}, 100);
-
-document.addEventListener('DOMContentLoaded', function() {
-    startSessionTimer();
-    
-    document.addEventListener('click', resetSessionTimer);
-    document.addEventListener('keypress', resetSessionTimer);
-    document.addEventListener('touchstart', resetSessionTimer);
-});
+/* ================= CLEANUP ================= */
 
 window.addEventListener('beforeunload', function() {
     if (sessionTimer) {

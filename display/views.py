@@ -1,3 +1,4 @@
+# display/views.py
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
 from django.contrib import messages
@@ -8,7 +9,7 @@ import base64
 import logging
 import requests
 from django.core.files.base import ContentFile
-from datetime import datetime, timedelta  # Fixed import
+from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
@@ -29,14 +30,23 @@ from .models import (
     MarriageRegistration, DocumentUpload
 )
 
+# Import security modules
+from .decorators import kiosk_login_required, rate_limit, log_activity
+from .utils.security import (
+    generate_secure_otp, hash_otp, verify_otp_hash, 
+    rate_limit_check, validate_aadhaar, sanitize_input,
+    mask_sensitive_data, log_security_event, get_client_ip,
+    validate_file_extension, validate_file_size
+)
+
 logger = logging.getLogger(__name__)
 
 
 # ================= OTP UTILITY FUNCTIONS =================
 
 def generate_otp(length=6):
-    """Generate a random OTP of specified length"""
-    return ''.join([str(random.randint(0, 9)) for _ in range(length)])
+    """Generate a cryptographically secure OTP"""
+    return generate_secure_otp(length)
 
 
 def send_otp_via_circuitdigest(phone_number, otp, aadhaar_number):
@@ -146,15 +156,15 @@ def send_otp_via_circuitdigest(phone_number, otp, aadhaar_number):
         return False, f"Failed to send OTP: {str(e)}"
 
 
-def verify_otp(stored_otp, entered_otp, otp_timestamp):
+def verify_otp(stored_hash, entered_otp, otp_timestamp):
     """
-    Verify OTP and check expiry (5 minutes)
+    Verify OTP using hash comparison and check expiry (5 minutes)
     """
-    
-    if not stored_otp or not entered_otp:
+    if not stored_hash or not entered_otp:
         return False, "OTP missing"
     
-    if stored_otp != entered_otp:
+    # Verify using hash
+    if not verify_otp_hash(stored_hash, entered_otp):
         return False, "Invalid OTP"
     
     # Check if OTP is expired (5 minutes)
@@ -171,8 +181,9 @@ def index(request):
     return render(request, 'index.html')
 
 
+@rate_limit(max_attempts=3, time_window=300, key_prefix='auth')
 def auth(request):
-    """Aadhaar authentication page"""
+    """Aadhaar authentication page with enhanced security"""
     # Clear any existing messages
     storage = messages.get_messages(request)
     storage.used = True
@@ -182,11 +193,13 @@ def auth(request):
         return redirect('auth')
     
     if request.method == 'POST':
-        aadhaar_number = request.POST.get('aadhaar_number')
+        aadhaar_number = sanitize_input(request.POST.get('aadhaar_number'), 12)
         
-        # Validate Aadhaar format
-        if not aadhaar_number or len(aadhaar_number) != 12 or not aadhaar_number.isdigit():
-            messages.error(request, 'Please enter a valid 12-digit Aadhaar number')
+        # Validate Aadhaar with Verhoeff algorithm
+        is_valid, message = validate_aadhaar(aadhaar_number)
+        if not is_valid:
+            messages.error(request, message)
+            log_security_event(request, 'INVALID_AADHAAR', {'reason': message})
             return render(request, 'auth.html')
         
         try:
@@ -197,9 +210,12 @@ def auth(request):
             request.session['aadhaar_number'] = aadhaar_number
             request.session['consumer_id'] = consumer.id
             
-            # Generate OTP
-            otp = generate_otp(6)
-            request.session['otp'] = otp
+            # Generate and hash OTP
+            otp = generate_secure_otp(6)
+            otp_hash = hash_otp(otp)
+            
+            # Store hash instead of plain OTP
+            request.session['otp_hash'] = otp_hash
             request.session['otp_attempts'] = 0
             request.session['otp_timestamp'] = datetime.now().isoformat()
             
@@ -223,7 +239,7 @@ def auth(request):
                     model_name='Consumer',
                     object_id=consumer.id,
                     changes={'aadhaar': aadhaar_number[-4:]},
-                    ip_address=request.META.get('REMOTE_ADDR', ''),
+                    ip_address=get_client_ip(request),
                     user_agent=request.META.get('HTTP_USER_AGENT', '')
                 )
                 
@@ -245,7 +261,7 @@ def auth(request):
                 model_name='Consumer',
                 object_id='',
                 changes={'aadhaar': aadhaar_number[-4:]},
-                ip_address=request.META.get('REMOTE_ADDR', ''),
+                ip_address=get_client_ip(request),
                 user_agent=request.META.get('HTTP_USER_AGENT', '')
             )
             
@@ -259,15 +275,16 @@ def auth(request):
     return render(request, 'auth.html')
 
 
+@rate_limit(max_attempts=5, time_window=300, key_prefix='otp_verification')
 def otp(request):
     """OTP verification page"""
     # Check if aadhaar is in session
     aadhaar_number = request.session.get('aadhaar_number')
     consumer_id = request.session.get('consumer_id')
-    stored_otp = request.session.get('otp')
+    stored_otp_hash = request.session.get('otp_hash')
     otp_timestamp_str = request.session.get('otp_timestamp')
     
-    if not aadhaar_number or not consumer_id or not stored_otp:
+    if not aadhaar_number or not consumer_id or not stored_otp_hash:
         messages.error(request, 'Session expired. Please enter Aadhaar again.')
         return redirect('auth')
     
@@ -278,7 +295,7 @@ def otp(request):
         otp_timestamp = datetime.now() - timedelta(minutes=6)  # Force expiry
     
     if request.method == 'POST':
-        entered_otp = request.POST.get('otp')
+        entered_otp = sanitize_input(request.POST.get('otp'), 6)
         
         # Get attempt count
         attempts = request.session.get('otp_attempts', 0)
@@ -286,15 +303,20 @@ def otp(request):
         
         if attempts >= 3:
             messages.error(request, 'Too many failed attempts. Please request new OTP.')
+            log_security_event(request, 'OTP_ATTEMPTS_EXCEEDED', {'aadhaar': aadhaar_number[-4:]})
             return redirect('resend-otp')
         
-        # Verify OTP
-        is_valid, message = verify_otp(stored_otp, entered_otp, otp_timestamp)
+        # Verify OTP using hash
+        is_valid, message = verify_otp(stored_otp_hash, entered_otp, otp_timestamp)
         
         if is_valid:
             # OTP verified successfully
             request.session['aadhaar_verified'] = True
             request.session['otp_verified'] = True
+            
+            # Generate CSRF token for session
+            from .utils.security import generate_csrf_token
+            request.session['csrf_token'] = generate_csrf_token()
             
             # Update consumer last login
             try:
@@ -302,7 +324,7 @@ def otp(request):
                 consumer.last_login = datetime.now()
                 consumer.save()
                 
-                # FIX: Handle UserSession creation properly
+                # Handle UserSession creation properly
                 session_key = request.session.session_key
                 
                 # Deactivate any existing active sessions for this consumer
@@ -319,7 +341,7 @@ def otp(request):
                 if existing_session:
                     # Update existing session
                     existing_session.consumer = consumer
-                    existing_session.ip_address = request.META.get('REMOTE_ADDR', '')
+                    existing_session.ip_address = get_client_ip(request)
                     existing_session.user_agent = request.META.get('HTTP_USER_AGENT', '')
                     existing_session.is_active = True
                     existing_session.save()
@@ -329,7 +351,7 @@ def otp(request):
                     UserSession.objects.create(
                         consumer=consumer,
                         session_key=session_key,
-                        ip_address=request.META.get('REMOTE_ADDR', ''),
+                        ip_address=get_client_ip(request),
                         user_agent=request.META.get('HTTP_USER_AGENT', '')
                     )
                     logger.info(f"✅ Created new session: {session_key}")
@@ -343,7 +365,7 @@ def otp(request):
                 )
                 
                 # Clear OTP from session
-                request.session.pop('otp', None)
+                request.session.pop('otp_hash', None)
                 request.session.pop('otp_timestamp', None)
                 
                 messages.success(request, 'OTP verified successfully!')
@@ -355,6 +377,7 @@ def otp(request):
             return redirect('menu')
         else:
             messages.error(request, message)
+            log_security_event(request, 'OTP_INVALID', {'aadhaar': aadhaar_number[-4:]})
     
     # Mask Aadhaar for display
     masked_aadhaar = 'XXXX XXXX ' + aadhaar_number[-4:]
@@ -380,8 +403,9 @@ def otp(request):
     return render(request, 'otp.html', context)
 
 
+@rate_limit(max_attempts=3, time_window=600, key_prefix='resend_otp')
 def resend_otp(request):
-    """Resend OTP"""
+    """Resend OTP with rate limiting"""
     if request.method == 'POST':
         aadhaar_number = request.session.get('aadhaar_number')
         consumer_id = request.session.get('consumer_id')
@@ -394,8 +418,9 @@ def resend_otp(request):
             consumer = Consumer.objects.get(id=consumer_id, aadhaar_number=aadhaar_number)
             
             # Generate new OTP
-            otp = generate_otp(6)
-            request.session['otp'] = otp
+            otp = generate_secure_otp(6)
+            otp_hash = hash_otp(otp)
+            request.session['otp_hash'] = otp_hash
             request.session['otp_attempts'] = 0
             request.session['otp_timestamp'] = datetime.now().isoformat()
             
@@ -412,7 +437,7 @@ def resend_otp(request):
                     model_name='Consumer',
                     object_id=consumer.id,
                     changes={'aadhaar': aadhaar_number[-4:]},
-                    ip_address=request.META.get('REMOTE_ADDR', ''),
+                    ip_address=get_client_ip(request),
                     user_agent=request.META.get('HTTP_USER_AGENT', '')
                 )
             else:
@@ -431,6 +456,7 @@ def resend_otp(request):
     return redirect('otp')
 
 
+@log_activity('LOGOUT')
 def logout(request):
     """Logout user - properly clean up session"""
     consumer_id = request.session.get('consumer_id')
@@ -453,13 +479,10 @@ def logout(request):
     return redirect('index')
 
 
+@kiosk_login_required
+@log_activity('VIEW_MENU')
 def menu(request):
     """Main menu after authentication"""
-    # Check if user is verified
-    if not request.session.get('aadhaar_verified') or not request.session.get('otp_verified'):
-        messages.error(request, 'Please login first')
-        return redirect('auth')
-    
     # Get consumer info for display
     consumer_id = request.session.get('consumer_id')
     try:
@@ -478,13 +501,8 @@ def menu(request):
 
 # ================= ELECTRICITY =================
 
+@kiosk_login_required
 def electricity_services(request):
-    # Check if user is verified
-    if not request.session.get('aadhaar_verified'):
-        messages.error(request, 'Please verify OTP first')
-        return redirect('auth')
-    
-    # Add some context data to ensure the page renders
     context = {
         'page_title': 'Electricity Services',
         'current_date': datetime.now().strftime('%d %b %Y'),
@@ -492,24 +510,22 @@ def electricity_services(request):
     return render(request, 'electricity-services.html', context)
 
 
+@kiosk_login_required
+@rate_limit(max_attempts=10, time_window=300, key_prefix='bill_payment')
 def electricity_bill_payment(request):
-    if not request.session.get('aadhaar_verified'):
-        messages.error(request, 'Please verify OTP first')
-        return redirect('auth')
-    
     context = {}
     
     if request.method == 'POST':
-        action = request.POST.get('action')
-        consumer_number = request.POST.get('consumer_number')
-        bill_amount = request.POST.get('bill_amount')
+        action = sanitize_input(request.POST.get('action'))
+        consumer_number = sanitize_input(request.POST.get('consumer_number'), 20)
+        bill_amount = sanitize_input(request.POST.get('bill_amount'))
         
         # FIELDS for payment method
-        payment_method = request.POST.get('payment_method')  # 'upi' or 'atm'
-        upi_id = request.POST.get('upi_id')
-        card_number = request.POST.get('card_number')
-        cvv = request.POST.get('cvv')
-        pin = request.POST.get('pin')
+        payment_method = sanitize_input(request.POST.get('payment_method'))
+        upi_id = sanitize_input(request.POST.get('upi_id'), 50)
+        card_number = sanitize_input(request.POST.get('card_number'), 19)
+        cvv = sanitize_input(request.POST.get('cvv'), 3)
+        pin = sanitize_input(request.POST.get('pin'), 4)
         
         if action == 'pay':
             if not consumer_number or not bill_amount:
@@ -553,6 +569,13 @@ def electricity_bill_payment(request):
             # Generate transaction ID
             transaction_id = f"TXN{datetime.now().strftime('%y%m%d%H%M%S')}{random.randint(100, 999)}"
             
+            # Log payment
+            log_security_event(request, 'PAYMENT_INITIATED', {
+                'service': 'electricity',
+                'amount': bill_amount,
+                'method': payment_method
+            })
+            
             messages.success(request, f'Payment of ₹{bill_amount} for consumer {consumer_number} successful! Transaction ID: {transaction_id}')
             return redirect('payment-history')
         
@@ -563,19 +586,16 @@ def electricity_bill_payment(request):
     return render(request, 'electricity-bill-payment.html', context)
 
 
+@kiosk_login_required
 def electricity_duplicate_bill(request):
-    if not request.session.get('aadhaar_verified'):
-        messages.error(request, 'Please verify OTP first')
-        return redirect('auth')
-    
     context = {}
     
     if request.method == 'POST':
-        action = request.POST.get('action')
+        action = sanitize_input(request.POST.get('action'))
         
         if action == 'download':
-            bill_id = request.POST.get('bill_id')
-            bill_month = request.POST.get('bill_month')
+            bill_id = sanitize_input(request.POST.get('bill_id'), 50)
+            bill_month = sanitize_input(request.POST.get('bill_month'), 20)
             
             if bill_id and bill_month:
                 messages.success(request, f'Bill for {bill_month} downloaded successfully!')
@@ -584,14 +604,14 @@ def electricity_duplicate_bill(request):
         
         elif action == 'pay':
             # Redirect to payment page with bill details
-            bill_month = request.POST.get('bill_month')
-            bill_amount = request.POST.get('bill_amount')
-            bill_number = request.POST.get('bill_number')
+            bill_month = sanitize_input(request.POST.get('bill_month'), 20)
+            bill_amount = sanitize_input(request.POST.get('bill_amount'))
+            bill_number = sanitize_input(request.POST.get('bill_number'), 50)
             
             # Store in session for payment page
             request.session['pending_payment'] = {
                 'service': 'electricity',
-                'consumer_no': request.POST.get('consumer_number'),
+                'consumer_no': sanitize_input(request.POST.get('consumer_number'), 20),
                 'amount': bill_amount,
                 'bill_number': bill_number,
                 'bill_month': bill_month
@@ -600,7 +620,7 @@ def electricity_duplicate_bill(request):
             return redirect('electricity-bill-payment')
         
         else:  # Search action
-            consumer_number = request.POST.get('consumer_number')
+            consumer_number = sanitize_input(request.POST.get('consumer_number'), 20)
             
             if not consumer_number or len(consumer_number) < 6:
                 messages.error(request, 'Please enter a valid consumer number')
@@ -631,15 +651,12 @@ def electricity_duplicate_bill(request):
     return render(request, 'electricity-duplicate-bill.html', context)
 
 
+@kiosk_login_required
 def electricity_solar(request):
-    if not request.session.get('aadhaar_verified'):
-        messages.error(request, 'Please verify OTP first')
-        return redirect('auth')
-    
     if request.method == 'POST':
-        consumer_number = request.POST.get('consumer_number')
-        solar_capacity = request.POST.get('solar_capacity')
-        roof_area = request.POST.get('roof_area')
+        consumer_number = sanitize_input(request.POST.get('consumer_number'), 20)
+        solar_capacity = sanitize_input(request.POST.get('solar_capacity'))
+        roof_area = sanitize_input(request.POST.get('roof_area'))
         
         if not consumer_number or not solar_capacity:
             messages.error(request, 'Please fill in all required fields')
@@ -652,17 +669,14 @@ def electricity_solar(request):
     return render(request, 'electricity-solar.html')
 
 
+@kiosk_login_required
 def electricity_new_connection(request):
-    if not request.session.get('aadhaar_verified'):
-        messages.error(request, 'Please verify OTP first')
-        return redirect('auth')
-    
     if request.method == 'POST':
-        full_name = request.POST.get('full_name')
-        address = request.POST.get('address')
-        property_type = request.POST.get('property_type')
-        load_required = request.POST.get('load_required')
-        mobile_number = request.POST.get('mobile_number')
+        full_name = sanitize_input(request.POST.get('full_name'), 100)
+        address = sanitize_input(request.POST.get('address'), 500)
+        property_type = sanitize_input(request.POST.get('property_type'), 20)
+        load_required = sanitize_input(request.POST.get('load_required'))
+        mobile_number = sanitize_input(request.POST.get('mobile_number'), 10)
         
         if not full_name:
             messages.error(request, 'Please enter your full name')
@@ -699,23 +713,20 @@ def electricity_new_connection(request):
     return render(request, 'electricity-new-connection.html')
 
 
+@kiosk_login_required
 def electricity_name_transfer(request):
-    if not request.session.get('aadhaar_verified'):
-        messages.error(request, 'Please verify OTP first')
-        return redirect('auth')
-    
     context = {}
     
     if request.method == 'POST':
-        consumer_number = request.POST.get('consumer_number', '123456789012')
-        new_owner_name = request.POST.get('new_owner_name')
-        new_owner_aadhaar = request.POST.get('new_owner_aadhaar')
-        relationship = request.POST.get('relationship')
+        consumer_number = sanitize_input(request.POST.get('consumer_number', '123456789012'), 20)
+        new_owner_name = sanitize_input(request.POST.get('new_owner_name'), 100)
+        new_owner_aadhaar = sanitize_input(request.POST.get('new_owner_aadhaar'), 12)
+        relationship = sanitize_input(request.POST.get('relationship'), 50)
         
         # NEW FIELDS
-        new_owner_phone = request.POST.get('new_owner_phone')
-        new_owner_email = request.POST.get('new_owner_email')
-        transfer_fee = request.POST.get('transfer_fee', 500)
+        new_owner_phone = sanitize_input(request.POST.get('new_owner_phone'), 10)
+        new_owner_email = sanitize_input(request.POST.get('new_owner_email'), 100)
+        transfer_fee = sanitize_input(request.POST.get('transfer_fee', 500))
         
         # File uploads
         sale_deed = request.FILES.get('sale_deed')
@@ -731,9 +742,10 @@ def electricity_name_transfer(request):
             messages.error(request, 'Please enter new owner Aadhaar number')
             return render(request, 'electricity-name-transfer.html', context)
         
-        aadhaar_clean = new_owner_aadhaar.replace(' ', '')
-        if not (aadhaar_clean.isdigit() and len(aadhaar_clean) == 12):
-            messages.error(request, 'Please enter a valid 12-digit Aadhaar number')
+        # Validate Aadhaar
+        is_valid, message = validate_aadhaar(new_owner_aadhaar)
+        if not is_valid:
+            messages.error(request, message)
             return render(request, 'electricity-name-transfer.html', context)
         
         # Validate phone if provided
@@ -757,6 +769,18 @@ def electricity_name_transfer(request):
         for i, doc in enumerate(required_docs):
             if not doc:
                 missing_docs.append(doc_names[i])
+            else:
+                # Validate file extension
+                is_valid_ext, ext = validate_file_extension(doc.name, ['.pdf', '.jpg', '.jpeg', '.png'])
+                if not is_valid_ext:
+                    messages.error(request, f'{doc_names[i]}: Invalid file type. Only PDF, JPG, PNG allowed.')
+                    return render(request, 'electricity-name-transfer.html', context)
+                
+                # Validate file size
+                is_valid_size, size = validate_file_size(doc, 25)
+                if not is_valid_size:
+                    messages.error(request, f'{doc_names[i]}: File size exceeds 25MB limit.')
+                    return render(request, 'electricity-name-transfer.html', context)
         
         if missing_docs:
             messages.error(request, f'Please upload all required documents. Missing: {", ".join(missing_docs)}')
@@ -776,21 +800,18 @@ def electricity_name_transfer(request):
     return render(request, 'electricity-name-transfer.html', context)
 
 
+@kiosk_login_required
 def electricity_meter_replacement(request):
-    if not request.session.get('aadhaar_verified'):
-        messages.error(request, 'Please verify OTP first')
-        return redirect('auth')
-    
     if request.method == 'POST':
-        consumer_number = request.POST.get('consumer_number', '123456789012')
-        meter_type = request.POST.get('meter_type')
-        meter_price = request.POST.get('meter_price')
-        reason = request.POST.get('reason')
-        preferred_date = request.POST.get('preferred_date')
+        consumer_number = sanitize_input(request.POST.get('consumer_number', '123456789012'), 20)
+        meter_type = sanitize_input(request.POST.get('meter_type'), 20)
+        meter_price = sanitize_input(request.POST.get('meter_price'))
+        reason = sanitize_input(request.POST.get('reason'), 50)
+        preferred_date = sanitize_input(request.POST.get('preferred_date'), 10)
         
         # NEW FIELDS
-        preferred_time = request.POST.get('preferred_time', '09:00-12:00')
-        additional_services = request.POST.get('additional_services', '')
+        preferred_time = sanitize_input(request.POST.get('preferred_time', '09:00-12:00'), 20)
+        additional_services = sanitize_input(request.POST.get('additional_services', ''))
         
         if not all([meter_type, reason, preferred_date]):
             messages.error(request, 'Please fill in all required fields')
@@ -833,19 +854,16 @@ def electricity_meter_replacement(request):
     return render(request, 'electricity-meter-replacement.html')
 
 
+@kiosk_login_required
 def electricity_load_enhancement(request):
-    if not request.session.get('aadhaar_verified'):
-        messages.error(request, 'Please verify OTP first')
-        return redirect('auth')
-    
     if request.method == 'POST':
-        consumer_number = request.POST.get('consumer_number', '123456789012')
-        current_load = request.POST.get('current_load', '3')
-        requested_load = request.POST.get('requested_load')
-        reason = request.POST.get('reason')
+        consumer_number = sanitize_input(request.POST.get('consumer_number', '123456789012'), 20)
+        current_load = sanitize_input(request.POST.get('current_load', '3'))
+        requested_load = sanitize_input(request.POST.get('requested_load'))
+        reason = sanitize_input(request.POST.get('reason'), 50)
         
         # NEW FIELD
-        reason_details = request.POST.get('reason_details', '')
+        reason_details = sanitize_input(request.POST.get('reason_details', ''), 500)
         
         if not requested_load:
             messages.error(request, 'Please enter requested load')
@@ -879,19 +897,16 @@ def electricity_load_enhancement(request):
     return render(request, 'electricity-load-enhancement.html')
 
 
+@kiosk_login_required
 def electricity_complaint(request):
-    if not request.session.get('aadhaar_verified'):
-        messages.error(request, 'Please verify OTP first')
-        return redirect('auth')
-    
     if request.method == 'POST':
-        consumer_number = request.POST.get('consumer_number', '123456789012')
-        complaint_type = request.POST.get('complaint_type')
-        complaint_description = request.POST.get('complaint_description')
+        consumer_number = sanitize_input(request.POST.get('consumer_number', '123456789012'), 20)
+        complaint_type = sanitize_input(request.POST.get('complaint_type'), 50)
+        complaint_description = sanitize_input(request.POST.get('complaint_description'), 1000)
         
         # NEW FIELDS
-        complaint_priority = request.POST.get('complaint_priority', 'Normal')
-        contact_phone = request.POST.get('contact_phone')
+        complaint_priority = sanitize_input(request.POST.get('complaint_priority', 'Normal'), 20)
+        contact_phone = sanitize_input(request.POST.get('contact_phone'), 10)
         
         if not all([complaint_type, complaint_description]):
             messages.error(request, 'Please fill in all required fields')
@@ -924,18 +939,15 @@ def electricity_complaint(request):
 
 # ================= WATER =================
 
+@kiosk_login_required
 def water_bill(request):
-    if not request.session.get('aadhaar_verified'):
-        messages.error(request, 'Please verify OTP first')
-        return redirect('auth')
-    
     if request.method == 'POST':
-        action = request.POST.get('action')
-        consumer_no = request.POST.get('consumer_no')
+        action = sanitize_input(request.POST.get('action'))
+        consumer_no = sanitize_input(request.POST.get('consumer_no'), 20)
         
         if action == 'pay':
-            bill_amount = request.POST.get('bill_amount')
-            payment_method = request.POST.get('payment_method', 'upi')
+            bill_amount = sanitize_input(request.POST.get('bill_amount'))
+            payment_method = sanitize_input(request.POST.get('payment_method', 'upi'), 10)
             
             if not consumer_no or not bill_amount:
                 messages.error(request, 'Invalid bill details')
@@ -969,24 +981,19 @@ def water_bill(request):
 
 # ================= MUNICIPAL SERVICES =================
 
+@kiosk_login_required
 def municipal_services(request):
-    if not request.session.get('aadhaar_verified'):
-        messages.error(request, 'Please verify OTP first')
-        return redirect('auth')
     return render(request, 'municipal-services.html')
 
 
+@kiosk_login_required
 def trade_license(request):
-    if not request.session.get('aadhaar_verified'):
-        messages.error(request, 'Please verify OTP first')
-        return redirect('auth')
-    
     if request.method == 'POST':
-        business_name = request.POST.get('business_name')
-        business_type = request.POST.get('business_type')
-        owner_name = request.POST.get('owner_name')
-        address = request.POST.get('address')
-        gst_number = request.POST.get('gst_number')
+        business_name = sanitize_input(request.POST.get('business_name'), 100)
+        business_type = sanitize_input(request.POST.get('business_type'), 50)
+        owner_name = sanitize_input(request.POST.get('owner_name'), 100)
+        address = sanitize_input(request.POST.get('address'), 500)
+        gst_number = sanitize_input(request.POST.get('gst_number'), 15)
         
         if not all([business_name, business_type, owner_name, address]):
             messages.error(request, 'Please fill in all required fields')
@@ -1003,18 +1010,15 @@ def trade_license(request):
     return render(request, 'trade-license.html')
 
 
+@kiosk_login_required
 def property_tax(request):
-    if not request.session.get('aadhaar_verified'):
-        messages.error(request, 'Please verify OTP first')
-        return redirect('auth')
-    
     if request.method == 'POST':
-        action = request.POST.get('action')
-        property_id = request.POST.get('property_id')
+        action = sanitize_input(request.POST.get('action'))
+        property_id = sanitize_input(request.POST.get('property_id'), 20)
         
         if action == 'pay':
-            tax_amount = request.POST.get('tax_amount')
-            payment_method = request.POST.get('payment_method', 'upi')
+            tax_amount = sanitize_input(request.POST.get('tax_amount'))
+            payment_method = sanitize_input(request.POST.get('payment_method', 'upi'), 10)
             
             if not property_id or not tax_amount:
                 messages.error(request, 'Invalid tax details')
@@ -1046,18 +1050,15 @@ def property_tax(request):
     return render(request, 'property-tax.html')
 
 
+@kiosk_login_required
 def professional_tax(request):
-    if not request.session.get('aadhaar_verified'):
-        messages.error(request, 'Please verify OTP first')
-        return redirect('auth')
-    
     if request.method == 'POST':
-        action = request.POST.get('action')
-        ptin = request.POST.get('ptin')
+        action = sanitize_input(request.POST.get('action'))
+        ptin = sanitize_input(request.POST.get('ptin'), 20)
         
         if action == 'pay':
-            tax_amount = request.POST.get('tax_amount')
-            payment_method = request.POST.get('payment_method', 'upi')
+            tax_amount = sanitize_input(request.POST.get('tax_amount'))
+            payment_method = sanitize_input(request.POST.get('payment_method', 'upi'), 10)
             
             if not ptin or not tax_amount:
                 messages.error(request, 'Invalid tax details')
@@ -1090,11 +1091,8 @@ def professional_tax(request):
     return render(request, 'professional-tax.html')
 
 
+@kiosk_login_required
 def application_status(request):
-    if not request.session.get('aadhaar_verified'):
-        messages.error(request, 'Please verify OTP first')
-        return redirect('auth')
-    
     # Sample data - in production, fetch from database
     context = {
         'application': {
@@ -1117,18 +1115,15 @@ def application_status(request):
     return render(request, 'application-status.html', context)
 
 
+@kiosk_login_required
 def building_plan(request):
-    if not request.session.get('aadhaar_verified'):
-        messages.error(request, 'Please verify OTP first')
-        return redirect('auth')
-    
     if request.method == 'POST':
-        owner_name = request.POST.get('owner_name')
-        property_address = request.POST.get('property_address')
-        survey_number = request.POST.get('survey_number')
-        plot_area = request.POST.get('plot_area')
-        building_type = request.POST.get('building_type')
-        num_floors = request.POST.get('num_floors')
+        owner_name = sanitize_input(request.POST.get('owner_name'), 100)
+        property_address = sanitize_input(request.POST.get('property_address'), 500)
+        survey_number = sanitize_input(request.POST.get('survey_number'), 50)
+        plot_area = sanitize_input(request.POST.get('plot_area'))
+        building_type = sanitize_input(request.POST.get('building_type'), 20)
+        num_floors = sanitize_input(request.POST.get('num_floors'), 2)
         building_plan = request.FILES.get('building_plan')
         
         if not all([owner_name, property_address, survey_number, plot_area, building_type, num_floors]):
@@ -1139,14 +1134,15 @@ def building_plan(request):
             messages.error(request, 'Please upload the building plan file')
             return render(request, 'building-plan.html')
         
-        if building_plan.size > 25 * 1024 * 1024:
-            messages.error(request, 'File size exceeds 25MB limit')
+        # Validate file
+        is_valid_ext, ext = validate_file_extension(building_plan.name, ['.pdf', '.dwg'])
+        if not is_valid_ext:
+            messages.error(request, 'Only PDF and DWG files are allowed')
             return render(request, 'building-plan.html')
         
-        allowed_extensions = ['.pdf', '.dwg']
-        file_extension = os.path.splitext(building_plan.name)[1].lower()
-        if file_extension not in allowed_extensions:
-            messages.error(request, 'Only PDF and DWG files are allowed')
+        is_valid_size, size = validate_file_size(building_plan, 25)
+        if not is_valid_size:
+            messages.error(request, 'File size exceeds 25MB limit')
             return render(request, 'building-plan.html')
         
         ref_number = f"BLD{random.randint(100000, 999999)}"
@@ -1158,23 +1154,18 @@ def building_plan(request):
 
 # ================= GAS SERVICES =================
 
+@kiosk_login_required
 def gas_services(request):
-    if not request.session.get('aadhaar_verified'):
-        messages.error(request, 'Please verify OTP first')
-        return redirect('auth')
     return render(request, 'gas-services.html')
 
 
+@kiosk_login_required
 def gas_subsidy(request):
-    if not request.session.get('aadhaar_verified'):
-        messages.error(request, 'Please verify OTP first')
-        return redirect('auth')
-    
     if request.method == 'POST':
-        action = request.POST.get('action')
+        action = sanitize_input(request.POST.get('action'))
         
         if action == 'fetch':
-            consumer_no = request.POST.get('consumer_no')
+            consumer_no = sanitize_input(request.POST.get('consumer_no'), 20)
             
             if not consumer_no:
                 messages.error(request, 'Please enter consumer number')
@@ -1195,16 +1186,13 @@ def gas_subsidy(request):
     return render(request, 'gas-subsidy.html')
 
 
+@kiosk_login_required
 def gas_new_connection(request):
-    if not request.session.get('aadhaar_verified'):
-        messages.error(request, 'Please verify OTP first')
-        return redirect('auth')
-    
     if request.method == 'POST':
-        full_name = request.POST.get('full_name')
-        address = request.POST.get('address')
-        mobile = request.POST.get('mobile')
-        document_type = request.POST.get('document_type')
+        full_name = sanitize_input(request.POST.get('full_name'), 100)
+        address = sanitize_input(request.POST.get('address'), 500)
+        mobile = sanitize_input(request.POST.get('mobile'), 10)
+        document_type = sanitize_input(request.POST.get('document_type'), 50)
         
         if not all([full_name, address, mobile, document_type]):
             messages.error(request, 'Please fill in all required fields')
@@ -1221,14 +1209,11 @@ def gas_new_connection(request):
     return render(request, 'gas-new-connection.html')
 
 
+@kiosk_login_required
 def gas_cylinder_booking(request):
-    if not request.session.get('aadhaar_verified'):
-        messages.error(request, 'Please verify OTP first')
-        return redirect('auth')
-    
     if request.method == 'POST':
-        cylinder_type = request.POST.get('cylinder_type')
-        cylinder_price = request.POST.get('cylinder_price_hidden')
+        cylinder_type = sanitize_input(request.POST.get('cylinder_type'), 20)
+        cylinder_price = sanitize_input(request.POST.get('cylinder_price_hidden'))
         
         if not cylinder_type:
             messages.error(request, 'Please select a cylinder type')
@@ -1241,16 +1226,19 @@ def gas_cylinder_booking(request):
     return render(request, 'gas-cylinder-booking.html')
 
 
+@kiosk_login_required
 def gas_consumer_lookup(request):
-    if not request.session.get('aadhaar_verified'):
-        messages.error(request, 'Please verify OTP first')
-        return redirect('auth')
-    
     if request.method == 'POST':
-        aadhaar_number = request.POST.get('aadhaar_number')
+        aadhaar_number = sanitize_input(request.POST.get('aadhaar_number'), 12)
         
         if not aadhaar_number or len(aadhaar_number) != 12:
             messages.error(request, 'Please enter a valid 12-digit Aadhaar number')
+            return render(request, 'gas-consumer-lookup.html')
+        
+        # Validate Aadhaar
+        is_valid, message = validate_aadhaar(aadhaar_number)
+        if not is_valid:
+            messages.error(request, message)
             return render(request, 'gas-consumer-lookup.html')
         
         # Simulate consumer lookup
@@ -1270,15 +1258,12 @@ def gas_consumer_lookup(request):
     return render(request, 'gas-consumer-lookup.html')
 
 
+@kiosk_login_required
 def gas_complaint(request):
-    if not request.session.get('aadhaar_verified'):
-        messages.error(request, 'Please verify OTP first')
-        return redirect('auth')
-    
     if request.method == 'POST':
-        consumer_number = request.POST.get('consumer_number', '123456789012')
-        complaint_type = request.POST.get('complaint_type')
-        description = request.POST.get('description')
+        consumer_number = sanitize_input(request.POST.get('consumer_number', '123456789012'), 20)
+        complaint_type = sanitize_input(request.POST.get('complaint_type'), 50)
+        description = sanitize_input(request.POST.get('description'), 1000)
         
         if not complaint_type:
             messages.error(request, 'Please select a complaint type')
@@ -1299,15 +1284,12 @@ def gas_complaint(request):
     return render(request, 'gas-complaint.html')
 
 
+@kiosk_login_required
 def gas_bookings_status(request):
-    if not request.session.get('aadhaar_verified'):
-        messages.error(request, 'Please verify OTP first')
-        return redirect('auth')
-    
     context = {}
     
     if request.method == 'POST':
-        reference_number = request.POST.get('reference_number')
+        reference_number = sanitize_input(request.POST.get('reference_number'), 20)
         
         if not reference_number:
             messages.error(request, 'Please enter a reference number')
@@ -1359,15 +1341,12 @@ def gas_bookings_status(request):
     return render(request, 'gas-booking-status.html', context)
 
 
+@kiosk_login_required
 def gas_bill_payment(request):
-    if not request.session.get('aadhaar_verified'):
-        messages.error(request, 'Please verify OTP first')
-        return redirect('auth')
-    
     if request.method == 'POST':
-        consumer_number = request.POST.get('consumer_number')
-        amount = request.POST.get('amount')
-        payment_method = request.POST.get('payment_method', 'upi')
+        consumer_number = sanitize_input(request.POST.get('consumer_number'), 20)
+        amount = sanitize_input(request.POST.get('amount'))
+        payment_method = sanitize_input(request.POST.get('payment_method', 'upi'), 10)
         
         transaction_id = f"GAS{datetime.now().strftime('%y%m%d%H%M%S')}{random.randint(100, 999)}"
         messages.success(request, f'Gas bill payment of ₹{amount} successful! Transaction ID: {transaction_id}')
@@ -1378,28 +1357,21 @@ def gas_bill_payment(request):
 
 # ================= TRANSPORT & REVENUE SERVICES =================
 
+@kiosk_login_required
 def transport_services(request):
-    if not request.session.get('aadhaar_verified'):
-        messages.error(request, 'Please verify OTP first')
-        return redirect('auth')
     return render(request, 'under-development.html')
 
 
+@kiosk_login_required
 def revenue_services(request):
-    if not request.session.get('aadhaar_verified'):
-        messages.error(request, 'Please verify OTP first')
-        return redirect('auth')
     return render(request, 'under-development.html')
 
 
 # ================= PAYMENTS =================
 
+@kiosk_login_required
 def payment_history(request):
-    if not request.session.get('aadhaar_verified'):
-        messages.error(request, 'Please verify OTP first')
-        return redirect('auth')
-    
-    filter_param = request.GET.get('filter', 'all')
+    filter_param = sanitize_input(request.GET.get('filter', 'all'), 20)
     
     # Sample payment data - in production, fetch from database
     payments = [
@@ -1457,13 +1429,10 @@ def payment_history(request):
     return render(request, 'payment-history.html', context)
 
 
+@kiosk_login_required
 def receipt_print(request):
-    if not request.session.get('aadhaar_verified'):
-        messages.error(request, 'Please verify OTP first')
-        return redirect('auth')
-    
     if request.method == 'POST':
-        receipt_ref = request.POST.get('receipt_ref')
+        receipt_ref = sanitize_input(request.POST.get('receipt_ref'), 20)
         
         # In production, fetch receipt from database
         receipt = {
@@ -1485,19 +1454,16 @@ def receipt_print(request):
 
 # ================= OTHER SERVICES / PAGES =================
 
+@kiosk_login_required
 def birth_certificate(request):
-    if not request.session.get('aadhaar_verified'):
-        messages.error(request, 'Please verify OTP first')
-        return redirect('auth')
-    
     if request.method == 'POST':
-        child_name = request.POST.get('child_name')
-        dob = request.POST.get('dob')
-        gender = request.POST.get('gender')
-        birth_place = request.POST.get('birth_place')
-        father_name = request.POST.get('father_name')
-        mother_name = request.POST.get('mother_name')
-        permanent_address = request.POST.get('permanent_address')
+        child_name = sanitize_input(request.POST.get('child_name'), 100)
+        dob = sanitize_input(request.POST.get('dob'), 10)
+        gender = sanitize_input(request.POST.get('gender'), 10)
+        birth_place = sanitize_input(request.POST.get('birth_place'), 100)
+        father_name = sanitize_input(request.POST.get('father_name'), 100)
+        mother_name = sanitize_input(request.POST.get('mother_name'), 100)
+        permanent_address = sanitize_input(request.POST.get('permanent_address'), 500)
         
         if not all([child_name, dob, gender, birth_place, father_name, mother_name, permanent_address]):
             messages.error(request, 'Please fill in all required fields')
@@ -1510,20 +1476,17 @@ def birth_certificate(request):
     return render(request, 'birth-certificate.html')
 
 
+@kiosk_login_required
 def death_certificate(request):
-    if not request.session.get('aadhaar_verified'):
-        messages.error(request, 'Please verify OTP first')
-        return redirect('auth')
-    
     if request.method == 'POST':
-        deceased_name = request.POST.get('deceased_name')
-        date_of_death = request.POST.get('date_of_death')
-        place_of_death = request.POST.get('place_of_death')
-        gender = request.POST.get('gender')
-        father_name = request.POST.get('father_name')
-        mother_name = request.POST.get('mother_name')
-        permanent_address = request.POST.get('permanent_address')
-        cause_of_death = request.POST.get('cause_of_death')
+        deceased_name = sanitize_input(request.POST.get('deceased_name'), 100)
+        date_of_death = sanitize_input(request.POST.get('date_of_death'), 10)
+        place_of_death = sanitize_input(request.POST.get('place_of_death'), 100)
+        gender = sanitize_input(request.POST.get('gender'), 10)
+        father_name = sanitize_input(request.POST.get('father_name'), 100)
+        mother_name = sanitize_input(request.POST.get('mother_name'), 100)
+        permanent_address = sanitize_input(request.POST.get('permanent_address'), 500)
+        cause_of_death = sanitize_input(request.POST.get('cause_of_death'), 500)
         
         if not all([deceased_name, date_of_death, place_of_death, gender, father_name, mother_name, permanent_address, cause_of_death]):
             messages.error(request, 'Please fill in all required fields')
@@ -1547,38 +1510,39 @@ def death_certificate(request):
     return render(request, 'death-certificate.html')
 
 
+@kiosk_login_required
 def marriage_registration(request):
-    if not request.session.get('aadhaar_verified'):
-        messages.error(request, 'Please verify OTP first')
-        return redirect('auth')
-    
     if request.method == 'POST':
-        groom_name = request.POST.get('groom_name')
-        groom_dob = request.POST.get('groom_dob')
-        groom_aadhaar = request.POST.get('groom_aadhaar')
-        groom_father_name = request.POST.get('groom_father_name')
-        bride_name = request.POST.get('bride_name')
-        bride_dob = request.POST.get('bride_dob')
-        bride_aadhaar = request.POST.get('bride_aadhaar')
-        bride_father_name = request.POST.get('bride_father_name')
-        marriage_date = request.POST.get('marriage_date')
-        marriage_place = request.POST.get('marriage_place')
-        marriage_type = request.POST.get('marriage_type')
-        witness1_name = request.POST.get('witness1_name')
-        witness2_name = request.POST.get('witness2_name')
+        groom_name = sanitize_input(request.POST.get('groom_name'), 100)
+        groom_dob = sanitize_input(request.POST.get('groom_dob'), 10)
+        groom_aadhaar = sanitize_input(request.POST.get('groom_aadhaar'), 12)
+        groom_father_name = sanitize_input(request.POST.get('groom_father_name'), 100)
+        bride_name = sanitize_input(request.POST.get('bride_name'), 100)
+        bride_dob = sanitize_input(request.POST.get('bride_dob'), 10)
+        bride_aadhaar = sanitize_input(request.POST.get('bride_aadhaar'), 12)
+        bride_father_name = sanitize_input(request.POST.get('bride_father_name'), 100)
+        marriage_date = sanitize_input(request.POST.get('marriage_date'), 10)
+        marriage_place = sanitize_input(request.POST.get('marriage_place'), 100)
+        marriage_type = sanitize_input(request.POST.get('marriage_type'), 50)
+        witness1_name = sanitize_input(request.POST.get('witness1_name'), 100)
+        witness2_name = sanitize_input(request.POST.get('witness2_name'), 100)
         
         if not all([groom_name, bride_name, marriage_date, marriage_place, marriage_type]):
             messages.error(request, 'Please fill in all required fields')
             return render(request, 'marriage-registration.html')
         
         # Validate Aadhaar if provided
-        if groom_aadhaar and (len(groom_aadhaar) != 12 or not groom_aadhaar.isdigit()):
-            messages.error(request, 'Please enter a valid 12-digit Aadhaar for groom')
-            return render(request, 'marriage-registration.html')
+        if groom_aadhaar:
+            is_valid, message = validate_aadhaar(groom_aadhaar)
+            if not is_valid:
+                messages.error(request, f'Groom Aadhaar: {message}')
+                return render(request, 'marriage-registration.html')
         
-        if bride_aadhaar and (len(bride_aadhaar) != 12 or not bride_aadhaar.isdigit()):
-            messages.error(request, 'Please enter a valid 12-digit Aadhaar for bride')
-            return render(request, 'marriage-registration.html')
+        if bride_aadhaar:
+            is_valid, message = validate_aadhaar(bride_aadhaar)
+            if not is_valid:
+                messages.error(request, f'Bride Aadhaar: {message}')
+                return render(request, 'marriage-registration.html')
         
         ref_number = f"MAR{random.randint(100000, 999999)}"
         messages.success(request, f'Marriage registration submitted successfully! Reference: {ref_number}')
@@ -1589,14 +1553,11 @@ def marriage_registration(request):
 
 # ================= DOCUMENT UPLOADS =================
 
+@kiosk_login_required
 def document_upload_qr_view(request):
-    if not request.session.get('aadhaar_verified'):
-        messages.error(request, 'Please verify OTP first')
-        return redirect('auth')
-    
     if request.method == 'POST':
-        session_id = request.POST.get('session_id')
-        document_count = request.POST.get('document_count', '0')
+        session_id = sanitize_input(request.POST.get('session_id'), 50)
+        document_count = sanitize_input(request.POST.get('document_count', '0'), 5)
         
         try:
             doc_count = int(document_count)
@@ -1617,11 +1578,8 @@ def document_upload_qr_view(request):
     return render(request, 'document-upload-qr.html', context)
 
 
+@kiosk_login_required
 def document_upload_pen_view(request):
-    if not request.session.get('aadhaar_verified'):
-        messages.error(request, 'Please verify OTP first')
-        return redirect('auth')
-    
     if request.method == 'POST':
         if request.FILES:
             uploaded_files = request.FILES.getlist('files')
@@ -1637,18 +1595,20 @@ def document_upload_pen_view(request):
             
             allowed_extensions = ['.pdf', '.jpg', '.jpeg', '.png']
             max_size_mb = 25
-            max_size_bytes = max_size_mb * 1024 * 1024
             
             valid_files = []
             errors = []
             
             for file in uploaded_files:
-                file_extension = os.path.splitext(file.name)[1].lower()
-                if file_extension not in allowed_extensions:
+                # Validate file extension
+                is_valid_ext, ext = validate_file_extension(file.name, allowed_extensions)
+                if not is_valid_ext:
                     errors.append(f"{file.name}: Invalid file type. Only PDF, JPG, PNG allowed.")
                     continue
                 
-                if file.size > max_size_bytes:
+                # Validate file size
+                is_valid_size, size = validate_file_size(file, max_size_mb)
+                if not is_valid_size:
                     errors.append(f"{file.name}: File size exceeds {max_size_mb}MB limit.")
                     continue
                 
@@ -1678,13 +1638,10 @@ def document_upload_pen_view(request):
     return render(request, 'document-upload-pen.html')
 
 
+@kiosk_login_required
 def document_upload_camera_view(request):
-    if not request.session.get('aadhaar_verified'):
-        messages.error(request, 'Please verify OTP first')
-        return redirect('auth')
-    
     if request.method == 'POST':
-        images_count = request.POST.get('images_count')
+        images_count = sanitize_input(request.POST.get('images_count'), 5)
         images_data = request.POST.get('images_data')
         
         if not images_count or int(images_count) == 0:
@@ -1713,17 +1670,14 @@ def document_upload_camera_view(request):
     return render(request, 'document-upload-camera.html')
 
 
+@kiosk_login_required
 def grievance(request):
-    if not request.session.get('aadhaar_verified'):
-        messages.error(request, 'Please verify OTP first')
-        return redirect('auth')
-    
     if request.method == 'POST':
-        name = request.POST.get('name')
-        mobile = request.POST.get('mobile')
-        location = request.POST.get('location')
-        description = request.POST.get('description')
-        department = request.POST.get('department')
+        name = sanitize_input(request.POST.get('name'), 100)
+        mobile = sanitize_input(request.POST.get('mobile'), 10)
+        location = sanitize_input(request.POST.get('location'), 200)
+        description = sanitize_input(request.POST.get('description'), 1000)
+        department = sanitize_input(request.POST.get('department'), 50)
         
         if not all([name, mobile, location, description, department]):
             messages.error(request, 'Please fill in all required fields')
@@ -1742,17 +1696,16 @@ def grievance(request):
 
 # ================= UNDER DEVELOPMENT =================
 
+@kiosk_login_required
 def under_development(request):
     """View for under development pages"""
-    if not request.session.get('aadhaar_verified'):
-        messages.error(request, 'Please verify OTP first')
-        return redirect('auth')
     return render(request, 'under-development.html')
 
 
 # ================= API ENDPOINTS =================
 
 @csrf_exempt
+@rate_limit(max_attempts=30, time_window=60, key_prefix='api_load_cost')
 def api_calculate_load_cost(request):
     """API endpoint to calculate load enhancement cost"""
     if request.method == 'POST':
@@ -1785,6 +1738,7 @@ def api_calculate_load_cost(request):
 
 
 @csrf_exempt
+@rate_limit(max_attempts=30, time_window=60, key_prefix='api_meter_cost')
 def api_calculate_meter_cost(request):
     """API endpoint to calculate meter replacement cost"""
     if request.method == 'POST':

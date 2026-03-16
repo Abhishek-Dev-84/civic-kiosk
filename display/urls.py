@@ -63,7 +63,5 @@ urlpatterns = [
     # TEMPORARY - remove after testing
     path('test-404/', views.test_404, name='test-404'),
     path('transport-services/', views.transport_services, name='transport-services'),
-    path('revenue-services/', views.revenue_services, name='revenue-services'),
-
-    
+    path('revenue-services/', views.revenue_services, name='revenue-services'),  
 ]

@@ -3,6 +3,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Security Meta Tags -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://upload.wikimedia.org https://www.cdac.in; font-src 'self';">
+    <meta name="referrer" content="same-origin">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Cache Control -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
     <style>
         /* Hide Google Translate elements */
         .goog-te-banner-frame.skiptranslate,
@@ -113,13 +124,31 @@
             50% { transform: scale(1.5); opacity: 0.7; }
             100% { transform: scale(1); opacity: 1; }
         }
+
+        /* CSRF Token (hidden) */
+        #csrf_token {
+            display: none;
+        }
+
+        /* Security Note */
+        .security-note {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            font-size: 10px;
+            color: #666;
+            background: rgba(255,255,255,0.8);
+            padding: 3px 8px;
+            border-radius: 12px;
+            z-index: 999;
+        }
     </style>
 
     <meta charset="UTF-8">
     <title>{% trans "Name Transfer - Civic Kiosk" %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;user-select:none;}
+        *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;user-select:none;-webkit-tap-highlight-color:transparent;}
         body{width:100vw;height:100vh;overflow:hidden;background:#f0f7ff;}
 
         /* HEADER */
@@ -164,6 +193,59 @@
         .back-btn:hover{background:#1e5fbf;color:white;}
         .back-btn:active{transform:translateY(4px);box-shadow:0 1px 0 #0a3d7a;}
 
+        /* VOICE BUTTON */
+        .voice-corner {
+            position: fixed;
+            top: 80px;
+            right: 15px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .voice-corner-btn {
+            background: #ff9933;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 3px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            cursor: pointer;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+            transition: all 0.2s;
+        }
+
+        .voice-corner-btn:hover {
+            background: #ffaa44;
+        }
+
+        .voice-corner-btn.listening {
+            background: #28a745;
+            animation: pulse 1s infinite;
+            transform: scale(1.1);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .voice-corner-text {
+            background: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #ff9933;
+            border: 1px solid #ff9933;
+        }
+
         /* SUCCESS MESSAGE */
         .success-message{
             position:fixed;
@@ -182,6 +264,7 @@
             display:flex;
             align-items:center;
             gap:8px;
+            max-width:calc(100% - 130px);
         }
         .success-message::before{
             content:"✅";
@@ -403,6 +486,8 @@
             align-items:center;
             color:white;
             font-size:24px;
+            flex-direction:column;
+            gap:15px;
         }
         .loading.show{display:flex;}
         .spinner{
@@ -412,7 +497,6 @@
             width:50px;
             height:50px;
             animation:spin 1s linear infinite;
-            margin-right:10px;
         }
         @keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
 
@@ -482,61 +566,22 @@
         /* UTILITY CLASSES */
         .hidden{display:none !important;}
 
-        /* Voice button position adjustment for this page */
-        .voice-corner {
-            position: fixed;
-            top: 80px;
-            right: 15px;
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
+        @media (max-width:768px) {
+            .upload-grid { grid-template-columns:1fr; }
         }
 
-        .voice-corner-btn {
-            background: #ff9933;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            border: 3px solid white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 26px;
-            cursor: pointer;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
-            transition: all 0.2s;
-        }
-
-        .voice-corner-btn:hover {
-            background: #ffaa44;
-        }
-
-        .voice-corner-btn.listening {
-            background: #28a745;
-            animation: pulse 1s infinite;
-            transform: scale(1.1);
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-
-        .voice-corner-text {
-            background: white;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 600;
-            color: #ff9933;
-            border: 1px solid #ff9933;
+        @media (max-width:480px) {
+            .voice-corner { top:75px; right:10px; }
+            .back-btn { top:75px; left:10px; padding:4px 12px; font-size:16px; }
+            .success-message { top:75px; left:10px; right:70px; padding:8px 15px; font-size:14px; }
+            h1 { font-size:28px; }
         }
     </style>
 </head>
 <body>
+    <!-- CSRF Token for JavaScript -->
+    {% csrf_token %}
+    <input type="hidden" id="csrf_token" value="{{ csrf_token }}">
 
     <!-- Timeout Warning -->
     <div id="timeoutWarning" class="timeout-warning">
@@ -577,14 +622,14 @@
         </div>
     </div>
 
-    <!-- Voice Button (provided by voice.js, but we'll also add our own for consistency) -->
+    <!-- Voice Button -->
     <div class="voice-corner">
-        <div class="voice-corner-btn" id="voiceBtn" onclick="toggleVoiceInput()">🎤</div>
+        <div class="voice-corner-btn" id="voiceBtn" onclick="toggleVoiceInput()" aria-label="{% trans 'Voice input' %}">🎤</div>
         <div class="voice-corner-text" id="voiceStatus">{% trans "Click" %}</div>
     </div>
 
     <!-- Back Button -->
-    <div class="back-btn" onclick="goBack()">← {% trans "Back" %}</div>
+    <div class="back-btn" onclick="goBack()" aria-label="{% trans 'Go back' %}">← {% trans "Back" %}</div>
 
     <!-- Main Container -->
     <div class="container">
@@ -594,7 +639,7 @@
             {% if messages %}
             <div class="messages">
                 {% for message in messages %}
-                <div class="message {{ message.tags }}">{{ message }}</div>
+                    <div class="message {{ message.tags }}">{{ message }}</div>
                 {% endfor %}
             </div>
             {% endif %}
@@ -615,22 +660,22 @@
             <div class="document-upload">
                 <label style="font-size:18px; color:#1e5fbf;">{% trans "Upload Documents" %}</label>
                 <div class="upload-grid">
-                    <div class="upload-item" onclick="uploadDocument('saleDeed')" id="saleDeedUpload">
+                    <div class="upload-item" onclick="uploadDocument('saleDeed')" id="saleDeedUpload" role="button" tabindex="0" onkeypress="if(event.key==='Enter') uploadDocument('saleDeed')" aria-label="{% trans 'Upload sale deed' %}">
                         <div class="upload-icon">📄</div>
                         <div class="upload-name">{% trans "Sale Deed" %}</div>
                         <div class="upload-status" id="saleDeedStatus">{% trans "Not Uploaded" %}</div>
                     </div>
-                    <div class="upload-item" onclick="uploadDocument('noc')" id="nocUpload">
+                    <div class="upload-item" onclick="uploadDocument('noc')" id="nocUpload" role="button" tabindex="0" onkeypress="if(event.key==='Enter') uploadDocument('noc')" aria-label="{% trans 'Upload NOC' %}">
                         <div class="upload-icon">📋</div>
                         <div class="upload-name">{% trans "NOC" %}</div>
                         <div class="upload-status" id="nocStatus">{% trans "Not Uploaded" %}</div>
                     </div>
-                    <div class="upload-item" onclick="uploadDocument('idProof')" id="idProofUpload">
+                    <div class="upload-item" onclick="uploadDocument('idProof')" id="idProofUpload" role="button" tabindex="0" onkeypress="if(event.key==='Enter') uploadDocument('idProof')" aria-label="{% trans 'Upload ID proof' %}">
                         <div class="upload-icon">🪪</div>
                         <div class="upload-name">{% trans "ID Proof" %}</div>
                         <div class="upload-status" id="idProofStatus">{% trans "Not Uploaded" %}</div>
                     </div>
-                    <div class="upload-item" onclick="uploadDocument('addressProof')" id="addressProofUpload">
+                    <div class="upload-item" onclick="uploadDocument('addressProof')" id="addressProofUpload" role="button" tabindex="0" onkeypress="if(event.key==='Enter') uploadDocument('addressProof')" aria-label="{% trans 'Upload address proof' %}">
                         <div class="upload-icon">🏠</div>
                         <div class="upload-name">{% trans "Address Proof" %}</div>
                         <div class="upload-status" id="addressProofStatus">{% trans "Not Uploaded" %}</div>
@@ -639,7 +684,7 @@
             </div>
 
             <!-- Django form for name transfer request -->
-            <form id="transferForm" method="post" action="{% url 'electricity-name-transfer' %}" enctype="multipart/form-data">
+            <form id="transferForm" method="post" action="{% url 'electricity-name-transfer' %}" enctype="multipart/form-data" onsubmit="return validateAndSubmit()">
                 {% csrf_token %}
                 <input type="hidden" name="consumer_number" id="consumerNumber" value="{% if consumer_number %}{{ consumer_number }}{% else %}123456789012{% endif %}">
                 <input type="hidden" name="new_owner_name" id="newOwnerName" value="{{ request.POST.new_owner_name }}">
@@ -650,40 +695,40 @@
                 <input type="hidden" name="transfer_fee" id="transferFee" value="500">
                 
                 <!-- Hidden file inputs for documents -->
-                <input type="file" id="saleDeedFile" name="sale_deed" accept=".pdf,.jpg,.jpeg,.png" style="display:none;" onchange="documentUploaded('saleDeed')">
-                <input type="file" id="nocFile" name="noc" accept=".pdf,.jpg,.jpeg,.png" style="display:none;" onchange="documentUploaded('noc')">
-                <input type="file" id="idProofFile" name="id_proof" accept=".pdf,.jpg,.jpeg,.png" style="display:none;" onchange="documentUploaded('idProof')">
-                <input type="file" id="addressProofFile" name="address_proof" accept=".pdf,.jpg,.jpeg,.png" style="display:none;" onchange="documentUploaded('addressProof')">
+                <input type="file" id="saleDeedFile" name="sale_deed" accept=".pdf,.jpg,.jpeg,.png" style="display:none;" onchange="validateAndUpdateFile('saleDeed', this)">
+                <input type="file" id="nocFile" name="noc" accept=".pdf,.jpg,.jpeg,.png" style="display:none;" onchange="validateAndUpdateFile('noc', this)">
+                <input type="file" id="idProofFile" name="id_proof" accept=".pdf,.jpg,.jpeg,.png" style="display:none;" onchange="validateAndUpdateFile('idProof', this)">
+                <input type="file" id="addressProofFile" name="address_proof" accept=".pdf,.jpg,.jpeg,.png" style="display:none;" onchange="validateAndUpdateFile('addressProof', this)">
             </form>
 
             <div class="form-group">
-                <label>{% trans "New Owner Name" %} *</label>
+                <label for="newName">{% trans "New Owner Name" %} *</label>
                 <input class="large-input text-input" id="newName" readonly placeholder="{% trans "Enter new owner name" %}" 
-                       value="{{ request.POST.new_owner_name }}">
+                       value="{{ request.POST.new_owner_name }}" maxlength="100" autocomplete="off" aria-label="{% trans 'New owner name' %}">
             </div>
 
             <div class="form-group">
-                <label>{% trans "New Owner Aadhaar" %} *</label>
+                <label for="aadhaar">{% trans "New Owner Aadhaar" %} *</label>
                 <input class="large-input text-input" id="aadhaar" readonly placeholder="{% trans "12 digit Aadhaar" %}" maxlength="12"
-                       value="{{ request.POST.new_owner_aadhaar }}">
+                       value="{{ request.POST.new_owner_aadhaar }}" autocomplete="off" aria-label="{% trans 'New owner Aadhaar' %}">
             </div>
 
             <!-- New Contact Information -->
             <div class="form-group">
-                <label>{% trans "New Owner Phone" %}</label>
+                <label for="newPhone">{% trans "New Owner Phone" %}</label>
                 <input class="large-input text-input" id="newPhone" readonly placeholder="{% trans "10 digit mobile number" %}" maxlength="10"
-                       value="{{ request.POST.new_owner_phone }}">
+                       value="{{ request.POST.new_owner_phone }}" autocomplete="off" aria-label="{% trans 'New owner phone' %}">
             </div>
 
             <div class="form-group">
-                <label>{% trans "New Owner Email" %}</label>
+                <label for="newEmail">{% trans "New Owner Email" %}</label>
                 <input class="large-input text-input" id="newEmail" readonly placeholder="{% trans "Email address" %}"
-                       value="{{ request.POST.new_owner_email }}">
+                       value="{{ request.POST.new_owner_email }}" maxlength="100" autocomplete="off" aria-label="{% trans 'New owner email' %}">
             </div>
 
             <div class="form-group">
-                <label>{% trans "Relationship" %}</label>
-                <select class="large-input" id="relationship" onchange="updateRelationship()">
+                <label for="relationship">{% trans "Relationship" %}</label>
+                <select class="large-input" id="relationship" onchange="updateRelationship()" aria-label="{% trans 'Relationship with current owner' %}">
                     <option value="Purchaser" {% if request.POST.relationship == 'Purchaser' or not request.POST.relationship %}selected{% endif %}>{% trans "Purchaser" %}</option>
                     <option value="Family Member" {% if request.POST.relationship == 'Family Member' %}selected{% endif %}>{% trans "Family Member" %}</option>
                     <option value="Legal Heir" {% if request.POST.relationship == 'Legal Heir' %}selected{% endif %}>{% trans "Legal Heir" %}</option>
@@ -727,9 +772,14 @@
                 </div>
             </div>
 
-            <button class="submit-btn" onclick="submitRequest()" id="submitBtn">{% trans "Submit Transfer Request" %}</button>
+            <button class="submit-btn" onclick="submitRequest()" id="submitBtn" aria-label="{% trans 'Submit transfer request' %}">{% trans "Submit Transfer Request" %}</button>
 
         </div>
+    </div>
+
+    <!-- Security Note -->
+    <div class="security-note">
+        🔒 {% trans "Secured by Government of India" %}
     </div>
 
     <!-- Loading indicator -->
@@ -740,617 +790,738 @@
 
     <!-- Floating Keyboard Elements -->
     <div id="overlay" class="overlay"></div>
-    <textarea id="floatingInput" class="floating-input" placeholder="{% trans "Type here..." %}"></textarea>
+    <textarea id="floatingInput" class="floating-input" placeholder="{% trans "Type here..." %}" maxlength="100"></textarea>
     <div id="keyboard" class="keyboard"></div>
 
     <!-- Load voice.js - must be at bottom -->
     <script src="{% static 'js/voice.js' %}"></script>
 
     <script>
-    /* ================= LANGUAGE UTILITIES ================= */
-    function getCurrentLangCode() {
-        const path = window.location.pathname.split('/');
-        return path[1] || "en";
-    }
+        // ================= SECURITY ENHANCEMENTS =================
 
-    function speak(text) {
-        if (!('speechSynthesis' in window)) return;
-        speechSynthesis.cancel();
-        let utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = window.getCurrentLang ? window.getCurrentLang() : 'en-IN';
-        utterance.rate = 1;
-        speechSynthesis.speak(utterance);
-    }
-
-    /* ================= SESSION TIMER ================= */
-    let sessionTimer;
-    let timeoutWarningTimer;
-    const SESSION_DURATION = 120000;
-    const WARNING_TIME = 30000;
-
-    function startSessionTimer() {
-        sessionTimer = setTimeout(() => {
-            showTimeoutWarning();
-        }, SESSION_DURATION - WARNING_TIME);
-    }
-
-    function showTimeoutWarning() {
-        const warning = document.getElementById('timeoutWarning');
-        if (warning) {
-            warning.style.display = 'block';
-            // Speak warning
-            const langCode = getCurrentLangCode();
-            const warnings = {
-                'en': 'Your session is about to expire. Please continue to stay logged in.',
-                'hi': 'आपका सत्र समाप्त होने वाला है। कृपया जारी रखें।',
-                'or': 'ଆପଣଙ୍କର ସତ୍ର ସମାପ୍ତ ହେବାକୁ ଯାଉଛି। ଦୟାକରି ଜାରି ରଖନ୍ତୁ।'
-            };
-            speak(warnings[langCode] || warnings['en']);
-            
-            timeoutWarningTimer = setTimeout(() => {
-                window.location.href = "/" + langCode + "/";
-            }, WARNING_TIME);
-        }
-    }
-
-    function extendSession() {
-        const warning = document.getElementById('timeoutWarning');
-        if (warning) {
-            warning.style.display = 'none';
-        }
-        clearTimeout(sessionTimer);
-        clearTimeout(timeoutWarningTimer);
-        startSessionTimer();
-        
-        const langCode = getCurrentLangCode();
-        const messages = {
-            'en': 'Session extended. You may continue.',
-            'hi': 'सत्र बढ़ा दिया गया। आप जारी रख सकते हैं।',
-            'or': 'ସତ୍ର ବୃଦ୍ଧି କରାଯାଇଛି। ଆପଣ ଜାରି ରଖିପାରିବେ।'
-        };
-        speak(messages[langCode] || messages['en']);
-    }
-
-    function resetSessionTimer() {
-        clearTimeout(sessionTimer);
-        clearTimeout(timeoutWarningTimer);
-        startSessionTimer();
-    }
-
-    function goBack() {
-        resetSessionTimer();
-        window.location.href = "/" + getCurrentLangCode() + "/electricity-services/";
-    }
-
-    /* ================= FLOATING KEYBOARD ================= */
-    let activeInput = null;
-    let activeFieldType = null;
-    let isUpperCase = false;
-
-    const overlay = document.getElementById("overlay");
-    const floatingInput = document.getElementById("floatingInput");
-    const keyboard = document.getElementById("keyboard");
-    const loadingIndicator = document.getElementById("loadingIndicator");
-
-    function createKeyboard() {
-        keyboard.innerHTML = "";
-        let letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        if (!isUpperCase) { letters = letters.toLowerCase(); }
-        let keys = (letters + "0123456789 .-@").split("");
-
-        let row = document.createElement("div");
-        row.className = "keyboard-row";
-
-        keys.forEach((k, i) => {
-            if (i % 10 === 0 && i !== 0) {
-                keyboard.appendChild(row);
-                row = document.createElement("div");
-                row.className = "keyboard-row";
+        // Disable keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
+            if (e.key === 'F12' || 
+                (e.ctrlKey && e.shiftKey && e.key === 'I') ||
+                (e.ctrlKey && e.shiftKey && e.key === 'J') ||
+                (e.ctrlKey && e.key === 'U')) {
+                e.preventDefault();
+                return false;
             }
-            let btn = document.createElement("button");
-            btn.innerText = k === " " ? "{% trans "Space" %}" : k;
-            btn.type = "button";
-            btn.onclick = () => floatingInput.value += k;
-            row.appendChild(btn);
+            
+            // Prevent backspace from navigating back
+            if (e.key === 'Backspace' && !e.target.matches('input, textarea, [contenteditable], button')) {
+                e.preventDefault();
+            }
         });
-        keyboard.appendChild(row);
 
-        let last = document.createElement("div");
-        last.className = "keyboard-row";
-        last.innerHTML = `
-            <button type="button" onclick="toggleCase()">⇧ {% trans "Shift" %}</button>
-            <button type="button" onclick="floatingInput.value = floatingInput.value.slice(0, -1)">⌫ {% trans "Back" %}</button>
-            <button type="button" onclick="floatingInput.value = ''">{% trans "Clear" %}</button>
-            <button type="button" class="ok-btn" onclick="finish()">✓ {% trans "OK" %}</button>
-        `;
-        keyboard.appendChild(last);
-    }
+        // Disable right-click
+        document.addEventListener('contextmenu', event => event.preventDefault());
 
-    function toggleCase() {
-        isUpperCase = !isUpperCase;
-        createKeyboard();
-    }
+        // Auto-hide cursor on touch devices
+        let cursorTimeout;
+        document.addEventListener('touchstart', function() {
+            document.body.style.cursor = 'default';
+            clearTimeout(cursorTimeout);
+            cursorTimeout = setTimeout(function() {
+                document.body.style.cursor = 'none';
+            }, 3000);
+        });
 
-    function openKeyboard(id, fieldType = 'text') {
-        activeInput = document.getElementById(id);
-        activeFieldType = fieldType;
-        floatingInput.value = activeInput.value;
-        overlay.style.display = "block";
-        floatingInput.style.display = "block";
-        keyboard.style.display = "block";
-        setTimeout(() => {
-            floatingInput.classList.add("show");
-            floatingInput.focus();
-        }, 10);
-    }
+        // Prevent page zoom on double tap
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function(event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
 
-    function finish() {
-        if (activeInput) {
-            activeInput.value = floatingInput.value;
-            // Update hidden field based on which input was active
-            if (activeInput.id === 'newName') {
-                document.getElementById('newOwnerName').value = floatingInput.value;
-            } else if (activeInput.id === 'aadhaar') {
-                const digits = floatingInput.value.replace(/\D/g, '').slice(0, 12);
-                activeInput.value = digits;
-                document.getElementById('newOwnerAadhaar').value = digits;
-            } else if (activeInput.id === 'newPhone') {
-                const digits = floatingInput.value.replace(/\D/g, '').slice(0, 10);
-                activeInput.value = digits;
-                document.getElementById('newOwnerPhone').value = digits;
-            } else if (activeInput.id === 'newEmail') {
-                document.getElementById('newOwnerEmail').value = floatingInput.value;
+        // ================= LANGUAGE UTILITIES =================
+        function getCurrentLangCode() {
+            const path = window.location.pathname.split('/');
+            return path[1] || "en";
+        }
+
+        function speak(text) {
+            if (!('speechSynthesis' in window)) return;
+            speechSynthesis.cancel();
+            let utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = window.getCurrentLang ? window.getCurrentLang() : 'en-IN';
+            utterance.rate = 1;
+            speechSynthesis.speak(utterance);
+        }
+
+        // ================= SESSION TIMER =================
+        let sessionTimer;
+        let timeoutWarningTimer;
+        const SESSION_DURATION = 240000; // 4 minutes
+        const WARNING_TIME = 60000; // Show warning 1 minute before expiry
+
+        function startSessionTimer() {
+            clearTimeout(sessionTimer);
+            clearTimeout(timeoutWarningTimer);
+            
+            sessionTimer = setTimeout(() => {
+                showTimeoutWarning();
+            }, SESSION_DURATION - WARNING_TIME);
+        }
+
+        function showTimeoutWarning() {
+            const warning = document.getElementById('timeoutWarning');
+            if (warning) {
+                warning.style.display = 'block';
+                
+                // Speak warning
+                const langCode = getCurrentLangCode();
+                const warnings = {
+                    'en': 'Your session is about to expire. Please continue to stay logged in.',
+                    'hi': 'आपका सत्र समाप्त होने वाला है। कृपया जारी रखें।',
+                    'or': 'ଆପଣଙ୍କର ସତ୍ର ସମାପ୍ତ ହେବାକୁ ଯାଉଛି। ଦୟାକରି ଜାରି ରଖନ୍ତୁ।'
+                };
+                speak(warnings[langCode] || warnings['en']);
+                
+                timeoutWarningTimer = setTimeout(() => {
+                    window.location.href = "/" + langCode + "/";
+                }, WARNING_TIME);
             }
         }
-        closeKeyboard();
-    }
 
-    function closeKeyboard() {
-        floatingInput.classList.remove("show");
-        setTimeout(() => {
-            overlay.style.display = "none";
-            floatingInput.style.display = "none";
-            keyboard.style.display = "none";
-        }, 200);
-    }
-
-    // Handle Enter key on floating input
-    floatingInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            finish();
-        }
-    });
-
-    document.getElementById("newName").addEventListener("click", () => openKeyboard("newName", 'text'));
-    document.getElementById("aadhaar").addEventListener("click", () => openKeyboard("aadhaar", 'aadhaar'));
-    document.getElementById("newPhone").addEventListener("click", () => openKeyboard("newPhone", 'phone'));
-    document.getElementById("newEmail").addEventListener("click", () => openKeyboard("newEmail", 'email'));
-    overlay.addEventListener("click", closeKeyboard);
-
-    createKeyboard();
-
-    /* ================= DOCUMENT UPLOAD FUNCTIONS ================= */
-    let uploadedDocs = {
-        saleDeed: false,
-        noc: false,
-        idProof: false,
-        addressProof: false
-    };
-
-    function uploadDocument(docType) {
-        resetSessionTimer();
-        document.getElementById(docType + 'File').click();
-    }
-
-    function documentUploaded(docType) {
-        const fileInput = document.getElementById(docType + 'File');
-        if (fileInput.files.length > 0) {
-            uploadedDocs[docType] = true;
-            document.getElementById(docType + 'Upload').classList.add('uploaded');
-            document.getElementById(docType + 'Status').innerHTML = '✅ ' + fileInput.files[0].name.substring(0, 15) + '...';
-            
-            const langCode = getCurrentLangCode();
-            const docNames = {
-                'saleDeed': {'en': 'Sale Deed', 'hi': 'बिक्री विलेख', 'or': 'ବିକ୍ରୟ ଦଲିଲ'},
-                'noc': {'en': 'NOC', 'hi': 'एनओसी', 'or': 'ଏନଓସି'},
-                'idProof': {'en': 'ID Proof', 'hi': 'आईडी प्रूफ', 'or': 'ଆଇଡି ପ୍ରୁଫ୍'},
-                'addressProof': {'en': 'Address Proof', 'hi': 'पता प्रमाण', 'or': 'ଠିକଣା ପ୍ରମାଣ'}
-            };
-            const docName = docNames[docType][langCode] || docNames[docType]['en'];
-            speak(docName + " " + (langCode === 'hi' ? 'अपलोड हो गया' : (langCode === 'or' ? 'ଅପଲୋଡ୍ ହେଲା' : 'uploaded')));
-        }
-        checkAllDocumentsUploaded();
-    }
-
-    function checkAllDocumentsUploaded() {
-        const allUploaded = Object.values(uploadedDocs).every(v => v === true);
-        document.getElementById('submitBtn').disabled = !allUploaded;
-        return allUploaded;
-    }
-
-    /* ================= NAME TRANSFER FUNCTIONS ================= */
-    function updateRelationship() {
-        const relationship = document.getElementById('relationship').value;
-        document.getElementById('relationshipValue').value = relationship;
-    }
-
-    function submitRequest() {
-        resetSessionTimer();
-        
-        const newName = document.getElementById('newName').value;
-        const aadhaar = document.getElementById('aadhaar').value;
-        const phone = document.getElementById('newPhone').value;
-        const email = document.getElementById('newEmail').value;
-
-        const langCode = getCurrentLangCode();
-        
-        if (!newName) {
-            const messages = {
-                'en': 'Please enter new owner name',
-                'hi': 'कृपया नए मालिक का नाम दर्ज करें',
-                'or': 'ଦୟାକରି ନୂତନ ମାଲିକଙ୍କ ନାମ ପ୍ରବେଶ କରନ୍ତୁ'
-            };
-            speak(messages[langCode] || messages['en']);
-            return;
-        }
-
-        if (!aadhaar) {
-            const messages = {
-                'en': 'Please enter new owner Aadhaar number',
-                'hi': 'कृपया नए मालिक का आधार नंबर दर्ज करें',
-                'or': 'ଦୟାକରି ନୂତନ ମାଲିକଙ୍କ ଆଧାର ନମ୍ବର ପ୍ରବେଶ କରନ୍ତୁ'
-            };
-            speak(messages[langCode] || messages['en']);
-            return;
-        }
-
-        // Validate Aadhaar (12 digits)
-        const aadhaarClean = aadhaar.replace(/\s/g, '');
-        if (!/^\d{12}$/.test(aadhaarClean)) {
-            const messages = {
-                'en': 'Please enter a valid 12-digit Aadhaar number',
-                'hi': 'कृपया 12 अंकों का आधार नंबर दर्ज करें',
-                'or': 'ଦୟାକରି 12 ଅଙ୍କ ବିଶିଷ୍ଟ ଆଧାର ନମ୍ବର ପ୍ରବେଶ କରନ୍ତୁ'
-            };
-            speak(messages[langCode] || messages['en']);
-            return;
-        }
-
-        if (phone && phone.length !== 10) {
-            const messages = {
-                'en': 'Please enter a 10-digit mobile number',
-                'hi': 'कृपया 10 अंकों का मोबाइल नंबर दर्ज करें',
-                'or': 'ଦୟାକରି 10 ଅଙ୍କ ବିଶିଷ୍ଟ ମୋବାଇଲ୍ ନମ୍ବର ପ୍ରବେଶ କରନ୍ତୁ'
-            };
-            speak(messages[langCode] || messages['en']);
-            return;
-        }
-
-        if (email && !email.includes('@')) {
-            const messages = {
-                'en': 'Please enter a valid email address',
-                'hi': 'कृपया मान्य ईमेल पता दर्ज करें',
-                'or': 'ଦୟାକରି ଏକ ବୈଧ ଇମେଲ୍ ଠିକଣା ପ୍ରବେଶ କରନ୍ତୁ'
-            };
-            speak(messages[langCode] || messages['en']);
-            return;
-        }
-
-        if (!checkAllDocumentsUploaded()) {
-            const messages = {
-                'en': 'Please upload all required documents',
-                'hi': 'कृपया सभी आवश्यक दस्तावेज अपलोड करें',
-                'or': 'ଦୟାକରି ସମସ୍ତ ଆବଶ୍ୟକୀୟ ଦଲିଲ ଅପଲୋଡ୍ କରନ୍ତୁ'
-            };
-            speak(messages[langCode] || messages['en']);
-            return;
-        }
-
-        // Update relationship
-        updateRelationship();
-
-        // Show loading
-        loadingIndicator.classList.add('show');
-        
-        const messages = {
-            'en': 'Submitting transfer request',
-            'hi': 'नामांतरण अनुरोध भेजा जा रहा है',
-            'or': 'ନାମ ହସ୍ତାନ୍ତର ଅନୁରୋଧ ପଠାଯାଉଛି'
-        };
-        speak(messages[langCode] || messages['en']);
-
-        // Submit form
-        setTimeout(() => {
-            document.getElementById('transferForm').submit();
-        }, 500);
-    }
-
-    /* ================= VOICE INPUT ================= */
-    let recognition;
-    let isListening = false;
-
-    function toggleVoiceInput() {
-        resetSessionTimer();
-        
-        if (isListening) {
-            stopVoiceInput();
-            return;
-        }
-
-        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!SR) {
-            alert("{% trans 'Speech not supported' %}");
-            return;
-        }
-
-        if (recognition) {
-            try {
-                recognition.stop();
-            } catch (e) {}
-        }
-
-        recognition = new SR();
-        recognition.lang = window.getCurrentLang ? window.getCurrentLang() : 'en-IN';
-        recognition.continuous = true;
-        recognition.interimResults = true;
-
-        recognition.onstart = function() {
-            isListening = true;
-            document.getElementById("voiceBtn").classList.add("listening");
-            document.getElementById("voiceStatus").innerText = "{% trans 'Listening...' %}";
-            document.getElementById('voiceStatusIndicator').classList.add('active');
+        function extendSession() {
+            const warning = document.getElementById('timeoutWarning');
+            if (warning) {
+                warning.style.display = 'none';
+            }
+            clearTimeout(sessionTimer);
+            clearTimeout(timeoutWarningTimer);
+            startSessionTimer();
             
             const langCode = getCurrentLangCode();
             const messages = {
-                'en': 'Please say a command... name, aadhaar, phone, email, relationship, document, or submit',
-                'hi': 'कृपया आदेश बोलें... नाम, आधार, फोन, ईमेल, रिश्ता, दस्तावेज, या जमा करें',
-                'or': 'ଦୟାକରି ନିର୍ଦ୍ଦେଶ କୁହନ୍ତୁ... ନାମ, ଆଧାର, ଫୋନ୍, ଇମେଲ୍, ସମ୍ପର୍କ, ଦଲିଲ, କିମ୍ବା ଦାଖଲ କରନ୍ତୁ'
+                'en': 'Session extended. You may continue.',
+                'hi': 'सत्र बढ़ा दिया गया। आप जारी रख सकते हैं।',
+                'or': 'ସତ୍ର ବୃଦ୍ଧି କରାଯାଇଛି। ଆପଣ ଜାରି ରଖିପାରିବେ।'
             };
             speak(messages[langCode] || messages['en']);
+        }
+
+        function resetSessionTimer() {
+            clearTimeout(sessionTimer);
+            clearTimeout(timeoutWarningTimer);
+            startSessionTimer();
+        }
+
+        function goBack() {
+            resetSessionTimer();
+            window.location.href = "/" + getCurrentLangCode() + "/electricity-services/";
+        }
+
+        // ================= FLOATING KEYBOARD =================
+        let activeInput = null;
+        let activeFieldType = null;
+        let isUpperCase = false;
+        let isSubmitting = false;
+
+        const overlay = document.getElementById("overlay");
+        const floatingInput = document.getElementById("floatingInput");
+        const keyboard = document.getElementById("keyboard");
+        const loadingIndicator = document.getElementById("loadingIndicator");
+
+        function createKeyboard() {
+            keyboard.innerHTML = "";
+            let letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            if (!isUpperCase) { letters = letters.toLowerCase(); }
+            let keys = (letters + "0123456789 .-@").split("");
+
+            let row = document.createElement("div");
+            row.className = "keyboard-row";
+
+            keys.forEach((k, i) => {
+                if (i % 10 === 0 && i !== 0) {
+                    keyboard.appendChild(row);
+                    row = document.createElement("div");
+                    row.className = "keyboard-row";
+                }
+                let btn = document.createElement("button");
+                btn.innerText = k === " " ? "{% trans "Space" %}" : k;
+                btn.type = "button";
+                btn.onclick = () => {
+                    resetSessionTimer();
+                    floatingInput.value += k;
+                };
+                row.appendChild(btn);
+            });
+            keyboard.appendChild(row);
+
+            let last = document.createElement("div");
+            last.className = "keyboard-row";
+            last.innerHTML = `
+                <button type="button" onclick="toggleCase()">⇧ {% trans "Shift" %}</button>
+                <button type="button" onclick="floatingInput.value = floatingInput.value.slice(0, -1)">⌫ {% trans "Back" %}</button>
+                <button type="button" onclick="floatingInput.value = ''">{% trans "Clear" %}</button>
+                <button type="button" class="ok-btn" onclick="finish()">✓ {% trans "OK" %}</button>
+            `;
+            keyboard.appendChild(last);
+        }
+
+        function toggleCase() {
+            isUpperCase = !isUpperCase;
+            createKeyboard();
+        }
+
+        function openKeyboard(id, fieldType = 'text') {
+            if (isSubmitting) return;
+            activeInput = document.getElementById(id);
+            activeFieldType = fieldType;
+            floatingInput.value = activeInput.value;
+            floatingInput.maxLength = activeInput.maxLength || 100;
+            overlay.style.display = "block";
+            floatingInput.style.display = "block";
+            keyboard.style.display = "block";
+            setTimeout(() => {
+                floatingInput.classList.add("show");
+                floatingInput.focus();
+            }, 10);
+        }
+
+        function finish() {
+            if (activeInput && !isSubmitting) {
+                let value = floatingInput.value;
+                
+                if (activeFieldType === 'aadhaar') {
+                    value = value.replace(/\D/g, '').slice(0, 12);
+                } else if (activeFieldType === 'phone') {
+                    value = value.replace(/\D/g, '').slice(0, 10);
+                } else if (activeFieldType === 'email') {
+                    // Sanitize email
+                    value = value.replace(/[<>]/g, '').substring(0, 100);
+                } else if (activeFieldType === 'text') {
+                    // Sanitize text input
+                    value = value.replace(/[<>]/g, '').substring(0, 100);
+                }
+                
+                activeInput.value = value;
+                
+                // Update hidden field based on which input was active
+                if (activeInput.id === 'newName') {
+                    document.getElementById('newOwnerName').value = value;
+                } else if (activeInput.id === 'aadhaar') {
+                    document.getElementById('newOwnerAadhaar').value = value;
+                } else if (activeInput.id === 'newPhone') {
+                    document.getElementById('newOwnerPhone').value = value;
+                } else if (activeInput.id === 'newEmail') {
+                    document.getElementById('newOwnerEmail').value = value;
+                }
+            }
+            closeKeyboard();
+        }
+
+        function closeKeyboard() {
+            floatingInput.classList.remove("show");
+            setTimeout(() => {
+                overlay.style.display = "none";
+                floatingInput.style.display = "none";
+                keyboard.style.display = "none";
+            }, 200);
+        }
+
+        // Handle Enter key on floating input
+        floatingInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                finish();
+            }
+        });
+
+        document.getElementById("newName").addEventListener("click", () => openKeyboard("newName", 'text'));
+        document.getElementById("aadhaar").addEventListener("click", () => openKeyboard("aadhaar", 'aadhaar'));
+        document.getElementById("newPhone").addEventListener("click", () => openKeyboard("newPhone", 'phone'));
+        document.getElementById("newEmail").addEventListener("click", () => openKeyboard("newEmail", 'email'));
+        overlay.addEventListener("click", closeKeyboard);
+
+        createKeyboard();
+
+        // ================= DOCUMENT UPLOAD FUNCTIONS =================
+        const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB
+        const ALLOWED_TYPES = ['.pdf', '.jpg', '.jpeg', '.png'];
+
+        let uploadedDocs = {
+            saleDeed: false,
+            noc: false,
+            idProof: false,
+            addressProof: false
         };
 
-        recognition.onresult = function(e) {
+        function validateFile(file) {
+            // Check file size
+            if (file.size > MAX_FILE_SIZE) {
+                const langCode = getCurrentLangCode();
+                const messages = {
+                    'en': 'File size exceeds 25MB limit',
+                    'hi': 'फ़ाइल का आकार 25MB से अधिक है',
+                    'or': 'ଫାଇଲ୍ ଆକାର 25MB ସୀମା ଠାରୁ ଅଧିକ'
+                };
+                speak(messages[langCode] || messages['en']);
+                return false;
+            }
+
+            // Check file extension
+            const fileName = file.name.toLowerCase();
+            const hasValidExtension = ALLOWED_TYPES.some(ext => fileName.endsWith(ext));
+            if (!hasValidExtension) {
+                const langCode = getCurrentLangCode();
+                const messages = {
+                    'en': 'Only PDF, JPG and PNG files are allowed',
+                    'hi': 'केवल PDF, JPG और PNG फ़ाइलें स्वीकार्य हैं',
+                    'or': 'କେବଳ PDF, JPG ଏବଂ PNG ଫାଇଲ୍ ଅନୁମତି'
+                };
+                speak(messages[langCode] || messages['en']);
+                return false;
+            }
+
+            return true;
+        }
+
+        function uploadDocument(docType) {
+            resetSessionTimer();
+            document.getElementById(docType + 'File').click();
+        }
+
+        function validateAndUpdateFile(docType, fileInput) {
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                if (validateFile(file)) {
+                    uploadedDocs[docType] = true;
+                    document.getElementById(docType + 'Upload').classList.add('uploaded');
+                    document.getElementById(docType + 'Status').innerHTML = '✅ ' + file.name.substring(0, 15) + '...';
+                    
+                    const langCode = getCurrentLangCode();
+                    const docNames = {
+                        'saleDeed': {'en': 'Sale Deed', 'hi': 'बिक्री विलेख', 'or': 'ବିକ୍ରୟ ଦଲିଲ'},
+                        'noc': {'en': 'NOC', 'hi': 'एनओसी', 'or': 'ଏନଓସି'},
+                        'idProof': {'en': 'ID Proof', 'hi': 'आईडी प्रूफ', 'or': 'ଆଇଡି ପ୍ରୁଫ୍'},
+                        'addressProof': {'en': 'Address Proof', 'hi': 'पता प्रमाण', 'or': 'ଠିକଣା ପ୍ରମାଣ'}
+                    };
+                    const docName = docNames[docType][langCode] || docNames[docType]['en'];
+                    speak(docName + " " + (langCode === 'hi' ? 'अपलोड हो गया' : (langCode === 'or' ? 'ଅପଲୋଡ୍ ହେଲା' : 'uploaded')));
+                } else {
+                    fileInput.value = ''; // Clear invalid file
+                }
+            }
+            checkAllDocumentsUploaded();
+        }
+
+        function checkAllDocumentsUploaded() {
+            const allUploaded = Object.values(uploadedDocs).every(v => v === true);
+            document.getElementById('submitBtn').disabled = !allUploaded;
+            return allUploaded;
+        }
+
+        // ================= NAME TRANSFER FUNCTIONS =================
+        function updateRelationship() {
+            const relationship = document.getElementById('relationship').value;
+            document.getElementById('relationshipValue').value = relationship;
+        }
+
+        function validateAndSubmit() {
+            return false; // Prevent default form submission
+        }
+
+        function submitRequest() {
             resetSessionTimer();
             
-            let finalTranscript = '';
-            let interimTranscript = '';
+            if (isSubmitting) return;
             
-            for (let i = 0; i < e.results.length; i++) {
-                const result = e.results[i];
-                if (result.isFinal) {
-                    finalTranscript += result[0].transcript;
-                } else {
-                    interimTranscript += result[0].transcript;
-                }
-            }
-            
-            const transcript = finalTranscript || interimTranscript;
-            const command = transcript.toLowerCase();
-            console.log("Name transfer command:", command);
-            
+            const newName = document.getElementById('newName').value.trim();
+            const aadhaar = document.getElementById('aadhaar').value.trim();
+            const phone = document.getElementById('newPhone').value.trim();
+            const email = document.getElementById('newEmail').value.trim();
+
             const langCode = getCurrentLangCode();
             
-            // Check for numbers in command (Aadhaar)
-            const numberMatch = command.match(/\d+/g);
-            if (numberMatch && (command.includes("aadhaar") || command.includes("आधार") || command.includes("ଆଧାର") || command.includes("uid"))) {
-                const digits = numberMatch.join('').slice(0, 12);
-                if (digits.length === 12) {
-                    document.getElementById('aadhaar').value = digits;
-                    document.getElementById('newOwnerAadhaar').value = digits;
-                    const messages = {
-                        'en': 'Aadhaar number entered',
-                        'hi': 'आधार नंबर दर्ज किया गया',
-                        'or': 'ଆଧାର ନମ୍ବର ପ୍ରବେଶ ହେଲା'
-                    };
-                    speak(messages[langCode] || messages['en']);
-                }
-                return;
-            }
-            
-            if (numberMatch && (command.includes("phone") || command.includes("mobile") || command.includes("फोन") || command.includes("ଫୋନ୍"))) {
-                const digits = numberMatch.join('').slice(0, 10);
-                document.getElementById('newPhone').value = digits;
-                document.getElementById('newOwnerPhone').value = digits;
+            if (!newName) {
                 const messages = {
-                    'en': 'Phone number entered',
-                    'hi': 'फोन नंबर दर्ज किया गया',
-                    'or': 'ଫୋନ୍ ନମ୍ବର ପ୍ରବେଶ ହେଲା'
+                    'en': 'Please enter new owner name',
+                    'hi': 'कृपया नए मालिक का नाम दर्ज करें',
+                    'or': 'ଦୟାକରି ନୂତନ ମାଲିକଙ୍କ ନାମ ପ୍ରବେଶ କରନ୍ତୁ'
                 };
                 speak(messages[langCode] || messages['en']);
                 return;
             }
-            
-            // Name input
-            if ((command.includes("name") || command.includes("नाम") || command.includes("ନାମ")) && command.length > 10) {
-                let name = command.replace("name", "").replace("नाम", "").replace("ନାମ", "").trim();
-                if (name) {
-                    name = name.split(' ').map(word => 
-                        word.charAt(0).toUpperCase() + word.slice(1)
-                    ).join(' ');
-                    document.getElementById('newName').value = name;
-                    document.getElementById('newOwnerName').value = name;
-                    const messages = {
-                        'en': 'Name entered: ' + name,
-                        'hi': 'नाम दर्ज किया गया: ' + name,
-                        'or': 'ନାମ ପ୍ରବେଶ ହେଲା: ' + name
-                    };
-                    speak(messages[langCode] || messages['en']);
-                }
+
+            if (!aadhaar) {
+                const messages = {
+                    'en': 'Please enter new owner Aadhaar number',
+                    'hi': 'कृपया नए मालिक का आधार नंबर दर्ज करें',
+                    'or': 'ଦୟାକରି ନୂତନ ମାଲିକଙ୍କ ଆଧାର ନମ୍ବର ପ୍ରବେଶ କରନ୍ତୁ'
+                };
+                speak(messages[langCode] || messages['en']);
                 return;
             }
-            
-            // Email input
-            if (command.includes("@") || (command.includes("email") || command.includes("ईमेल") || command.includes("ଇମେଲ୍"))) {
-                document.getElementById('newEmail').value = command;
-                document.getElementById('newOwnerEmail').value = command;
+
+            // Validate Aadhaar (12 digits)
+            const aadhaarClean = aadhaar.replace(/\s/g, '');
+            if (!/^\d{12}$/.test(aadhaarClean)) {
+                const messages = {
+                    'en': 'Please enter a valid 12-digit Aadhaar number',
+                    'hi': 'कृपया 12 अंकों का आधार नंबर दर्ज करें',
+                    'or': 'ଦୟାକରି 12 ଅଙ୍କ ବିଶିଷ୍ଟ ଆଧାର ନମ୍ବର ପ୍ରବେଶ କରନ୍ତୁ'
+                };
+                speak(messages[langCode] || messages['en']);
                 return;
             }
-            
-            // Document upload commands
-            if (command.includes("sale deed") || command.includes("बिक्री विलेख") || command.includes("ବିକ୍ରୟ ଦଲିଲ")) {
-                document.getElementById('saleDeedFile').click();
-                return;
-            } else if (command.includes("noc") || command.includes("एनओसी") || command.includes("ଏନଓସି")) {
-                document.getElementById('nocFile').click();
-                return;
-            } else if (command.includes("id proof") || command.includes("आईडी") || command.includes("ଆଇଡି") || command.includes("identity")) {
-                document.getElementById('idProofFile').click();
-                return;
-            } else if (command.includes("address proof") || command.includes("पता") || command.includes("ଠିକଣା")) {
-                document.getElementById('addressProofFile').click();
+
+            if (phone && phone.length !== 10) {
+                const messages = {
+                    'en': 'Please enter a 10-digit mobile number',
+                    'hi': 'कृपया 10 अंकों का मोबाइल नंबर दर्ज करें',
+                    'or': 'ଦୟାକରି 10 ଅଙ୍କ ବିଶିଷ୍ଟ ମୋବାଇଲ୍ ନମ୍ବର ପ୍ରବେଶ କରନ୍ତୁ'
+                };
+                speak(messages[langCode] || messages['en']);
                 return;
             }
+
+            if (email && !email.includes('@')) {
+                const messages = {
+                    'en': 'Please enter a valid email address',
+                    'hi': 'कृपया मान्य ईमेल पता दर्ज करें',
+                    'or': 'ଦୟାକରି ଏକ ବୈଧ ଇମେଲ୍ ଠିକଣା ପ୍ରବେଶ କରନ୍ତୁ'
+                };
+                speak(messages[langCode] || messages['en']);
+                return;
+            }
+
+            if (!checkAllDocumentsUploaded()) {
+                const messages = {
+                    'en': 'Please upload all required documents',
+                    'hi': 'कृपया सभी आवश्यक दस्तावेज अपलोड करें',
+                    'or': 'ଦୟାକରି ସମସ୍ତ ଆବଶ୍ୟକୀୟ ଦଲିଲ ଅପଲୋଡ୍ କରନ୍ତୁ'
+                };
+                speak(messages[langCode] || messages['en']);
+                return;
+            }
+
+            // Update relationship
+            updateRelationship();
+
+            // Show loading
+            isSubmitting = true;
+            document.getElementById('submitBtn').disabled = true;
+            loadingIndicator.classList.add('show');
             
-            // Relationship selection
-            const relations = {
-                "purchaser": "Purchaser",
-                "family": "Family Member",
-                "legal": "Legal Heir",
-                "heir": "Legal Heir",
-                "other": "Other"
+            const messages = {
+                'en': 'Submitting transfer request',
+                'hi': 'नामांतरण अनुरोध भेजा जा रहा है',
+                'or': 'ନାମ ହସ୍ତାନ୍ତର ଅନୁରୋଧ ପଠାଯାଉଛି'
             };
+            speak(messages[langCode] || messages['en']);
+
+            // Submit form
+            setTimeout(() => {
+                document.getElementById('transferForm').submit();
+            }, 500);
+        }
+
+        // ================= VOICE INPUT =================
+        let recognition;
+        let isListening = false;
+        let voiceRestartTimeout = null;
+
+        function toggleVoiceInput() {
+            resetSessionTimer();
             
-            for (let [key, value] of Object.entries(relations)) {
-                if (command.includes(key) || (value === "Legal Heir" && (command.includes("legal") || command.includes("heir")))) {
-                    const select = document.getElementById('relationship');
-                    select.value = value;
-                    updateRelationship();
+            if (isListening) {
+                stopVoiceInput();
+                return;
+            }
+
+            const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SR) {
+                alert("{% trans 'Speech not supported' %}");
+                return;
+            }
+
+            if (recognition) {
+                try {
+                    recognition.stop();
+                } catch (e) {}
+            }
+
+            recognition = new SR();
+            recognition.lang = window.getCurrentLang ? window.getCurrentLang() : 'en-IN';
+            recognition.continuous = true;
+            recognition.interimResults = true;
+
+            recognition.onstart = function() {
+                isListening = true;
+                document.getElementById("voiceBtn").classList.add("listening");
+                document.getElementById("voiceStatus").innerText = "{% trans 'Listening...' %}";
+                document.getElementById('voiceStatusIndicator').classList.add('active');
+                
+                const langCode = getCurrentLangCode();
+                const messages = {
+                    'en': 'Please say a command... name, aadhaar, phone, email, relationship, document, or submit',
+                    'hi': 'कृपया आदेश बोलें... नाम, आधार, फोन, ईमेल, रिश्ता, दस्तावेज, या जमा करें',
+                    'or': 'ଦୟାକରି ନିର୍ଦ୍ଦେଶ କୁହନ୍ତୁ... ନାମ, ଆଧାର, ଫୋନ୍, ଇମେଲ୍, ସମ୍ପର୍କ, ଦଲିଲ, କିମ୍ବା ଦାଖଲ କରନ୍ତୁ'
+                };
+                speak(messages[langCode] || messages['en']);
+            };
+
+            recognition.onresult = function(e) {
+                resetSessionTimer();
+                
+                let finalTranscript = '';
+                let interimTranscript = '';
+                
+                for (let i = 0; i < e.results.length; i++) {
+                    const result = e.results[i];
+                    if (result.isFinal) {
+                        finalTranscript += result[0].transcript;
+                    } else {
+                        interimTranscript += result[0].transcript;
+                    }
+                }
+                
+                const transcript = finalTranscript || interimTranscript;
+                const command = transcript.toLowerCase();
+                console.log("Name transfer command:", command);
+                
+                const langCode = getCurrentLangCode();
+                
+                // Check for numbers in command (Aadhaar)
+                const numberMatch = command.match(/\d+/g);
+                if (numberMatch && (command.includes("aadhaar") || command.includes("आधार") || command.includes("ଆଧାର") || command.includes("uid"))) {
+                    const digits = numberMatch.join('').slice(0, 12);
+                    if (digits.length === 12) {
+                        document.getElementById('aadhaar').value = digits;
+                        document.getElementById('newOwnerAadhaar').value = digits;
+                        const messages = {
+                            'en': 'Aadhaar number entered',
+                            'hi': 'आधार नंबर दर्ज किया गया',
+                            'or': 'ଆଧାର ନମ୍ବର ପ୍ରବେଶ ହେଲା'
+                        };
+                        speak(messages[langCode] || messages['en']);
+                    }
+                    return;
+                }
+                
+                if (numberMatch && (command.includes("phone") || command.includes("mobile") || command.includes("फोन") || command.includes("ଫୋନ୍"))) {
+                    const digits = numberMatch.join('').slice(0, 10);
+                    document.getElementById('newPhone').value = digits;
+                    document.getElementById('newOwnerPhone').value = digits;
                     const messages = {
-                        'en': value + ' selected',
-                        'hi': value + ' चयनित',
-                        'or': value + ' ଚୟନ ହେଲା'
+                        'en': 'Phone number entered',
+                        'hi': 'फोन नंबर दर्ज किया गया',
+                        'or': 'ଫୋନ୍ ନମ୍ବର ପ୍ରବେଶ ହେଲା'
                     };
                     speak(messages[langCode] || messages['en']);
                     return;
                 }
+                
+                // Name input
+                if ((command.includes("name") || command.includes("नाम") || command.includes("ନାମ")) && command.length > 10) {
+                    let name = command.replace("name", "").replace("नाम", "").replace("ନାମ", "").trim();
+                    if (name) {
+                        name = name.split(' ').map(word => 
+                            word.charAt(0).toUpperCase() + word.slice(1)
+                        ).join(' ');
+                        document.getElementById('newName').value = name;
+                        document.getElementById('newOwnerName').value = name;
+                        const messages = {
+                            'en': 'Name entered: ' + name,
+                            'hi': 'नाम दर्ज किया गया: ' + name,
+                            'or': 'ନାମ ପ୍ରବେଶ ହେଲା: ' + name
+                        };
+                        speak(messages[langCode] || messages['en']);
+                    }
+                    return;
+                }
+                
+                // Email input
+                if (command.includes("@") || (command.includes("email") || command.includes("ईमेल") || command.includes("ଇମେଲ୍"))) {
+                    let email = command.replace("email", "").replace("ईमेल", "").replace("ଇମେଲ୍", "").trim();
+                    document.getElementById('newEmail').value = email;
+                    document.getElementById('newOwnerEmail').value = email;
+                    return;
+                }
+                
+                // Document upload commands
+                if (command.includes("sale deed") || command.includes("बिक्री विलेख") || command.includes("ବିକ୍ରୟ ଦଲିଲ")) {
+                    document.getElementById('saleDeedFile').click();
+                    return;
+                } else if (command.includes("noc") || command.includes("एनओसी") || command.includes("ଏନଓସି")) {
+                    document.getElementById('nocFile').click();
+                    return;
+                } else if (command.includes("id proof") || command.includes("आईडी") || command.includes("ଆଇଡି") || command.includes("identity")) {
+                    document.getElementById('idProofFile').click();
+                    return;
+                } else if (command.includes("address proof") || command.includes("पता") || command.includes("ଠିକଣା")) {
+                    document.getElementById('addressProofFile').click();
+                    return;
+                }
+                
+                // Relationship selection
+                const relations = {
+                    "purchaser": "Purchaser",
+                    "family": "Family Member",
+                    "legal": "Legal Heir",
+                    "heir": "Legal Heir",
+                    "other": "Other"
+                };
+                
+                for (let [key, value] of Object.entries(relations)) {
+                    if (command.includes(key) || (value === "Legal Heir" && (command.includes("legal") || command.includes("heir")))) {
+                        const select = document.getElementById('relationship');
+                        select.value = value;
+                        updateRelationship();
+                        const messages = {
+                            'en': value + ' selected',
+                            'hi': value + ' चयनित',
+                            'or': value + ' ଚୟନ ହେଲା'
+                        };
+                        speak(messages[langCode] || messages['en']);
+                        return;
+                    }
+                }
+                
+                // Submit command
+                if (command.includes("submit") || command.includes("transfer") || command.includes("जमा") || command.includes("हस्तांतरण") || command.includes("ଦାଖଲ")) {
+                    submitRequest();
+                    return;
+                } else if (command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ") || command.includes("পিছনে")) {
+                    goBack();
+                    return;
+                } else if (command.includes("home") || command.includes("होम") || command.includes("ଘର") || command.includes("হোম")) {
+                    window.location.href = "/" + langCode + "/";
+                    return;
+                } else if (command.includes("stop listening") || command.includes("stop voice")) {
+                    stopVoiceInput();
+                    return;
+                }
+            };
+
+            recognition.onerror = function(event) {
+                console.error("Recognition error:", event.error);
+                if (event.error === 'no-speech') return;
+                stopVoiceInput();
+            };
+
+            recognition.onend = function() {
+                if (isListening) {
+                    if (voiceRestartTimeout) clearTimeout(voiceRestartTimeout);
+                    voiceRestartTimeout = setTimeout(() => {
+                        try {
+                            recognition.start();
+                        } catch (e) {
+                            console.error("Failed to restart recognition:", e);
+                            stopVoiceInput();
+                        }
+                    }, 1000);
+                } else {
+                    document.getElementById("voiceBtn").classList.remove("listening");
+                    document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
+                    document.getElementById('voiceStatusIndicator').classList.remove('active');
+                }
+            };
+
+            try {
+                recognition.start();
+            } catch (e) {
+                console.error("Failed to start recognition:", e);
+                stopVoiceInput();
+            }
+        }
+
+        function stopVoiceInput() {
+            isListening = false;
+            if (recognition) {
+                try {
+                    recognition.stop();
+                } catch (e) {}
+            }
+            document.getElementById("voiceBtn").classList.remove("listening");
+            document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
+            document.getElementById('voiceStatusIndicator').classList.remove('active');
+            if (voiceRestartTimeout) {
+                clearTimeout(voiceRestartTimeout);
+            }
+        }
+
+        // Auto-read page instructions
+        function autoReadPage() {
+            setTimeout(() => {
+                const langCode = getCurrentLangCode();
+                const messages = {
+                    'en': 'Name transfer page. Enter new owner name, aadhaar, phone, email, select relationship, upload all documents, then say submit.',
+                    'hi': 'नामांतरण पृष्ठ। नए मालिक का नाम, आधार, फोन, ईमेल दर्ज करें, रिश्ता चुनें, सभी दस्तावेज अपलोड करें, फिर जमा करें कहें।',
+                    'or': 'ନାମ ହସ୍ତାନ୍ତର ପୃଷ୍ଠା। ନୂତନ ମାଲିକଙ୍କ ନାମ, ଆଧାର, ଫୋନ୍, ଇମେଲ୍ ପ୍ରବେଶ କରନ୍ତୁ, ସମ୍ପର୍କ ଚୟନ କରନ୍ତୁ, ସମସ୍ତ ଦଲିଲ ଅପଲୋଡ୍ କରନ୍ତୁ, ତାପରେ ଦାଖଲ କରନ୍ତୁ କୁହନ୍ତୁ।'
+                };
+                speak(messages[langCode] || messages['en']);
+            }, 2000);
+        }
+
+        // ================= INIT =================
+        document.addEventListener('DOMContentLoaded', function() {
+            startSessionTimer();
+            
+            // Add activity listeners
+            document.addEventListener('click', resetSessionTimer);
+            document.addEventListener('keypress', resetSessionTimer);
+            document.addEventListener('touchstart', resetSessionTimer);
+            document.addEventListener('mousemove', resetSessionTimer);
+            
+            // Check if voice should auto-start
+            const autoStartVoice = sessionStorage.getItem('autoStartVoice');
+            if (autoStartVoice === 'true') {
+                sessionStorage.removeItem('autoStartVoice');
+                setTimeout(() => {
+                    toggleVoiceInput();
+                }, 1000);
             }
             
-            // Submit command
-            if (command.includes("submit") || command.includes("transfer") || command.includes("जमा") || command.includes("हस्तांतरण") || command.includes("ଦାଖଲ")) {
-                submitRequest();
-                return;
-            } else if (command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ") || command.includes("পিছনে")) {
-                goBack();
-                return;
-            } else if (command.includes("home") || command.includes("होम") || command.includes("ଘର") || command.includes("হোম")) {
-                window.location.href = "/" + langCode + "/";
-                return;
-            } else if (command.includes("stop listening") || command.includes("stop voice")) {
-                stopVoiceInput();
-                return;
-            }
-        };
-
-        recognition.onerror = function(event) {
-            console.error("Recognition error:", event.error);
-            if (event.error === 'no-speech') return;
-            stopVoiceInput();
-        };
-
-        recognition.onend = function() {
-            if (isListening) {
-                try {
-                    recognition.start();
-                } catch (e) {
-                    console.error("Failed to restart recognition:", e);
-                    stopVoiceInput();
-                }
-            } else {
-                document.getElementById("voiceBtn").classList.remove("listening");
-                document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
-                document.getElementById('voiceStatusIndicator').classList.remove('active');
-            }
-        };
-
-        try {
-            recognition.start();
-        } catch (e) {
-            console.error("Failed to start recognition:", e);
-            stopVoiceInput();
-        }
-    }
-
-    function stopVoiceInput() {
-        isListening = false;
-        if (recognition) {
-            try {
-                recognition.stop();
-            } catch (e) {}
-        }
-        document.getElementById("voiceBtn").classList.remove("listening");
-        document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
-        document.getElementById('voiceStatusIndicator').classList.remove('active');
-    }
-
-    // Auto-read page instructions
-    function autoReadPage() {
-        setTimeout(() => {
-            const langCode = getCurrentLangCode();
-            const messages = {
-                'en': 'Name transfer page. Enter new owner name, aadhaar, phone, email, select relationship, upload all documents, then say submit.',
-                'hi': 'नामांतरण पृष्ठ। नए मालिक का नाम, आधार, फोन, ईमेल दर्ज करें, रिश्ता चुनें, सभी दस्तावेज अपलोड करें, फिर जमा करें कहें।',
-                'or': 'ନାମ ହସ୍ତାନ୍ତର ପୃଷ୍ଠା। ନୂତନ ମାଲିକଙ୍କ ନାମ, ଆଧାର, ଫୋନ୍, ଇମେଲ୍ ପ୍ରବେଶ କରନ୍ତୁ, ସମ୍ପର୍କ ଚୟନ କରନ୍ତୁ, ସମସ୍ତ ଦଲିଲ ଅପଲୋଡ୍ କରନ୍ତୁ, ତାପରେ ଦାଖଲ କରନ୍ତୁ କୁହନ୍ତୁ।'
-            };
-            speak(messages[langCode] || messages['en']);
-        }, 2000);
-    }
-
-    // Auto-hide messages after 5 seconds
-    setTimeout(function() {
-        document.querySelectorAll('.message').forEach(function(message) {
-            message.style.display = 'none';
+            // Auto-read page
+            setTimeout(autoReadPage, 2000);
+            
+            // Check initial document upload status
+            checkAllDocumentsUploaded();
         });
-    }, 5000);
 
-    // Auto-hide success messages after 3 seconds
-    setTimeout(function() {
-        const successMsg = document.getElementById('successMessage');
-        if (successMsg) {
-            successMsg.style.animation = 'slideOutLeft 0.3s ease';
-            setTimeout(function() {
-                if (successMsg) successMsg.remove();
-            }, 300);
-        }
-    }, 3000);
+        window.addEventListener('beforeunload', function() {
+            if (sessionTimer) {
+                clearTimeout(sessionTimer);
+            }
+            if (timeoutWarningTimer) {
+                clearTimeout(timeoutWarningTimer);
+            }
+            stopVoiceInput();
+        });
 
-    // Prevent form submission on Enter key
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
-            e.preventDefault();
-        }
-    });
+        // Auto-hide messages after 5 seconds
+        setTimeout(function() {
+            document.querySelectorAll('.message').forEach(function(message) {
+                message.style.display = 'none';
+            });
+        }, 5000);
 
-    // Initialize
-    document.addEventListener('DOMContentLoaded', function() {
-        startSessionTimer();
-        
-        document.addEventListener('click', resetSessionTimer);
-        document.addEventListener('keypress', resetSessionTimer);
-        document.addEventListener('touchstart', resetSessionTimer);
-        
-        // Check if voice should auto-start
-        const autoStartVoice = sessionStorage.getItem('autoStartVoice');
-        if (autoStartVoice === 'true') {
-            sessionStorage.removeItem('autoStartVoice');
-            setTimeout(() => {
-                toggleVoiceInput();
-            }, 1000);
-        }
-        
-        // Auto-read page
-        setTimeout(autoReadPage, 2000);
-        
-        // Check initial document upload status
-        checkAllDocumentsUploaded();
-    });
+        // Auto-hide success messages after 3 seconds
+        setTimeout(function() {
+            const successMsg = document.getElementById('successMessage');
+            if (successMsg) {
+                successMsg.style.animation = 'slideOutLeft 0.3s ease';
+                setTimeout(function() {
+                    if (successMsg) successMsg.remove();
+                }, 300);
+            }
+        }, 3000);
 
-    window.addEventListener('beforeunload', function() {
-        if (sessionTimer) {
-            clearTimeout(sessionTimer);
-        }
-        stopVoiceInput();
-    });
+        // Prevent form submission on Enter key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
+                e.preventDefault();
+            }
+        });
     </script>
 
 </body>

@@ -22,7 +22,7 @@ SECRET_KEY = os.environ.get(
     "django-insecure-uk5=5+2g7ax7(cbh1o=o%hf83)&*c8uyox-x=9-c3^q51+(lhz"
 )
 
-DEBUG = True
+DEBUG = True  # Keep True for now, but set to False in production
 
 ALLOWED_HOSTS = ["*", ".vercel.app"]
 
@@ -43,7 +43,7 @@ INSTALLED_APPS = [
 
 
 # -------------------------------------------------
-# MIDDLEWARE
+# MIDDLEWARE - ADD OUR CUSTOM MIDDLEWARE
 # -------------------------------------------------
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -55,6 +55,10 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    # Add our custom middleware here (order matters)
+    "display.middleware.KioskSessionMiddleware",
+    "display.middleware.KioskSecurityMiddleware",
+    "display.middleware.AuditLogMiddleware",
 ]
 
 
@@ -120,7 +124,7 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        "NAME": "django.contrib.auth.password_validation.MinLengthValidator",
     },
     {
         "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
@@ -185,37 +189,98 @@ LOGIN_URL = "index"
 
 
 # -------------------------------------------------
+# SESSION SECURITY SETTINGS
+# -------------------------------------------------
+SESSION_COOKIE_AGE = 300  # 5 minutes in seconds (kiosk timeout)
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_SAVE_EVERY_REQUEST = True
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Lax'
+
+
+# -------------------------------------------------
+# CSRF SETTINGS
+# -------------------------------------------------
+CSRF_COOKIE_HTTPONLY = True
+CSRF_COOKIE_SAMESITE = 'Lax'
+CSRF_USE_SESSIONS = True  # Store CSRF token in session instead of cookie
+
+
+# -------------------------------------------------
 # SECURITY SETTINGS
 # -------------------------------------------------
 if DEBUG:
-
     SECURE_SSL_REDIRECT = False
     SESSION_COOKIE_SECURE = False
     CSRF_COOKIE_SECURE = False
-
     SECURE_HSTS_SECONDS = 0
     SECURE_HSTS_INCLUDE_SUBDOMAINS = False
     SECURE_HSTS_PRELOAD = False
-
 else:
-
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     USE_X_FORWARDED_HOST = True
-
     SECURE_SSL_REDIRECT = True
-
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
-
     CSRF_TRUSTED_ORIGINS = [
-        "https://*.vercel.app"
+        "https://*.vercel.app",
+        "https://*.now.sh",
     ]
-
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
-
     X_FRAME_OPTIONS = "DENY"
-
-    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
+
+
+# -------------------------------------------------
+# CACHE SETTINGS (for rate limiting)
+# -------------------------------------------------
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+    }
+}
+
+
+# -------------------------------------------------
+# FILE UPLOAD SECURITY
+# -------------------------------------------------
+FILE_UPLOAD_MAX_MEMORY_SIZE = 25 * 1024 * 1024  # 25MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 25 * 1024 * 1024  # 25MB
+FILE_UPLOAD_PERMISSIONS = 0o644
+FILE_UPLOAD_DIRECTORY_PERMISSIONS = 0o755
+
+
+# -------------------------------------------------
+# LOGGING CONFIGURATION
+# -------------------------------------------------
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+            'propagate': False,
+        },
+    },
+}

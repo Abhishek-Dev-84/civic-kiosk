@@ -3,9 +3,23 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <!-- Security Meta Tags -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://upload.wikimedia.org https://www.cdac.in; font-src 'self';">
+    <meta name="referrer" content="same-origin">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Cache Control -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
     <title>{% trans "QR Upload - Civic Kiosk" %}</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif; user-select:none; }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif; user-select:none; -webkit-tap-highlight-color:transparent; }
         body { width:100vw; height:100vh; overflow:hidden; background:#f0f7ff; }
 
         .header { height:70px; background:white; display:flex; align-items:center; justify-content:space-between; padding:0 20px; border-bottom:2px solid #1e5fbf; }
@@ -70,6 +84,10 @@
         .back-btn:active {
             transform:translateY(4px);
             box-shadow:0 1px 0 #0a3d7a;
+        }
+        .back-btn:hover {
+            background:#1e5fbf;
+            color:white;
         }
 
         /* Timeout Warning */
@@ -148,6 +166,19 @@
             to { transform:translateX(-100%); opacity:0; }
         }
 
+        /* Security Note */
+        .security-note {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            font-size: 10px;
+            color: #666;
+            background: rgba(255,255,255,0.8);
+            padding: 3px 8px;
+            border-radius: 12px;
+            z-index: 999;
+        }
+
         .container { position:fixed; top:70px; left:0; right:0; bottom:0; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:10px; overflow:hidden; }
         .content-wrapper { width:100%; max-width:600px; text-align:center; }
 
@@ -158,483 +189,664 @@
 
         .refresh-qr { background:#ff9933; color:white; font-size:16px; padding:8px 15px; border-radius:20px; border:none; cursor:pointer; margin-top:10px; box-shadow:0 3px 0 #b35900; transition:all 0.1s; }
         .refresh-qr:active { transform:translateY(3px); box-shadow:0 1px 0 #b35900; }
+        .refresh-qr:disabled { opacity:0.6; cursor:not-allowed; transform:none; box-shadow:0 3px 0 #b35900; }
 
         .continue-btn { background:#28a745; color:white; font-size:24px; padding:12px; border-radius:30px; width:100%; border:none; margin-top:15px; display:none; box-shadow:0 5px 0 #1e7e34; transition:all 0.1s; }
         .continue-btn:active { transform:translateY(5px); box-shadow:0 1px 0 #1e7e34; }
+        .continue-btn:disabled { opacity:0.6; cursor:not-allowed; transform:none; box-shadow:0 5px 0 #1e7e34; }
 
-        .document-list { background:white; border:2px solid #1e5fbf; border-radius:20px; padding:15px; margin:20px 0; max-height:200px; overflow-y:auto; display:none; }
+        .document-list { background:white; border:2px solid #1e5fbf; border-radius:20px; padding:15px; margin:20px 0; max-height:200px; overflow-y:auto; display:none; text-align:left; }
+        .document-item { padding:8px; border-bottom:1px solid #eee; font-size:16px; }
+        .document-item:last-child { border-bottom:none; }
+        .document-item::before { content:"📄 "; }
 
-        .loading { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center; color:white; font-size:24px; }
+        .loading {
+            display:none;
+            position:fixed;
+            top:0;
+            left:0;
+            right:0;
+            bottom:0;
+            background:rgba(0,0,0,0.5);
+            z-index:2000;
+            justify-content:center;
+            align-items:center;
+            color:white;
+            font-size:24px;
+            flex-direction:column;
+            gap:15px;
+        }
         .loading.show { display:flex; }
+        .loading-spinner {
+            border:4px solid #f3f3f3;
+            border-top:4px solid #1e5fbf;
+            border-radius:50%;
+            width:50px;
+            height:50px;
+            animation:spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform:rotate(0deg); }
+            100% { transform:rotate(360deg); }
+        }
+
+        /* CSRF Token (hidden) */
+        #csrf_token { display:none; }
 
         /* Utility Classes */
         .hidden { display:none !important; }
     </style>
 </head>
 <body>
+    <!-- CSRF Token for JavaScript -->
+    {% csrf_token %}
+    <input type="hidden" id="csrf_token" value="{{ csrf_token }}">
 
-<div class="header">
-    <div class="header-left">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg">
-        <div>
-            {% trans "Ministry of Electronics &" %}<br>
-            {% trans "Information Technology" %}<br>
-            {% trans "Government of India" %}
-        </div>
-    </div>
-    <div class="header-right">
-        <img src="https://www.cdac.in/img/cdac-logo.png">
-    </div>
-</div>
-
-<!-- Voice Button -->
-<div class="voice-corner">
-    <div class="voice-corner-btn" id="voiceBtn" onclick="toggleVoiceInput()">🎤</div>
-    <div class="voice-corner-text" id="voiceStatus">{% trans "Click" %}</div>
-</div>
-
-<!-- Back Button -->
-<a href="{% url 'menu' %}" class="back-btn" id="backBtn">← {% trans "Back" %}</a>
-
-<!-- Timeout Warning -->
-<div id="timeoutWarning" class="timeout-warning">
-    <p>⏰ {% trans "Session about to expire!" %}</p>
-    <button onclick="extendSession()">{% trans "Continue" %}</button>
-    <button class="logout-btn" onclick="window.location='{% url 'index' %}'">{% trans "Logout" %}</button>
-</div>
-
-<!-- Success Messages -->
-{% if messages %}
-    {% for message in messages %}
-        {% if message.tags == 'success' %}
-            <div class="success-message">
-                {{ message }}
+    <div class="header">
+        <div class="header-left">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India">
+            <div>
+                {% trans "Ministry of Electronics &" %}<br>
+                {% trans "Information Technology" %}<br>
+                {% trans "Government of India" %}
             </div>
-        {% endif %}
-    {% endfor %}
-{% endif %}
-
-<div class="container">
-    <div class="content-wrapper">
-        <h1>📱 {% trans "QR Code Upload" %}</h1>
-
-        <form id="qrForm" method="post" action="{% url 'document-upload-qr' %}">
-            {% csrf_token %}
-            <input type="hidden" name="session_id" id="sessionId">
-            <input type="hidden" name="document_count" id="documentCount" value="0">
-        </form>
-
-        <div class="qr-container">
-            <div class="qr-code" id="qrCode">{% trans "QR" %}</div>
         </div>
-
-        <button class="refresh-qr" onclick="refreshQRCode()" id="refreshBtn">🔄 {% trans "Refresh QR Code" %}</button>
-
-        <div id="waitingMessage" style="margin-top:15px;">⏳ {% trans "Waiting for upload..." %}</div>
-
-        <div id="documentList" class="document-list">
-            <div id="documentsContainer"></div>
+        <div class="header-right">
+            <img src="https://www.cdac.in/img/cdac-logo.png" alt="CDAC Logo">
         </div>
-
-        <button class="continue-btn" id="continueBtn" onclick="continueToMenu()">{% trans "Continue to Menu" %}</button>
     </div>
-</div>
 
-<div id="loadingIndicator" class="loading">
-    {% trans "Processing..." %}
-</div>
+    <!-- Voice Button -->
+    <div class="voice-corner">
+        <div class="voice-corner-btn" id="voiceBtn" onclick="toggleVoiceInput()" aria-label="{% trans 'Voice input' %}">🎤</div>
+        <div class="voice-corner-text" id="voiceStatus">{% trans "Click" %}</div>
+    </div>
 
-<script src="{% static 'js/voice.js' %}"></script>
+    <!-- Back Button -->
+    <a href="{% url 'menu' %}" class="back-btn" id="backBtn" aria-label="{% trans 'Go back' %}">← {% trans "Back" %}</a>
 
-<script>
-/* ================= LANGUAGE MAP ================= */
-const languageMap = {
-    "en": "en-IN",
-    "hi": "hi-IN",
-    "ta": "ta-IN",
-    "te": "te-IN",
-    "bn": "bn-IN",
-    "or": "or-IN"
-};
+    <!-- Timeout Warning -->
+    <div id="timeoutWarning" class="timeout-warning" role="alert">
+        <p>⏰ {% trans "Session about to expire!" %}</p>
+        <button onclick="extendSession()" aria-label="{% trans 'Continue session' %}">{% trans "Continue" %}</button>
+        <button class="logout-btn" onclick="window.location='{% url 'index' %}'" aria-label="{% trans 'Logout' %}">{% trans "Logout" %}</button>
+    </div>
 
-function getCurrentLang() {
-    let path = window.location.pathname.split('/');
-    const langCode = path[1] || "en";
-    return languageMap[langCode] || "en-IN";
-}
+    <!-- Success Messages -->
+    {% if messages %}
+        {% for message in messages %}
+            {% if message.tags == 'success' %}
+                <div class="success-message" role="alert">
+                    {{ message }}
+                </div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
 
-function getCurrentLangCode() {
-    let path = window.location.pathname.split('/');
-    return path[1] || "en";
-}
+    <div class="container">
+        <div class="content-wrapper">
+            <h1>📱 {% trans "QR Code Upload" %}</h1>
 
-/* ================= TEXT TO SPEECH ================= */
-function speak(text) {
-    if(!('speechSynthesis' in window)) return;
-    speechSynthesis.cancel();
-    let u = new SpeechSynthesisUtterance(text);
-    u.lang = getCurrentLang();
-    u.rate = 1;
-    speechSynthesis.speak(u);
-}
+            <form id="qrForm" method="post" action="{% url 'document-upload-qr' %}">
+                {% csrf_token %}
+                <input type="hidden" name="session_id" id="sessionId">
+                <input type="hidden" name="document_count" id="documentCount" value="0">
+            </form>
 
-/* ================= SESSION TIMER ================= */
-let sessionTimer;
-let timeoutWarningTimer;
-const SESSION_DURATION = 120000;
-const WARNING_TIME = 10000;
+            <div class="qr-container">
+                <div class="qr-code" id="qrCode" aria-label="{% trans 'QR Code' %}">{% trans "QR" %}</div>
+            </div>
 
-function startSessionTimer() {
-    sessionTimer = setTimeout(() => {
-        showTimeoutWarning();
-    }, SESSION_DURATION - WARNING_TIME);
-}
+            <button class="refresh-qr" onclick="refreshQRCode()" id="refreshBtn" aria-label="{% trans 'Refresh QR code' %}">🔄 {% trans "Refresh QR Code" %}</button>
 
-function showTimeoutWarning() {
-    const warning = document.getElementById('timeoutWarning');
-    if (warning) {
-        warning.style.display = 'block';
-        timeoutWarningTimer = setTimeout(() => {
-            window.location.href = "{% url 'index' %}";
-        }, WARNING_TIME);
-    }
-}
+            <div id="waitingMessage" style="margin-top:15px; font-size:18px; color:#1e5fbf;">⏳ {% trans "Waiting for upload..." %}</div>
 
-function extendSession() {
-    const warning = document.getElementById('timeoutWarning');
-    if (warning) {
-        warning.style.display = 'none';
-    }
-    clearTimeout(sessionTimer);
-    clearTimeout(timeoutWarningTimer);
-    startSessionTimer();
-}
+            <div id="documentList" class="document-list">
+                <div id="documentsContainer"></div>
+            </div>
 
-function resetSessionTimer() {
-    clearTimeout(sessionTimer);
-    clearTimeout(timeoutWarningTimer);
-    startSessionTimer();
-}
+            <button class="continue-btn" id="continueBtn" onclick="continueToMenu()" aria-label="{% trans 'Continue to menu' %}">{% trans "Continue to Menu" %}</button>
+        </div>
+    </div>
 
-/* ================= QR SIMULATION ================= */
-let scanTimeout = setTimeout(simulateDocumentsReceived, 30000);
+    <div id="loadingIndicator" class="loading">
+        <div class="loading-spinner"></div>
+        <div>{% trans "Processing..." %}</div>
+    </div>
 
-function simulateDocumentsReceived() {
-    resetSessionTimer();
-    document.getElementById('waitingMessage').style.display = 'none';
-    document.getElementById('documentList').style.display = 'block';
-    document.getElementById('continueBtn').style.display = 'block';
-    document.getElementById('documentCount').value = 4;
-    
-    const langCode = getCurrentLangCode();
-    if (langCode === 'hi') {
-        speak("दस्तावेज़ प्राप्त हो गए। जारी रखने के लिए कंटिन्यू कहें।");
-    } else if (langCode === 'or') {
-        speak("ଦଲିଲଗୁଡିକ ପ୍ରାପ୍ତ ହେଲା। ଜାରି ରଖିବା ପାଇଁ କଣ୍ଟିନ୍ୟୁ କୁହନ୍ତୁ।");
-    } else {
-        speak("{% trans 'Documents received. Say continue to proceed.' %}");
-    }
-}
+    <!-- Security Note -->
+    <div class="security-note">
+        🔒 {% trans "Secured by Government of India" %}
+    </div>
 
-function refreshQRCode() {
-    resetSessionTimer();
-    clearTimeout(scanTimeout);
-    document.getElementById('waitingMessage').style.display = 'block';
-    document.getElementById('documentList').style.display = 'none';
-    document.getElementById('continueBtn').style.display = 'none';
-    scanTimeout = setTimeout(simulateDocumentsReceived, 30000);
-    
-    const langCode = getCurrentLangCode();
-    if (langCode === 'hi') {
-        speak("क्यूआर कोड रीफ्रेश किया गया");
-    } else if (langCode === 'or') {
-        speak("QR କୋଡ୍ ରିଫ୍ରେସ୍ ହେଲା");
-    } else {
-        speak("{% trans 'QR code refreshed' %}");
-    }
-}
+    <script src="{% static 'js/voice.js' %}"></script>
 
-function continueToMenu() {
-    resetSessionTimer();
-    document.getElementById('loadingIndicator').classList.add('show');
-    
-    const langCode = getCurrentLangCode();
-    if (langCode === 'hi') {
-        speak("प्रसंस्करण हो रहा है");
-    } else if (langCode === 'or') {
-        speak("ପ୍ରକ୍ରିୟାକରଣ ହେଉଛି");
-    } else {
-        speak("{% trans 'Processing' %}");
-    }
-    
-    setTimeout(() => document.getElementById('qrForm').submit(), 500);
-}
+    <script>
+        // ================= SECURITY ENHANCEMENTS =================
 
-/* ================= VOICE INPUT ================= */
-let recognition;
-let isListening = false;
+        // Disable keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
+            if (e.key === 'F12' || 
+                (e.ctrlKey && e.shiftKey && e.key === 'I') ||
+                (e.ctrlKey && e.shiftKey && e.key === 'J') ||
+                (e.ctrlKey && e.key === 'U')) {
+                e.preventDefault();
+                return false;
+            }
+            
+            // Prevent backspace from navigating back
+            if (e.key === 'Backspace' && !e.target.matches('input, textarea, [contenteditable], button')) {
+                e.preventDefault();
+            }
+        });
 
-function toggleVoiceInput() {
-    resetSessionTimer();
-    
-    if(isListening) {
-        stopVoiceInput();
-        return;
-    }
+        // Disable right-click
+        document.addEventListener('contextmenu', event => event.preventDefault());
 
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if(!SR) {
-        alert("{% trans 'Speech not supported' %}");
-        return;
-    }
+        // Auto-hide cursor on touch devices
+        let cursorTimeout;
+        document.addEventListener('touchstart', function() {
+            document.body.style.cursor = 'default';
+            clearTimeout(cursorTimeout);
+            cursorTimeout = setTimeout(function() {
+                document.body.style.cursor = 'none';
+            }, 3000);
+        });
 
-    if (recognition) {
-        try {
-            recognition.stop();
-        } catch(e) {}
-    }
+        // Prevent page zoom on double tap
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function(event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
 
-    recognition = new SR();
-    recognition.lang = getCurrentLang();
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.maxAlternatives = 1;
+        // ================= LANGUAGE MAP =================
+        const languageMap = {
+            "en": "en-IN",
+            "hi": "hi-IN",
+            "ta": "ta-IN",
+            "te": "te-IN",
+            "bn": "bn-IN",
+            "or": "or-IN"
+        };
 
-    recognition.onstart = function() {
-        isListening = true;
-        document.getElementById("voiceBtn").classList.add("listening");
-        document.getElementById("voiceStatus").innerText = "{% trans 'Listening...' %}";
-        
-        const langCode = getCurrentLangCode();
-        if (langCode === 'hi') {
-            speak("कृपया आदेश बोलें... रीफ्रेश, कंटिन्यू, स्टेटस, या वापस");
-        } else if (langCode === 'or') {
-            speak("ଦୟାକରି ନିର୍ଦ୍ଦେଶ କୁହନ୍ତୁ... ରିଫ୍ରେସ୍, କଣ୍ଟିନ୍ୟୁ, ସ୍ଥିତି, କିମ୍ବା ପଛକୁ");
-        } else {
-            speak("{% trans 'Please say a command... refresh, continue, status, or back' %}");
+        function getCurrentLang() {
+            let path = window.location.pathname.split('/');
+            const langCode = path[1] || "en";
+            return languageMap[langCode] || "en-IN";
         }
-    };
 
-    recognition.onresult = function(e) {
-        resetSessionTimer();
-        
-        let finalTranscript = '';
-        let interimTranscript = '';
-        
-        for (let i = 0; i < e.results.length; i++) {
-            const result = e.results[i];
-            if (result.isFinal) {
-                finalTranscript += result[0].transcript;
-            } else {
-                interimTranscript += result[0].transcript;
+        function getCurrentLangCode() {
+            let path = window.location.pathname.split('/');
+            return path[1] || "en";
+        }
+
+        // ================= TEXT TO SPEECH =================
+        function speak(text) {
+            if(!('speechSynthesis' in window)) return;
+            speechSynthesis.cancel();
+            let u = new SpeechSynthesisUtterance(text);
+            u.lang = getCurrentLang();
+            u.rate = 1;
+            speechSynthesis.speak(u);
+        }
+
+        // ================= SESSION TIMER =================
+        let sessionTimer;
+        let timeoutWarningTimer;
+        const SESSION_DURATION = 240000; // 4 minutes
+        const WARNING_TIME = 60000; // Show warning 1 minute before expiry
+
+        function startSessionTimer() {
+            clearTimeout(sessionTimer);
+            clearTimeout(timeoutWarningTimer);
+            
+            sessionTimer = setTimeout(() => {
+                showTimeoutWarning();
+            }, SESSION_DURATION - WARNING_TIME);
+        }
+
+        function showTimeoutWarning() {
+            const warning = document.getElementById('timeoutWarning');
+            if (warning) {
+                warning.style.display = 'block';
+                
+                timeoutWarningTimer = setTimeout(() => {
+                    window.location.href = "{% url 'index' %}";
+                }, WARNING_TIME);
             }
         }
-        
-        const transcript = finalTranscript || interimTranscript;
-        const command = transcript.toLowerCase();
-        console.log("QR command:", command);
 
-        // QR-specific commands
-        if (command.includes("refresh") || command.includes("new qr") || command.includes("reset") || 
-            command.includes("रीफ्रेश") || command.includes("ରିଫ୍ରେସ୍")) {
-            refreshQRCode();
-            return;
-        }
-        else if (command.includes("continue") || command.includes("next") || command.includes("proceed") || 
-                 command.includes("कंटिन्यू") || command.includes("କଣ୍ଟିନ୍ୟୁ")) {
-            if (document.getElementById('continueBtn').style.display === 'block') {
-                continueToMenu();
-            } else {
-                const langCode = getCurrentLangCode();
-                if (langCode === 'hi') {
-                    speak("कृपया दस्तावेज़ों के लिए प्रतीक्षा करें");
-                } else if (langCode === 'or') {
-                    speak("ଦୟାକରି ଦଲିଲ ପାଇଁ ଅପେକ୍ଷା କରନ୍ତୁ");
-                } else {
-                    speak("{% trans 'Please wait for documents' %}");
-                }
+        function extendSession() {
+            const warning = document.getElementById('timeoutWarning');
+            if (warning) {
+                warning.style.display = 'none';
             }
-            return;
+            clearTimeout(sessionTimer);
+            clearTimeout(timeoutWarningTimer);
+            startSessionTimer();
         }
-        else if (command.includes("status") || command.includes("check") || command.includes("स्थिति") || command.includes("ସ୍ଥିତି")) {
-            if (document.getElementById('continueBtn').style.display === 'block') {
-                const langCode = getCurrentLangCode();
-                if (langCode === 'hi') {
-                    speak("दस्तावेज़ प्राप्त हो गए");
-                } else if (langCode === 'or') {
-                    speak("ଦଲିଲଗୁଡିକ ପ୍ରାପ୍ତ ହେଲା");
-                } else {
-                    speak("{% trans 'Documents received' %}");
-                }
-            } else {
-                const langCode = getCurrentLangCode();
-                if (langCode === 'hi') {
-                    speak("अपलोड की प्रतीक्षा है");
-                } else if (langCode === 'or') {
-                    speak("ଅପଲୋଡ୍ ପାଇଁ ଅପେକ୍ଷା");
-                } else {
-                    speak("{% trans 'Waiting for upload' %}");
-                }
+
+        function resetSessionTimer() {
+            clearTimeout(sessionTimer);
+            clearTimeout(timeoutWarningTimer);
+            startSessionTimer();
+        }
+
+        // ================= QR SIMULATION WITH SECURITY =================
+        let scanTimeout = null;
+        let isRefreshing = false;
+        let isProcessing = false;
+
+        // Generate a random session ID
+        function generateSessionId() {
+            return 'qr_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        // Initialize session ID
+        document.getElementById('sessionId').value = generateSessionId();
+
+        function simulateDocumentsReceived() {
+            if (isProcessing) return;
+            
+            resetSessionTimer();
+            document.getElementById('waitingMessage').style.display = 'none';
+            document.getElementById('documentList').style.display = 'block';
+            document.getElementById('continueBtn').style.display = 'block';
+            
+            // Simulate received documents
+            const docCount = Math.floor(Math.random() * 5) + 2; // 2-6 documents
+            document.getElementById('documentCount').value = docCount;
+            
+            const documentsContainer = document.getElementById('documentsContainer');
+            documentsContainer.innerHTML = '';
+            
+            const documentTypes = [
+                '{% trans "Document" %}', 
+                '{% trans "Photo" %}', 
+                '{% trans "Form" %}', 
+                '{% trans "Certificate" %}',
+                '{% trans "ID Proof" %}',
+                '{% trans "Address Proof" %}'
+            ];
+            
+            for (let i = 0; i < docCount; i++) {
+                const type = documentTypes[Math.floor(Math.random() * documentTypes.length)];
+                const num = Math.floor(Math.random() * 100) + 1;
+                const div = document.createElement('div');
+                div.className = 'document-item';
+                div.textContent = `${type} ${num}`;
+                documentsContainer.appendChild(div);
             }
-            return;
+            
+            const langCode = getCurrentLangCode();
+            if (langCode === 'hi') {
+                speak(docCount + " दस्तावेज़ प्राप्त हो गए। जारी रखने के लिए कंटिन्यू कहें।");
+            } else if (langCode === 'or') {
+                speak(docCount + " ଦଲିଲଗୁଡିକ ପ୍ରାପ୍ତ ହେଲା। ଜାରି ରଖିବା ପାଇଁ କଣ୍ଟିନ୍ୟୁ କୁହନ୍ତୁ।");
+            } else {
+                speak(docCount + " documents received. Say continue to proceed.");
+            }
         }
-        else if (command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
-            window.location.href = "/" + getCurrentLangCode() + "/menu/";
-            return;
-        }
-        else if (command.includes("home") || command.includes("होम") || command.includes("ଘର")) {
-            window.location.href = "/" + getCurrentLangCode() + "/";
-            return;
-        }
-        else if (command.includes("stop listening") || command.includes("stop voice")) {
-            stopVoiceInput();
-            return;
-        }
-    };
 
-    recognition.onerror = function(event) {
-        console.error("Recognition error:", event.error);
-        if (event.error === 'no-speech') return;
-        stopVoiceInput();
-    };
+        function refreshQRCode() {
+            if (isRefreshing || isProcessing) return;
+            
+            resetSessionTimer();
+            isRefreshing = true;
+            document.getElementById('refreshBtn').disabled = true;
+            
+            clearTimeout(scanTimeout);
+            document.getElementById('waitingMessage').style.display = 'block';
+            document.getElementById('documentList').style.display = 'none';
+            document.getElementById('continueBtn').style.display = 'none';
+            document.getElementById('documentCount').value = '0';
+            
+            // Generate new session ID
+            document.getElementById('sessionId').value = generateSessionId();
+            
+            // Animate QR code refresh
+            const qrElement = document.getElementById('qrCode');
+            qrElement.style.opacity = '0.5';
+            qrElement.innerHTML = '⟳';
+            
+            setTimeout(() => {
+                qrElement.style.opacity = '1';
+                qrElement.innerHTML = '{% trans "QR" %}';
+                document.getElementById('refreshBtn').disabled = false;
+                isRefreshing = false;
+                
+                const langCode = getCurrentLangCode();
+                if (langCode === 'hi') {
+                    speak("क्यूआर कोड रीफ्रेश किया गया");
+                } else if (langCode === 'or') {
+                    speak("QR କୋଡ୍ ରିଫ୍ରେସ୍ ହେଲା");
+                } else {
+                    speak("QR code refreshed");
+                }
+            }, 500);
+            
+            // Set new timeout for document simulation
+            scanTimeout = setTimeout(simulateDocumentsReceived, 30000);
+        }
 
-    recognition.onend = function() {
-        if (isListening) {
+        function continueToMenu() {
+            if (isProcessing) return;
+            
+            resetSessionTimer();
+            
+            const docCount = parseInt(document.getElementById('documentCount').value);
+            if (docCount === 0) {
+                const langCode = getCurrentLangCode();
+                if (langCode === 'hi') {
+                    speak("कोई दस्तावेज़ नहीं मिला");
+                } else if (langCode === 'or') {
+                    speak("କୌଣସି ଦଲିଲ ମିଳିଲା ନାହିଁ");
+                } else {
+                    speak("No documents received");
+                }
+                return;
+            }
+
+            isProcessing = true;
+            document.getElementById('continueBtn').disabled = true;
+            document.getElementById('refreshBtn').disabled = true;
+            document.getElementById('loadingIndicator').classList.add('show');
+            
+            const langCode = getCurrentLangCode();
+            if (langCode === 'hi') {
+                speak("प्रसंस्करण हो रहा है");
+            } else if (langCode === 'or') {
+                speak("ପ୍ରକ୍ରିୟାକରଣ ହେଉଛି");
+            } else {
+                speak("Processing");
+            }
+            
+            // Submit form
+            document.getElementById('qrForm').submit();
+        }
+
+        // ================= VOICE INPUT =================
+        let recognition;
+        let isListening = false;
+        let voiceRestartTimeout = null;
+
+        function toggleVoiceInput() {
+            resetSessionTimer();
+            
+            if(isListening) {
+                stopVoiceInput();
+                return;
+            }
+
+            const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if(!SR) {
+                alert("{% trans 'Speech not supported' %}");
+                return;
+            }
+
+            if (recognition) {
+                try {
+                    recognition.stop();
+                } catch(e) {}
+            }
+
+            recognition = new SR();
+            recognition.lang = getCurrentLang();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.maxAlternatives = 1;
+
+            recognition.onstart = function() {
+                isListening = true;
+                document.getElementById("voiceBtn").classList.add("listening");
+                document.getElementById("voiceStatus").innerText = "{% trans 'Listening...' %}";
+                
+                const langCode = getCurrentLangCode();
+                if (langCode === 'hi') {
+                    speak("कृपया आदेश बोलें... रीफ्रेश, कंटिन्यू, स्टेटस, या वापस");
+                } else if (langCode === 'or') {
+                    speak("ଦୟାକରି ନିର୍ଦ୍ଦେଶ କୁହନ୍ତୁ... ରିଫ୍ରେସ୍, କଣ୍ଟିନ୍ୟୁ, ସ୍ଥିତି, କିମ୍ବା ପଛକୁ");
+                } else {
+                    speak("Please say a command... refresh, continue, status, or back");
+                }
+            };
+
+            recognition.onresult = function(e) {
+                resetSessionTimer();
+                
+                let finalTranscript = '';
+                let interimTranscript = '';
+                
+                for (let i = 0; i < e.results.length; i++) {
+                    const result = e.results[i];
+                    if (result.isFinal) {
+                        finalTranscript += result[0].transcript;
+                    } else {
+                        interimTranscript += result[0].transcript;
+                    }
+                }
+                
+                const transcript = finalTranscript || interimTranscript;
+                const command = transcript.toLowerCase();
+                console.log("QR command:", command);
+
+                // QR-specific commands
+                if (command.includes("refresh") || command.includes("new qr") || command.includes("reset") || 
+                    command.includes("रीफ्रेश") || command.includes("ରିଫ୍ରେସ୍")) {
+                    refreshQRCode();
+                    return;
+                }
+                else if (command.includes("continue") || command.includes("next") || command.includes("proceed") || 
+                         command.includes("कंटिन्यू") || command.includes("କଣ୍ଟିନ୍ୟୁ")) {
+                    if (document.getElementById('continueBtn').style.display === 'block') {
+                        continueToMenu();
+                    } else {
+                        const langCode = getCurrentLangCode();
+                        if (langCode === 'hi') {
+                            speak("कृपया दस्तावेज़ों के लिए प्रतीक्षा करें");
+                        } else if (langCode === 'or') {
+                            speak("ଦୟାକରି ଦଲିଲ ପାଇଁ ଅପେକ୍ଷା କରନ୍ତୁ");
+                        } else {
+                            speak("Please wait for documents");
+                        }
+                    }
+                    return;
+                }
+                else if (command.includes("status") || command.includes("check") || command.includes("स्थिति") || command.includes("ସ୍ଥିତି")) {
+                    if (document.getElementById('continueBtn').style.display === 'block') {
+                        const docCount = document.getElementById('documentCount').value;
+                        const langCode = getCurrentLangCode();
+                        if (langCode === 'hi') {
+                            speak(docCount + " दस्तावेज़ प्राप्त हो गए");
+                        } else if (langCode === 'or') {
+                            speak(docCount + " ଦଲିଲଗୁଡିକ ପ୍ରାପ୍ତ ହେଲା");
+                        } else {
+                            speak(docCount + " documents received");
+                        }
+                    } else {
+                        const langCode = getCurrentLangCode();
+                        if (langCode === 'hi') {
+                            speak("अपलोड की प्रतीक्षा है");
+                        } else if (langCode === 'or') {
+                            speak("ଅପଲୋଡ୍ ପାଇଁ ଅପେକ୍ଷା");
+                        } else {
+                            speak("Waiting for upload");
+                        }
+                    }
+                    return;
+                }
+                else if (command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
+                    window.location.href = "/" + getCurrentLangCode() + "/menu/";
+                    return;
+                }
+                else if (command.includes("home") || command.includes("होम") || command.includes("ଘର")) {
+                    window.location.href = "/" + getCurrentLangCode() + "/";
+                    return;
+                }
+                else if (command.includes("stop listening") || command.includes("stop voice")) {
+                    stopVoiceInput();
+                    return;
+                }
+            };
+
+            recognition.onerror = function(event) {
+                console.error("Recognition error:", event.error);
+                if (event.error === 'no-speech') return;
+                stopVoiceInput();
+            };
+
+            recognition.onend = function() {
+                if (isListening) {
+                    if (voiceRestartTimeout) clearTimeout(voiceRestartTimeout);
+                    voiceRestartTimeout = setTimeout(() => {
+                        try {
+                            recognition.start();
+                        } catch(e) {
+                            console.error("Failed to restart recognition:", e);
+                            stopVoiceInput();
+                        }
+                    }, 1000);
+                } else {
+                    document.getElementById("voiceBtn").classList.remove("listening");
+                    document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
+                }
+            };
+
             try {
                 recognition.start();
             } catch(e) {
-                console.error("Failed to restart recognition:", e);
+                console.error("Failed to start recognition:", e);
                 stopVoiceInput();
             }
-        } else {
+        }
+
+        function stopVoiceInput() {
+            isListening = false;
+            if (recognition) {
+                try {
+                    recognition.stop();
+                } catch(e) {}
+            }
             document.getElementById("voiceBtn").classList.remove("listening");
             document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
-        }
-    };
-
-    try {
-        recognition.start();
-    } catch(e) {
-        console.error("Failed to start recognition:", e);
-        stopVoiceInput();
-    }
-}
-
-function stopVoiceInput() {
-    isListening = false;
-    if (recognition) {
-        try {
-            recognition.stop();
-        } catch(e) {}
-    }
-    document.getElementById("voiceBtn").classList.remove("listening");
-    document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
-}
-
-/* ================= OVERRIDE VOICE COMMANDS ================= */
-const originalHandleCommand = window.handleCommand;
-window.handleCommand = function(command) {
-    command = command.toLowerCase();
-    console.log("QR command:", command);
-    
-    // QR-specific commands
-    if(command.includes("refresh") || command.includes("new qr") || command.includes("reset") || 
-       command.includes("रीफ्रेश") || command.includes("ରିଫ୍ରେସ୍")) {
-        refreshQRCode();
-        return;
-    }
-    else if(command.includes("continue") || command.includes("next") || command.includes("proceed") || 
-            command.includes("कंटिन्यू") || command.includes("କଣ୍ଟିନ୍ୟୁ")) {
-        if(document.getElementById('continueBtn').style.display === 'block') {
-            continueToMenu();
-        } else {
-            if(typeof speak === 'function') speak("{% trans 'Please wait for documents' %}");
-        }
-        return;
-    }
-    else if(command.includes("status") || command.includes("check") || command.includes("स्थिति") || command.includes("ସ୍ଥିତି")) {
-        if(document.getElementById('continueBtn').style.display === 'block') {
-            if(typeof speak === 'function') speak("{% trans 'Documents received' %}");
-        } else {
-            if(typeof speak === 'function') speak("{% trans 'Waiting for upload' %}");
-        }
-        return;
-    }
-    else if(command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
-        window.location.href = "/" + getCurrentLangCode() + "/menu/";
-        return;
-    }
-    else if(command.includes("home") || command.includes("होम") || command.includes("ଘର")) {
-        window.location.href = "/" + getCurrentLangCode() + "/";
-        return;
-    }
-    else if(command.includes("stop listening") || command.includes("stop voice")) {
-        stopVoiceInput();
-        return;
-    }
-    
-    // If not QR-specific, pass to original handler
-    if(originalHandleCommand) {
-        originalHandleCommand(command);
-    }
-};
-
-/* ================= AUTO READ PAGE ================= */
-const originalAutoRead = window.autoReadPage;
-window.autoReadPage = function() {
-    if(originalAutoRead) originalAutoRead();
-    setTimeout(() => {
-        if(typeof speak === 'function') {
-            const langCode = getCurrentLangCode();
-            if (langCode === 'hi') {
-                speak("क्यूआर कोड अपलोड पृष्ठ। अपने फोन से क्यूआर कोड स्कैन करें। नया कोड के लिए रीफ्रेश कहें, तैयार होने पर कंटिन्यू कहें।");
-            } else if (langCode === 'or') {
-                speak("QR କୋଡ୍ ଅପଲୋଡ୍ ପୃଷ୍ଠା। ଆପଣଙ୍କ ଫୋନ୍ ରେ QR କୋଡ୍ ସ୍କାନ୍ କରନ୍ତୁ। ନୂଆ କୋଡ୍ ପାଇଁ ରିଫ୍ରେସ୍ କୁହନ୍ତୁ, ପ୍ରସ୍ତୁତ ହେଲେ କଣ୍ଟିନ୍ୟୁ କୁହନ୍ତୁ।");
-            } else {
-                speak("{% trans 'QR code upload page. Scan QR code with your phone. Say refresh for new code, continue when done.' %}");
+            if (voiceRestartTimeout) {
+                clearTimeout(voiceRestartTimeout);
             }
         }
-    }, 2000);
-};
 
-/* ================= INIT ================= */
-document.addEventListener('DOMContentLoaded', function() {
-    startSessionTimer();
-    
-    document.addEventListener('click', resetSessionTimer);
-    document.addEventListener('keypress', resetSessionTimer);
-    document.addEventListener('touchstart', resetSessionTimer);
-    
-    // Auto-read instructions
-    setTimeout(autoReadPage, 2000);
-});
+        // ================= OVERRIDE VOICE COMMANDS =================
+        const originalHandleCommand = window.handleCommand;
+        window.handleCommand = function(command) {
+            command = command.toLowerCase();
+            console.log("QR command:", command);
+            
+            // QR-specific commands
+            if(command.includes("refresh") || command.includes("new qr") || command.includes("reset") || 
+               command.includes("रीफ्रेश") || command.includes("ରିଫ୍ରେସ୍")) {
+                refreshQRCode();
+                return;
+            }
+            else if(command.includes("continue") || command.includes("next") || command.includes("proceed") || 
+                    command.includes("कंटिन्यू") || command.includes("କଣ୍ଟିନ୍ୟୁ")) {
+                if(document.getElementById('continueBtn').style.display === 'block') {
+                    continueToMenu();
+                } else {
+                    if(typeof speak === 'function') speak("Please wait for documents");
+                }
+                return;
+            }
+            else if(command.includes("status") || command.includes("check") || command.includes("स्थिति") || command.includes("ସ୍ଥିତି")) {
+                if(document.getElementById('continueBtn').style.display === 'block') {
+                    const docCount = document.getElementById('documentCount').value;
+                    if(typeof speak === 'function') speak(docCount + " documents received");
+                } else {
+                    if(typeof speak === 'function') speak("Waiting for upload");
+                }
+                return;
+            }
+            else if(command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
+                window.location.href = "/" + getCurrentLangCode() + "/menu/";
+                return;
+            }
+            else if(command.includes("home") || command.includes("होम") || command.includes("ଘର")) {
+                window.location.href = "/" + getCurrentLangCode() + "/";
+                return;
+            }
+            else if(command.includes("stop listening") || command.includes("stop voice")) {
+                stopVoiceInput();
+                return;
+            }
+            
+            // If not QR-specific, pass to original handler
+            if(originalHandleCommand) {
+                originalHandleCommand(command);
+            }
+        };
 
-window.addEventListener('beforeunload', function() {
-    if (sessionTimer) {
-        clearTimeout(sessionTimer);
-    }
-    stopVoiceInput();
-});
+        // ================= AUTO READ PAGE =================
+        const originalAutoRead = window.autoReadPage;
+        window.autoReadPage = function() {
+            if(originalAutoRead) originalAutoRead();
+            setTimeout(() => {
+                if(typeof speak === 'function') {
+                    const langCode = getCurrentLangCode();
+                    if (langCode === 'hi') {
+                        speak("क्यूआर कोड अपलोड पृष्ठ। अपने फोन से क्यूआर कोड स्कैन करें। नया कोड के लिए रीफ्रेश कहें, तैयार होने पर कंटिन्यू कहें।");
+                    } else if (langCode === 'or') {
+                        speak("QR କୋଡ୍ ଅପଲୋଡ୍ ପୃଷ୍ଠା। ଆପଣଙ୍କ ଫୋନ୍ ରେ QR କୋଡ୍ ସ୍କାନ୍ କରନ୍ତୁ। ନୂଆ କୋଡ୍ ପାଇଁ ରିଫ୍ରେସ୍ କୁହନ୍ତୁ, ପ୍ରସ୍ତୁତ ହେଲେ କଣ୍ଟିନ୍ୟୁ କୁହନ୍ତୁ।");
+                    } else {
+                        speak("QR code upload page. Scan QR code with your phone. Say refresh for new code, continue when done.");
+                    }
+                }
+            }, 2000);
+        };
 
-// Auto-hide success messages after 3 seconds
-setTimeout(function() {
-    const successMsg = document.querySelector('.success-message');
-    if (successMsg) {
-        successMsg.style.animation = 'slideOutLeft 0.3s ease';
+        // ================= INIT =================
+        document.addEventListener('DOMContentLoaded', function() {
+            startSessionTimer();
+            
+            // Add activity listeners
+            document.addEventListener('click', resetSessionTimer);
+            document.addEventListener('keypress', resetSessionTimer);
+            document.addEventListener('touchstart', resetSessionTimer);
+            document.addEventListener('mousemove', resetSessionTimer);
+            
+            // Auto-read instructions
+            setTimeout(autoReadPage, 2000);
+            
+            // Start QR timeout
+            scanTimeout = setTimeout(simulateDocumentsReceived, 30000);
+        });
+
+        window.addEventListener('beforeunload', function() {
+            if (sessionTimer) {
+                clearTimeout(sessionTimer);
+            }
+            if (timeoutWarningTimer) {
+                clearTimeout(timeoutWarningTimer);
+            }
+            if (scanTimeout) {
+                clearTimeout(scanTimeout);
+            }
+            stopVoiceInput();
+        });
+
+        // Auto-hide success messages after 3 seconds
         setTimeout(function() {
-            if (successMsg) successMsg.remove();
-        }, 300);
-    }
-}, 3000);
-
-// Ensure voice engine starts
-document.addEventListener('DOMContentLoaded', function() {
-    if(typeof startVoiceEngine === 'function') {
-        setTimeout(startVoiceEngine, 1000);
-    }
-});
-
-</script>
+            const successMsg = document.querySelector('.success-message');
+            if (successMsg) {
+                successMsg.style.animation = 'slideOutLeft 0.3s ease';
+                setTimeout(function() {
+                    if (successMsg) successMsg.remove();
+                }, 300);
+            }
+        }, 3000);
+    </script>
 
 </body>
 </html>
