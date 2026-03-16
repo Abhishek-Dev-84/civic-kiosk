@@ -25,6 +25,7 @@ def kiosk_login_required(view_func):
 def rate_limit(max_attempts=5, time_window=300, key_prefix='rate_limit'):
     """
     Decorator to rate limit views
+    Fixed to handle LocMemCache which doesn't have ttl()
     """
     def decorator(view_func):
         @wraps(view_func)
@@ -38,7 +39,11 @@ def rate_limit(max_attempts=5, time_window=300, key_prefix='rate_limit'):
             allowed, remaining, reset_time = rate_limit_check(rate_key, max_attempts, time_window)
             
             if not allowed:
-                messages.error(request, f'Too many attempts. Please try again in {reset_time} seconds.')
+                # For LocMemCache, we don't have reset_time, so show generic message
+                if reset_time:
+                    messages.error(request, f'Too many attempts. Please try again in {reset_time} seconds.')
+                else:
+                    messages.error(request, 'Too many attempts. Please try again later.')
                 logger.warning(f"Rate limit exceeded for {client_ip} on {request.path}")
                 return redirect(request.META.get('HTTP_REFERER', 'menu'))
             
@@ -167,6 +172,7 @@ def kiosk_maintenance_mode(view_func):
             client_ip = get_client_ip(request)
             
             if client_ip not in allowed_ips:
+                from django.shortcuts import render
                 return render(request, 'maintenance.html', status=503)
         
         return view_func(request, *args, **kwargs)

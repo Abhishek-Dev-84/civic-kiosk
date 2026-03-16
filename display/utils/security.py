@@ -45,12 +45,15 @@ def rate_limit_check(key, max_attempts=5, time_window=300):
     """
     Check rate limit for a given key
     Returns (is_allowed, attempts_left, reset_time)
+    
+    Fixed to work with all cache backends (including LocMemCache)
     """
     attempts = cache.get(key, 0)
     
     if attempts >= max_attempts:
-        reset_time = cache.ttl(key)
-        return False, 0, reset_time
+        # For LocMemCache, we need to estimate remaining time
+        # Since ttl() isn't available, we'll return None for reset_time
+        return False, 0, None
     
     # Increment attempts
     cache.set(key, attempts + 1, timeout=time_window)
