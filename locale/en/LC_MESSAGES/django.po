@@ -12,15 +12,14 @@ msgstr ""
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: ta\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-
 #: .\templates\404.html:7
 msgid "Civic Kiosk - 404"
-msgstr "சிவிக் கியோஸ்க் - 404"
+msgstr ""
 
 #: .\templates\404.html:194 .\templates\application-status.html:396
 #: .\templates\auth.html:454 .\templates\birth-certificate.html:142
@@ -50,7 +49,7 @@ msgstr "சிவிக் கியோஸ்க் - 404"
 #: .\templates\trade-license.html:376 .\templates\under-development.html:464
 #: .\templates\water-bill.html:509
 msgid "Ministry of Electronics &"
-msgstr "மின்னணுவியல் மற்றும் தகவல் தொழில்நுட்ப அமைச்சகம்"
+msgstr ""
 
 #: .\templates\404.html:195 .\templates\application-status.html:397
 #: .\templates\auth.html:455 .\templates\birth-certificate.html:142
@@ -80,7 +79,7 @@ msgstr "மின்னணுவியல் மற்றும் தகவல�
 #: .\templates\trade-license.html:376 .\templates\under-development.html:465
 #: .\templates\water-bill.html:509
 msgid "Information Technology"
-msgstr "தகவல் தொழில்நுட்பம்"
+msgstr ""
 
 #: .\templates\404.html:196 .\templates\application-status.html:398
 #: .\templates\auth.html:456 .\templates\birth-certificate.html:142
@@ -110,31 +109,31 @@ msgstr "தகவல் தொழில்நுட்பம்"
 #: .\templates\receipt-print.html:415 .\templates\trade-license.html:376
 #: .\templates\under-development.html:466 .\templates\water-bill.html:509
 msgid "Government of India"
-msgstr "இந்திய அரசு"
+msgstr ""
 
 #: .\templates\404.html:222
 msgid "Looks like you're lost"
-msgstr "நீங்கள் வழி தவறியது போல் தெரிகிறது"
+msgstr ""
 
 #: .\templates\404.html:223
 msgid "The page you are looking for is not available!"
-msgstr "நீங்கள் தேடும் பக்கம் கிடைக்கவில்லை!"
+msgstr ""
 
 #: .\templates\404.html:229
 msgid "The requested URL was not found on this server."
-msgstr "கோரப்பட்ட URL இந்த சேவையகத்தில் கிடைக்கவில்லை."
+msgstr ""
 
 #: .\templates\404.html:234
 msgid "Go To Home"
-msgstr "முகப்புக்குச் செல்லவும்"
+msgstr ""
 
 #: .\templates\404.html:244
 msgid "Digital Civic Services Portal"
-msgstr "டிஜிட்டல் சிவிக் சேவைகள் போர்டல்"
+msgstr ""
 
 #: .\templates\404.html:245
 msgid "Error Code"
-msgstr "பிழைக் குறியீடு"
+msgstr ""
 
 #: .\templates\404.html:274
 msgid "Voice"
@@ -146,7 +145,7 @@ msgstr ""
 
 #: .\templates\application-status.html:18
 msgid "Application Status - Civic Services Kiosk"
-msgstr "விண்ணப்ப நிலை - சிவிக் சேவைகள் கியோஸ்க்"
+msgstr ""
 
 #: .\templates\application-status.html:408
 #: .\templates\birth-certificate.html:151 .\templates\building-plan.html:166
@@ -253,7 +252,7 @@ msgstr ""
 #: .\templates\under-development.html:760 .\templates\water-bill.html:530
 #: .\templates\water-bill.html:1077 .\templates\water-bill.html:1097
 msgid "Click"
-msgstr "கிளிக் செய்யவும்"
+msgstr ""
 
 #: .\templates\application-status.html:413
 #: .\templates\birth-certificate.html:156 .\templates\building-plan.html:171
@@ -307,7 +306,7 @@ msgstr ""
 #: .\templates\trade-license.html:592 .\templates\under-development.html:481
 #: .\templates\water-bill.html:534
 msgid "Back"
-msgstr "பின்"
+msgstr ""
 
 #: .\templates\application-status.html:417 .\templates\auth.html:444
 #: .\templates\birth-certificate.html:160 .\templates\building-plan.html:175
@@ -337,7 +336,7 @@ msgstr "பின்"
 #: .\templates\trade-license.html:405 .\templates\under-development.html:485
 #: .\templates\water-bill.html:538
 msgid "Session about to expire!"
-msgstr "அமர்வு காலாவதியாக உள்ளது!"
+msgstr ""
 
 #: .\templates\application-status.html:418
 #: .\templates\birth-certificate.html:161 .\templates\building-plan.html:176
@@ -350,10 +349,8 @@ msgstr "அமர்வு காலாவதியாக உள்ளது!"
 #: .\templates\electricity-duplicate-bill.html:409
 #: .\templates\electricity-load-enhancement.html:404
 #: .\templates\electricity-meter-replacement.html:293
-#, fuzzy
-#| msgid "Continue Session"
 msgid "Continue session"
-msgstr "அமர்வைத் தொடரவும்"
+msgstr ""
 
 #: .\templates\application-status.html:418 .\templates\auth.html:445
 #: .\templates\birth-certificate.html:161 .\templates\building-plan.html:176
@@ -383,7 +380,7 @@ msgstr "அமர்வைத் தொடரவும்"
 #: .\templates\trade-license.html:406 .\templates\under-development.html:486
 #: .\templates\water-bill.html:539
 msgid "Continue"
-msgstr "தொடரவும்"
+msgstr ""
 
 #: .\templates\application-status.html:419 .\templates\auth.html:446
 #: .\templates\birth-certificate.html:162 .\templates\building-plan.html:177
@@ -413,96 +410,94 @@ msgstr "தொடரவும்"
 #: .\templates\trade-license.html:407 .\templates\under-development.html:487
 #: .\templates\water-bill.html:540
 msgid "Logout"
-msgstr "வெளியேறு"
+msgstr ""
 
 #: .\templates\application-status.html:436
 msgid "Status Portal"
-msgstr "நிலை போர்டல்"
+msgstr ""
 
 #: .\templates\application-status.html:439
 msgid "Application Status"
-msgstr "விண்ணப்ப நிலை"
+msgstr ""
 
 #: .\templates\application-status.html:442
 #: .\templates\payment-history.html:399
 msgid "Payment History"
-msgstr "கட்டண வரலாறு"
+msgstr ""
 
 #: .\templates\application-status.html:447
-#, fuzzy
-#| msgid "Application Status"
 msgid "Application details"
-msgstr "விண்ணப்ப நிலை"
+msgstr ""
 
 #: .\templates\application-status.html:449
 msgid "Application & Complaint Status"
-msgstr "விண்ணப்பம் மற்றும் புகார் நிலை"
+msgstr ""
 
 #: .\templates\application-status.html:454
 msgid "Application Tracking"
-msgstr "விண்ணப்ப கண்காணிப்பு"
+msgstr ""
 
 #: .\templates\application-status.html:457
 msgid "Application ID:"
-msgstr "விண்ணப்ப ஐடி:"
+msgstr ""
 
 #: .\templates\application-status.html:462
 msgid "Department:"
-msgstr "துறை:"
+msgstr ""
 
 #: .\templates\application-status.html:467
 msgid "Submitted Date:"
-msgstr "சமர்ப்பிக்கப்பட்ட தேதி:"
+msgstr ""
 
 #: .\templates\application-status.html:472
 msgid "Current Stage:"
-msgstr "தற்போதைய நிலை:"
+msgstr ""
 
 #: .\templates\application-status.html:477
 msgid "Assigned Officer:"
-msgstr "நியமிக்கப்பட்ட அலுவலர்:"
+msgstr ""
 
 #: .\templates\application-status.html:482
 msgid "Expected Completion:"
-msgstr "எதிர்பார்க்கப்படும் நிறைவு:"
+msgstr ""
 
 #: .\templates\application-status.html:489
 msgid "Complaint Tracking"
-msgstr "புகார் கண்காணிப்பு"
+msgstr ""
 
 #: .\templates\application-status.html:492
 msgid "Complaint ID:"
-msgstr "புகார் ஐடி:"
+msgstr ""
 
 #: .\templates\application-status.html:497
 #: .\templates\gas-consumer-lookup.html:506
 msgid "Status:"
-msgstr "நிலை:"
+msgstr ""
 
 #: .\templates\application-status.html:502
 msgid "Work Completed:"
-msgstr "பணி முடிந்தது:"
+msgstr ""
 
 #: .\templates\application-status.html:511
 msgid "Officer Remark:"
-msgstr "அலுவலர் குறிப்பு:"
+msgstr ""
 
 #: .\templates\application-status.html:516
 msgid "Deadline:"
-msgstr "கடைசி நாள்:"
+msgstr ""
 
 #: .\templates\application-status.html:524
 msgid "No Active Applications"
-msgstr "செயலில் உள்ள விண்ணப்பங்கள் இல்லை"
+msgstr ""
 
 #: .\templates\application-status.html:526
 msgid "You don't have any active applications or complaints."
-msgstr "உங்களிடம் செயலில் உள்ள விண்ணப்பங்கள் அல்லது புகார்கள் எதுவும் இல்லை."
+msgstr ""
 
 #: .\templates\application-status.html:529
 #: .\templates\application-status.html:537
 msgid "Back to Menu"
-msgstr "மெனுவிற்குத் திரும்பு"
+msgstr ""
 
 #: .\templates\application-status.html:547 .\templates\auth.html:524
 #: .\templates\birth-certificate.html:240 .\templates\building-plan.html:256
@@ -518,10 +513,8 @@ msgstr "மெனுவிற்குத் திரும்பு"
 #: .\templates\electricity-name-transfer.html:782
 #: .\templates\electricity-new-connection.html:491 .\templates\menu.html:817
 #: .\templates\otp.html:649
-#, fuzzy
-#| msgid "Government of India"
 msgid "Secured by Government of India"
-msgstr "இந்திய அரசு"
+msgstr ""
 
 #: .\templates\application-status.html:690
 #: .\templates\application-status.html:913
@@ -530,10 +523,8 @@ msgid "Application details page. Say back to return."
 msgstr ""
 
 #: .\templates\application-status.html:708
-#, fuzzy
-#| msgid "Back to Menu"
 msgid "Back to main menu"
-msgstr "மெனுவிற்குத் திரும்பு"
+msgstr ""
 
 #: .\templates\application-status.html:727 .\templates\auth.html:849
 #: .\templates\birth-certificate.html:460 .\templates\building-plan.html:615
@@ -603,23 +594,19 @@ msgstr ""
 #: .\templates\trade-license.html:754 .\templates\under-development.html:645
 #: .\templates\water-bill.html:966
 msgid "Listening..."
-msgstr "கேட்கிறது..."
+msgstr ""
 
 #: .\templates\application-status.html:754
 msgid "Please say a command... Application Status, Payment History, or Back"
 msgstr ""
 
 #: .\templates\application-status.html:802 .\templates\menu.html:1129
-#, fuzzy
-#| msgid "Application Status"
 msgid "Opening Application Status"
-msgstr "விண்ணப்ப நிலை"
+msgstr ""
 
 #: .\templates\application-status.html:808
-#, fuzzy
-#| msgid "Payment History"
 msgid "Opening Payment History"
-msgstr "கட்டண வரலாறு"
+msgstr ""
 
 #: .\templates\application-status.html:814
 #: .\templates\municipal-services.html:572
@@ -642,30 +629,28 @@ msgstr ""
 
 #: .\templates\auth.html:103
 msgid "Civic Services Kiosk - Aadhaar Entry"
-msgstr "சிவிக் சேவைகள் கியோஸ்க் - ஆதார் உள்ளீடு"
+msgstr ""
 
 #: .\templates\auth.html:488
 msgid "Enter Aadhaar"
-msgstr "ஆதாரை உள்ளிடவும்"
+msgstr ""
 
 #: .\templates\auth.html:489
 msgid "12-digit Aadhaar Number"
-msgstr "12-இலக்க ஆதார் எண்"
+msgstr ""
 
 #: .\templates\auth.html:509 .\templates\auth.html:789
 #: .\templates\auth.html:799
 msgid "Proceed"
-msgstr "தொடரவும்"
+msgstr ""
 
 #: .\templates\auth.html:518 .\templates\otp.html:663
-#, fuzzy
-#| msgid "remaining"
 msgid "Attempts remaining"
-msgstr "மீதமுள்ள"
+msgstr ""
 
 #: .\templates\auth.html:724 .\templates\auth.html:734
 msgid "Please enter 12 digits"
-msgstr "தயவுசெய்து 12 இலக்கங்களை உள்ளிடவும்"
+msgstr ""
 
 #: .\templates\auth.html:747 .\templates\document-upload-qr.html:314
 #: .\templates\electricity-bill-payment.html:731
@@ -682,23 +667,19 @@ msgstr "தயவுசெய்து 12 இலக்கங்களை உள�
 #: .\templates\receipt-print.html:406 .\templates\trade-license.html:424
 #: .\templates\water-bill.html:644
 msgid "Processing..."
-msgstr "செயலாக்குகிறது..."
+msgstr ""
 
 #: .\templates\auth.html:759
-#, fuzzy
-#| msgid "Processing..."
 msgid "Processing"
-msgstr "செயலாக்குகிறது..."
+msgstr ""
 
 #: .\templates\auth.html:878
 msgid "Speak now..."
 msgstr ""
 
 #: .\templates\auth.html:1056
-#, fuzzy
-#| msgid "Aadhaar Card"
 msgid "Aadhaar cleared"
-msgstr "ஆதார் அட்டை"
+msgstr ""
 
 #: .\templates\auth.html:1097
 msgid ""
@@ -708,42 +689,42 @@ msgstr ""
 
 #: .\templates\birth-certificate.html:17
 msgid "Birth Certificate - Civic Kiosk"
-msgstr "பிறப்புச் சான்றிதழ் - சிவிக் கியோஸ்க்"
+msgstr ""
 
 #: .\templates\birth-certificate.html:187
 #: .\templates\municipal-services.html:354
 #: .\templates\payment-history.html:425
 msgid "Birth Certificate"
-msgstr "பிறப்புச் சான்றிதழ்"
+msgstr ""
 
 #: .\templates\birth-certificate.html:188
 msgid "Apply within 21 days of birth for free registration"
-msgstr "இலவச பதிவுக்காக பிறந்த 21 நாட்களுக்குள் விண்ணப்பிக்கவும்"
+msgstr ""
 
 #: .\templates\birth-certificate.html:194
 msgid "Child's Full Name"
-msgstr "குழந்தையின் முழுப்பெயர்"
+msgstr ""
 
 #: .\templates\birth-certificate.html:199
 #: .\templates\marriage-registration.html:417
 #: .\templates\marriage-registration.html:438
 msgid "Date of Birth"
-msgstr "பிறந்த தேதி"
+msgstr ""
 
 #: .\templates\birth-certificate.html:204
 #: .\templates\death-certificate.html:220
 msgid "Gender"
-msgstr "பாலினம்"
+msgstr ""
 
 #: .\templates\birth-certificate.html:206
 #: .\templates\death-certificate.html:223
 msgid "Male"
-msgstr "ஆண்"
+msgstr ""
 
 #: .\templates\birth-certificate.html:207
 #: .\templates\death-certificate.html:224
 msgid "Female"
-msgstr "பெண்"
+msgstr ""
 
 #: .\templates\birth-certificate.html:208
 #: .\templates\death-certificate.html:225
@@ -755,64 +736,60 @@ msgstr "பெண்"
 #: .\templates\marriage-registration.html:471
 #: .\templates\trade-license.html:445
 msgid "Other"
-msgstr "மற்றவை"
+msgstr ""
 
 #: .\templates\birth-certificate.html:213
 msgid "Place of Birth"
-msgstr "பிறந்த இடம்"
+msgstr ""
 
 #: .\templates\birth-certificate.html:218
 #: .\templates\death-certificate.html:231
 #: .\templates\marriage-registration.html:425
 #: .\templates\marriage-registration.html:446
 msgid "Father's Name"
-msgstr "தந்தையின் பெயர்"
+msgstr ""
 
 #: .\templates\birth-certificate.html:223
 #: .\templates\death-certificate.html:236
 msgid "Mother's Name"
-msgstr "தாயின் பெயர்"
+msgstr ""
 
 #: .\templates\birth-certificate.html:228
 #: .\templates\death-certificate.html:241
 msgid "Permanent Address"
-msgstr "நிரந்தர முகவரி"
+msgstr ""
 
 #: .\templates\birth-certificate.html:232
 #: .\templates\electricity-new-connection.html:578
 #: .\templates\gas-new-connection.html:496
 msgid "Submit Application"
-msgstr "விண்ணப்பத்தை சமர்ப்பிக்கவும்"
+msgstr ""
 
 #: .\templates\birth-certificate.html:324
-#, fuzzy
-#| msgid "Preferred date cannot be in the past"
 msgid "Date of birth cannot be in the future"
-msgstr "விருப்பமான தேதி கடந்த காலத்தில் இருக்க முடியாது"
+msgstr ""
 
 #: .\templates\birth-certificate.html:337 .\templates\building-plan.html:346
 #: .\templates\death-certificate.html:360
 #: .\templates\marriage-registration.html:700
 #: .\templates\trade-license.html:699
 msgid "Please fill all required fields"
-msgstr "தேவையான அனைத்து புலங்களையும் நிரப்பவும்"
+msgstr ""
 
 #: .\templates\birth-certificate.html:345 .\templates\building-plan.html:378
 #: .\templates\death-certificate.html:368
 #: .\templates\electricity-complaint.html:590
 #: .\templates\gas-complaint.html:495 .\templates\grievance.html:448
 msgid "Submitting..."
-msgstr "சமர்ப்பிக்கிறது..."
+msgstr ""
 
 #: .\templates\birth-certificate.html:487
 msgid "Please speak... name, place, father name, mother name, or address"
 msgstr ""
 
 #: .\templates\birth-certificate.html:515
-#, fuzzy
-#| msgid "Pen drive detected:"
 msgid "Gender selected: Male"
-msgstr "பென் டிரைவ் கண்டறியப்பட்டது:"
+msgstr ""
 
 #: .\templates\birth-certificate.html:520
 msgid "Gender selected: Female"
@@ -824,10 +801,8 @@ msgstr ""
 
 #: .\templates\birth-certificate.html:542 .\templates\building-plan.html:714
 #: .\templates\death-certificate.html:655
-#, fuzzy
-#| msgid "Last updated:"
 msgid "Field updated"
-msgstr "கடைசியாகப் புதுப்பிக்கப்பட்டது:"
+msgstr ""
 
 #: .\templates\birth-certificate.html:627 .\templates\building-plan.html:798
 #: .\templates\death-certificate.html:739
@@ -843,65 +818,59 @@ msgstr ""
 
 #: .\templates\building-plan.html:17
 msgid "Building Plan Approval - Civic Kiosk"
-msgstr "கட்டிடத் திட்ட ஒப்புதல் - சிவிக் கியோஸ்க்"
+msgstr ""
 
 #: .\templates\building-plan.html:194
 msgid "Building Plan Approval"
-msgstr "கட்டிடத் திட்ட ஒப்புதல்"
+msgstr ""
 
 #: .\templates\building-plan.html:205 .\templates\trade-license.html:449
 msgid "Owner Name"
-msgstr "உரிமையாளரின் பெயர்"
+msgstr ""
 
 #: .\templates\building-plan.html:210
 msgid "Property Address"
-msgstr "சொத்தின் முகவரி"
+msgstr ""
 
 #: .\templates\building-plan.html:215
 msgid "Survey/Khasra Number"
-msgstr "கணக்கெடுப்பு/கஸ்ரா எண்"
+msgstr ""
 
 #: .\templates\building-plan.html:220
 msgid "Plot Area (sq m)"
-msgstr "மனை பரப்பளவு (ச.மீ)"
+msgstr ""
 
 #: .\templates\building-plan.html:225
 msgid "Building Type"
-msgstr "கட்டிட வகை"
+msgstr ""
 
 #: .\templates\building-plan.html:235
 msgid "Number of Floors"
-msgstr "மாடிகளின் எண்ணிக்கை"
+msgstr ""
 
 #: .\templates\building-plan.html:240
 msgid "Upload Building Plan (PDF/DWG - Max 25MB)"
-msgstr "கட்டிடத் திட்டத்தைப் பதிவேற்றவும் (PDF/DWG - அதிகபட்சம் 25MB)"
+msgstr ""
 
 #: .\templates\building-plan.html:245
 msgid "Submit for Approval"
-msgstr "ஒப்புதலுக்கு சமர்ப்பிக்கவும்"
+msgstr ""
 
 #: .\templates\building-plan.html:334
 msgid "Please upload building plan"
 msgstr ""
 
 #: .\templates\building-plan.html:358
-#, fuzzy
-#| msgid "Please enter a valid consumer number"
 msgid "Please enter valid plot area"
-msgstr "செல்லுபடியாகும் நுகர்வோர் எண்ணை உள்ளிடவும்"
+msgstr ""
 
 #: .\templates\building-plan.html:370
-#, fuzzy
-#| msgid "Please enter a valid consumer number"
 msgid "Please enter valid number of floors (1-50)"
-msgstr "செல்லுபடியாகும் நுகர்வோர் எண்ணை உள்ளிடவும்"
+msgstr ""
 
 #: .\templates\building-plan.html:525 .\templates\building-plan.html:529
-#, fuzzy
-#| msgid "Please enter consumer number"
 msgid "Please enter numbers only"
-msgstr "நுகர்வோர் எண்ணை உள்ளிடவும்"
+msgstr ""
 
 #: .\templates\building-plan.html:577
 msgid "File size exceeds 25MB limit"
@@ -912,10 +881,8 @@ msgid "Only PDF and DWG files are allowed"
 msgstr ""
 
 #: .\templates\building-plan.html:597
-#, fuzzy
-#| msgid "files selected"
 msgid "File selected"
-msgstr "கோப்புகள் தேர்ந்தெடுக்கப்பட்டன"
+msgstr ""
 
 #: .\templates\building-plan.html:642
 msgid ""
@@ -924,34 +891,24 @@ msgid ""
 msgstr ""
 
 #: .\templates\building-plan.html:671
-#, fuzzy
-#| msgid "Residential"
 msgid "Selected Residential"
-msgstr "குடியிருப்பு"
+msgstr ""
 
 #: .\templates\building-plan.html:676
-#, fuzzy
-#| msgid "Commercial"
 msgid "Selected Commercial"
-msgstr "வணிக"
+msgstr ""
 
 #: .\templates\building-plan.html:681
-#, fuzzy
-#| msgid "Selected Files:"
 msgid "Selected Mixed Use"
-msgstr "தேர்ந்தெடுக்கப்பட்ட கோப்புகள்:"
+msgstr ""
 
 #: .\templates\building-plan.html:686
-#, fuzzy
-#| msgid "Industrial"
 msgid "Selected Industrial"
-msgstr "தொழில்துறை"
+msgstr ""
 
 #: .\templates\building-plan.html:693
-#, fuzzy
-#| msgid "Please select files to upload"
 msgid "Please select file to upload"
-msgstr "பதிவேற்ற கோப்புகளைத் தேர்ந்தெடுக்கவும்"
+msgstr ""
 
 #: .\templates\building-plan.html:820
 msgid ""
@@ -962,47 +919,41 @@ msgstr ""
 
 #: .\templates\death-certificate.html:17
 msgid "Death Certificate - Civic Kiosk"
-msgstr "இறப்புச் சான்றிதழ் - சிவிக் கியோஸ்க்"
+msgstr ""
 
 #: .\templates\death-certificate.html:191
 #: .\templates\municipal-services.html:355
 #: .\templates\payment-history.html:426
 msgid "Death Certificate"
-msgstr "இறப்புச் சான்றிதழ்"
+msgstr ""
 
 #: .\templates\death-certificate.html:201
-#, fuzzy
-#| msgid "Register within 21 days of death"
 msgid "Please register within 21 days of death"
-msgstr "இறந்த 21 நாட்களுக்குள் பதிவு செய்யவும்"
+msgstr ""
 
 #: .\templates\death-certificate.html:205
 msgid "Deceased Full Name"
-msgstr "இறந்தவரின் முழுப்பெயர்"
+msgstr ""
 
 #: .\templates\death-certificate.html:210
 msgid "Date of Death"
-msgstr "இறந்த தேதி"
+msgstr ""
 
 #: .\templates\death-certificate.html:215
 msgid "Place of Death"
-msgstr "இறந்த இடம்"
+msgstr ""
 
 #: .\templates\death-certificate.html:222
-#, fuzzy
-#| msgid "Selected:"
 msgid "Select Gender"
-msgstr "தேர்ந்தெடுக்கப்பட்டது:"
+msgstr ""
 
 #: .\templates\death-certificate.html:246
 msgid "Cause of Death"
-msgstr "இறப்புக்கான காரணம்"
+msgstr ""
 
 #: .\templates\death-certificate.html:250
-#, fuzzy
-#| msgid "Register Marriage"
 msgid "Register Death"
-msgstr "திருமணத்தைப் பதிவு செய்யவும்"
+msgstr ""
 
 #: .\templates\death-certificate.html:256
 #: .\templates\electricity-complaint.html:599
@@ -1014,13 +965,11 @@ msgstr "திருமணத்தைப் பதிவு செய்யவ�
 #: .\templates\marriage-registration.html:496
 #: .\templates\trade-license.html:483
 msgid "Type here..."
-msgstr "இங்கே தட்டச்சு செய்யவும்..."
+msgstr ""
 
 #: .\templates\death-certificate.html:346
-#, fuzzy
-#| msgid "Preferred date cannot be in the past"
 msgid "Date of death cannot be in the future"
-msgstr "விருப்பமான தேதி கடந்த காலத்தில் இருக்க முடியாது"
+msgstr ""
 
 #: .\templates\death-certificate.html:595
 msgid ""
@@ -1029,22 +978,16 @@ msgid ""
 msgstr ""
 
 #: .\templates\death-certificate.html:624
-#, fuzzy
-#| msgid "Selected Files:"
 msgid "Selected Male"
-msgstr "தேர்ந்தெடுக்கப்பட்ட கோப்புகள்:"
+msgstr ""
 
 #: .\templates\death-certificate.html:629
-#, fuzzy
-#| msgid "Selected Files:"
 msgid "Selected Female"
-msgstr "தேர்ந்தெடுக்கப்பட்ட கோப்புகள்:"
+msgstr ""
 
 #: .\templates\death-certificate.html:634
-#, fuzzy
-#| msgid "Selected:"
 msgid "Selected Other"
-msgstr "தேர்ந்தெடுக்கப்பட்டது:"
+msgstr ""
 
 #: .\templates\death-certificate.html:761
 msgid ""
@@ -1055,45 +998,39 @@ msgstr ""
 
 #: .\templates\document-upload-camera.html:17
 msgid "Camera Upload - Civic Kiosk"
-msgstr "கேமரா பதிவேற்றம் - சிவிக் கியோஸ்க்"
+msgstr ""
 
 #: .\templates\document-upload-camera.html:177
 msgid "Camera Upload"
-msgstr "கேமரா பதிவேற்றம்"
+msgstr ""
 
 #: .\templates\document-upload-camera.html:184
-#, fuzzy
-#| msgid "Capture"
 msgid "Capture photo"
-msgstr "பிடி"
+msgstr ""
 
 #: .\templates\document-upload-camera.html:184
 msgid "Capture"
-msgstr "பிடி"
+msgstr ""
 
 #: .\templates\document-upload-camera.html:185
-#, fuzzy
-#| msgid "Switch"
 msgid "Switch camera"
-msgstr "மாற்று"
+msgstr ""
 
 #: .\templates\document-upload-camera.html:185
 msgid "Switch"
-msgstr "மாற்று"
+msgstr ""
 
 #: .\templates\document-upload-camera.html:189
 msgid "Captured Images"
-msgstr "பிடிக்கப்பட்ட படங்கள்"
+msgstr ""
 
 #: .\templates\document-upload-camera.html:191
-#, fuzzy
-#| msgid "Upload All"
 msgid "Upload all images"
-msgstr "அனைத்தையும் பதிவேற்றவும்"
+msgstr ""
 
 #: .\templates\document-upload-camera.html:191
 msgid "Upload All"
-msgstr "அனைத்தையும் பதிவேற்றவும்"
+msgstr ""
 
 #: .\templates\document-upload-camera.html:427
 msgid "Remove image"
@@ -1103,7 +1040,7 @@ msgstr ""
 #: .\templates\document-upload-pen.html:203
 #: .\templates\document-upload-pen.html:495
 msgid "Uploading..."
-msgstr "பதிவேற்றுகிறது..."
+msgstr ""
 
 #: .\templates\document-upload-camera.html:551
 msgid "Please say a command... capture, switch, upload, or remove"
@@ -1111,66 +1048,60 @@ msgstr ""
 
 #: .\templates\document-upload-pen.html:17
 msgid "Pen Drive Upload - Civic Kiosk"
-msgstr "பென் டிரைவ் பதிவேற்றம் - சிவிக் கியோஸ்க்"
+msgstr ""
 
 #: .\templates\document-upload-pen.html:169
 msgid "Pen Drive Upload"
-msgstr "பென் டிரைவ் பதிவேற்றம்"
+msgstr ""
 
 #: .\templates\document-upload-pen.html:180
 msgid "Insert Pen Drive to Continue"
-msgstr "தொடர பென் டிரைவை செருகவும்"
+msgstr ""
 
 #: .\templates\document-upload-pen.html:181
 msgid "No drive detected"
-msgstr "எந்த டிரைவும் கண்டறியப்படவில்லை"
+msgstr ""
 
 #: .\templates\document-upload-pen.html:184
-#, fuzzy
-#| msgid "Selected Files:"
 msgid "Select files"
-msgstr "தேர்ந்தெடுக்கப்பட்ட கோப்புகள்:"
+msgstr ""
 
 #: .\templates\document-upload-pen.html:185
 msgid "Select Files from Computer"
-msgstr "கணினியிலிருந்து கோப்புகளைத் தேர்ந்தெடுக்கவும்"
+msgstr ""
 
 #: .\templates\document-upload-pen.html:192
 msgid "files selected"
-msgstr "கோப்புகள் தேர்ந்தெடுக்கப்பட்டன"
+msgstr ""
 
 #: .\templates\document-upload-pen.html:196
-#, fuzzy
-#| msgid "Upload Documents"
 msgid "Upload documents"
-msgstr "ஆவணங்களைப் பதிவேற்றவும்"
+msgstr ""
 
 #: .\templates\document-upload-pen.html:196
 #: .\templates\electricity-name-transfer.html:661
 msgid "Upload Documents"
-msgstr "ஆவணங்களைப் பதிவேற்றவும்"
+msgstr ""
 
 #: .\templates\document-upload-pen.html:442
 msgid "Remove file"
 msgstr ""
 
 #: .\templates\document-upload-pen.html:559
-#, fuzzy
-#| msgid "Please select files to upload"
 msgid "Please say a command... select files, upload, or back"
-msgstr "பதிவேற்ற கோப்புகளைத் தேர்ந்தெடுக்கவும்"
+msgstr ""
 
 #: .\templates\document-upload-qr.html:17
 msgid "QR Upload - Civic Kiosk"
-msgstr "QR பதிவேற்றம் - சிவிக் கியோஸ்க்"
+msgstr ""
 
 #: .\templates\document-upload-qr.html:288
 msgid "QR Code Upload"
-msgstr "QR குறியீடு பதிவேற்றம்"
+msgstr ""
 
 #: .\templates\document-upload-qr.html:297 .\templates\receipt-print.html:457
 msgid "QR Code"
-msgstr "QR குறியீடு"
+msgstr ""
 
 #: .\templates\document-upload-qr.html:297
 #: .\templates\document-upload-qr.html:519
@@ -1178,34 +1109,28 @@ msgid "QR"
 msgstr ""
 
 #: .\templates\document-upload-qr.html:300
-#, fuzzy
-#| msgid "Refresh QR Code"
 msgid "Refresh QR code"
-msgstr "QR குறியீட்டைப் புதுப்பிக்கவும்"
+msgstr ""
 
 #: .\templates\document-upload-qr.html:300
 msgid "Refresh QR Code"
-msgstr "QR குறியீட்டைப் புதுப்பிக்கவும்"
+msgstr ""
 
 #: .\templates\document-upload-qr.html:302
 msgid "Waiting for upload..."
-msgstr "பதிவேற்றத்திற்காக காத்திருக்கிறது..."
+msgstr ""
 
 #: .\templates\document-upload-qr.html:308
-#, fuzzy
-#| msgid "Continue to Menu"
 msgid "Continue to menu"
-msgstr "மெனுவிற்குத் தொடரவும்"
+msgstr ""
 
 #: .\templates\document-upload-qr.html:308
 msgid "Continue to Menu"
-msgstr "மெனுவிற்குத் தொடரவும்"
+msgstr ""
 
 #: .\templates\document-upload-qr.html:469
-#, fuzzy
-#| msgid "Document Type"
 msgid "Document"
-msgstr "ஆவண வகை"
+msgstr ""
 
 #: .\templates\document-upload-qr.html:470
 msgid "Photo"
@@ -1216,10 +1141,8 @@ msgid "Form"
 msgstr ""
 
 #: .\templates\document-upload-qr.html:472
-#, fuzzy
-#| msgid "Birth Certificate"
 msgid "Certificate"
-msgstr "பிறப்புச் சான்றிதழ்"
+msgstr ""
 
 #: .\templates\document-upload-qr.html:473
 #: .\templates\electricity-name-transfer.html:675
@@ -1228,30 +1151,26 @@ msgstr ""
 
 #: .\templates\document-upload-qr.html:474
 #: .\templates\electricity-name-transfer.html:680
-#, fuzzy
-#| msgid "Address"
 msgid "Address Proof"
-msgstr "முகவரி"
+msgstr ""
 
 #: .\templates\electricity-bill-payment.html:17
 msgid "Electricity Bill Payment - Civic Kiosk"
-msgstr "மின்சார பில் கட்டணம் - சிவிக் கியோஸ்க்"
+msgstr ""
 
 #: .\templates\electricity-bill-payment.html:656
 #: .\templates\payment-history.html:419
 msgid "Electricity Bill"
-msgstr "மின்சார பில்"
+msgstr ""
 
 #: .\templates\electricity-bill-payment.html:674
-#, fuzzy
-#| msgid "Fetch Bill"
 msgid "Fetch bill"
-msgstr "பில்லைப் பெறு"
+msgstr ""
 
 #: .\templates\electricity-bill-payment.html:674
 #: .\templates\water-bill.html:563
 msgid "Fetch Bill"
-msgstr "பில்லைப் பெறு"
+msgstr ""
 
 #: .\templates\electricity-bill-payment.html:677
 #: .\templates\electricity-load-enhancement.html:449
@@ -1260,40 +1179,38 @@ msgstr "பில்லைப் பெறு"
 #: .\templates\gas-cylinder-booking.html:473 .\templates\gas-subsidy.html:465
 #: .\templates\receipt-print.html:432 .\templates\water-bill.html:568
 msgid "Consumer No:"
-msgstr "நுகர்வோர் எண்:"
+msgstr ""
 
 #: .\templates\electricity-bill-payment.html:678
 #: .\templates\electricity-duplicate-bill.html:459
 #: .\templates\gas-bill-payment.html:551 .\templates\water-bill.html:576
 msgid "Bill Number:"
-msgstr "பில் எண்:"
+msgstr ""
 
 #: .\templates\electricity-bill-payment.html:679
 #: .\templates\electricity-duplicate-bill.html:463
 #: .\templates\gas-bill-payment.html:556 .\templates\water-bill.html:580
 msgid "Bill Date:"
-msgstr "பில் தேதி:"
+msgstr ""
 
 #: .\templates\electricity-bill-payment.html:680
 #: .\templates\electricity-duplicate-bill.html:467
 #: .\templates\gas-bill-payment.html:561 .\templates\professional-tax.html:608
 #: .\templates\property-tax.html:610 .\templates\water-bill.html:584
 msgid "Due Date:"
-msgstr "கடைசி தேதி:"
+msgstr ""
 
 #: .\templates\electricity-bill-payment.html:681
 #: .\templates\electricity-duplicate-bill.html:471
 #: .\templates\water-bill.html:588
 msgid "Units Consumed:"
-msgstr "நுகரப்பட்ட அலகுகள்:"
+msgstr ""
 
 #: .\templates\electricity-bill-payment.html:686
 #: .\templates\professional-tax.html:623 .\templates\property-tax.html:617
 #: .\templates\water-bill.html:595
-#, fuzzy
-#| msgid "Payment Mode:"
 msgid "Select Payment Method"
-msgstr "கட்டண முறை:"
+msgstr ""
 
 #: .\templates\electricity-bill-payment.html:688
 #: .\templates\gas-bill-payment.html:575 .\templates\professional-tax.html:625
@@ -1304,32 +1221,24 @@ msgstr ""
 #: .\templates\electricity-bill-payment.html:689
 #: .\templates\gas-bill-payment.html:576 .\templates\professional-tax.html:626
 #: .\templates\property-tax.html:620 .\templates\water-bill.html:598
-#, fuzzy
-#| msgid "Aadhaar Card"
 msgid "ATM Card"
-msgstr "ஆதார் அட்டை"
+msgstr ""
 
 #: .\templates\electricity-bill-payment.html:698
 #: .\templates\professional-tax.html:635 .\templates\property-tax.html:629
 #: .\templates\water-bill.html:607
-#, fuzzy
-#| msgid "Scan QR code with your phone"
 msgid "Scan this QR code with any UPI app to pay"
-msgstr "உங்கள் மொபைலில் QR குறியீட்டை ஸ்கேன் செய்யவும்"
+msgstr ""
 
 #: .\templates\electricity-bill-payment.html:706
 #: .\templates\gas-bill-payment.html:591 .\templates\professional-tax.html:643
 #: .\templates\property-tax.html:637 .\templates\water-bill.html:615
-#, fuzzy
-#| msgid "Consumer Number"
 msgid "Card Number"
-msgstr "நுகர்வோர் எண்"
+msgstr ""
 
 #: .\templates\electricity-bill-payment.html:707
-#, fuzzy
-#| msgid "Consumer Number"
 msgid "Card number"
-msgstr "நுகர்வோர் எண்"
+msgstr ""
 
 #: .\templates\electricity-bill-payment.html:711
 #: .\templates\electricity-bill-payment.html:712
@@ -1342,31 +1251,25 @@ msgstr ""
 #: .\templates\electricity-bill-payment.html:716
 #: .\templates\gas-bill-payment.html:604 .\templates\professional-tax.html:652
 #: .\templates\property-tax.html:646 .\templates\water-bill.html:624
-#, fuzzy
-#| msgid "PTIN:"
 msgid "PIN"
-msgstr "PTIN:"
+msgstr ""
 
 #: .\templates\electricity-bill-payment.html:722
-#, fuzzy
-#| msgid "Pay Now"
 msgid "Pay now"
-msgstr "இப்போது செலுத்து"
+msgstr ""
 
 #: .\templates\electricity-bill-payment.html:722
 #: .\templates\electricity-duplicate-bill.html:478
 #: .\templates\gas-bill-payment.html:622 .\templates\professional-tax.html:659
 #: .\templates\property-tax.html:653 .\templates\water-bill.html:631
 msgid "Pay Now"
-msgstr "இப்போது செலுத்து"
+msgstr ""
 
 #: .\templates\electricity-bill-payment.html:740
 #: .\templates\professional-tax.html:666 .\templates\property-tax.html:660
 #: .\templates\water-bill.html:638
-#, fuzzy
-#| msgid "Enter Full Name"
 msgid "Enter value"
-msgstr "முழுப்பெயரை உள்ளிடவும்"
+msgstr ""
 
 #: .\templates\electricity-bill-payment.html:889
 #: .\templates\electricity-complaint.html:763
@@ -1382,7 +1285,7 @@ msgstr "முழுப்பெயரை உள்ளிடவும்"
 #: .\templates\property-tax.html:765 .\templates\trade-license.html:593
 #: .\templates\water-bill.html:749
 msgid "Clear"
-msgstr "அழி"
+msgstr ""
 
 #: .\templates\electricity-bill-payment.html:891
 #: .\templates\electricity-complaint.html:764
@@ -1398,13 +1301,11 @@ msgstr "அழி"
 #: .\templates\property-tax.html:767 .\templates\trade-license.html:594
 #: .\templates\water-bill.html:751
 msgid "OK"
-msgstr "சரி"
+msgstr ""
 
 #: .\templates\electricity-bill-payment.html:999
-#, fuzzy
-#| msgid "Payment Receipt"
 msgid "UPI payment selected"
-msgstr "கட்டண ரசீது"
+msgstr ""
 
 #: .\templates\electricity-bill-payment.html:1005
 msgid "ATM card payment selected"
@@ -1413,23 +1314,19 @@ msgstr ""
 #: .\templates\electricity-bill-payment.html:1030
 #: .\templates\electricity-duplicate-bill.html:726
 msgid "Please enter a valid consumer number"
-msgstr "செல்லுபடியாகும் நுகர்வோர் எண்ணை உள்ளிடவும்"
+msgstr ""
 
 #: .\templates\electricity-bill-payment.html:1037
-#, fuzzy
-#| msgid "Fetch Tax Details"
 msgid "Fetching bill details"
-msgstr "வரி விவரங்களைப் பெறுக"
+msgstr ""
 
 #: .\templates\electricity-bill-payment.html:1073
 msgid "Bill details fetched"
 msgstr ""
 
 #: .\templates\electricity-bill-payment.html:1095
-#, fuzzy
-#| msgid "Please fill all required fields"
 msgid "Please fill all card details"
-msgstr "தேவையான அனைத்து புலங்களையும் நிரப்பவும்"
+msgstr ""
 
 #: .\templates\electricity-bill-payment.html:1100
 msgid "Invalid card number"
@@ -1445,15 +1342,13 @@ msgstr ""
 
 #: .\templates\electricity-bill-payment.html:1116
 msgid "Pay"
-msgstr "செலுத்து"
+msgstr ""
 
 #: .\templates\electricity-bill-payment.html:1133
 #: .\templates\professional-tax.html:956 .\templates\property-tax.html:950
 #: .\templates\water-bill.html:915
-#, fuzzy
-#| msgid "Processing..."
 msgid "Processing payment"
-msgstr "செயலாக்குகிறது..."
+msgstr ""
 
 #: .\templates\electricity-bill-payment.html:1183
 #: .\templates\water-bill.html:974
@@ -1462,18 +1357,14 @@ msgstr ""
 
 #: .\templates\electricity-bill-payment.html:1213
 #: .\templates\electricity-bill-payment.html:1314
-#, fuzzy
-#| msgid "Consumer Number"
 msgid "Consumer number entered"
-msgstr "நுகர்வோர் எண்"
+msgstr ""
 
 #: .\templates\electricity-bill-payment.html:1238
 #: .\templates\electricity-bill-payment.html:1339
 #: .\templates\water-bill.html:1039 .\templates\water-bill.html:1141
-#, fuzzy
-#| msgid "Please enter mobile number"
 msgid "Please fetch bill first"
-msgstr "மொபைல் எண்ணை உள்ளிடவும்"
+msgstr ""
 
 #: .\templates\electricity-bill-payment.html:1373
 msgid ""
@@ -1483,26 +1374,24 @@ msgstr ""
 
 #: .\templates\electricity-complaint.html:17
 msgid "Electricity Complaint - Civic Kiosk"
-msgstr "மின்சார புகார் - சிவிக் கியோஸ்க்"
+msgstr ""
 
 #: .\templates\electricity-complaint.html:515
 #: .\templates\gas-complaint.html:455
 msgid "Lodge Complaint"
-msgstr "புகார் செய்யவும்"
+msgstr ""
 
 #: .\templates\electricity-complaint.html:528
 #: .\templates\electricity-meter-replacement.html:338
 #: .\templates\electricity-solar.html:454 .\templates\gas-complaint.html:466
 msgid "Consumer Number"
-msgstr "நுகர்வோர் எண்"
+msgstr ""
 
 #: .\templates\electricity-complaint.html:529
 #: .\templates\electricity-duplicate-bill.html:441
 #: .\templates\electricity-meter-replacement.html:339
-#, fuzzy
-#| msgid "Consumer Number"
 msgid "Consumer number"
-msgstr "நுகர்வோர் எண்"
+msgstr ""
 
 #: .\templates\electricity-complaint.html:534
 msgid "Contact Phone"
@@ -1513,22 +1402,16 @@ msgid "for updates"
 msgstr ""
 
 #: .\templates\electricity-complaint.html:535
-#, fuzzy
-#| msgid "Please enter 10-digit mobile number"
 msgid "10-digit mobile number"
-msgstr "10-இலக்க மொபைல் எண்ணை உள்ளிடவும்"
+msgstr ""
 
 #: .\templates\electricity-complaint.html:535
-#, fuzzy
-#| msgid "Enter consumer number"
 msgid "Contact phone number"
-msgstr "நுகர்வோர் எண்ணை உள்ளிடவும்"
+msgstr ""
 
 #: .\templates\electricity-complaint.html:540
-#, fuzzy
-#| msgid "Complaint Type"
 msgid "Complaint Priority"
-msgstr "புகார் வகை"
+msgstr ""
 
 #: .\templates\electricity-complaint.html:542
 msgid "Normal"
@@ -1550,37 +1433,37 @@ msgstr ""
 #: .\templates\electricity-complaint.html:554
 #: .\templates\gas-complaint.html:471
 msgid "Complaint Type"
-msgstr "புகார் வகை"
+msgstr ""
 
 #: .\templates\electricity-complaint.html:556
 msgid "No Power"
-msgstr "மின்சாரம் இல்லை"
+msgstr ""
 
 #: .\templates\electricity-complaint.html:557
 msgid "Voltage Issue"
-msgstr "மின்னழுத்த பிரச்சினை"
+msgstr ""
 
 #: .\templates\electricity-complaint.html:558
 msgid "Meter Problem"
-msgstr "மீட்டர் பிரச்சினை"
+msgstr ""
 
 #: .\templates\electricity-complaint.html:559
 #: .\templates\gas-complaint.html:476
 msgid "Billing Issue"
-msgstr "பில்லிங் பிரச்சினை"
+msgstr ""
 
 #: .\templates\electricity-complaint.html:560
 msgid "Pole/Wire Issue"
-msgstr "கம்பம்/கம்பி பிரச்சினை"
+msgstr ""
 
 #: .\templates\electricity-complaint.html:566
 #: .\templates\gas-complaint.html:483
 msgid "Description"
-msgstr "விளக்கம்"
+msgstr ""
 
 #: .\templates\electricity-complaint.html:567
 msgid "Describe your complaint in detail..."
-msgstr "உங்கள் புகாரை விரிவாக விவரிக்கவும்..."
+msgstr ""
 
 #: .\templates\electricity-complaint.html:574
 msgid "Emergency Helpline:"
@@ -1591,15 +1474,13 @@ msgid "Power Failure:"
 msgstr ""
 
 #: .\templates\electricity-complaint.html:582
-#, fuzzy
-#| msgid "Submit Complaint"
 msgid "Submit complaint"
-msgstr "புகாரை சமர்ப்பிக்கவும்"
+msgstr ""
 
 #: .\templates\electricity-complaint.html:582
 #: .\templates\gas-complaint.html:487
 msgid "Submit Complaint"
-msgstr "புகாரை சமர்ப்பிக்கவும்"
+msgstr ""
 
 #: .\templates\electricity-complaint.html:748
 #: .\templates\electricity-name-transfer.html:948
@@ -1609,7 +1490,7 @@ msgstr "புகாரை சமர்ப்பிக்கவும்"
 #: .\templates\gas-new-connection.html:629 .\templates\grievance.html:654
 #: .\templates\trade-license.html:581
 msgid "Space"
-msgstr "இடைவெளி"
+msgstr ""
 
 #: .\templates\electricity-complaint.html:761
 #: .\templates\electricity-name-transfer.html:961
@@ -1620,7 +1501,7 @@ msgstr "இடைவெளி"
 #: .\templates\gas-new-connection.html:628 .\templates\grievance.html:653
 #: .\templates\trade-license.html:591
 msgid "Shift"
-msgstr "ஷிப்ட்"
+msgstr ""
 
 #: .\templates\electricity-complaint.html:889
 msgid "Estimated response: Within 30 minutes"
@@ -1644,29 +1525,27 @@ msgstr ""
 
 #: .\templates\electricity-duplicate-bill.html:17
 msgid "Duplicate Bill - Civic Kiosk"
-msgstr "நகல் பில் - சிவிக் கியோஸ்க்"
+msgstr ""
 
 #: .\templates\electricity-duplicate-bill.html:427
 #: .\templates\electricity-services.html:317
 msgid "Duplicate Bill"
-msgstr "நகல் பில்"
+msgstr ""
 
 #: .\templates\electricity-duplicate-bill.html:441
 #: .\templates\gas-subsidy.html:458 .\templates\water-bill.html:561
 msgid "Enter Consumer No."
-msgstr "நுகர்வோர் எண்ணை உள்ளிடவும்"
+msgstr ""
 
 #: .\templates\electricity-duplicate-bill.html:442
-#, fuzzy
-#| msgid "Search"
 msgid "Search bills"
-msgstr "தேடு"
+msgstr ""
 
 #: .\templates\electricity-duplicate-bill.html:442
 #: .\templates\gas-booking-status.html:481
 #: .\templates\professional-tax.html:586
 msgid "Search"
-msgstr "தேடு"
+msgstr ""
 
 #: .\templates\electricity-duplicate-bill.html:447
 msgid "Show all bills"
@@ -1685,10 +1564,8 @@ msgid "Show 2025 bills"
 msgstr ""
 
 #: .\templates\electricity-duplicate-bill.html:475
-#, fuzzy
-#| msgid "Total Amount:"
 msgid "Amount:"
-msgstr "மொத்த தொகை:"
+msgstr ""
 
 #: .\templates\electricity-duplicate-bill.html:478
 msgid "Pay this bill"
@@ -1698,23 +1575,19 @@ msgstr ""
 #: .\templates\electricity-meter-replacement.html:468
 #: .\templates\gas-subsidy.html:507
 msgid "Enter consumer number"
-msgstr "நுகர்வோர் எண்ணை உள்ளிடவும்"
+msgstr ""
 
 #: .\templates\electricity-duplicate-bill.html:766
-#, fuzzy
-#| msgid "Selected:"
 msgid "Select"
-msgstr "தேர்ந்தெடுக்கப்பட்டது:"
+msgstr ""
 
 #: .\templates\electricity-duplicate-bill.html:766
-#, fuzzy
-#| msgid "cylinder for ₹"
 msgid "bill for ₹"
-msgstr "₹-க்கு சிலிண்டர்"
+msgstr ""
 
 #: .\templates\electricity-duplicate-bill.html:778
 msgid "Download"
-msgstr "பதிவிறக்கு"
+msgstr ""
 
 #: .\templates\electricity-duplicate-bill.html:778
 msgid "bill"
@@ -1722,10 +1595,8 @@ msgstr ""
 
 #: .\templates\electricity-duplicate-bill.html:860
 #: .\templates\electricity-duplicate-bill.html:882
-#, fuzzy
-#| msgid "Download"
 msgid "Downloading"
-msgstr "பதிவிறக்கு"
+msgstr ""
 
 #: .\templates\electricity-duplicate-bill.html:956
 msgid ""
@@ -1740,23 +1611,21 @@ msgstr ""
 
 #: .\templates\electricity-load-enhancement.html:17
 msgid "Load Enhancement - Civic Kiosk"
-msgstr "சுமை மேம்பாடு - சிவிக் கியோஸ்க்"
+msgstr ""
 
 #: .\templates\electricity-load-enhancement.html:431
 #: .\templates\electricity-services.html:313
 msgid "Load Enhancement"
-msgstr "சுமை மேம்பாடு"
+msgstr ""
 
 #: .\templates\electricity-load-enhancement.html:445
 #: .\templates\electricity-load-enhancement.html:462
 msgid "Current Load:"
-msgstr "தற்போதைய சுமை:"
+msgstr ""
 
 #: .\templates\electricity-load-enhancement.html:457
-#, fuzzy
-#| msgid "Selected:"
 msgid "Select Load:"
-msgstr "தேர்ந்தெடுக்கப்பட்டது:"
+msgstr ""
 
 #: .\templates\electricity-load-enhancement.html:460
 msgid "Load slider"
@@ -1767,66 +1636,56 @@ msgid "Increase by:"
 msgstr ""
 
 #: .\templates\electricity-load-enhancement.html:468
-#, fuzzy
-#| msgid "Enter load in kW"
 msgid "Set load to 5 kW"
-msgstr "கிலோவாட்டில் சுமையை உள்ளிடவும்"
+msgstr ""
 
 #: .\templates\electricity-load-enhancement.html:469
 msgid "Set load to 7.5 kW"
 msgstr ""
 
 #: .\templates\electricity-load-enhancement.html:470
-#, fuzzy
-#| msgid "Enter load in kW"
 msgid "Set load to 10 kW"
-msgstr "கிலோவாட்டில் சுமையை உள்ளிடவும்"
+msgstr ""
 
 #: .\templates\electricity-load-enhancement.html:471
 msgid "Set load to 12.5 kW"
 msgstr ""
 
 #: .\templates\electricity-load-enhancement.html:472
-#, fuzzy
-#| msgid "Enter load in kW"
 msgid "Set load to 15 kW"
-msgstr "கிலோவாட்டில் சுமையை உள்ளிடவும்"
+msgstr ""
 
 #: .\templates\electricity-load-enhancement.html:476
 msgid "Requested Load (kW)"
-msgstr "கோரப்பட்ட சுமை (கிலோவாட்)"
+msgstr ""
 
 #: .\templates\electricity-load-enhancement.html:477
 msgid "Enter new load (e.g., 5, 7.5)"
-msgstr "புதிய சுமையை உள்ளிடவும் (எ.கா., 5, 7.5)"
+msgstr ""
 
 #: .\templates\electricity-load-enhancement.html:478
-#, fuzzy
-#| msgid "Requested Load (kW)"
 msgid "Requested load"
-msgstr "கோரப்பட்ட சுமை (கிலோவாட்)"
+msgstr ""
 
 #: .\templates\electricity-load-enhancement.html:482
 msgid "Reason for Enhancement"
-msgstr "மேம்பாட்டுக்கான காரணம்"
+msgstr ""
 
 #: .\templates\electricity-load-enhancement.html:483
-#, fuzzy
-#| msgid "Reason for Enhancement"
 msgid "Reason for enhancement"
-msgstr "மேம்பாட்டுக்கான காரணம்"
+msgstr ""
 
 #: .\templates\electricity-load-enhancement.html:484
 msgid "New Appliances"
-msgstr "புதிய உபகரணங்கள்"
+msgstr ""
 
 #: .\templates\electricity-load-enhancement.html:485
 msgid "Home Extension"
-msgstr "வீட்டு நீட்டிப்பு"
+msgstr ""
 
 #: .\templates\electricity-load-enhancement.html:486
 msgid "Commercial Activity"
-msgstr "வணிக நடவடிக்கை"
+msgstr ""
 
 #: .\templates\electricity-load-enhancement.html:487
 msgid "EV Charger Installation"
@@ -1845,10 +1704,8 @@ msgid "Base Fee:"
 msgstr ""
 
 #: .\templates\electricity-load-enhancement.html:504
-#, fuzzy
-#| msgid "Application Fee:"
 msgid "Additional Load Fee:"
-msgstr "விண்ணப்பக் கட்டணம்:"
+msgstr ""
 
 #: .\templates\electricity-load-enhancement.html:508
 #: .\templates\electricity-meter-replacement.html:441
@@ -1860,34 +1717,28 @@ msgstr ""
 #: .\templates\electricity-load-enhancement.html:512
 #: .\templates\electricity-meter-replacement.html:445
 #: .\templates\electricity-name-transfer.html:770
-#, fuzzy
-#| msgid "Total Amount:"
 msgid "Total:"
-msgstr "மொத்த தொகை:"
+msgstr ""
 
 #: .\templates\electricity-load-enhancement.html:518
 msgid "Estimated Cost"
-msgstr "மதிப்பிடப்பட்ட செலவு"
+msgstr ""
 
 #: .\templates\electricity-load-enhancement.html:522
-#, fuzzy
-#| msgid "Submit Transfer Request"
 msgid "Submit load enhancement request"
-msgstr "மாற்றக் கோரிக்கையை சமர்ப்பிக்கவும்"
+msgstr ""
 
 #: .\templates\electricity-load-enhancement.html:522
 msgid "Submit Request"
-msgstr "கோரிக்கையை சமர்ப்பிக்கவும்"
+msgstr ""
 
 #: .\templates\electricity-load-enhancement.html:539
 msgid "Enter load in kW"
-msgstr "கிலோவாட்டில் சுமையை உள்ளிடவும்"
+msgstr ""
 
 #: .\templates\electricity-load-enhancement.html:930
-#, fuzzy
-#| msgid "Please enter requested load"
 msgid "Please enter a valid load"
-msgstr "தயவுசெய்து கோரப்பட்ட சுமையை உள்ளிடவும்"
+msgstr ""
 
 #: .\templates\electricity-load-enhancement.html:1038
 msgid "Please say a command... load value, reason, or submit"
@@ -1901,61 +1752,57 @@ msgstr ""
 
 #: .\templates\electricity-meter-replacement.html:17
 msgid "Meter Replacement - Civic Kiosk"
-msgstr "மீட்டர் மாற்றீடு - சிவிக் கியோஸ்க்"
+msgstr ""
 
 #: .\templates\electricity-meter-replacement.html:324
 #: .\templates\electricity-services.html:315
 msgid "Meter Replacement"
-msgstr "மீட்டர் மாற்றீடு"
+msgstr ""
 
 #: .\templates\electricity-meter-replacement.html:343
 msgid "Reason for Replacement"
-msgstr "மாற்றீட்டுக்கான காரணம்"
+msgstr ""
 
 #: .\templates\electricity-meter-replacement.html:344
-#, fuzzy
-#| msgid "Reason for Replacement"
 msgid "Reason for replacement"
-msgstr "மாற்றீட்டுக்கான காரணம்"
+msgstr ""
 
 #: .\templates\electricity-meter-replacement.html:345
 msgid "Meter faulty/not working"
-msgstr "மீட்டர் கோளாறு/வேலை செய்யவில்லை"
+msgstr ""
 
 #: .\templates\electricity-meter-replacement.html:346
 msgid "Meter damaged"
-msgstr "மீட்டர் சேதமடைந்தது"
+msgstr ""
 
 #: .\templates\electricity-meter-replacement.html:347
 msgid "Upgrade to smart meter"
-msgstr "ஸ்மார்ட் மீட்டருக்கு மேம்படுத்தவும்"
+msgstr ""
 
 #: .\templates\electricity-meter-replacement.html:348
 msgid "Meter showing error"
-msgstr "மீட்டரில் பிழை காட்டுகிறது"
+msgstr ""
 
 #: .\templates\electricity-meter-replacement.html:349
 msgid "Meter stolen"
-msgstr "மீட்டர் திருடப்பட்டது"
+msgstr ""
 
 #: .\templates\electricity-meter-replacement.html:355
 msgid "Select Meter Type"
-msgstr "மீட்டர் வகையைத் தேர்ந்தெடுக்கவும்"
+msgstr ""
 
 #: .\templates\electricity-meter-replacement.html:358
-#, fuzzy
-#| msgid "Single Phase"
 msgid "Single Phase meter, ₹1,200"
-msgstr "சிங்கிள் பேஸ்"
+msgstr ""
 
 #: .\templates\electricity-meter-replacement.html:359
 msgid "Single Phase"
-msgstr "சிங்கிள் பேஸ்"
+msgstr ""
 
 #: .\templates\electricity-meter-replacement.html:362
 #: .\templates\electricity-new-connection.html:559
 msgid "Residential"
-msgstr "குடியிருப்பு"
+msgstr ""
 
 #: .\templates\electricity-meter-replacement.html:363
 msgid "Basic"
@@ -1967,29 +1814,27 @@ msgstr ""
 
 #: .\templates\electricity-meter-replacement.html:368
 msgid "Three Phase"
-msgstr "த்ரீ பேஸ்"
+msgstr ""
 
 #: .\templates\electricity-meter-replacement.html:371
 #: .\templates\electricity-new-connection.html:560
 #: .\templates\gas-cylinder-booking.html:511
 msgid "Commercial"
-msgstr "வணிக"
+msgstr ""
 
 #: .\templates\electricity-meter-replacement.html:372
 #: .\templates\electricity-meter-replacement.html:391
 #: .\templates\electricity-new-connection.html:561
 msgid "Industrial"
-msgstr "தொழில்துறை"
+msgstr ""
 
 #: .\templates\electricity-meter-replacement.html:376
-#, fuzzy
-#| msgid "Smart Meter"
 msgid "Smart meter, ₹3,000"
-msgstr "ஸ்மார்ட் மீட்டர்"
+msgstr ""
 
 #: .\templates\electricity-meter-replacement.html:377
 msgid "Smart Meter"
-msgstr "ஸ்மார்ட் மீட்டர்"
+msgstr ""
 
 #: .\templates\electricity-meter-replacement.html:380
 msgid "WiFi"
@@ -2009,23 +1854,19 @@ msgstr ""
 
 #: .\templates\electricity-meter-replacement.html:387
 msgid "CT Meter"
-msgstr "CT மீட்டர்"
+msgstr ""
 
 #: .\templates\electricity-meter-replacement.html:390
 msgid "High Load"
 msgstr ""
 
 #: .\templates\electricity-meter-replacement.html:399
-#, fuzzy
-#| msgid "Preferred Date"
 msgid "Preferred Date & Time"
-msgstr "விருப்பமான தேதி"
+msgstr ""
 
 #: .\templates\electricity-meter-replacement.html:400
-#, fuzzy
-#| msgid "Preferred Date"
 msgid "Preferred date"
-msgstr "விருப்பமான தேதி"
+msgstr ""
 
 #: .\templates\electricity-meter-replacement.html:404
 msgid "9 AM to 12 PM slot"
@@ -2040,20 +1881,16 @@ msgid "3 PM to 6 PM slot"
 msgstr ""
 
 #: .\templates\electricity-meter-replacement.html:411
-#, fuzzy
-#| msgid "All Services"
 msgid "Additional Services"
-msgstr "அனைத்து சேவைகள்"
+msgstr ""
 
 #: .\templates\electricity-meter-replacement.html:413
 msgid "Meter calibration service"
 msgstr ""
 
 #: .\templates\electricity-meter-replacement.html:414
-#, fuzzy
-#| msgid "Meter stolen"
 msgid "Meter Calibration"
-msgstr "மீட்டர் திருடப்பட்டது"
+msgstr ""
 
 #: .\templates\electricity-meter-replacement.html:417
 msgid "Wiring check service"
@@ -2072,64 +1909,54 @@ msgid "New Meter Seal"
 msgstr ""
 
 #: .\templates\electricity-meter-replacement.html:429
-#, fuzzy
-#| msgid "Meter stolen"
 msgid "Meter Cost:"
-msgstr "மீட்டர் திருடப்பட்டது"
+msgstr ""
 
 #: .\templates\electricity-meter-replacement.html:433
-#, fuzzy
-#| msgid "All Services"
 msgid "Additional Services:"
-msgstr "அனைத்து சேவைகள்"
+msgstr ""
 
 #: .\templates\electricity-meter-replacement.html:437
-#, fuzzy
-#| msgid "Application Fee:"
 msgid "Installation Fee:"
-msgstr "விண்ணப்பக் கட்டணம்:"
+msgstr ""
 
 #: .\templates\electricity-meter-replacement.html:451
 msgid "Estimated Total"
-msgstr "மதிப்பிடப்பட்ட மொத்தம்"
+msgstr ""
 
 #: .\templates\electricity-meter-replacement.html:455
-#, fuzzy
-#| msgid "Submit Transfer Request"
 msgid "Submit meter replacement request"
-msgstr "மாற்றக் கோரிக்கையை சமர்ப்பிக்கவும்"
+msgstr ""
 
 #: .\templates\electricity-meter-replacement.html:455
 msgid "Request Replacement"
-msgstr "மாற்றீட்டைக் கோருங்கள்"
+msgstr ""
 
 #: .\templates\electricity-name-transfer.html:148
 msgid "Name Transfer - Civic Kiosk"
-msgstr "பெயர் மாற்றம் - சிவிக் கியோஸ்க்"
+msgstr ""
 
 #: .\templates\electricity-name-transfer.html:647
 #: .\templates\electricity-services.html:314
 msgid "Name Transfer"
-msgstr "பெயர் மாற்றம்"
+msgstr ""
 
 #: .\templates\electricity-name-transfer.html:650
 msgid "Current Owner:"
-msgstr "தற்போதைய உரிமையாளர்:"
+msgstr ""
 
 #: .\templates\electricity-name-transfer.html:652
 #: .\templates\gas-consumer-lookup.html:498
 msgid "Address:"
-msgstr "முகவரி:"
+msgstr ""
 
 #: .\templates\electricity-name-transfer.html:656
 msgid "Required Documents: Sale Deed, NOC, ID Proof, Address Proof"
-msgstr "தேவையான ஆவணங்கள்: விற்பனைப் பத்திரம், NOC, அடையாளச் சான்று, முகவரிச் சான்று"
+msgstr ""
 
 #: .\templates\electricity-name-transfer.html:663
-#, fuzzy
-#| msgid "Upload All"
 msgid "Upload sale deed"
-msgstr "அனைத்தையும் பதிவேற்றவும்"
+msgstr ""
 
 #: .\templates\electricity-name-transfer.html:665
 msgid "Sale Deed"
@@ -2139,16 +1966,12 @@ msgstr ""
 #: .\templates\electricity-name-transfer.html:671
 #: .\templates\electricity-name-transfer.html:676
 #: .\templates\electricity-name-transfer.html:681
-#, fuzzy
-#| msgid "QR Code Upload"
 msgid "Not Uploaded"
-msgstr "QR குறியீடு பதிவேற்றம்"
+msgstr ""
 
 #: .\templates\electricity-name-transfer.html:668
-#, fuzzy
-#| msgid "Upload All"
 msgid "Upload NOC"
-msgstr "அனைத்தையும் பதிவேற்றவும்"
+msgstr ""
 
 #: .\templates\electricity-name-transfer.html:670
 msgid "NOC"
@@ -2164,71 +1987,55 @@ msgstr ""
 
 #: .\templates\electricity-name-transfer.html:705
 msgid "New Owner Name"
-msgstr "புதிய உரிமையாளரின் பெயர்"
+msgstr ""
 
 #: .\templates\electricity-name-transfer.html:706
 msgid "Enter new owner name"
-msgstr "புதிய உரிமையாளரின் பெயரை உள்ளிடவும்"
+msgstr ""
 
 #: .\templates\electricity-name-transfer.html:707
-#, fuzzy
-#| msgid "New Owner Name"
 msgid "New owner name"
-msgstr "புதிய உரிமையாளரின் பெயர்"
+msgstr ""
 
 #: .\templates\electricity-name-transfer.html:711
 msgid "New Owner Aadhaar"
-msgstr "புதிய உரிமையாளரின் ஆதார்"
+msgstr ""
 
 #: .\templates\electricity-name-transfer.html:712
 msgid "12 digit Aadhaar"
-msgstr "12 இலக்க ஆதார்"
+msgstr ""
 
 #: .\templates\electricity-name-transfer.html:713
-#, fuzzy
-#| msgid "New Owner Aadhaar"
 msgid "New owner Aadhaar"
-msgstr "புதிய உரிமையாளரின் ஆதார்"
+msgstr ""
 
 #: .\templates\electricity-name-transfer.html:718
-#, fuzzy
-#| msgid "New Owner Name"
 msgid "New Owner Phone"
-msgstr "புதிய உரிமையாளரின் பெயர்"
+msgstr ""
 
 #: .\templates\electricity-name-transfer.html:719
-#, fuzzy
-#| msgid "10 digit mobile"
 msgid "10 digit mobile number"
-msgstr "10 இலக்க மொபைல்"
+msgstr ""
 
 #: .\templates\electricity-name-transfer.html:720
-#, fuzzy
-#| msgid "New Owner Name"
 msgid "New owner phone"
-msgstr "புதிய உரிமையாளரின் பெயர்"
+msgstr ""
 
 #: .\templates\electricity-name-transfer.html:724
-#, fuzzy
-#| msgid "New Owner Name"
 msgid "New Owner Email"
-msgstr "புதிய உரிமையாளரின் பெயர்"
+msgstr ""
 
 #: .\templates\electricity-name-transfer.html:725
-#, fuzzy
-#| msgid "Enter complete address"
 msgid "Email address"
-msgstr "முழுமையான முகவரியை உள்ளிடவும்"
+msgstr ""
 
 #: .\templates\electricity-name-transfer.html:726
-#, fuzzy
-#| msgid "New Owner Name"
 msgid "New owner email"
-msgstr "புதிய உரிமையாளரின் பெயர்"
+msgstr ""
 
 #: .\templates\electricity-name-transfer.html:730
 msgid "Relationship"
-msgstr "உறவு"
+msgstr ""
 
 #: .\templates\electricity-name-transfer.html:731
 msgid "Relationship with current owner"
@@ -2236,15 +2043,15 @@ msgstr ""
 
 #: .\templates\electricity-name-transfer.html:732
 msgid "Purchaser"
-msgstr "வாங்குபவர்"
+msgstr ""
 
 #: .\templates\electricity-name-transfer.html:733
 msgid "Family Member"
-msgstr "குடும்ப உறுப்பினர்"
+msgstr ""
 
 #: .\templates\electricity-name-transfer.html:734
 msgid "Legal Heir"
-msgstr "சட்ட வாரிசு"
+msgstr ""
 
 #: .\templates\electricity-name-transfer.html:742
 msgid "Help Desk:"
@@ -2255,217 +2062,199 @@ msgid "Email:"
 msgstr ""
 
 #: .\templates\electricity-name-transfer.html:750
-#, fuzzy
-#| msgid "Processing..."
 msgid "Processing Time:"
-msgstr "செயலாக்குகிறது..."
+msgstr ""
 
 #: .\templates\electricity-name-transfer.html:751
 msgid "7-10 working days"
 msgstr ""
 
 #: .\templates\electricity-name-transfer.html:758
-#, fuzzy
-#| msgid "Name Transfer"
 msgid "Transfer Fee:"
-msgstr "பெயர் மாற்றம்"
+msgstr ""
 
 #: .\templates\electricity-name-transfer.html:762
-#, fuzzy
-#| msgid "Death Certificate"
 msgid "Document Verification:"
-msgstr "இறப்புச் சான்றிதழ்"
+msgstr ""
 
 #: .\templates\electricity-name-transfer.html:775
-#, fuzzy
-#| msgid "Submit Transfer Request"
 msgid "Submit transfer request"
-msgstr "மாற்றக் கோரிக்கையை சமர்ப்பிக்கவும்"
+msgstr ""
 
 #: .\templates\electricity-name-transfer.html:775
 msgid "Submit Transfer Request"
-msgstr "மாற்றக் கோரிக்கையை சமர்ப்பிக்கவும்"
+msgstr ""
 
 #: .\templates\electricity-new-connection.html:176
 msgid "New Electricity Connection - Civic Kiosk"
-msgstr "புதிய மின்சார இணைப்பு - சிவிக் கியோஸ்க்"
+msgstr ""
 
 #: .\templates\electricity-new-connection.html:531
 msgid "New Electricity Connection"
-msgstr "புதிய மின்சார இணைப்பு"
+msgstr ""
 
 #: .\templates\electricity-new-connection.html:532
 #: .\templates\gas-new-connection.html:465
 msgid "Your data is secure"
-msgstr "உங்கள் தரவு பாதுகாப்பானது"
+msgstr ""
 
 #: .\templates\electricity-new-connection.html:545
 #: .\templates\gas-new-connection.html:471
 #: .\templates\marriage-registration.html:413
 #: .\templates\marriage-registration.html:434
 msgid "Full Name"
-msgstr "முழுப்பெயர்"
+msgstr ""
 
 #: .\templates\electricity-new-connection.html:546
 msgid "Enter your full name"
-msgstr "உங்கள் முழுப்பெயரை உள்ளிடவும்"
+msgstr ""
 
 #: .\templates\electricity-new-connection.html:547
-#, fuzzy
-#| msgid "Full Name"
 msgid "Full name"
-msgstr "முழுப்பெயர்"
+msgstr ""
 
 #: .\templates\electricity-new-connection.html:551
 #: .\templates\electricity-new-connection.html:553
 #: .\templates\gas-new-connection.html:476
 msgid "Address"
-msgstr "முகவரி"
+msgstr ""
 
 #: .\templates\electricity-new-connection.html:552
 #: .\templates\trade-license.html:454
 msgid "Enter complete address"
-msgstr "முழுமையான முகவரியை உள்ளிடவும்"
+msgstr ""
 
 #: .\templates\electricity-new-connection.html:557
 msgid "Property Type"
-msgstr "சொத்து வகை"
+msgstr ""
 
 #: .\templates\electricity-new-connection.html:558
-#, fuzzy
-#| msgid "Property Type"
 msgid "Property type"
-msgstr "சொத்து வகை"
+msgstr ""
 
 #: .\templates\electricity-new-connection.html:562
 msgid "Agricultural"
-msgstr "விவசாய"
+msgstr ""
 
 #: .\templates\electricity-new-connection.html:567
 msgid "Load Required (kW)"
-msgstr "தேவையான சுமை (கிலோவாட்)"
+msgstr ""
 
 #: .\templates\electricity-new-connection.html:568
 msgid "e.g., 5"
-msgstr "எ.கா., 5"
+msgstr ""
 
 #: .\templates\electricity-new-connection.html:569
-#, fuzzy
-#| msgid "Load Required (kW)"
 msgid "Load required in kilowatts"
-msgstr "தேவையான சுமை (கிலோவாட்)"
+msgstr ""
 
 #: .\templates\electricity-new-connection.html:573
 #: .\templates\gas-new-connection.html:481 .\templates\grievance.html:509
 msgid "Mobile Number"
-msgstr "மொபைல் எண்"
+msgstr ""
 
 #: .\templates\electricity-new-connection.html:574
 msgid "10 digit mobile"
-msgstr "10 இலக்க மொபைல்"
+msgstr ""
 
 #: .\templates\electricity-new-connection.html:575
-#, fuzzy
-#| msgid "Mobile Number"
 msgid "Mobile number"
-msgstr "மொபைல் எண்"
+msgstr ""
 
 #: .\templates\electricity-new-connection.html:578
-#, fuzzy
-#| msgid "Submit Application"
 msgid "Submit application"
-msgstr "விண்ணப்பத்தை சமர்ப்பிக்கவும்"
+msgstr ""
 
 #: .\templates\electricity-services.html:6
 msgid "Electricity Services - Civic Kiosk"
-msgstr "மின்சார சேவைகள் - சிவிக் கியோஸ்க்"
+msgstr ""
 
 #: .\templates\electricity-services.html:307
 msgid "Electricity Services"
-msgstr "மின்சார சேவைகள்"
+msgstr ""
 
 #: .\templates\electricity-services.html:310 .\templates\gas-services.html:378
 msgid "Bill Payment"
-msgstr "பில் கட்டணம்"
+msgstr ""
 
 #: .\templates\electricity-services.html:311 .\templates\gas-services.html:376
 msgid "New Connection"
-msgstr "புதிய இணைப்பு"
+msgstr ""
 
 #: .\templates\electricity-services.html:312 .\templates\gas-services.html:379
 msgid "Complaint"
-msgstr "புகார்"
+msgstr ""
 
 #: .\templates\electricity-services.html:316
 #: .\templates\electricity-solar.html:436
 msgid "Solar Net Metering"
-msgstr "சோலார் நெட் மீட்டரிங்"
+msgstr ""
 
 #: .\templates\electricity-solar.html:119
 msgid "Solar Net Metering - Civic Kiosk"
-msgstr "சோலார் நெட் மீட்டரிங் - சிவிக் கியோஸ்க்"
+msgstr ""
 
 #: .\templates\electricity-solar.html:439
 msgid "Government Subsidy Available!"
-msgstr "அரசு மானியம் கிடைக்கிறது!"
+msgstr ""
 
 #: .\templates\electricity-solar.html:440
 #, python-format
 msgid "Up to 40%% subsidy on solar installations for residential consumers."
-msgstr "குடியிருப்பு நுகர்வோருக்கு சோலார் நிறுவல்களில் 40%% வரை மானியம்."
+msgstr ""
 
 #: .\templates\electricity-solar.html:444
 msgid "₹8,000/yr"
-msgstr "₹8,000/ஆண்டு"
+msgstr ""
 
 #: .\templates\electricity-solar.html:444
 msgid "Estimated Savings"
-msgstr "மதிப்பிடப்பட்ட சேமிப்பு"
+msgstr ""
 
 #: .\templates\electricity-solar.html:445
 msgid "5-7 years"
-msgstr "5-7 ஆண்டுகள்"
+msgstr ""
 
 #: .\templates\electricity-solar.html:445
 msgid "Payback Period"
-msgstr "திரும்பப் பெறும் காலம்"
+msgstr ""
 
 #: .\templates\electricity-solar.html:446
 msgid "25 years"
-msgstr "25 ஆண்டுகள்"
+msgstr ""
 
 #: .\templates\electricity-solar.html:446
 msgid "Panel Life"
-msgstr "பேனல் ஆயுள்"
+msgstr ""
 
 #: .\templates\electricity-solar.html:447
 #, python-format
 msgid "40%%"
-msgstr "40%%"
+msgstr ""
 
 #: .\templates\electricity-solar.html:447 .\templates\gas-services.html:377
 msgid "Subsidy"
-msgstr "மானியம்"
+msgstr ""
 
 #: .\templates\electricity-solar.html:459
 msgid "Proposed Solar Capacity (kW)"
-msgstr "முன்மொழியப்பட்ட சோலார் திறன் (கிலோவாட்)"
+msgstr ""
 
 #: .\templates\electricity-solar.html:466
 msgid "Above 5 kW"
-msgstr "5 கிலோவாட்டுக்கு மேல்"
+msgstr ""
 
 #: .\templates\electricity-solar.html:471
 msgid "Roof Area Available (sq ft)"
-msgstr "கிடைக்கும் கூரை பகுதி (ச.அடி)"
+msgstr ""
 
 #: .\templates\electricity-solar.html:472
 msgid "e.g., 500"
-msgstr "எ.கா., 500"
+msgstr ""
 
 #: .\templates\electricity-solar.html:476
 msgid "Estimated Cost (After Subsidy)"
-msgstr "மதிப்பிடப்பட்ட செலவு (மானியத்திற்குப் பிறகு)"
+msgstr ""
 
 #: .\templates\electricity-solar.html:477
 msgid "Select capacity to see estimate"
@@ -2473,45 +2262,39 @@ msgstr ""
 
 #: .\templates\electricity-solar.html:480
 msgid "Apply for Net Metering"
-msgstr "நெட் மீட்டரிங்கிற்கு விண்ணப்பிக்கவும்"
+msgstr ""
 
 #: .\templates\gas-bill-payment.html:271
 msgid "Gas Bill Payment - Civic Kiosk"
-msgstr "எரிவாயு பில் கட்டணம் - சிவிக் கியோஸ்க்"
+msgstr ""
 
 #: .\templates\gas-bill-payment.html:505
-#, fuzzy
-#| msgid "Processing..."
 msgid "Processing Payment..."
-msgstr "செயலாக்குகிறது..."
+msgstr ""
 
 #: .\templates\gas-bill-payment.html:541
 msgid "Gas Bill Payment"
-msgstr "எரிவாயு பில் கட்டணம்"
+msgstr ""
 
 #: .\templates\gas-bill-payment.html:546
 msgid "Consumer Number:"
-msgstr "நுகர்வோர் எண்:"
+msgstr ""
 
 #: .\templates\gas-bill-payment.html:566
 msgid "Period:"
-msgstr "காலம்:"
+msgstr ""
 
 #: .\templates\gas-bill-payment.html:567
 msgid "Jan 2026"
-msgstr "ஜன 2026"
+msgstr ""
 
 #: .\templates\gas-bill-payment.html:583
-#, fuzzy
-#| msgid "Scan QR code with your phone"
 msgid "Scan QR code with any UPI app"
-msgstr "உங்கள் மொபைலில் QR குறியீட்டை ஸ்கேன் செய்யவும்"
+msgstr ""
 
 #: .\templates\gas-bill-payment.html:592
-#, fuzzy
-#| msgid "Please enter 12-digit Aadhaar number"
 msgid "Enter 15-16 digit card number"
-msgstr "12-இலக்க ஆதார் எண்ணை உள்ளிடவும்"
+msgstr ""
 
 #: .\templates\gas-bill-payment.html:593
 msgid "Card number must be at least 15 digits"
@@ -2535,262 +2318,262 @@ msgstr ""
 
 #: .\templates\gas-booking-status.html:119
 msgid "Gas Booking Status - Civic Kiosk"
-msgstr "எரிவாயு பதிவு நிலை - சிவிக் கியோஸ்க்"
+msgstr ""
 
 #: .\templates\gas-booking-status.html:470 .\templates\gas-services.html:381
 msgid "Booking Status"
-msgstr "பதிவு நிலை"
+msgstr ""
 
 #: .\templates\gas-booking-status.html:479
 msgid "Enter Reference No. (e.g., CYL251234)"
-msgstr "குறிப்பு எண்ணை உள்ளிடவும் (எ.கா., CYL251234)"
+msgstr ""
 
 #: .\templates\gas-booking-status.html:486
 msgid "Booking #"
-msgstr "பதிவு #"
+msgstr ""
 
 #: .\templates\gas-booking-status.html:491
 #: .\templates\gas-booking-status.html:526
 msgid "Booked"
-msgstr "பதிவு செய்யப்பட்டது"
+msgstr ""
 
 #: .\templates\gas-booking-status.html:495
 #: .\templates\gas-booking-status.html:527
 msgid "Processed"
-msgstr "செயலாக்கப்பட்டது"
+msgstr ""
 
 #: .\templates\gas-booking-status.html:499
 #: .\templates\gas-booking-status.html:528
 msgid "Out for Delivery"
-msgstr "டெலிவரிக்கு வெளியே"
+msgstr ""
 
 #: .\templates\gas-booking-status.html:503
 #: .\templates\gas-booking-status.html:529
 msgid "Delivered"
-msgstr "டெலிவர் செய்யப்பட்டது"
+msgstr ""
 
 #: .\templates\gas-booking-status.html:508
 #: .\templates\gas-booking-status.html:533
 msgid "Booked on:"
-msgstr "பதிவு செய்யப்பட்ட தேதி:"
+msgstr ""
 
 #: .\templates\gas-booking-status.html:509
 #: .\templates\gas-booking-status.html:534
 msgid "Expected delivery:"
-msgstr "எதிர்பார்க்கப்படும் டெலிவரி:"
+msgstr ""
 
 #: .\templates\gas-booking-status.html:511
 #: .\templates\gas-booking-status.html:535
 msgid "Delivery person:"
-msgstr "டெலிவரி நபர்:"
+msgstr ""
 
 #: .\templates\gas-booking-status.html:514
 msgid "Delivered on:"
-msgstr "டெலிவர் செய்யப்பட்ட தேதி:"
+msgstr ""
 
 #: .\templates\gas-booking-status.html:523
 msgid "Booking #CYL251234"
-msgstr "பதிவு #CYL251234"
+msgstr ""
 
 #: .\templates\gas-booking-status.html:534
 msgid "Today (25 Feb) by 6 PM"
-msgstr "இன்று (25 பிப்) மாலை 6 மணிக்குள்"
+msgstr ""
 
 #: .\templates\gas-booking-status.html:539
 msgid "Domestic Cylinder"
-msgstr "வீட்டு உபயோக சிலிண்டர்"
+msgstr ""
 
 #: .\templates\gas-booking-status.html:550
 #: .\templates\gas-consumer-lookup.html:425
 msgid "Searching..."
-msgstr "தேடுகிறது..."
+msgstr ""
 
 #: .\templates\gas-booking-status.html:555
 msgid "Enter reference number"
-msgstr "குறிப்பு எண்ணை உள்ளிடவும்"
+msgstr ""
 
 #: .\templates\gas-complaint.html:119
 msgid "Gas Complaint - Civic Kiosk"
-msgstr "எரிவாயு புகார் - சிவிக் கியோஸ்க்"
+msgstr ""
 
 #: .\templates\gas-complaint.html:473
 msgid "Gas Leakage"
-msgstr "எரிவாயு கசிவு"
+msgstr ""
 
 #: .\templates\gas-complaint.html:474
 msgid "Cylinder Issue"
-msgstr "சிலிண்டர் பிரச்சினை"
+msgstr ""
 
 #: .\templates\gas-complaint.html:475
 msgid "Regulator Fault"
-msgstr "ரெகுலேட்டர் கோளாறு"
+msgstr ""
 
 #: .\templates\gas-complaint.html:477
 msgid "Delivery Delay"
-msgstr "டெலிவரி தாமதம்"
+msgstr ""
 
 #: .\templates\gas-complaint.html:484
 msgid "Describe your complaint in detail"
-msgstr "உங்கள் புகாரை விரிவாக விவரிக்கவும்"
+msgstr ""
 
 #: .\templates\gas-complaint.html:500
 msgid "Type your complaint here..."
-msgstr "உங்கள் புகாரை இங்கே தட்டச்சு செய்யவும்..."
+msgstr ""
 
 #: .\templates\gas-consumer-lookup.html:119
 msgid "Consumer Lookup - Civic Kiosk"
-msgstr "நுகர்வோர் தேடல் - சிவிக் கியோஸ்க்"
+msgstr ""
 
 #: .\templates\gas-consumer-lookup.html:462 .\templates\gas-services.html:382
 msgid "Consumer Lookup"
-msgstr "நுகர்வோர் தேடல்"
+msgstr ""
 
 #: .\templates\gas-consumer-lookup.html:466
 msgid "Enter Aadhaar Number"
-msgstr "ஆதார் எண்ணை உள்ளிடவும்"
+msgstr ""
 
 #: .\templates\gas-consumer-lookup.html:485
 msgid "Lookup Consumer"
-msgstr "நுகர்வோரைத் தேடு"
+msgstr ""
 
 #: .\templates\gas-consumer-lookup.html:494
 #: .\templates\professional-tax.html:596 .\templates\water-bill.html:572
 msgid "Name:"
-msgstr "பெயர்:"
+msgstr ""
 
 #: .\templates\gas-consumer-lookup.html:502
 msgid "Distributor:"
-msgstr "விநியோகஸ்தர்:"
+msgstr ""
 
 #: .\templates\gas-consumer-lookup.html:515
 msgid "Last Booking:"
-msgstr "கடைசி பதிவு:"
+msgstr ""
 
 #: .\templates\gas-cylinder-booking.html:146
 msgid "Cylinder Booking - Civic Kiosk"
-msgstr "சிலிண்டர் பதிவு - சிவிக் கியோஸ்க்"
+msgstr ""
 
 #: .\templates\gas-cylinder-booking.html:466
 msgid "Book Cylinder"
-msgstr "சிலிண்டரைப் பதிவு செய்யவும்"
+msgstr ""
 
 #: .\templates\gas-cylinder-booking.html:477 .\templates\gas-subsidy.html:469
 msgid "Subsidy Status:"
-msgstr "மானிய நிலை:"
+msgstr ""
 
 #: .\templates\gas-cylinder-booking.html:479 .\templates\gas-subsidy.html:471
 msgid "Active"
-msgstr "செயலில்"
+msgstr ""
 
 #: .\templates\gas-cylinder-booking.html:479 .\templates\gas-subsidy.html:473
 msgid "Inactive"
-msgstr "செயலற்றது"
+msgstr ""
 
 #: .\templates\gas-cylinder-booking.html:484
 msgid "Remaining Subsidies:"
-msgstr "மீதமுள்ள மானியங்கள்:"
+msgstr ""
 
 #: .\templates\gas-cylinder-booking.html:485
 msgid "cylinders"
-msgstr "சிலிண்டர்கள்"
+msgstr ""
 
 #: .\templates\gas-cylinder-booking.html:490
 msgid "Select Cylinder Type"
-msgstr "சிலிண்டர் வகையைத் தேர்ந்தெடுக்கவும்"
+msgstr ""
 
 #: .\templates\gas-cylinder-booking.html:498
 #: .\templates\gas-cylinder-booking.html:504
 msgid "Subsidized"
-msgstr "மானியம் பெற்ற"
+msgstr ""
 
 #: .\templates\gas-cylinder-booking.html:503
 #: .\templates\gas-cylinder-booking.html:507
 msgid "Domestic"
-msgstr "வீட்டு உபயோக"
+msgstr ""
 
 #: .\templates\gas-cylinder-booking.html:520
 msgid "Book Now"
-msgstr "இப்போது பதிவு செய்யவும்"
+msgstr ""
 
 #: .\templates\gas-new-connection.html:146
 msgid "New Gas Connection - Civic Kiosk"
-msgstr "புதிய எரிவாயு இணைப்பு - சிவிக் கியோஸ்க்"
+msgstr ""
 
 #: .\templates\gas-new-connection.html:464
 msgid "New Gas Connection"
-msgstr "புதிய எரிவாயு இணைப்பு"
+msgstr ""
 
 #: .\templates\gas-new-connection.html:472
 msgid "Enter Full Name"
-msgstr "முழுப்பெயரை உள்ளிடவும்"
+msgstr ""
 
 #: .\templates\gas-new-connection.html:477
 msgid "Enter Address"
-msgstr "முகவரியை உள்ளிடவும்"
+msgstr ""
 
 #: .\templates\gas-new-connection.html:482
 msgid "Enter Mobile Number"
-msgstr "மொபைல் எண்ணை உள்ளிடவும்"
+msgstr ""
 
 #: .\templates\gas-new-connection.html:482 .\templates\grievance.html:510
 msgid "Please enter 10-digit mobile number"
-msgstr "10-இலக்க மொபைல் எண்ணை உள்ளிடவும்"
+msgstr ""
 
 #: .\templates\gas-new-connection.html:486
 msgid "Document Type"
-msgstr "ஆவண வகை"
+msgstr ""
 
 #: .\templates\gas-new-connection.html:488
 msgid "Select Document Type"
-msgstr "ஆவண வகையைத் தேர்ந்தெடுக்கவும்"
+msgstr ""
 
 #: .\templates\gas-new-connection.html:489
 msgid "Aadhaar Card"
-msgstr "ஆதார் அட்டை"
+msgstr ""
 
 #: .\templates\gas-new-connection.html:490
 msgid "Voter ID"
-msgstr "வாக்காளர் அடையாள அட்டை"
+msgstr ""
 
 #: .\templates\gas-new-connection.html:491
 msgid "Passport"
-msgstr "கடவுச்சீட்டு"
+msgstr ""
 
 #: .\templates\gas-new-connection.html:492
 msgid "Driving License"
-msgstr "ஓட்டுநர் உரிமம்"
+msgstr ""
 
 #: .\templates\gas-services.html:119
 msgid "Gas Services - Civic Kiosk"
-msgstr "எரிவாயு சேவைகள் - சிவிக் கியோஸ்க்"
+msgstr ""
 
 #: .\templates\gas-services.html:373
 msgid "Gas Services"
-msgstr "எரிவாயு சேவைகள்"
+msgstr ""
 
 #: .\templates\gas-services.html:380
 msgid "Cylinder Booking"
-msgstr "சிலிண்டர் பதிவு"
+msgstr ""
 
 #: .\templates\gas-services.html:393
 msgid "Active Consumer:"
-msgstr "செயலில் உள்ள நுகர்வோர்:"
+msgstr ""
 
 #: .\templates\gas-subsidy.html:6
 msgid "Gas Subsidy - Civic Kiosk"
-msgstr "எரிவாயு மானியம் - சிவிக் கியோஸ்க்"
+msgstr ""
 
 #: .\templates\gas-subsidy.html:453
 msgid "Subsidy Management"
-msgstr "மானிய மேலாண்மை"
+msgstr ""
 
 #: .\templates\gas-subsidy.html:460
 msgid "Check Subsidy"
-msgstr "மானியத்தைச் சரிபார்க்கவும்"
+msgstr ""
 
 #: .\templates\gas-subsidy.html:477
 msgid "Subsidy Amount:"
-msgstr "மானியத் தொகை:"
+msgstr ""
 
 #: .\templates\gas-subsidy.html:478 .\templates\gas-subsidy.html:495
 #: .\templates\professional-tax.html:613 .\templates\professional-tax.html:617
@@ -2798,63 +2581,57 @@ msgstr "மானியத் தொகை:"
 #: .\templates\receipt-print.html:449 .\templates\trade-license.html:463
 #: .\templates\trade-license.html:472 .\templates\water-bill.html:591
 msgid "₹"
-msgstr "₹"
+msgstr ""
 
 #: .\templates\gas-subsidy.html:478
 msgid "per cylinder"
-msgstr "ஒரு சிலிண்டருக்கு"
+msgstr ""
 
 #: .\templates\gas-subsidy.html:481
 msgid "Cylinders/Year:"
-msgstr "சிலிண்டர்கள்/ஆண்டு:"
+msgstr ""
 
 #: .\templates\gas-subsidy.html:482
 msgid "remaining"
-msgstr "மீதமுள்ள"
+msgstr ""
 
 #: .\templates\gas-subsidy.html:485
 msgid "Next Eligibility:"
-msgstr "அடுத்த தகுதி:"
+msgstr ""
 
 #: .\templates\gas-subsidy.html:489
 msgid "Bank Account:"
-msgstr "வங்கிக் கணக்கு:"
+msgstr ""
 
 #: .\templates\gas-subsidy.html:494
 msgid "Last Subsidy:"
-msgstr "கடைசி மானியம்:"
+msgstr ""
 
 #: .\templates\gas-subsidy.html:495
 msgid "on"
-msgstr "அன்று"
+msgstr ""
 
 #: .\templates\gas-subsidy.html:500
 msgid "Last updated:"
-msgstr "கடைசியாகப் புதுப்பிக்கப்பட்டது:"
+msgstr ""
 
 #: .\templates\gas-subsidy.html:690 .\templates\water-bill.html:886
 msgid "Please enter consumer number"
-msgstr "நுகர்வோர் எண்ணை உள்ளிடவும்"
+msgstr ""
 
 #: .\templates\gas-subsidy.html:703 .\templates\gas-subsidy.html:799
 #: .\templates\gas-subsidy.html:887
-#, fuzzy
-#| msgid "Check Subsidy"
 msgid "Checking subsidy status"
-msgstr "மானியத்தைச் சரிபார்க்கவும்"
+msgstr ""
 
 #: .\templates\gas-subsidy.html:754
-#, fuzzy
-#| msgid "Please enter a valid consumer number"
 msgid "Please say a command... consumer number, check, or back"
-msgstr "செல்லுபடியாகும் நுகர்வோர் எண்ணை உள்ளிடவும்"
+msgstr ""
 
 #: .\templates\gas-subsidy.html:808 .\templates\gas-subsidy.html:890
 #: .\templates\water-bill.html:1031 .\templates\water-bill.html:1133
-#, fuzzy
-#| msgid "Please enter consumer number"
 msgid "Please enter consumer number first"
-msgstr "நுகர்வோர் எண்ணை உள்ளிடவும்"
+msgstr ""
 
 #: .\templates\gas-subsidy.html:925
 msgid ""
@@ -2863,10 +2640,8 @@ msgid ""
 msgstr ""
 
 #: .\templates\gas-subsidy.html:935
-#, fuzzy
-#| msgid "Subsidy Status:"
 msgid "Subsidy status is"
-msgstr "மானிய நிலை:"
+msgstr ""
 
 #: .\templates\gas-subsidy.html:935
 msgid "Say check with a new number to check again."
@@ -2874,139 +2649,135 @@ msgstr ""
 
 #: .\templates\grievance.html:146
 msgid "Grievance - Civic Kiosk"
-msgstr "மனு - சிவிக் கியோஸ்க்"
+msgstr ""
 
 #: .\templates\grievance.html:485
 msgid "Lodge Grievance"
-msgstr "மனு செய்யவும்"
+msgstr ""
 
 #: .\templates\grievance.html:491
 msgid "Department"
-msgstr "துறை"
+msgstr ""
 
 #: .\templates\grievance.html:493 .\templates\payment-history.html:407
 msgid "Water"
-msgstr "நீர்"
+msgstr ""
 
 #: .\templates\grievance.html:494
 msgid "Sewage"
-msgstr "கழிவுநீர்"
+msgstr ""
 
 #: .\templates\grievance.html:495
 msgid "Roads"
-msgstr "சாலைகள்"
+msgstr ""
 
 #: .\templates\grievance.html:496
 msgid "Street Light"
-msgstr "தெரு விளக்கு"
+msgstr ""
 
 #: .\templates\grievance.html:497
 msgid "Garbage"
-msgstr "குப்பை"
+msgstr ""
 
 #: .\templates\grievance.html:504
 msgid "Your Name"
-msgstr "உங்கள் பெயர்"
+msgstr ""
 
 #: .\templates\grievance.html:514
 msgid "Address/Location"
-msgstr "முகவரி/இருப்பிடம்"
+msgstr ""
 
 #: .\templates\grievance.html:519
 msgid "Grievance Description"
-msgstr "மனு விளக்கம்"
+msgstr ""
 
 #: .\templates\grievance.html:523
 msgid "Submit Grievance"
-msgstr "மனுவை சமர்ப்பிக்கவும்"
+msgstr ""
 
 #: .\templates\marriage-registration.html:6
 msgid "Marriage Registration - Kiosk"
-msgstr "திருமணப் பதிவு - கியோஸ்க்"
+msgstr ""
 
 #: .\templates\marriage-registration.html:403
 #: .\templates\municipal-services.html:356
 #: .\templates\payment-history.html:427
 msgid "Marriage Registration"
-msgstr "திருமணப் பதிவு"
+msgstr ""
 
 #: .\templates\marriage-registration.html:411
 msgid "Groom Details"
-msgstr "மணமகன் விவரங்கள்"
+msgstr ""
 
 #: .\templates\marriage-registration.html:421
 #: .\templates\marriage-registration.html:442
 msgid "Aadhaar"
-msgstr "ஆதார்"
+msgstr ""
 
 #: .\templates\marriage-registration.html:422
 #: .\templates\marriage-registration.html:443
 msgid "Please enter 12-digit Aadhaar number"
-msgstr "12-இலக்க ஆதார் எண்ணை உள்ளிடவும்"
+msgstr ""
 
 #: .\templates\marriage-registration.html:432
 msgid "Bride Details"
-msgstr "மணமகள் விவரங்கள்"
+msgstr ""
 
 #: .\templates\marriage-registration.html:453
 msgid "Marriage Details"
-msgstr "திருமண விவரங்கள்"
+msgstr ""
 
 #: .\templates\marriage-registration.html:456
 msgid "Date"
-msgstr "தேதி"
+msgstr ""
 
 #: .\templates\marriage-registration.html:460
 msgid "Place"
-msgstr "இடம்"
+msgstr ""
 
 #: .\templates\marriage-registration.html:464
 msgid "Type"
-msgstr "வகை"
+msgstr ""
 
 #: .\templates\marriage-registration.html:466
 msgid "Select Type"
-msgstr "வகையைத் தேர்ந்தெடுக்கவும்"
+msgstr ""
 
 #: .\templates\marriage-registration.html:467
 msgid "Hindu Marriage Act"
-msgstr "இந்து திருமணச் சட்டம்"
+msgstr ""
 
 #: .\templates\marriage-registration.html:468
 msgid "Special Marriage Act"
-msgstr "சிறப்பு திருமணச் சட்டம்"
+msgstr ""
 
 #: .\templates\marriage-registration.html:469
 msgid "Muslim Personal Law"
-msgstr "முஸ்லிம் தனிநபர் சட்டம்"
+msgstr ""
 
 #: .\templates\marriage-registration.html:470
 msgid "Christian Marriage Act"
-msgstr "கிறிஸ்தவ திருமணச் சட்டம்"
+msgstr ""
 
 #: .\templates\marriage-registration.html:477
 msgid "Witness 1 Name"
-msgstr "சாட்சி 1 பெயர்"
+msgstr ""
 
 #: .\templates\marriage-registration.html:481
 msgid "Witness 2 Name"
-msgstr "சாட்சி 2 பெயர்"
+msgstr ""
 
 #: .\templates\marriage-registration.html:489
 msgid "Register Marriage"
-msgstr "திருமணத்தைப் பதிவு செய்யவும்"
+msgstr ""
 
 #: .\templates\marriage-registration.html:716
-#, fuzzy
-#| msgid "Please enter a valid 12-digit Aadhaar number"
 msgid "Please enter valid 12-digit Aadhaar numbers"
-msgstr "செல்லுபடியாகும் 12-இலக்க ஆதார் எண்ணை உள்ளிடவும்"
+msgstr ""
 
 #: .\templates\marriage-registration.html:729
-#, fuzzy
-#| msgid "Marriage Registration"
 msgid "Submitting marriage registration"
-msgstr "திருமணப் பதிவு"
+msgstr ""
 
 #: .\templates\marriage-registration.html:779
 msgid ""
@@ -3022,89 +2793,75 @@ msgstr ""
 
 #: .\templates\menu.html:173
 msgid "Civic Services Kiosk - Main Menu"
-msgstr "சிவிக் சேவைகள் கியோஸ்க் - முதன்மை மெனு"
+msgstr ""
 
 #: .\templates\menu.html:845
 msgid "Session about to expire"
-msgstr "அமர்வு காலாவதியாக உள்ளது"
+msgstr ""
 
 #: .\templates\menu.html:846
 msgid "Continue Session"
-msgstr "அமர்வைத் தொடரவும்"
+msgstr ""
 
 #: .\templates\menu.html:853
-#, fuzzy
-#| msgid "Processing..."
 msgid "Processing voice command..."
-msgstr "செயலாக்குகிறது..."
+msgstr ""
 
 #: .\templates\menu.html:869
 msgid "सेवाएं / Services"
-msgstr "सेवाएं / சேவைகள்"
+msgstr ""
 
 #: .\templates\menu.html:870
 msgid "आपका आधार सुरक्षित रूप से कनेक्ट है"
-msgstr "உங்கள் ஆதார் பாதுகாப்பாக இணைக்கப்பட்டுள்ளது"
+msgstr ""
 
 #: .\templates\menu.html:873
-#, fuzzy
-#| msgid "Gas Services"
 msgid "Gas services"
-msgstr "எரிவாயு சேவைகள்"
+msgstr ""
 
 #: .\templates\menu.html:875 .\templates\payment-history.html:405
 msgid "Gas"
-msgstr "எரிவாயு"
+msgstr ""
 
 #: .\templates\menu.html:878
-#, fuzzy
-#| msgid "Electricity Services"
 msgid "Electricity services"
-msgstr "மின்சார சேவைகள்"
+msgstr ""
 
 #: .\templates\menu.html:880 .\templates\payment-history.html:406
 msgid "Electricity"
-msgstr "மின்சாரம்"
+msgstr ""
 
 #: .\templates\menu.html:883
-#, fuzzy
-#| msgid "Municipal Services"
 msgid "Municipal services"
-msgstr "நகராட்சி சேவைகள்"
+msgstr ""
 
 #: .\templates\menu.html:885 .\templates\payment-history.html:408
 msgid "Municipal"
-msgstr "நகராட்சி"
+msgstr ""
 
 #: .\templates\menu.html:888
-#, fuzzy
-#| msgid "Transport"
 msgid "Transport services"
-msgstr "போக்குவரத்து"
+msgstr ""
 
 #: .\templates\menu.html:890
 msgid "Transport"
-msgstr "போக்குவரத்து"
+msgstr ""
 
 #: .\templates\menu.html:893
-#, fuzzy
-#| msgid "Revenue"
 msgid "Revenue services"
-msgstr "வருவாய்"
+msgstr ""
 
 #: .\templates\menu.html:895
 msgid "Revenue"
-msgstr "வருவாய்"
+msgstr ""
 
 #: .\templates\menu.html:898
-#, fuzzy
-#| msgid "Application Status"
 msgid "Application status"
-msgstr "விண்ணப்ப நிலை"
+msgstr ""
 
 #: .\templates\menu.html:900
 msgid "Status"
-msgstr "நிலை"
+msgstr ""
 
 #: .\templates\menu.html:1065
 msgid ""
@@ -3113,22 +2870,16 @@ msgid ""
 msgstr ""
 
 #: .\templates\menu.html:1094
-#, fuzzy
-#| msgid "Gas Services"
 msgid "Opening Gas services"
-msgstr "எரிவாயு சேவைகள்"
+msgstr ""
 
 #: .\templates\menu.html:1101
-#, fuzzy
-#| msgid "Electricity Services"
 msgid "Opening Electricity services"
-msgstr "மின்சார சேவைகள்"
+msgstr ""
 
 #: .\templates\menu.html:1108
-#, fuzzy
-#| msgid "Municipal Services"
 msgid "Opening Municipal services"
-msgstr "நகராட்சி சேவைகள்"
+msgstr ""
 
 #: .\templates\menu.html:1115
 msgid "Opening Transport services"
@@ -3151,46 +2902,44 @@ msgstr ""
 
 #: .\templates\municipal-services.html:6
 msgid "Municipal Services - Civic Kiosk"
-msgstr "நகராட்சி சேவைகள் - சிவிக் கியோஸ்க்"
+msgstr ""
 
 #: .\templates\municipal-services.html:344
 #: .\templates\payment-history.html:394 .\templates\under-development.html:513
-#, fuzzy
-#| msgid "Uploading..."
 msgid "Loading..."
-msgstr "பதிவேற்றுகிறது..."
+msgstr ""
 
 #: .\templates\municipal-services.html:349
 msgid "Municipal Services"
-msgstr "நகராட்சி சேவைகள்"
+msgstr ""
 
 #: .\templates\municipal-services.html:351
 #: .\templates\payment-history.html:422 .\templates\property-tax.html:578
 msgid "Property Tax"
-msgstr "சொத்து வரி"
+msgstr ""
 
 #: .\templates\municipal-services.html:352
 #: .\templates\payment-history.html:421 .\templates\water-bill.html:556
 msgid "Water Bill"
-msgstr "நீர் கட்டணம்"
+msgstr ""
 
 #: .\templates\municipal-services.html:353
 #: .\templates\payment-history.html:424 .\templates\trade-license.html:429
 msgid "Trade License"
-msgstr "வர்த்தக உரிமம்"
+msgstr ""
 
 #: .\templates\municipal-services.html:357
 msgid "Building Plan"
-msgstr "கட்டிடத் திட்டம்"
+msgstr ""
 
 #: .\templates\municipal-services.html:358
 msgid "Grievance"
-msgstr "மனு"
+msgstr ""
 
 #: .\templates\municipal-services.html:359
 #: .\templates\payment-history.html:423 .\templates\professional-tax.html:580
 msgid "Professional Tax"
-msgstr "தொழில் வரி"
+msgstr ""
 
 #: .\templates\municipal-services.html:508
 msgid ""
@@ -3212,29 +2961,27 @@ msgstr ""
 
 #: .\templates\otp.html:177
 msgid "Civic Services Kiosk - OTP Verification"
-msgstr "சிவிக் சேவைகள் கியோஸ்க் - OTP சரிபார்ப்பு"
+msgstr ""
 
 #: .\templates\otp.html:654
 msgid "Verify OTP for"
-msgstr "க்கான OTP-ஐ சரிபார்க்கவும்"
+msgstr ""
 
 #: .\templates\otp.html:658
 msgid "Sending OTP..."
-msgstr "OTP அனுப்பப்படுகிறது..."
+msgstr ""
 
 #: .\templates\otp.html:680
 msgid "Enter 6-digit OTP"
-msgstr "6-இலக்க OTP-ஐ உள்ளிடவும்"
+msgstr ""
 
 #: .\templates\otp.html:691
-#, fuzzy
-#| msgid "Processing..."
 msgid "Processing voice..."
-msgstr "செயலாக்குகிறது..."
+msgstr ""
 
 #: .\templates\otp.html:716
 msgid "Resend OTP"
-msgstr "OTP-ஐ மீண்டும் அனுப்பு"
+msgstr ""
 
 #: .\templates\otp.html:912
 msgid "OTP digit"
@@ -3245,36 +2992,32 @@ msgid "Enter 6-digit OTP using keypad or speak the numbers"
 msgstr ""
 
 #: .\templates\otp.html:1068
-#, fuzzy
-#| msgid "Sending OTP..."
 msgid "Sending..."
-msgstr "OTP அனுப்பப்படுகிறது..."
+msgstr ""
 
 #: .\templates\payment-history.html:6
 msgid "Payment History - Civic Kiosk"
-msgstr "கட்டண வரலாறு - சிவிக் கியோஸ்க்"
+msgstr ""
 
 #: .\templates\payment-history.html:404
 msgid "All Services"
-msgstr "அனைத்து சேவைகள்"
+msgstr ""
 
 #: .\templates\payment-history.html:420
 msgid "Gas Bill"
-msgstr "எரிவாயு பில்"
+msgstr ""
 
 #: .\templates\payment-history.html:431
 msgid "Ref:"
-msgstr "குறிப்பு:"
+msgstr ""
 
 #: .\templates\payment-history.html:441
 msgid "No payment history found"
-msgstr "கட்டண வரலாறு எதுவும் கிடைக்கவில்லை"
+msgstr ""
 
 #: .\templates\payment-history.html:547
-#, fuzzy
-#| msgid "Printing receipt..."
 msgid "Viewing receipt"
-msgstr "ரசீது அச்சிடப்படுகிறது..."
+msgstr ""
 
 #: .\templates\payment-history.html:615
 msgid ""
@@ -3283,10 +3026,8 @@ msgid ""
 msgstr ""
 
 #: .\templates\payment-history.html:648 .\templates\payment-history.html:836
-#, fuzzy
-#| msgid "All Services"
 msgid "Showing all services"
-msgstr "அனைத்து சேவைகள்"
+msgstr ""
 
 #: .\templates\payment-history.html:661 .\templates\payment-history.html:842
 msgid "Showing gas payments only"
@@ -3305,28 +3046,20 @@ msgid "Showing municipal payments only"
 msgstr ""
 
 #: .\templates\payment-history.html:726 .\templates\payment-history.html:875
-#, fuzzy
-#| msgid "Receipt No:"
 msgid "Receipt not found"
-msgstr "ரசீது எண்:"
+msgstr ""
 
 #: .\templates\payment-history.html:758 .\templates\payment-history.html:899
-#, fuzzy
-#| msgid "No payment history found"
 msgid "payments found"
-msgstr "கட்டண வரலாறு எதுவும் கிடைக்கவில்லை"
+msgstr ""
 
 #: .\templates\payment-history.html:766 .\templates\payment-history.html:901
-#, fuzzy
-#| msgid "No payment history found"
 msgid "No payments found"
-msgstr "கட்டண வரலாறு எதுவும் கிடைக்கவில்லை"
+msgstr ""
 
 #: .\templates\payment-history.html:939
-#, fuzzy
-#| msgid "Payment History"
 msgid "Payment history. "
-msgstr "கட்டண வரலாறு"
+msgstr ""
 
 #: .\templates\payment-history.html:939
 msgid ""
@@ -3335,57 +3068,51 @@ msgid ""
 msgstr ""
 
 #: .\templates\payment-history.html:947
-#, fuzzy
-#| msgid "No payment history found"
 msgid "No payment history found."
-msgstr "கட்டண வரலாறு எதுவும் கிடைக்கவில்லை"
+msgstr ""
 
 #: .\templates\professional-tax.html:6
 msgid "Professional Tax - Civic Kiosk"
-msgstr "தொழில் வரி - சிவிக் கியோஸ்க்"
+msgstr ""
 
 #: .\templates\professional-tax.html:585
 msgid "Enter PTIN"
-msgstr "PTIN-ஐ உள்ளிடவும்"
+msgstr ""
 
 #: .\templates\professional-tax.html:592
 msgid "PTIN:"
-msgstr "PTIN:"
+msgstr ""
 
 #: .\templates\professional-tax.html:600
 msgid "Profession:"
-msgstr "தொழில்:"
+msgstr ""
 
 #: .\templates\professional-tax.html:604 .\templates\property-tax.html:606
 msgid "Assessment Year:"
-msgstr "மதிப்பீட்டு ஆண்டு:"
+msgstr ""
 
 #: .\templates\professional-tax.html:612
 msgid "Half-yearly Tax:"
-msgstr "அரையாண்டு வரி:"
+msgstr ""
 
 #: .\templates\professional-tax.html:616
 msgid "Penalty (if any):"
-msgstr "அபராதம் (ஏதேனும் இருந்தால்):"
+msgstr ""
 
 #: .\templates\professional-tax.html:927
 msgid "Please enter PTIN"
-msgstr "PTIN-ஐ உள்ளிடவும்"
+msgstr ""
 
 #: .\templates\professional-tax.html:938
 #: .\templates\professional-tax.html:1061
 #: .\templates\professional-tax.html:1163
-#, fuzzy
-#| msgid "Fetch Tax Details"
 msgid "Searching for tax details"
-msgstr "வரி விவரங்களைப் பெறுக"
+msgstr ""
 
 #: .\templates\professional-tax.html:948 .\templates\property-tax.html:942
 #: .\templates\water-bill.html:907
-#, fuzzy
-#| msgid "Pay Now"
 msgid "Pay "
-msgstr "இப்போது செலுத்து"
+msgstr ""
 
 #: .\templates\professional-tax.html:1007
 msgid "Please say a command... PTIN, search tax, UPI, ATM, or pay"
@@ -3393,27 +3120,21 @@ msgstr ""
 
 #: .\templates\professional-tax.html:1064
 #: .\templates\professional-tax.html:1166
-#, fuzzy
-#| msgid "Please enter PTIN"
 msgid "Please enter PTIN first"
-msgstr "PTIN-ஐ உள்ளிடவும்"
+msgstr ""
 
 #: .\templates\professional-tax.html:1072
 #: .\templates\professional-tax.html:1174
-#, fuzzy
-#| msgid "Please enter your address"
 msgid "Please search for tax details first"
-msgstr "உங்கள் முகவரியை உள்ளிடவும்"
+msgstr ""
 
 #: .\templates\professional-tax.html:1213
 msgid "Professional tax page. Enter PTIN or say number, then say search tax."
 msgstr ""
 
 #: .\templates\professional-tax.html:1222
-#, fuzzy
-#| msgid "Professional Tax"
 msgid "Professional tax due"
-msgstr "தொழில் வரி"
+msgstr ""
 
 #: .\templates\professional-tax.html:1222 .\templates\property-tax.html:1218
 #: .\templates\water-bill.html:1189
@@ -3422,52 +3143,48 @@ msgstr ""
 
 #: .\templates\property-tax.html:6
 msgid "Property Tax - Civic Kiosk"
-msgstr "சொத்து வரி - சிவிக் கியோஸ்க்"
+msgstr ""
 
 #: .\templates\property-tax.html:583
 msgid "Enter Property ID"
-msgstr "சொத்து ஐடியை உள்ளிடவும்"
+msgstr ""
 
 #: .\templates\property-tax.html:585
 msgid "Fetch Tax Details"
-msgstr "வரி விவரங்களைப் பெறுக"
+msgstr ""
 
 #: .\templates\property-tax.html:590
 msgid "Property ID:"
-msgstr "சொத்து ஐடி:"
+msgstr ""
 
 #: .\templates\property-tax.html:594
 msgid "Owner Name:"
-msgstr "உரிமையாளரின் பெயர்:"
+msgstr ""
 
 #: .\templates\property-tax.html:598
 msgid "Property Type:"
-msgstr "சொத்து வகை:"
+msgstr ""
 
 #: .\templates\property-tax.html:602
 msgid "Area (sq ft):"
-msgstr "பரப்பளவு (ச.அடி):"
+msgstr ""
 
 #: .\templates\property-tax.html:921
 msgid "Please enter property ID"
-msgstr "சொத்து ஐடியை உள்ளிடவும்"
+msgstr ""
 
 #: .\templates\property-tax.html:932 .\templates\property-tax.html:1056
 #: .\templates\property-tax.html:1159
-#, fuzzy
-#| msgid "Fetch Tax Details"
 msgid "Fetching property tax details"
-msgstr "வரி விவரங்களைப் பெறுக"
+msgstr ""
 
 #: .\templates\property-tax.html:1001
 msgid "Please say a command... property ID, fetch tax, UPI, ATM, or pay"
 msgstr ""
 
 #: .\templates\property-tax.html:1059 .\templates\property-tax.html:1162
-#, fuzzy
-#| msgid "Please enter property ID"
 msgid "Please enter property ID first"
-msgstr "சொத்து ஐடியை உள்ளிடவும்"
+msgstr ""
 
 #: .\templates\property-tax.html:1067 .\templates\property-tax.html:1170
 msgid "Please fetch tax details first"
@@ -3480,90 +3197,84 @@ msgid ""
 msgstr ""
 
 #: .\templates\property-tax.html:1218
-#, fuzzy
-#| msgid "Property Tax"
 msgid "Property tax due"
-msgstr "சொத்து வரி"
+msgstr ""
 
 #: .\templates\receipt-print.html:6
 msgid "Payment Receipt - Civic Kiosk"
-msgstr "கட்டண ரசீது - சிவிக் கியோஸ்க்"
+msgstr ""
 
 #: .\templates\receipt-print.html:411 .\templates\receipt-print.html:416
 msgid "Payment Receipt"
-msgstr "கட்டண ரசீது"
+msgstr ""
 
 #: .\templates\receipt-print.html:414
 msgid "CIVIC KIOSK"
-msgstr "சிவிக் கியோஸ்க்"
+msgstr ""
 
 #: .\templates\receipt-print.html:420
 msgid "Receipt No:"
-msgstr "ரசீது எண்:"
+msgstr ""
 
 #: .\templates\receipt-print.html:424
 msgid "Date & Time:"
-msgstr "தேதி & நேரம்:"
+msgstr ""
 
 #: .\templates\receipt-print.html:428
 msgid "Service:"
-msgstr "சேவை:"
+msgstr ""
 
 #: .\templates\receipt-print.html:436
 msgid "Bill Period:"
-msgstr "பில் காலம்:"
+msgstr ""
 
 #: .\templates\receipt-print.html:440
 msgid "Payment Mode:"
-msgstr "கட்டண முறை:"
+msgstr ""
 
 #: .\templates\receipt-print.html:444
 msgid "Transaction ID:"
-msgstr "பரிவர்த்தனை ஐடி:"
+msgstr ""
 
 #: .\templates\receipt-print.html:448
 msgid "Total Amount:"
-msgstr "மொத்த தொகை:"
+msgstr ""
 
 #: .\templates\receipt-print.html:460
 msgid "Scan to verify receipt"
-msgstr "ரசீதை சரிபார்க்க ஸ்கேன் செய்யவும்"
+msgstr ""
 
 #: .\templates\receipt-print.html:461
 msgid "Thank you for using Civic Kiosk"
-msgstr "சிவிக் கியோஸ்க் பயன்படுத்தியதற்கு நன்றி"
+msgstr ""
 
 #: .\templates\receipt-print.html:462
 msgid "This is a computer generated receipt"
-msgstr "இது கணினியால் உருவாக்கப்பட்ட ரசீது"
+msgstr ""
 
 #: .\templates\receipt-print.html:469
 msgid "Print"
-msgstr "அச்சிடு"
+msgstr ""
 
 #: .\templates\receipt-print.html:471
 msgid "Home"
-msgstr "முகப்பு"
+msgstr ""
 
 #: .\templates\receipt-print.html:585 .\templates\receipt-print.html:861
-#, fuzzy
-#| msgid "Receipt No:"
 msgid "Receipt"
-msgstr "ரசீது எண்:"
+msgstr ""
 
 #: .\templates\receipt-print.html:585 .\templates\receipt-print.html:861
 msgid "generated. Say print, home, or back."
 msgstr ""
 
 #: .\templates\receipt-print.html:608
-#, fuzzy
-#| msgid "Printing receipt..."
 msgid "Printing receipt"
-msgstr "ரசீது அச்சிடப்படுகிறது..."
+msgstr ""
 
 #: .\templates\receipt-print.html:619
 msgid "Printing receipt..."
-msgstr "ரசீது அச்சிடப்படுகிறது..."
+msgstr ""
 
 #: .\templates\receipt-print.html:666
 msgid "Please say a command... print, home, back, or receipt number"
@@ -3574,98 +3285,92 @@ msgid "Receipt number is"
 msgstr ""
 
 #: .\templates\receipt-print.html:715 .\templates\receipt-print.html:837
-#, fuzzy
-#| msgid "Total Amount:"
 msgid "Total amount is"
-msgstr "மொத்த தொகை:"
+msgstr ""
 
 #: .\templates\receipt-print.html:735 .\templates\receipt-print.html:811
 msgid "Going to main menu"
 msgstr ""
 
 #: .\templates\receipt-print.html:747 .\templates\receipt-print.html:816
-#, fuzzy
-#| msgid "No payment history found"
 msgid "Going back to payment history"
-msgstr "கட்டண வரலாறு எதுவும் கிடைக்கவில்லை"
+msgstr ""
 
 #: .\templates\trade-license.html:6
 msgid "Trade License - Civic Kiosk"
-msgstr "வர்த்தக உரிமம் - சிவிக் கியோஸ்க்"
+msgstr ""
 
 #: .\templates\trade-license.html:433
 msgid "Business Name"
-msgstr "வணிகப் பெயர்"
+msgstr ""
 
 #: .\templates\trade-license.html:434
 msgid "Enter business name"
-msgstr "வணிகப் பெயரை உள்ளிடவும்"
+msgstr ""
 
 #: .\templates\trade-license.html:437
 msgid "Business Type"
-msgstr "வணிக வகை"
+msgstr ""
 
 #: .\templates\trade-license.html:439
 msgid "Select Business Type"
-msgstr "வணிக வகையைத் தேர்ந்தெடுக்கவும்"
+msgstr ""
 
 #: .\templates\trade-license.html:440
 msgid "Retail Shop"
-msgstr "சில்லறைக் கடை"
+msgstr ""
 
 #: .\templates\trade-license.html:441
 msgid "Restaurant"
-msgstr "உணவகம்"
+msgstr ""
 
 #: .\templates\trade-license.html:442
 msgid "Manufacturing"
-msgstr "உற்பத்தி"
+msgstr ""
 
 #: .\templates\trade-license.html:443
 msgid "Service Provider"
-msgstr "சேவை வழங்குநர்"
+msgstr ""
 
 #: .\templates\trade-license.html:444
 msgid "Warehouse"
-msgstr "கிடங்கு"
+msgstr ""
 
 #: .\templates\trade-license.html:450
 msgid "Enter owner name"
-msgstr "உரிமையாளரின் பெயரை உள்ளிடவும்"
+msgstr ""
 
 #: .\templates\trade-license.html:453
 msgid "Business Address"
-msgstr "வணிக முகவரி"
+msgstr ""
 
 #: .\templates\trade-license.html:457
 msgid "GST Number (if applicable)"
-msgstr "GST எண் (பொருந்தினால்)"
+msgstr ""
 
 #: .\templates\trade-license.html:458
 msgid "Enter GST number"
-msgstr "GST எண்ணை உள்ளிடவும்"
+msgstr ""
 
 #: .\templates\trade-license.html:462
 msgid "Application Fee:"
-msgstr "விண்ணப்பக் கட்டணம்:"
+msgstr ""
 
 #: .\templates\trade-license.html:466
 msgid "License Fee (Annual):"
-msgstr "உரிமக் கட்டணம் (ஆண்டு):"
+msgstr ""
 
 #: .\templates\trade-license.html:471
 msgid "Estimated Total:"
-msgstr "மதிப்பிடப்பட்ட மொத்தம்:"
+msgstr ""
 
 #: .\templates\trade-license.html:476
 msgid "Apply for License"
-msgstr "உரிமத்திற்கு விண்ணப்பிக்கவும்"
+msgstr ""
 
 #: .\templates\trade-license.html:712
-#, fuzzy
-#| msgid "Submit Application"
 msgid "Submitting license application"
-msgstr "விண்ணப்பத்தை சமர்ப்பிக்கவும்"
+msgstr ""
 
 #: .\templates\trade-license.html:762
 msgid ""
@@ -3680,27 +3385,27 @@ msgstr ""
 
 #: .\templates\under-development.html:7
 msgid "Civic Kiosk - Under Development"
-msgstr "சிவிக் கியோஸ்க் - உருவாக்கத்தில்"
+msgstr ""
 
 #: .\templates\under-development.html:524
 msgid "Module Under Development"
-msgstr "தொகுதி உருவாக்கத்தில்"
+msgstr ""
 
 #: .\templates\under-development.html:528
 msgid "This digital service module is currently being configured and deployed."
-msgstr "இந்த டிஜிட்டல் சேவை தொகுதி தற்போது கட்டமைக்கப்பட்டு பயன்படுத்தப்படுகிறது."
+msgstr ""
 
 #: .\templates\under-development.html:529
 msgid "Please check back soon for activation."
-msgstr "செயல்படுத்தப்படுவதற்கு விரைவில் மீண்டும் சரிபார்க்கவும்."
+msgstr ""
 
 #: .\templates\under-development.html:533
 msgid "Back to Home"
-msgstr "முகப்புக்குத் திரும்பு"
+msgstr ""
 
 #: .\templates\under-development.html:538
 msgid "Digital Civic Services Portal | Development Mode |"
-msgstr "டிஜிட்டல் சிவிக் சேவைகள் போர்டல் | மேம்பாட்டு முறை |"
+msgstr ""
 
 #: .\templates\under-development.html:653
 msgid "Please say a command... home or back"
@@ -3724,14 +3429,12 @@ msgstr ""
 
 #: .\templates\water-bill.html:6
 msgid "Water Bill - Civic Kiosk"
-msgstr "நீர் கட்டணம் - சிவிக் கியோஸ்க்"
+msgstr ""
 
 #: .\templates\water-bill.html:897 .\templates\water-bill.html:1028
 #: .\templates\water-bill.html:1130
-#, fuzzy
-#| msgid "Fetch Bill"
 msgid "Fetching water bill"
-msgstr "பில்லைப் பெறு"
+msgstr ""
 
 #: .\templates\water-bill.html:1180
 msgid ""
@@ -3740,218 +3443,5 @@ msgid ""
 msgstr ""
 
 #: .\templates\water-bill.html:1189
-#, fuzzy
-#| msgid "Water Bill"
 msgid "Water bill due"
-msgstr "நீர் கட்டணம்"
-
-#~ msgid "Voice assistant activated"
-#~ msgstr "குரல் உதவியாளர் செயல்படுத்தப்பட்டது"
-
-#~ msgid "Listen"
-#~ msgstr "கேளுங்கள்"
-
-#~ msgid "Enter child's name"
-#~ msgstr "குழந்தையின் பெயரை உள்ளிடவும்"
-
-#~ msgid "Hospital/Clinic name or Address"
-#~ msgstr "மருத்துவமனை/மருந்தகத்தின் பெயர் அல்லது முகவரி"
-
-#~ msgid "Enter father's full name"
-#~ msgstr "தந்தையின் முழுப்பெயரை உள்ளிடவும்"
-
-#~ msgid "Enter mother's full name"
-#~ msgstr "தாயின் முழுப்பெயரை உள்ளிடவும்"
-
-#~ msgid "Enter permanent address"
-#~ msgstr "நிரந்தர முகவரியை உள்ளிடவும்"
-
-#~ msgid "Mixed Use"
-#~ msgstr "கலப்பு பயன்பாடு"
-
-#~ msgid "Father's/Spouse Name"
-#~ msgstr "தந்தை/மனைவியின் பெயர்"
-
-#~ msgid "Informant Name"
-#~ msgstr "தகவல் அளிப்பவர் பெயர்"
-
-#~ msgid "Informant Aadhaar"
-#~ msgstr "தகவல் அளிப்பவரின் ஆதார்"
-
-#~ msgid "Camera access denied or not available"
-#~ msgstr "கேமரா அணுகல் மறுக்கப்பட்டது அல்லது கிடைக்கவில்லை"
-
-#~ msgid "Please capture at least one image"
-#~ msgstr "தயவுசெய்து குறைந்தது ஒரு படத்தையாவது பிடிக்கவும்"
-
-#~ msgid "Uploading"
-#~ msgstr "பதிவேற்றுகிறது"
-
-#~ msgid "images..."
-#~ msgstr "படங்கள்..."
-
-#~ msgid "Images uploaded successfully!"
-#~ msgstr "படங்கள் வெற்றிகரமாக பதிவேற்றப்பட்டன!"
-
-#~ msgid "Supported: PDF, JPG, PNG (Max 10 files, 25MB each)"
-#~ msgstr "ஆதரிக்கப்படுபவை: PDF, JPG, PNG (அதிகபட்சம் 10 கோப்புகள், ஒவ்வொன்றும் 25MB)"
-
-#~ msgid "Maximum"
-#~ msgstr "அதிகபட்சம்"
-
-#~ msgid "files allowed. You selected"
-#~ msgstr "கோப்புகள் அனுமதிக்கப்பட்டன. நீங்கள் தேர்ந்தெடுத்தீர்கள்"
-
-#~ msgid "files."
-#~ msgstr "கோப்புகள்."
-
-#~ msgid "Some files exceed"
-#~ msgstr "சில கோப்புகள் மீறுகின்றன"
-
-#~ msgid "limit:"
-#~ msgstr "வரம்பு:"
-
-#~ msgid "files uploaded successfully!"
-#~ msgstr "கோப்புகள் வெற்றிகரமாக பதிவேற்றப்பட்டன!"
-
-#~ msgid "Open DigiLocker or any scanner app"
-#~ msgstr "DigiLocker அல்லது ஏதேனும் ஸ்கேனர் பயன்பாட்டைத் திறக்கவும்"
-
-#~ msgid "Scan this QR code"
-#~ msgstr "இந்த QR குறியீட்டை ஸ்கேன் செய்யவும்"
-
-#~ msgid "Upload documents from your phone"
-#~ msgstr "உங்கள் மொபைலில் இருந்து ஆவணங்களைப் பதிவேற்றவும்"
-
-#~ msgid "Documents will appear here automatically"
-#~ msgstr "ஆவணங்கள் தானாகவே இங்கே தோன்றும்"
-
-#~ msgid "Received Documents:"
-#~ msgstr "பெறப்பட்ட ஆவணங்கள்:"
-
-#~ msgid "documents received successfully via QR scan!"
-#~ msgstr "QR ஸ்கேன் மூலம் ஆவணங்கள் வெற்றிகரமாகப் பெறப்பட்டன!"
-
-#~ msgid "Please enter a valid consumer number (minimum 6 digits)"
-#~ msgstr "செல்லுபடியாகும் நுகர்வோர் எண்ணை உள்ளிடவும் (குறைந்தது 6 இலக்கங்கள்)"
-
-#~ msgid "Enter Consumer Number:"
-#~ msgstr "நுகர்வோர் எண்ணை உள்ளிடவும்:"
-
-#~ msgid "Please describe your complaint"
-#~ msgstr "உங்கள் புகாரை விவரிக்கவும்"
-
-#~ msgid "February 2026"
-#~ msgstr "பிப்ரவரி 2026"
-
-#~ msgid "January 2026"
-#~ msgstr "ஜனவரி 2026"
-
-#~ msgid "December 2025"
-#~ msgstr "டிசம்பர் 2025"
-
-#~ msgid "Enter Consumer Number"
-#~ msgstr "நுகர்வோர் எண்ணை உள்ளிடவும்"
-
-#~ msgid "Downloading bill for"
-#~ msgstr "பில் பதிவிறக்குகிறது"
-
-#~ msgid "Taxes"
-#~ msgstr "வரிகள்"
-
-#~ msgid "Minimum charges"
-#~ msgstr "குறைந்தபட்ச கட்டணங்கள்"
-
-#~ msgid "Please enter a valid load value (positive number)"
-#~ msgstr "செல்லுபடியாகும் சுமை மதிப்பை உள்ளிடவும் (நேர்மறை எண்)"
-
-#~ msgid "Requested load must be greater than current load"
-#~ msgstr "கோரப்பட்ட சுமை தற்போதைய சுமையை விட அதிகமாக இருக்க வேண்டும்"
-
-#~ msgid ""
-#~ "Maximum load enhancement is 50 kW. Please contact commercial office for "
-#~ "higher loads."
-#~ msgstr ""
-#~ "அதிகபட்ச சுமை மேம்பாடு 50 கிலோவாட் ஆகும். அதிக சுமைகளுக்கு வணிக அலுவலகத்தைத் "
-#~ "தொடர்பு கொள்ளவும்."
-
-#~ msgid "Please select a preferred date"
-#~ msgstr "விருப்பமான தேதியைத் தேர்ந்தெடுக்கவும்"
-
-#~ msgid "Please enter new owner name"
-#~ msgstr "புதிய உரிமையாளரின் பெயரை உள்ளிடவும்"
-
-#~ msgid "Please enter new owner Aadhaar number"
-#~ msgstr "புதிய உரிமையாளரின் ஆதார் எண்ணை உள்ளிடவும்"
-
-#~ msgid "Please enter your full name"
-#~ msgstr "உங்கள் முழுப்பெயரை உள்ளிடவும்"
-
-#~ msgid "Please enter load required"
-#~ msgstr "தேவையான சுமையை உள்ளிடவும்"
-
-#~ msgid "Please enter a valid 10-digit mobile number"
-#~ msgstr "செல்லுபடியாகும் 10-இலக்க மொபைல் எண்ணை உள்ளிடவும்"
-
-#~ msgid "₹ 45,000 - ₹ 2,10,000"
-#~ msgstr "₹ 45,000 - ₹ 2,10,000"
-
-#~ msgid "Solar net metering application submitted! Reference:"
-#~ msgstr "சோலார் நெட் மீட்டரிங் விண்ணப்பம் சமர்ப்பிக்கப்பட்டது! குறிப்பு:"
-
-#~ msgid "Error:"
-#~ msgstr "பிழை:"
-
-#~ msgid "Solar net metering application submitted! Reference: SOLAR"
-#~ msgstr "சோலார் நெட் மீட்டரிங் விண்ணப்பம் சமர்ப்பிக்கப்பட்டது! குறிப்பு: SOLAR"
-
-#~ msgid "Please enter reference number"
-#~ msgstr "குறிப்பு எண்ணை உள்ளிடவும்"
-
-#~ msgid "Please provide a more detailed description (minimum 10 characters)"
-#~ msgstr "மேலும் விரிவான விளக்கத்தை வழங்கவும் (குறைந்தது 10 எழுத்துகள்)"
-
-#~ msgid "Please enter complete 12-digit Aadhaar"
-#~ msgstr "முழுமையான 12-இலக்க ஆதாரை உள்ளிடவும்"
-
-#~ msgid "Book"
-#~ msgstr "பதிவு செய்"
-
-#~ msgid "Civic Services Kiosk - Language"
-#~ msgstr "சிவிக் சேவைகள் கியோஸ்க் - மொழி"
-
-#~ msgid "भाषा चुनें"
-#~ msgstr "भाषा चुनें"
-
-#~ msgid "Select Language"
-#~ msgstr "மொழியைத் தேர்ந்தெடுக்கவும்"
-
-#~ msgid "English"
-#~ msgstr "ஆங்கிலம்"
-
-#~ msgid "हिंदी"
-#~ msgstr "हिंदी"
-
-#~ msgid "ଓଡ଼ିଆ"
-#~ msgstr "ଓଡ଼ିଆ"
-
-#~ msgid "বাংলা"
-#~ msgstr "বাংলা"
-
-#~ msgid "தமிழ்"
-#~ msgstr "தமிழ்"
-
-#~ msgid "తెలుగు"
-#~ msgstr "తెలుగు"
-
-#~ msgid "Verify"
-#~ msgstr "சரிபார்"
-
-#~ msgid "Please enter 6-digit OTP"
-#~ msgstr "6-இலக்க OTP-ஐ உள்ளிடவும்"
-
-#~ msgid "OTP expired. Please request a new one."
-#~ msgstr "OTP காலாவதியானது. புதியதைக் கோரவும்."
-
-#~ msgid "Pay ₹"
-#~ msgstr "₹ செலுத்து"
+msgstr ""

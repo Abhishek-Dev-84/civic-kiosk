@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-01 01:02+0530\n"
+"POT-Creation-Date: 2026-03-17 09:47+0530\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,2249 +22,3936 @@ msgstr ""
 msgid "Civic Kiosk - 404"
 msgstr "सिविक कियोस्क - ४०४"
 
-#: .\templates\404.html:196 .\templates\application-status.html:236
-#: .\templates\auth.html:432 .\templates\birth-certificate.html:325
-#: .\templates\building-plan.html:281 .\templates\death-certificate.html:285
-#: .\templates\document-upload-camera.html:43
-#: .\templates\document-upload-pen.html:58
-#: .\templates\document-upload-qr.html:69
-#: .\templates\electricity-bill-payment.html:354
-#: .\templates\electricity-complaint.html:154
-#: .\templates\electricity-duplicate-bill.html:142
-#: .\templates\electricity-load-enhancement.html:145
-#: .\templates\electricity-meter-replacement.html:101
-#: .\templates\electricity-name-transfer.html:277
-#: .\templates\electricity-new-connection.html:267
-#: .\templates\electricity-services.html:74
-#: .\templates\electricity-solar.html:281
-#: .\templates\gas-bill-payment.html:103
-#: .\templates\gas-booking-status.html:293 .\templates\gas-complaint.html:281
-#: .\templates\gas-consumer-lookup.html:48
-#: .\templates\gas-cylinder-booking.html:245
-#: .\templates\gas-new-connection.html:147 .\templates\gas-services.html:37
-#: .\templates\gas-subsidy.html:45 .\templates\grievance.html:155
-#: .\templates\index.html:215 .\templates\marriage-registration.html:79
-#: .\templates\menu.html:635 .\templates\municipal-services.html:37
-#: .\templates\otp.html:413 .\templates\payment-history.html:49
-#: .\templates\professional-tax.html:44 .\templates\property-tax.html:44
-#: .\templates\receipt-print.html:47 .\templates\trade-license.html:40
-#: .\templates\under-development.html:234 .\templates\water-bill.html:46
+#: .\templates\404.html:194 .\templates\application-status.html:396
+#: .\templates\auth.html:454 .\templates\birth-certificate.html:142
+#: .\templates\building-plan.html:157 .\templates\death-certificate.html:154
+#: .\templates\document-upload-camera.html:141
+#: .\templates\document-upload-pen.html:126
+#: .\templates\document-upload-qr.html:249
+#: .\templates\electricity-bill-payment.html:610
+#: .\templates\electricity-complaint.html:469
+#: .\templates\electricity-duplicate-bill.html:387
+#: .\templates\electricity-load-enhancement.html:385
+#: .\templates\electricity-meter-replacement.html:274
+#: .\templates\electricity-name-transfer.html:615
+#: .\templates\electricity-new-connection.html:499
+#: .\templates\electricity-services.html:278
+#: .\templates\electricity-solar.html:417
+#: .\templates\gas-bill-payment.html:512
+#: .\templates\gas-booking-status.html:441 .\templates\gas-complaint.html:426
+#: .\templates\gas-consumer-lookup.html:432
+#: .\templates\gas-cylinder-booking.html:433
+#: .\templates\gas-new-connection.html:434 .\templates\gas-services.html:343
+#: .\templates\gas-subsidy.html:400 .\templates\grievance.html:455
+#: .\templates\marriage-registration.html:349 .\templates\menu.html:824
+#: .\templates\municipal-services.html:296 .\templates\otp.html:618
+#: .\templates\payment-history.html:346 .\templates\professional-tax.html:527
+#: .\templates\property-tax.html:525 .\templates\receipt-print.html:358
+#: .\templates\trade-license.html:376 .\templates\under-development.html:464
+#: .\templates\water-bill.html:509
 msgid "Ministry of Electronics &"
 msgstr "इलेक्ट्रॉनिक्स एवं सूचना प्रौद्योगिकी मंत्रालय"
 
-#: .\templates\404.html:197 .\templates\application-status.html:237
-#: .\templates\auth.html:433 .\templates\birth-certificate.html:325
-#: .\templates\building-plan.html:281 .\templates\death-certificate.html:285
-#: .\templates\document-upload-camera.html:43
-#: .\templates\document-upload-pen.html:58
-#: .\templates\document-upload-qr.html:69
-#: .\templates\electricity-bill-payment.html:354
-#: .\templates\electricity-complaint.html:154
-#: .\templates\electricity-duplicate-bill.html:142
-#: .\templates\electricity-load-enhancement.html:145
-#: .\templates\electricity-meter-replacement.html:101
-#: .\templates\electricity-name-transfer.html:277
-#: .\templates\electricity-new-connection.html:267
-#: .\templates\electricity-services.html:74
-#: .\templates\electricity-solar.html:281
-#: .\templates\gas-bill-payment.html:103
-#: .\templates\gas-booking-status.html:293 .\templates\gas-complaint.html:281
-#: .\templates\gas-consumer-lookup.html:48
-#: .\templates\gas-cylinder-booking.html:246
-#: .\templates\gas-new-connection.html:147 .\templates\gas-services.html:37
-#: .\templates\gas-subsidy.html:45 .\templates\grievance.html:155
-#: .\templates\index.html:215 .\templates\marriage-registration.html:79
-#: .\templates\menu.html:636 .\templates\municipal-services.html:37
-#: .\templates\otp.html:414 .\templates\payment-history.html:49
-#: .\templates\professional-tax.html:44 .\templates\property-tax.html:44
-#: .\templates\receipt-print.html:47 .\templates\trade-license.html:40
-#: .\templates\under-development.html:235 .\templates\water-bill.html:46
+#: .\templates\404.html:195 .\templates\application-status.html:397
+#: .\templates\auth.html:455 .\templates\birth-certificate.html:142
+#: .\templates\building-plan.html:157 .\templates\death-certificate.html:154
+#: .\templates\document-upload-camera.html:141
+#: .\templates\document-upload-pen.html:126
+#: .\templates\document-upload-qr.html:250
+#: .\templates\electricity-bill-payment.html:610
+#: .\templates\electricity-complaint.html:469
+#: .\templates\electricity-duplicate-bill.html:388
+#: .\templates\electricity-load-enhancement.html:385
+#: .\templates\electricity-meter-replacement.html:274
+#: .\templates\electricity-name-transfer.html:616
+#: .\templates\electricity-new-connection.html:500
+#: .\templates\electricity-services.html:278
+#: .\templates\electricity-solar.html:417
+#: .\templates\gas-bill-payment.html:512
+#: .\templates\gas-booking-status.html:441 .\templates\gas-complaint.html:426
+#: .\templates\gas-consumer-lookup.html:432
+#: .\templates\gas-cylinder-booking.html:434
+#: .\templates\gas-new-connection.html:434 .\templates\gas-services.html:343
+#: .\templates\gas-subsidy.html:400 .\templates\grievance.html:455
+#: .\templates\marriage-registration.html:349 .\templates\menu.html:825
+#: .\templates\municipal-services.html:296 .\templates\otp.html:619
+#: .\templates\payment-history.html:346 .\templates\professional-tax.html:527
+#: .\templates\property-tax.html:525 .\templates\receipt-print.html:358
+#: .\templates\trade-license.html:376 .\templates\under-development.html:465
+#: .\templates\water-bill.html:509
 msgid "Information Technology"
 msgstr "सूचना प्रौद्योगिकी"
 
-#: .\templates\404.html:198 .\templates\application-status.html:238
-#: .\templates\auth.html:434 .\templates\birth-certificate.html:325
-#: .\templates\building-plan.html:281 .\templates\death-certificate.html:285
-#: .\templates\document-upload-camera.html:43
-#: .\templates\document-upload-pen.html:58
-#: .\templates\document-upload-qr.html:69
-#: .\templates\electricity-bill-payment.html:354
-#: .\templates\electricity-complaint.html:154
-#: .\templates\electricity-duplicate-bill.html:142
-#: .\templates\electricity-load-enhancement.html:145
-#: .\templates\electricity-meter-replacement.html:101
-#: .\templates\electricity-name-transfer.html:277
-#: .\templates\electricity-new-connection.html:267
-#: .\templates\electricity-services.html:74
-#: .\templates\electricity-solar.html:281
-#: .\templates\gas-bill-payment.html:103
-#: .\templates\gas-booking-status.html:293 .\templates\gas-complaint.html:281
-#: .\templates\gas-consumer-lookup.html:48
-#: .\templates\gas-cylinder-booking.html:247
-#: .\templates\gas-new-connection.html:147 .\templates\gas-services.html:37
-#: .\templates\gas-subsidy.html:45 .\templates\grievance.html:155
-#: .\templates\index.html:215 .\templates\marriage-registration.html:79
-#: .\templates\menu.html:637 .\templates\municipal-services.html:37
-#: .\templates\otp.html:415 .\templates\payment-history.html:49
-#: .\templates\professional-tax.html:44 .\templates\property-tax.html:44
-#: .\templates\receipt-print.html:47 .\templates\receipt-print.html:75
-#: .\templates\trade-license.html:40 .\templates\under-development.html:236
-#: .\templates\water-bill.html:46
+#: .\templates\404.html:196 .\templates\application-status.html:398
+#: .\templates\auth.html:456 .\templates\birth-certificate.html:142
+#: .\templates\building-plan.html:157 .\templates\death-certificate.html:154
+#: .\templates\document-upload-camera.html:141
+#: .\templates\document-upload-pen.html:126
+#: .\templates\document-upload-qr.html:251
+#: .\templates\electricity-bill-payment.html:610
+#: .\templates\electricity-complaint.html:469
+#: .\templates\electricity-duplicate-bill.html:389
+#: .\templates\electricity-load-enhancement.html:385
+#: .\templates\electricity-meter-replacement.html:274
+#: .\templates\electricity-name-transfer.html:617
+#: .\templates\electricity-new-connection.html:501
+#: .\templates\electricity-services.html:278
+#: .\templates\electricity-solar.html:417
+#: .\templates\gas-bill-payment.html:512
+#: .\templates\gas-booking-status.html:441 .\templates\gas-complaint.html:426
+#: .\templates\gas-consumer-lookup.html:432
+#: .\templates\gas-cylinder-booking.html:435
+#: .\templates\gas-new-connection.html:434 .\templates\gas-services.html:343
+#: .\templates\gas-subsidy.html:400 .\templates\grievance.html:455
+#: .\templates\marriage-registration.html:349 .\templates\menu.html:826
+#: .\templates\municipal-services.html:296 .\templates\otp.html:620
+#: .\templates\payment-history.html:346 .\templates\professional-tax.html:527
+#: .\templates\property-tax.html:525 .\templates\receipt-print.html:358
+#: .\templates\receipt-print.html:415 .\templates\trade-license.html:376
+#: .\templates\under-development.html:466 .\templates\water-bill.html:509
 msgid "Government of India"
 msgstr "भारत सरकार"
 
-#: .\templates\404.html:227
+#: .\templates\404.html:222
 msgid "Looks like you're lost"
 msgstr "लगता है आप रास्ता भटक गए हैं"
 
-#: .\templates\404.html:228
+#: .\templates\404.html:223
 msgid "The page you are looking for is not available!"
 msgstr "आप जिस पृष्ठ की तलाश कर रहे हैं वह उपलब्ध नहीं है!"
 
-#: .\templates\404.html:234
+#: .\templates\404.html:229
 msgid "The requested URL was not found on this server."
 msgstr "अनुरोधित URL इस सर्वर पर नहीं मिला।"
 
-#: .\templates\404.html:239
+#: .\templates\404.html:234
 msgid "Go To Home"
 msgstr "होम पर जाएं"
 
-#: .\templates\404.html:249
+#: .\templates\404.html:244
 msgid "Digital Civic Services Portal"
 msgstr "डिजिटल नागरिक सेवा पोर्टल"
 
-#: .\templates\404.html:250
+#: .\templates\404.html:245
 msgid "Error Code"
 msgstr "त्रुटि कोड"
 
-#: .\templates\application-status.html:7
+#: .\templates\404.html:274
+msgid "Voice"
+msgstr ""
+
+#: .\templates\404.html:281
+msgid "Error 404. Page not found. Say Home to return to menu."
+msgstr ""
+
+#: .\templates\application-status.html:18
 msgid "Application Status - Civic Services Kiosk"
 msgstr "आवेदन स्थिति - सिविक सेवा कियोस्क"
 
-#: .\templates\application-status.html:247
-#: .\templates\document-upload-camera.html:50
-#: .\templates\document-upload-pen.html:66
-#: .\templates\document-upload-qr.html:77
-#: .\templates\electricity-bill-payment.html:362
-#: .\templates\electricity-complaint.html:162
-#: .\templates\electricity-duplicate-bill.html:150
-#: .\templates\electricity-load-enhancement.html:153
-#: .\templates\electricity-meter-replacement.html:109
-#: .\templates\electricity-name-transfer.html:285
-#: .\templates\electricity-new-connection.html:275
-#: .\templates\electricity-services.html:82
-#: .\templates\electricity-solar.html:289
-#: .\templates\gas-bill-payment.html:111
-#: .\templates\gas-booking-status.html:301 .\templates\gas-complaint.html:289
-#: .\templates\gas-consumer-lookup.html:66
-#: .\templates\gas-cylinder-booking.html:267
-#: .\templates\gas-new-connection.html:166 .\templates\gas-services.html:55
-#: .\templates\gas-subsidy.html:63 .\templates\grievance.html:174
-#: .\templates\municipal-services.html:55 .\templates\payment-history.html:67
-#: .\templates\professional-tax.html:62 .\templates\property-tax.html:62
-#: .\templates\receipt-print.html:65 .\templates\trade-license.html:58
-#: .\templates\water-bill.html:64
-msgid "Voice assistant activated"
-msgstr "वॉयस असिस्टेंट सक्रिय हो गया है"
+#: .\templates\application-status.html:408
+#: .\templates\birth-certificate.html:151 .\templates\building-plan.html:166
+#: .\templates\death-certificate.html:163
+#: .\templates\document-upload-camera.html:150
+#: .\templates\document-upload-pen.html:135
+#: .\templates\document-upload-qr.html:261
+#: .\templates\electricity-bill-payment.html:619
+#: .\templates\electricity-complaint.html:478
+#: .\templates\electricity-duplicate-bill.html:399
+#: .\templates\electricity-load-enhancement.html:394
+#: .\templates\electricity-meter-replacement.html:283
+#: .\templates\electricity-name-transfer.html:627
+#: .\templates\electricity-new-connection.html:511 .\templates\menu.html:836
+#: .\templates\otp.html:630
+msgid "Voice input"
+msgstr ""
 
-#: .\templates\application-status.html:248 .\templates\auth.html:447
-#: .\templates\auth.html:687 .\templates\birth-certificate.html:334
-#: .\templates\building-plan.html:290 .\templates\death-certificate.html:294
-#: .\templates\document-upload-camera.html:51
-#: .\templates\document-upload-pen.html:67
-#: .\templates\document-upload-qr.html:78
-#: .\templates\electricity-bill-payment.html:363
-#: .\templates\electricity-complaint.html:163
-#: .\templates\electricity-duplicate-bill.html:151
-#: .\templates\electricity-load-enhancement.html:154
-#: .\templates\electricity-meter-replacement.html:110
-#: .\templates\electricity-name-transfer.html:286
-#: .\templates\electricity-new-connection.html:276
-#: .\templates\electricity-services.html:83
-#: .\templates\electricity-solar.html:290
-#: .\templates\gas-bill-payment.html:112
-#: .\templates\gas-booking-status.html:302 .\templates\gas-complaint.html:290
-#: .\templates\gas-consumer-lookup.html:67
-#: .\templates\gas-cylinder-booking.html:268
-#: .\templates\gas-new-connection.html:167 .\templates\gas-services.html:56
-#: .\templates\gas-subsidy.html:64 .\templates\grievance.html:175
-#: .\templates\index.html:224 .\templates\menu.html:647
-#: .\templates\menu.html:823 .\templates\municipal-services.html:56
-#: .\templates\otp.html:425 .\templates\payment-history.html:68
-#: .\templates\professional-tax.html:63 .\templates\property-tax.html:63
-#: .\templates\receipt-print.html:66 .\templates\trade-license.html:59
-#: .\templates\water-bill.html:65
+#: .\templates\application-status.html:409
+#: .\templates\application-status.html:854
+#: .\templates\application-status.html:874 .\templates\auth.html:467
+#: .\templates\auth.html:987 .\templates\auth.html:1007
+#: .\templates\birth-certificate.html:152
+#: .\templates\birth-certificate.html:570
+#: .\templates\birth-certificate.html:590 .\templates\building-plan.html:167
+#: .\templates\building-plan.html:737 .\templates\building-plan.html:757
+#: .\templates\death-certificate.html:164
+#: .\templates\death-certificate.html:682
+#: .\templates\death-certificate.html:702
+#: .\templates\document-upload-camera.html:151
+#: .\templates\document-upload-camera.html:627
+#: .\templates\document-upload-camera.html:647
+#: .\templates\document-upload-pen.html:136
+#: .\templates\document-upload-pen.html:631
+#: .\templates\document-upload-pen.html:651
+#: .\templates\document-upload-qr.html:262
+#: .\templates\document-upload-qr.html:716
+#: .\templates\document-upload-qr.html:736
+#: .\templates\electricity-bill-payment.html:620
+#: .\templates\electricity-bill-payment.html:1275
+#: .\templates\electricity-bill-payment.html:1295
+#: .\templates\electricity-complaint.html:479
+#: .\templates\electricity-complaint.html:1188
+#: .\templates\electricity-complaint.html:1208
+#: .\templates\electricity-duplicate-bill.html:400
+#: .\templates\electricity-duplicate-bill.html:1080
+#: .\templates\electricity-duplicate-bill.html:1100
+#: .\templates\electricity-load-enhancement.html:395
+#: .\templates\electricity-load-enhancement.html:1179
+#: .\templates\electricity-load-enhancement.html:1199
+#: .\templates\electricity-meter-replacement.html:284
+#: .\templates\electricity-meter-replacement.html:1067
+#: .\templates\electricity-meter-replacement.html:1087
+#: .\templates\electricity-name-transfer.html:628
+#: .\templates\electricity-name-transfer.html:1424
+#: .\templates\electricity-name-transfer.html:1445
+#: .\templates\electricity-new-connection.html:512
+#: .\templates\electricity-new-connection.html:1212
+#: .\templates\electricity-new-connection.html:1233
+#: .\templates\electricity-services.html:288
+#: .\templates\electricity-services.html:610
+#: .\templates\electricity-services.html:631
+#: .\templates\electricity-solar.html:427
+#: .\templates\electricity-solar.html:937
+#: .\templates\electricity-solar.html:958
+#: .\templates\gas-bill-payment.html:522
+#: .\templates\gas-bill-payment.html:1091
+#: .\templates\gas-bill-payment.html:1112
+#: .\templates\gas-booking-status.html:451
+#: .\templates\gas-booking-status.html:923
+#: .\templates\gas-booking-status.html:944 .\templates\gas-complaint.html:436
+#: .\templates\gas-complaint.html:948 .\templates\gas-complaint.html:969
+#: .\templates\gas-consumer-lookup.html:453
+#: .\templates\gas-consumer-lookup.html:894
+#: .\templates\gas-consumer-lookup.html:915
+#: .\templates\gas-cylinder-booking.html:457
+#: .\templates\gas-cylinder-booking.html:814
+#: .\templates\gas-cylinder-booking.html:835
+#: .\templates\gas-new-connection.html:455
+#: .\templates\gas-new-connection.html:983
+#: .\templates\gas-new-connection.html:1004 .\templates\gas-services.html:364
+#: .\templates\gas-services.html:729 .\templates\gas-services.html:750
+#: .\templates\gas-subsidy.html:421 .\templates\gas-subsidy.html:843
+#: .\templates\gas-subsidy.html:863 .\templates\grievance.html:476
+#: .\templates\grievance.html:1026 .\templates\grievance.html:1047
+#: .\templates\marriage-registration.html:370
+#: .\templates\marriage-registration.html:1026
+#: .\templates\marriage-registration.html:1046 .\templates\menu.html:837
+#: .\templates\menu.html:1179 .\templates\menu.html:1200
+#: .\templates\municipal-services.html:317
+#: .\templates\municipal-services.html:621
+#: .\templates\municipal-services.html:641 .\templates\otp.html:631
+#: .\templates\otp.html:1259 .\templates\otp.html:1280
+#: .\templates\payment-history.html:367 .\templates\payment-history.html:803
+#: .\templates\payment-history.html:823 .\templates\professional-tax.html:548
+#: .\templates\professional-tax.html:1110
+#: .\templates\professional-tax.html:1130 .\templates\property-tax.html:546
+#: .\templates\property-tax.html:1105 .\templates\property-tax.html:1125
+#: .\templates\receipt-print.html:379 .\templates\receipt-print.html:774
+#: .\templates\receipt-print.html:794 .\templates\trade-license.html:397
+#: .\templates\trade-license.html:963 .\templates\trade-license.html:983
+#: .\templates\under-development.html:477
+#: .\templates\under-development.html:740
+#: .\templates\under-development.html:760 .\templates\water-bill.html:530
+#: .\templates\water-bill.html:1077 .\templates\water-bill.html:1097
 msgid "Click"
 msgstr "क्लिक करें"
 
-#: .\templates\application-status.html:251 .\templates\auth.html:451
-#: .\templates\birth-certificate.html:337 .\templates\building-plan.html:293
-#: .\templates\death-certificate.html:297
-#: .\templates\document-upload-camera.html:53
-#: .\templates\document-upload-pen.html:70
-#: .\templates\document-upload-qr.html:81
-#: .\templates\electricity-bill-payment.html:366
-#: .\templates\electricity-complaint.html:166
-#: .\templates\electricity-complaint.html:289
-#: .\templates\electricity-duplicate-bill.html:154
-#: .\templates\electricity-duplicate-bill.html:286
-#: .\templates\electricity-load-enhancement.html:157
-#: .\templates\electricity-meter-replacement.html:113
-#: .\templates\electricity-name-transfer.html:289
-#: .\templates\electricity-name-transfer.html:397
-#: .\templates\electricity-new-connection.html:279
-#: .\templates\electricity-new-connection.html:391
-#: .\templates\electricity-services.html:86
-#: .\templates\electricity-solar.html:293
-#: .\templates\gas-bill-payment.html:116
-#: .\templates\gas-booking-status.html:305
-#: .\templates\gas-booking-status.html:441 .\templates\gas-complaint.html:293
-#: .\templates\gas-complaint.html:397 .\templates\gas-consumer-lookup.html:69
-#: .\templates\gas-cylinder-booking.html:271
-#: .\templates\gas-new-connection.html:170 .\templates\gas-services.html:58
-#: .\templates\gas-subsidy.html:66 .\templates\grievance.html:178
-#: .\templates\marriage-registration.html:98 .\templates\menu.html:651
-#: .\templates\municipal-services.html:58 .\templates\otp.html:428
-#: .\templates\payment-history.html:70 .\templates\professional-tax.html:65
-#: .\templates\property-tax.html:65 .\templates\receipt-print.html:68
-#: .\templates\trade-license.html:61 .\templates\water-bill.html:67
+#: .\templates\application-status.html:413
+#: .\templates\birth-certificate.html:156 .\templates\building-plan.html:171
+#: .\templates\death-certificate.html:168
+#: .\templates\document-upload-camera.html:155
+#: .\templates\document-upload-pen.html:140
+#: .\templates\document-upload-qr.html:266
+#: .\templates\electricity-bill-payment.html:624
+#: .\templates\electricity-complaint.html:483
+#: .\templates\electricity-duplicate-bill.html:404
+#: .\templates\electricity-load-enhancement.html:399
+#: .\templates\electricity-meter-replacement.html:288
+#: .\templates\electricity-name-transfer.html:632
+#: .\templates\electricity-new-connection.html:516 .\templates\menu.html:841
+#: .\templates\otp.html:634
+msgid "Go back"
+msgstr ""
+
+#: .\templates\application-status.html:413 .\templates\auth.html:471
+#: .\templates\birth-certificate.html:156 .\templates\building-plan.html:171
+#: .\templates\death-certificate.html:168
+#: .\templates\document-upload-camera.html:155
+#: .\templates\document-upload-pen.html:140
+#: .\templates\document-upload-qr.html:266
+#: .\templates\electricity-bill-payment.html:624
+#: .\templates\electricity-complaint.html:483
+#: .\templates\electricity-complaint.html:762
+#: .\templates\electricity-duplicate-bill.html:404
+#: .\templates\electricity-load-enhancement.html:399
+#: .\templates\electricity-meter-replacement.html:288
+#: .\templates\electricity-name-transfer.html:632
+#: .\templates\electricity-name-transfer.html:962
+#: .\templates\electricity-new-connection.html:516
+#: .\templates\electricity-new-connection.html:765
+#: .\templates\electricity-services.html:292
+#: .\templates\electricity-solar.html:431
+#: .\templates\electricity-solar.html:617
+#: .\templates\gas-bill-payment.html:526 .\templates\gas-bill-payment.html:789
+#: .\templates\gas-booking-status.html:455
+#: .\templates\gas-booking-status.html:679 .\templates\gas-complaint.html:440
+#: .\templates\gas-complaint.html:647 .\templates\gas-consumer-lookup.html:457
+#: .\templates\gas-cylinder-booking.html:461
+#: .\templates\gas-new-connection.html:459
+#: .\templates\gas-new-connection.html:630 .\templates\gas-services.html:368
+#: .\templates\gas-subsidy.html:425 .\templates\grievance.html:480
+#: .\templates\grievance.html:655 .\templates\marriage-registration.html:374
+#: .\templates\menu.html:841 .\templates\municipal-services.html:321
+#: .\templates\otp.html:634 .\templates\payment-history.html:371
+#: .\templates\professional-tax.html:552 .\templates\property-tax.html:550
+#: .\templates\receipt-print.html:383 .\templates\trade-license.html:401
+#: .\templates\trade-license.html:592 .\templates\under-development.html:481
+#: .\templates\water-bill.html:534
 msgid "Back"
 msgstr "वापस"
 
-#: .\templates\application-status.html:256
-msgid "Status Portal"
-msgstr "स्थिति पोर्टल"
-
-#: .\templates\application-status.html:259
-msgid "Application Status"
-msgstr "आवेदन की स्थिति"
-
-#: .\templates\application-status.html:262 .\templates\payment-history.html:73
-msgid "Payment History"
-msgstr "भुगतान इतिहास"
-
-#: .\templates\application-status.html:269
-msgid "Application & Complaint Status"
-msgstr "आवेदन एवं शिकायत स्थिति"
-
-#: .\templates\application-status.html:274
-msgid "Application Tracking"
-msgstr "आवेदन ट्रैकिंग"
-
-#: .\templates\application-status.html:277
-msgid "Application ID:"
-msgstr "आवेदन आईडी:"
-
-#: .\templates\application-status.html:282
-msgid "Department:"
-msgstr "विभाग:"
-
-#: .\templates\application-status.html:287
-msgid "Submitted Date:"
-msgstr "जमा करने की तारीख:"
-
-#: .\templates\application-status.html:292
-msgid "Current Stage:"
-msgstr "वर्तमान चरण:"
-
-#: .\templates\application-status.html:297
-msgid "Assigned Officer:"
-msgstr "नियुक्त अधिकारी:"
-
-#: .\templates\application-status.html:302
-msgid "Expected Completion:"
-msgstr "अपेक्षित पूर्णता:"
-
-#: .\templates\application-status.html:309
-msgid "Complaint Tracking"
-msgstr "शिकायत ट्रैकिंग"
-
-#: .\templates\application-status.html:312
-msgid "Complaint ID:"
-msgstr "शिकायत आईडी:"
-
-#: .\templates\application-status.html:317
-#: .\templates\gas-consumer-lookup.html:116
-msgid "Status:"
-msgstr "स्थिति:"
-
-#: .\templates\application-status.html:322
-msgid "Work Completed:"
-msgstr "कार्य पूर्ण:"
-
-#: .\templates\application-status.html:327
-msgid "Officer Remark:"
-msgstr "अधिकारी की टिप्पणी:"
-
-#: .\templates\application-status.html:332
-msgid "Deadline:"
-msgstr "अंतिम तिथि:"
-
-#: .\templates\application-status.html:340
-msgid "No Active Applications"
-msgstr "कोई सक्रिय आवेदन नहीं"
-
-#: .\templates\application-status.html:342
-msgid "You don't have any active applications or complaints."
-msgstr "आपके पास कोई सक्रिय आवेदन या शिकायत नहीं है।"
-
-#: .\templates\application-status.html:345
-msgid "Back to Menu"
-msgstr "मेनू पर वापस जाएं"
-
-#: .\templates\auth.html:108
-msgid "Civic Services Kiosk - Aadhaar Entry"
-msgstr "सिविक सेवा कियोस्क - आधार प्रविष्टि"
-
-#: .\templates\auth.html:422 .\templates\index.html:228
+#: .\templates\application-status.html:417 .\templates\auth.html:444
+#: .\templates\birth-certificate.html:160 .\templates\building-plan.html:175
+#: .\templates\death-certificate.html:172
+#: .\templates\document-upload-camera.html:159
+#: .\templates\document-upload-pen.html:144
+#: .\templates\document-upload-qr.html:270
+#: .\templates\electricity-bill-payment.html:628
+#: .\templates\electricity-complaint.html:487
+#: .\templates\electricity-duplicate-bill.html:408
+#: .\templates\electricity-load-enhancement.html:403
+#: .\templates\electricity-meter-replacement.html:292
+#: .\templates\electricity-name-transfer.html:588
+#: .\templates\electricity-new-connection.html:478
+#: .\templates\electricity-services.html:263
+#: .\templates\electricity-solar.html:402
+#: .\templates\gas-bill-payment.html:491
+#: .\templates\gas-booking-status.html:426 .\templates\gas-complaint.html:411
+#: .\templates\gas-consumer-lookup.html:411
+#: .\templates\gas-cylinder-booking.html:411
+#: .\templates\gas-new-connection.html:413 .\templates\gas-services.html:328
+#: .\templates\gas-subsidy.html:429 .\templates\grievance.html:434
+#: .\templates\marriage-registration.html:378
+#: .\templates\municipal-services.html:325 .\templates\otp.html:609
+#: .\templates\payment-history.html:375 .\templates\professional-tax.html:556
+#: .\templates\property-tax.html:554 .\templates\receipt-print.html:387
+#: .\templates\trade-license.html:405 .\templates\under-development.html:485
+#: .\templates\water-bill.html:538
 msgid "Session about to expire!"
 msgstr "सत्र समाप्त होने वाला है!"
 
-#: .\templates\auth.html:423 .\templates\index.html:229
+#: .\templates\application-status.html:418
+#: .\templates\birth-certificate.html:161 .\templates\building-plan.html:176
+#: .\templates\death-certificate.html:173
+#: .\templates\document-upload-camera.html:160
+#: .\templates\document-upload-pen.html:145
+#: .\templates\document-upload-qr.html:271
+#: .\templates\electricity-bill-payment.html:629
+#: .\templates\electricity-complaint.html:488
+#: .\templates\electricity-duplicate-bill.html:409
+#: .\templates\electricity-load-enhancement.html:404
+#: .\templates\electricity-meter-replacement.html:293
+#, fuzzy
+#| msgid "Continue Session"
+msgid "Continue session"
+msgstr "सत्र जारी रखें"
+
+#: .\templates\application-status.html:418 .\templates\auth.html:445
+#: .\templates\birth-certificate.html:161 .\templates\building-plan.html:176
+#: .\templates\death-certificate.html:173
+#: .\templates\document-upload-camera.html:160
+#: .\templates\document-upload-pen.html:145
+#: .\templates\document-upload-qr.html:271
+#: .\templates\electricity-bill-payment.html:629
+#: .\templates\electricity-complaint.html:488
+#: .\templates\electricity-duplicate-bill.html:409
+#: .\templates\electricity-load-enhancement.html:404
+#: .\templates\electricity-meter-replacement.html:293
+#: .\templates\electricity-name-transfer.html:589
+#: .\templates\electricity-new-connection.html:479
+#: .\templates\electricity-services.html:264
+#: .\templates\electricity-solar.html:403
+#: .\templates\gas-bill-payment.html:492
+#: .\templates\gas-booking-status.html:427 .\templates\gas-complaint.html:412
+#: .\templates\gas-consumer-lookup.html:412
+#: .\templates\gas-cylinder-booking.html:412
+#: .\templates\gas-new-connection.html:414 .\templates\gas-services.html:329
+#: .\templates\gas-subsidy.html:430 .\templates\grievance.html:435
+#: .\templates\marriage-registration.html:379
+#: .\templates\municipal-services.html:326 .\templates\otp.html:610
+#: .\templates\payment-history.html:376 .\templates\professional-tax.html:557
+#: .\templates\property-tax.html:555 .\templates\receipt-print.html:388
+#: .\templates\trade-license.html:406 .\templates\under-development.html:486
+#: .\templates\water-bill.html:539
 msgid "Continue"
 msgstr "जारी रखें"
 
-#: .\templates\auth.html:424 .\templates\index.html:230
-#: .\templates\menu.html:657
+#: .\templates\application-status.html:419 .\templates\auth.html:446
+#: .\templates\birth-certificate.html:162 .\templates\building-plan.html:177
+#: .\templates\death-certificate.html:174
+#: .\templates\document-upload-camera.html:161
+#: .\templates\document-upload-pen.html:146
+#: .\templates\document-upload-qr.html:272
+#: .\templates\electricity-bill-payment.html:630
+#: .\templates\electricity-complaint.html:489
+#: .\templates\electricity-duplicate-bill.html:410
+#: .\templates\electricity-load-enhancement.html:405
+#: .\templates\electricity-meter-replacement.html:294
+#: .\templates\electricity-name-transfer.html:590
+#: .\templates\electricity-new-connection.html:480
+#: .\templates\electricity-services.html:265
+#: .\templates\electricity-solar.html:404
+#: .\templates\gas-bill-payment.html:493
+#: .\templates\gas-booking-status.html:428 .\templates\gas-complaint.html:413
+#: .\templates\gas-consumer-lookup.html:413
+#: .\templates\gas-cylinder-booking.html:413
+#: .\templates\gas-new-connection.html:415 .\templates\gas-services.html:330
+#: .\templates\gas-subsidy.html:431 .\templates\grievance.html:436
+#: .\templates\marriage-registration.html:380 .\templates\menu.html:847
+#: .\templates\municipal-services.html:327 .\templates\otp.html:611
+#: .\templates\payment-history.html:377 .\templates\professional-tax.html:558
+#: .\templates\property-tax.html:556 .\templates\receipt-print.html:389
+#: .\templates\trade-license.html:407 .\templates\under-development.html:487
+#: .\templates\water-bill.html:540
 msgid "Logout"
 msgstr "लॉगआउट"
 
-#: .\templates\auth.html:468
+#: .\templates\application-status.html:436
+msgid "Status Portal"
+msgstr "स्थिति पोर्टल"
+
+#: .\templates\application-status.html:439
+msgid "Application Status"
+msgstr "आवेदन की स्थिति"
+
+#: .\templates\application-status.html:442
+#: .\templates\payment-history.html:399
+msgid "Payment History"
+msgstr "भुगतान इतिहास"
+
+#: .\templates\application-status.html:447
+#, fuzzy
+#| msgid "Application Status"
+msgid "Application details"
+msgstr "आवेदन की स्थिति"
+
+#: .\templates\application-status.html:449
+msgid "Application & Complaint Status"
+msgstr "आवेदन एवं शिकायत स्थिति"
+
+#: .\templates\application-status.html:454
+msgid "Application Tracking"
+msgstr "आवेदन ट्रैकिंग"
+
+#: .\templates\application-status.html:457
+msgid "Application ID:"
+msgstr "आवेदन आईडी:"
+
+#: .\templates\application-status.html:462
+msgid "Department:"
+msgstr "विभाग:"
+
+#: .\templates\application-status.html:467
+msgid "Submitted Date:"
+msgstr "जमा करने की तारीख:"
+
+#: .\templates\application-status.html:472
+msgid "Current Stage:"
+msgstr "वर्तमान चरण:"
+
+#: .\templates\application-status.html:477
+msgid "Assigned Officer:"
+msgstr "नियुक्त अधिकारी:"
+
+#: .\templates\application-status.html:482
+msgid "Expected Completion:"
+msgstr "अपेक्षित पूर्णता:"
+
+#: .\templates\application-status.html:489
+msgid "Complaint Tracking"
+msgstr "शिकायत ट्रैकिंग"
+
+#: .\templates\application-status.html:492
+msgid "Complaint ID:"
+msgstr "शिकायत आईडी:"
+
+#: .\templates\application-status.html:497
+#: .\templates\gas-consumer-lookup.html:506
+msgid "Status:"
+msgstr "स्थिति:"
+
+#: .\templates\application-status.html:502
+msgid "Work Completed:"
+msgstr "कार्य पूर्ण:"
+
+#: .\templates\application-status.html:511
+msgid "Officer Remark:"
+msgstr "अधिकारी की टिप्पणी:"
+
+#: .\templates\application-status.html:516
+msgid "Deadline:"
+msgstr "अंतिम तिथि:"
+
+#: .\templates\application-status.html:524
+msgid "No Active Applications"
+msgstr "कोई सक्रिय आवेदन नहीं"
+
+#: .\templates\application-status.html:526
+msgid "You don't have any active applications or complaints."
+msgstr "आपके पास कोई सक्रिय आवेदन या शिकायत नहीं है।"
+
+#: .\templates\application-status.html:529
+#: .\templates\application-status.html:537
+msgid "Back to Menu"
+msgstr "मेनू पर वापस जाएं"
+
+#: .\templates\application-status.html:547 .\templates\auth.html:524
+#: .\templates\birth-certificate.html:240 .\templates\building-plan.html:256
+#: .\templates\death-certificate.html:261
+#: .\templates\document-upload-camera.html:199
+#: .\templates\document-upload-pen.html:208
+#: .\templates\document-upload-qr.html:319
+#: .\templates\electricity-bill-payment.html:736
+#: .\templates\electricity-complaint.html:595
+#: .\templates\electricity-duplicate-bill.html:486
+#: .\templates\electricity-load-enhancement.html:529
+#: .\templates\electricity-meter-replacement.html:310
+#: .\templates\electricity-name-transfer.html:782
+#: .\templates\electricity-new-connection.html:491 .\templates\menu.html:817
+#: .\templates\otp.html:649
+#, fuzzy
+#| msgid "Government of India"
+msgid "Secured by Government of India"
+msgstr "भारत सरकार"
+
+#: .\templates\application-status.html:690
+#: .\templates\application-status.html:913
+#: .\templates\application-status.html:1001
+msgid "Application details page. Say back to return."
+msgstr ""
+
+#: .\templates\application-status.html:708
+#, fuzzy
+#| msgid "Back to Menu"
+msgid "Back to main menu"
+msgstr "मेनू पर वापस जाएं"
+
+#: .\templates\application-status.html:727 .\templates\auth.html:849
+#: .\templates\birth-certificate.html:460 .\templates\building-plan.html:615
+#: .\templates\death-certificate.html:568
+#: .\templates\document-upload-camera.html:524
+#: .\templates\document-upload-pen.html:532
+#: .\templates\document-upload-qr.html:588
+#: .\templates\electricity-bill-payment.html:1156
+#: .\templates\electricity-complaint.html:1017
+#: .\templates\electricity-duplicate-bill.html:929
+#: .\templates\electricity-load-enhancement.html:1011
+#: .\templates\electricity-meter-replacement.html:872
+#: .\templates\electricity-name-transfer.html:1242
+#: .\templates\electricity-new-connection.html:989
+#: .\templates\electricity-services.html:426
+#: .\templates\electricity-solar.html:747
+#: .\templates\gas-bill-payment.html:949
+#: .\templates\gas-booking-status.html:786 .\templates\gas-complaint.html:759
+#: .\templates\gas-consumer-lookup.html:760
+#: .\templates\gas-cylinder-booking.html:665
+#: .\templates\gas-new-connection.html:776 .\templates\gas-services.html:513
+#: .\templates\gas-subsidy.html:727 .\templates\grievance.html:823
+#: .\templates\marriage-registration.html:752 .\templates\menu.html:1037
+#: .\templates\municipal-services.html:481 .\templates\otp.html:1124
+#: .\templates\payment-history.html:588 .\templates\professional-tax.html:980
+#: .\templates\property-tax.html:974 .\templates\receipt-print.html:639
+#: .\templates\trade-license.html:735 .\templates\under-development.html:626
+#: .\templates\water-bill.html:947
+msgid "Speech not supported"
+msgstr ""
+
+#: .\templates\application-status.html:746 .\templates\auth.html:870
+#: .\templates\birth-certificate.html:479 .\templates\building-plan.html:634
+#: .\templates\death-certificate.html:587
+#: .\templates\document-upload-camera.html:543
+#: .\templates\document-upload-pen.html:551
+#: .\templates\document-upload-qr.html:607
+#: .\templates\electricity-bill-payment.html:1175
+#: .\templates\electricity-complaint.html:1036
+#: .\templates\electricity-duplicate-bill.html:948
+#: .\templates\electricity-load-enhancement.html:1030
+#: .\templates\electricity-meter-replacement.html:891
+#: .\templates\electricity-name-transfer.html:607
+#: .\templates\electricity-name-transfer.html:1260
+#: .\templates\electricity-new-connection.html:486
+#: .\templates\electricity-new-connection.html:1007
+#: .\templates\electricity-services.html:271
+#: .\templates\electricity-services.html:444
+#: .\templates\electricity-solar.html:410
+#: .\templates\electricity-solar.html:765
+#: .\templates\gas-bill-payment.html:499 .\templates\gas-bill-payment.html:967
+#: .\templates\gas-booking-status.html:434
+#: .\templates\gas-booking-status.html:804 .\templates\gas-complaint.html:419
+#: .\templates\gas-complaint.html:777 .\templates\gas-consumer-lookup.html:419
+#: .\templates\gas-consumer-lookup.html:778
+#: .\templates\gas-cylinder-booking.html:419
+#: .\templates\gas-cylinder-booking.html:683
+#: .\templates\gas-new-connection.html:421
+#: .\templates\gas-new-connection.html:794 .\templates\gas-services.html:336
+#: .\templates\gas-services.html:531 .\templates\gas-subsidy.html:746
+#: .\templates\grievance.html:442 .\templates\grievance.html:841
+#: .\templates\marriage-registration.html:771 .\templates\menu.html:812
+#: .\templates\menu.html:1056 .\templates\municipal-services.html:500
+#: .\templates\otp.html:604 .\templates\otp.html:1143
+#: .\templates\payment-history.html:607 .\templates\professional-tax.html:999
+#: .\templates\property-tax.html:993 .\templates\receipt-print.html:658
+#: .\templates\trade-license.html:754 .\templates\under-development.html:645
+#: .\templates\water-bill.html:966
+msgid "Listening..."
+msgstr "सुन रहे हैं..."
+
+#: .\templates\application-status.html:754
+msgid "Please say a command... Application Status, Payment History, or Back"
+msgstr ""
+
+#: .\templates\application-status.html:802 .\templates\menu.html:1129
+#, fuzzy
+#| msgid "Application Status"
+msgid "Opening Application Status"
+msgstr "आवेदन की स्थिति"
+
+#: .\templates\application-status.html:808
+#, fuzzy
+#| msgid "Payment History"
+msgid "Opening Payment History"
+msgstr "भुगतान इतिहास"
+
+#: .\templates\application-status.html:814
+#: .\templates\municipal-services.html:572
+msgid "Going back to main menu"
+msgstr ""
+
+#: .\templates\application-status.html:820 .\templates\menu.html:1143
+msgid "Going to home"
+msgstr ""
+
+#: .\templates\application-status.html:921
+msgid ""
+"Status Portal. Choose Application Status or Payment History. Press mic "
+"button for voice help."
+msgstr ""
+
+#: .\templates\application-status.html:1003
+msgid "Status Portal. Choose Application Status or Payment History."
+msgstr ""
+
+#: .\templates\auth.html:103
+msgid "Civic Services Kiosk - Aadhaar Entry"
+msgstr "सिविक सेवा कियोस्क - आधार प्रविष्टि"
+
+#: .\templates\auth.html:488
 msgid "Enter Aadhaar"
 msgstr "आधार दर्ज करें"
 
-#: .\templates\auth.html:471
+#: .\templates\auth.html:489
 msgid "12-digit Aadhaar Number"
 msgstr "१२-अंकीय आधार संख्या"
 
-#: .\templates\auth.html:494
+#: .\templates\auth.html:509 .\templates\auth.html:789
+#: .\templates\auth.html:799
 msgid "Proceed"
 msgstr "आगे बढ़ें"
 
-#: .\templates\auth.html:601
+#: .\templates\auth.html:518 .\templates\otp.html:663
+#, fuzzy
+#| msgid "remaining"
+msgid "Attempts remaining"
+msgstr "शेष"
+
+#: .\templates\auth.html:724 .\templates\auth.html:734
 msgid "Please enter 12 digits"
 msgstr "कृपया १२ अंक दर्ज करें"
 
-#: .\templates\auth.html:661
-msgid "Listen"
-msgstr "सुनें"
-
-#: .\templates\birth-certificate.html:7
-msgid "Birth Certificate - Civic Kiosk"
-msgstr "जन्म प्रमाण पत्र - सिविक कियोस्क"
-
-#: .\templates\birth-certificate.html:351
-#: .\templates\municipal-services.html:66 .\templates\payment-history.html:99
-msgid "Birth Certificate"
-msgstr "जन्म प्रमाण पत्र"
-
-#: .\templates\birth-certificate.html:352
-msgid "Apply within 21 days of birth for free registration"
-msgstr "मुफ्त पंजीकरण के लिए जन्म के २१ दिनों के भीतर आवेदन करें"
-
-#: .\templates\birth-certificate.html:359
-msgid "Child's Full Name"
-msgstr "बच्चे का पूरा नाम"
-
-#: .\templates\birth-certificate.html:361
-msgid "Enter child's name"
-msgstr "बच्चे का नाम दर्ज करें"
-
-#: .\templates\birth-certificate.html:365
-#: .\templates\marriage-registration.html:117
-#: .\templates\marriage-registration.html:138
-msgid "Date of Birth"
-msgstr "जन्म तिथि"
-
-#: .\templates\birth-certificate.html:371
-#: .\templates\death-certificate.html:335
-msgid "Gender"
-msgstr "लिंग"
-
-#: .\templates\birth-certificate.html:375
-#: .\templates\death-certificate.html:337
-msgid "Male"
-msgstr "पुरुष"
-
-#: .\templates\birth-certificate.html:379
-#: .\templates\death-certificate.html:338
-msgid "Female"
-msgstr "महिला"
-
-#: .\templates\birth-certificate.html:383
-#: .\templates\death-certificate.html:339
-#: .\templates\electricity-complaint.html:203
-#: .\templates\electricity-load-enhancement.html:205
-#: .\templates\electricity-meter-replacement.html:152
-#: .\templates\electricity-name-transfer.html:342
-#: .\templates\gas-complaint.html:330 .\templates\grievance.html:196
-#: .\templates\marriage-registration.html:171
-#: .\templates\trade-license.html:80
-msgid "Other"
-msgstr "अन्य"
-
-#: .\templates\birth-certificate.html:389
-msgid "Place of Birth"
-msgstr "जन्म स्थान"
-
-#: .\templates\birth-certificate.html:391
-msgid "Hospital/Clinic name or Address"
-msgstr "अस्पताल/क्लिनिक का नाम या पता"
-
-#: .\templates\birth-certificate.html:395
-#: .\templates\marriage-registration.html:125
-#: .\templates\marriage-registration.html:146
-msgid "Father's Name"
-msgstr "पिता का नाम"
-
-#: .\templates\birth-certificate.html:397
-msgid "Enter father's full name"
-msgstr "पिता का पूरा नाम दर्ज करें"
-
-#: .\templates\birth-certificate.html:401
-msgid "Mother's Name"
-msgstr "माता का नाम"
-
-#: .\templates\birth-certificate.html:403
-msgid "Enter mother's full name"
-msgstr "माता का पूरा नाम दर्ज करें"
-
-#: .\templates\birth-certificate.html:407
-msgid "Permanent Address"
-msgstr "स्थायी पता"
-
-#: .\templates\birth-certificate.html:409
-msgid "Enter permanent address"
-msgstr "स्थायी पता दर्ज करें"
-
-#: .\templates\birth-certificate.html:412
-#: .\templates\death-certificate.html:367
-#: .\templates\electricity-new-connection.html:340
-#: .\templates\gas-new-connection.html:207
-msgid "Submit Application"
-msgstr "आवेदन जमा करें"
-
-#: .\templates\birth-certificate.html:419 .\templates\building-plan.html:367
-#: .\templates\death-certificate.html:373
-#: .\templates\electricity-name-transfer.html:358
-#: .\templates\electricity-new-connection.html:352
-#: .\templates\electricity-solar.html:349
-msgid "Type here..."
-msgstr "यहां टाइप करें..."
-
-#: .\templates\birth-certificate.html:458 .\templates\building-plan.html:401
-#: .\templates\death-certificate.html:407
-#: .\templates\electricity-bill-payment.html:442
-#: .\templates\electricity-complaint.html:290
-#: .\templates\electricity-duplicate-bill.html:287
-#: .\templates\electricity-load-enhancement.html:277
-#: .\templates\electricity-name-transfer.html:398
-#: .\templates\electricity-new-connection.html:392
-#: .\templates\electricity-solar.html:385
-#: .\templates\gas-booking-status.html:442 .\templates\gas-complaint.html:398
-#: .\templates\gas-new-connection.html:255 .\templates\grievance.html:267
-#: .\templates\marriage-registration.html:229
-msgid "Clear"
-msgstr "साफ़ करें"
-
-#: .\templates\birth-certificate.html:459 .\templates\building-plan.html:403
-#: .\templates\death-certificate.html:409
-#: .\templates\electricity-complaint.html:278
-#: .\templates\electricity-name-transfer.html:386
-#: .\templates\electricity-new-connection.html:380
-#: .\templates\electricity-solar.html:374 .\templates\gas-complaint.html:386
-#: .\templates\gas-new-connection.html:254 .\templates\grievance.html:266
-#: .\templates\marriage-registration.html:228
-msgid "Space"
-msgstr "स्पेस"
-
-#: .\templates\birth-certificate.html:461 .\templates\building-plan.html:404
-#: .\templates\death-certificate.html:410
-#: .\templates\electricity-bill-payment.html:444
-#: .\templates\electricity-complaint.html:291
-#: .\templates\electricity-duplicate-bill.html:288
-#: .\templates\electricity-load-enhancement.html:289
-#: .\templates\electricity-name-transfer.html:399
-#: .\templates\electricity-new-connection.html:393
-#: .\templates\electricity-solar.html:386
-#: .\templates\gas-booking-status.html:443 .\templates\gas-complaint.html:399
-#: .\templates\gas-new-connection.html:256 .\templates\grievance.html:268
-#: .\templates\marriage-registration.html:230
-msgid "OK"
-msgstr "ठीक है"
-
-#: .\templates\building-plan.html:6
-msgid "Building Plan Approval - Civic Kiosk"
-msgstr "भवन योजना अनुमोदन - सिविक कियोस्क"
-
-#: .\templates\building-plan.html:299
-msgid "Building Plan Approval"
-msgstr "भवन योजना अनुमोदन"
-
-#: .\templates\building-plan.html:311 .\templates\trade-license.html:84
-msgid "Owner Name"
-msgstr "मालिक का नाम"
-
-#: .\templates\building-plan.html:317
-msgid "Property Address"
-msgstr "संपत्ति का पता"
-
-#: .\templates\building-plan.html:323
-msgid "Survey/Khasra Number"
-msgstr "सर्वे/खसरा संख्या"
-
-#: .\templates\building-plan.html:329
-msgid "Plot Area (sq m)"
-msgstr "प्लॉट क्षेत्र (वर्ग मीटर)"
-
-#: .\templates\building-plan.html:335
-msgid "Building Type"
-msgstr "भवन का प्रकार"
-
-#: .\templates\building-plan.html:337
-#: .\templates\electricity-new-connection.html:321
-msgid "Residential"
-msgstr "आवासीय"
-
-#: .\templates\building-plan.html:338
-#: .\templates\electricity-new-connection.html:322
-#: .\templates\gas-cylinder-booking.html:321
-msgid "Commercial"
-msgstr "वाणिज्यिक"
-
-#: .\templates\building-plan.html:339
-msgid "Mixed Use"
-msgstr "मिश्रित उपयोग"
-
-#: .\templates\building-plan.html:340
-#: .\templates\electricity-new-connection.html:323
-msgid "Industrial"
-msgstr "औद्योगिक"
-
-#: .\templates\building-plan.html:345
-msgid "Number of Floors"
-msgstr "मंजिलों की संख्या"
-
-#: .\templates\building-plan.html:351
-msgid "Upload Building Plan (PDF/DWG - Max 25MB)"
-msgstr "भवन योजना अपलोड करें (PDF/DWG - अधिकतम २५एमबी)"
-
-#: .\templates\building-plan.html:355 .\templates\building-plan.html:453
-msgid "Selected:"
-msgstr "चयनित:"
-
-#: .\templates\building-plan.html:361
-msgid "Submit for Approval"
-msgstr "अनुमोदन के लिए जमा करें"
-
-#: .\templates\death-certificate.html:6
-msgid "Death Certificate - Civic Kiosk"
-msgstr "मृत्यु प्रमाण पत्र - सिविक कियोस्क"
-
-#: .\templates\death-certificate.html:303
-#: .\templates\municipal-services.html:67 .\templates\payment-history.html:100
-msgid "Death Certificate"
-msgstr "मृत्यु प्रमाण पत्र"
-
-#: .\templates\death-certificate.html:314
-msgid "Register within 21 days of death"
-msgstr "मृत्यु के २१ दिनों के भीतर पंजीकरण करें"
-
-#: .\templates\death-certificate.html:317
-msgid "Deceased Full Name"
-msgstr "मृतक का पूरा नाम"
-
-#: .\templates\death-certificate.html:323
-msgid "Date of Death"
-msgstr "मृत्यु तिथि"
-
-#: .\templates\death-certificate.html:329
-msgid "Place of Death"
-msgstr "मृत्यु स्थान"
-
-#: .\templates\death-certificate.html:344
-msgid "Father's/Spouse Name"
-msgstr "पिता/पति का नाम"
-
-#: .\templates\death-certificate.html:350
-msgid "Informant Name"
-msgstr "सूचना देने वाले का नाम"
-
-#: .\templates\death-certificate.html:356
-msgid "Informant Aadhaar"
-msgstr "सूचना देने वाले का आधार"
-
-#: .\templates\death-certificate.html:362
-msgid "Cause of Death"
-msgstr "मृत्यु का कारण"
-
-#: .\templates\document-upload-camera.html:5
-msgid "Camera Upload - Civic Kiosk"
-msgstr "कैमरा अपलोड - सिविक कियोस्क"
-
-#: .\templates\document-upload-camera.html:56
-msgid "Camera Upload"
-msgstr "कैमरा अपलोड"
-
-#: .\templates\document-upload-camera.html:61
-msgid "Capture"
-msgstr "कैप्चर करें"
-
-#: .\templates\document-upload-camera.html:62
-msgid "Switch"
-msgstr "स्विच करें"
-
-#: .\templates\document-upload-camera.html:66
-msgid "Captured Images"
-msgstr "कैप्चर की गई छवियाँ"
-
-#: .\templates\document-upload-camera.html:68
-msgid "Upload All"
-msgstr "सभी अपलोड करें"
-
-#: .\templates\document-upload-camera.html:102
-msgid "Camera access denied or not available"
-msgstr "कैमरा पहुंच अस्वीकृत या उपलब्ध नहीं है"
-
-#: .\templates\document-upload-camera.html:171
-msgid "Please capture at least one image"
-msgstr "कृपया कम से कम एक छवि कैप्चर करें"
-
-#: .\templates\document-upload-camera.html:175
-msgid "Uploading"
-msgstr "अपलोड हो रहा है"
-
-#: .\templates\document-upload-camera.html:175
-msgid "images..."
-msgstr "छवियाँ..."
-
-#: .\templates\document-upload-camera.html:177
-msgid "Images uploaded successfully!"
-msgstr "छवियाँ सफलतापूर्वक अपलोड हो गईं!"
-
-#: .\templates\document-upload-pen.html:6
-msgid "Pen Drive Upload - Civic Kiosk"
-msgstr "पेन ड्राइव अपलोड - सिविक कियोस्क"
-
-#: .\templates\document-upload-pen.html:84
-msgid "Pen Drive Upload"
-msgstr "पेन ड्राइव अपलोड"
-
-#: .\templates\document-upload-pen.html:96
-msgid "Insert Pen Drive to Continue"
-msgstr "जारी रखने के लिए पेन ड्राइव डालें"
-
-#: .\templates\document-upload-pen.html:97
-msgid "No drive detected"
-msgstr "कोई ड्राइव नहीं मिली"
-
-#: .\templates\document-upload-pen.html:102
-msgid "Select Files from Computer"
-msgstr "कंप्यूटर से फ़ाइलें चुनें"
-
-#: .\templates\document-upload-pen.html:111
-msgid "files selected"
-msgstr "फ़ाइलें चयनित"
-
-#: .\templates\document-upload-pen.html:115
-msgid "Upload Documents"
-msgstr "दस्तावेज़ अपलोड करें"
-
-#: .\templates\document-upload-pen.html:116
-msgid "Supported: PDF, JPG, PNG (Max 10 files, 25MB each)"
-msgstr "समर्थित: PDF, JPG, PNG (अधिकतम १० फ़ाइलें, प्रत्येक २५एमबी)"
-
-#: .\templates\document-upload-pen.html:123
-msgid "Uploading..."
-msgstr "अपलोड हो रहा है..."
-
-#: .\templates\document-upload-pen.html:134
-msgid "Pen drive detected:"
-msgstr "पेन ड्राइव का पता चला:"
-
-#: .\templates\document-upload-pen.html:177
-msgid "Maximum"
-msgstr "अधिकतम"
-
-#: .\templates\document-upload-pen.html:177
-msgid "files allowed. You selected"
-msgstr "फ़ाइलें अनुमत हैं। आपने चयन किया"
-
-#: .\templates\document-upload-pen.html:177
-msgid "files."
-msgstr "फ़ाइलें।"
-
-#: .\templates\document-upload-pen.html:187
-msgid "Some files exceed"
-msgstr "कुछ फ़ाइलें अधिक हैं"
-
-#: .\templates\document-upload-pen.html:187
-msgid "limit:"
-msgstr "सीमा:"
-
-#: .\templates\document-upload-pen.html:196
-msgid "Selected Files:"
-msgstr "चयनित फ़ाइलें:"
-
-#: .\templates\document-upload-pen.html:235
-msgid "Please select files to upload"
-msgstr "कृपया अपलोड करने के लिए फ़ाइलें चुनें"
-
-#: .\templates\document-upload-pen.html:257
-msgid "files uploaded successfully!"
-msgstr "फ़ाइलें सफलतापूर्वक अपलोड हो गईं!"
-
-#: .\templates\document-upload-qr.html:6
-msgid "QR Upload - Civic Kiosk"
-msgstr "क्यूआर अपलोड - सिविक कियोस्क"
-
-#: .\templates\document-upload-qr.html:95
-msgid "QR Code Upload"
-msgstr "क्यूआर कोड अपलोड"
-
-#: .\templates\document-upload-qr.html:110
-msgid "Refresh QR Code"
-msgstr "क्यूआर कोड रीफ्रेश करें"
-
-#: .\templates\document-upload-qr.html:112
-msgid "Scan QR code with your phone"
-msgstr "अपने फोन से क्यूआर कोड स्कैन करें"
-
-#: .\templates\document-upload-qr.html:115
-msgid "Open DigiLocker or any scanner app"
-msgstr "DigiLocker या कोई स्कैनर ऐप खोलें"
-
-#: .\templates\document-upload-qr.html:116
-msgid "Scan this QR code"
-msgstr "इस क्यूआर कोड को स्कैन करें"
-
-#: .\templates\document-upload-qr.html:117
-msgid "Upload documents from your phone"
-msgstr "अपने फोन से दस्तावेज़ अपलोड करें"
-
-#: .\templates\document-upload-qr.html:118
-msgid "Documents will appear here automatically"
-msgstr "दस्तावेज़ स्वचालित रूप से यहां दिखाई देंगे"
-
-#: .\templates\document-upload-qr.html:121
-#: .\templates\document-upload-qr.html:217
-msgid "Waiting for upload..."
-msgstr "अपलोड की प्रतीक्षा..."
-
-#: .\templates\document-upload-qr.html:125
-msgid "Received Documents:"
-msgstr "प्राप्त दस्तावेज़:"
-
-#: .\templates\document-upload-qr.html:129
-msgid "Continue to Menu"
-msgstr "मेनू पर जारी रखें"
-
-#: .\templates\document-upload-qr.html:136
-#: .\templates\electricity-bill-payment.html:411
-#: .\templates\electricity-duplicate-bill.html:243
-#: .\templates\electricity-load-enhancement.html:222
-#: .\templates\electricity-meter-replacement.html:200
-#: .\templates\electricity-name-transfer.html:354
-#: .\templates\electricity-new-connection.html:348
+#: .\templates\auth.html:747 .\templates\document-upload-qr.html:314
+#: .\templates\electricity-bill-payment.html:731
+#: .\templates\electricity-duplicate-bill.html:492
+#: .\templates\electricity-load-enhancement.html:535
+#: .\templates\electricity-meter-replacement.html:463
+#: .\templates\electricity-name-transfer.html:788
+#: .\templates\electricity-new-connection.html:586
+#: .\templates\electricity-solar.html:488
+#: .\templates\gas-cylinder-booking.html:425
+#: .\templates\gas-new-connection.html:427 .\templates\gas-subsidy.html:448
+#: .\templates\marriage-registration.html:397
+#: .\templates\professional-tax.html:575 .\templates\property-tax.html:573
+#: .\templates\receipt-print.html:406 .\templates\trade-license.html:424
+#: .\templates\water-bill.html:644
 msgid "Processing..."
 msgstr "प्रक्रिया हो रही है..."
 
-#: .\templates\document-upload-qr.html:182
-msgid "documents received successfully via QR scan!"
-msgstr "क्यूआर स्कैन के माध्यम से दस्तावेज़ सफलतापूर्वक प्राप्त हुए!"
+#: .\templates\auth.html:759
+#, fuzzy
+#| msgid "Processing..."
+msgid "Processing"
+msgstr "प्रक्रिया हो रही है..."
 
-#: .\templates\electricity-bill-payment.html:6
-msgid "Electricity Bill Payment - Civic Kiosk"
-msgstr "बिजली बिल भुगतान - सिविक कियोस्क"
+#: .\templates\auth.html:878
+msgid "Speak now..."
+msgstr ""
 
-#: .\templates\electricity-bill-payment.html:380
-#: .\templates\payment-history.html:93
-msgid "Electricity Bill"
-msgstr "बिजली बिल"
+#: .\templates\auth.html:1056
+#, fuzzy
+#| msgid "Aadhaar Card"
+msgid "Aadhaar cleared"
+msgstr "आधार कार्ड"
 
-#: .\templates\electricity-bill-payment.html:393
-#: .\templates\water-bill.html:77
-msgid "Fetch Bill"
-msgstr "बिल प्राप्त करें"
+#: .\templates\auth.html:1097
+msgid ""
+"Enter your 12-digit Aadhaar number using keypad or voice. Say proceed when "
+"done."
+msgstr ""
 
-#: .\templates\electricity-bill-payment.html:396
-#: .\templates\electricity-load-enhancement.html:188
-#: .\templates\electricity-name-transfer.html:307
-#: .\templates\gas-consumer-lookup.html:100
-#: .\templates\gas-cylinder-booking.html:283 .\templates\gas-subsidy.html:81
-#: .\templates\receipt-print.html:92 .\templates\water-bill.html:82
-msgid "Consumer No:"
-msgstr "उपभोक्ता संख्या:"
+#: .\templates\birth-certificate.html:17
+msgid "Birth Certificate - Civic Kiosk"
+msgstr "जन्म प्रमाण पत्र - सिविक कियोस्क"
 
-#: .\templates\electricity-bill-payment.html:397
-#: .\templates\gas-bill-payment.html:134 .\templates\water-bill.html:90
-msgid "Bill Number:"
-msgstr "बिल संख्या:"
+#: .\templates\birth-certificate.html:187
+#: .\templates\municipal-services.html:354
+#: .\templates\payment-history.html:425
+msgid "Birth Certificate"
+msgstr "जन्म प्रमाण पत्र"
 
-#: .\templates\electricity-bill-payment.html:398
-#: .\templates\electricity-duplicate-bill.html:188
-#: .\templates\electricity-duplicate-bill.html:200
-#: .\templates\electricity-duplicate-bill.html:210
-#: .\templates\electricity-duplicate-bill.html:220
-#: .\templates\gas-bill-payment.html:140 .\templates\water-bill.html:94
-msgid "Bill Date:"
-msgstr "बिल तिथि:"
+#: .\templates\birth-certificate.html:188
+msgid "Apply within 21 days of birth for free registration"
+msgstr "मुफ्त पंजीकरण के लिए जन्म के २१ दिनों के भीतर आवेदन करें"
 
-#: .\templates\electricity-bill-payment.html:399
-#: .\templates\electricity-duplicate-bill.html:189
-#: .\templates\electricity-duplicate-bill.html:201
-#: .\templates\electricity-duplicate-bill.html:211
-#: .\templates\electricity-duplicate-bill.html:221
-#: .\templates\gas-bill-payment.html:145 .\templates\professional-tax.html:96
-#: .\templates\property-tax.html:100 .\templates\water-bill.html:98
-msgid "Due Date:"
-msgstr "नियत तिथि:"
+#: .\templates\birth-certificate.html:194
+msgid "Child's Full Name"
+msgstr "बच्चे का पूरा नाम"
 
-#: .\templates\electricity-bill-payment.html:400
-#: .\templates\water-bill.html:102
-msgid "Units Consumed:"
-msgstr "उपभोग की गई इकाइयाँ:"
+#: .\templates\birth-certificate.html:199
+#: .\templates\marriage-registration.html:417
+#: .\templates\marriage-registration.html:438
+msgid "Date of Birth"
+msgstr "जन्म तिथि"
 
-#: .\templates\electricity-bill-payment.html:402
-#: .\templates\gas-bill-payment.html:157 .\templates\professional-tax.html:113
-#: .\templates\property-tax.html:109 .\templates\water-bill.html:111
-msgid "Pay Now"
-msgstr "अभी भुगतान करें"
+#: .\templates\birth-certificate.html:204
+#: .\templates\death-certificate.html:220
+msgid "Gender"
+msgstr "लिंग"
 
-#: .\templates\electricity-bill-payment.html:415
-msgid "Enter consumer number"
-msgstr "उपभोक्ता संख्या दर्ज करें"
+#: .\templates\birth-certificate.html:206
+#: .\templates\death-certificate.html:223
+msgid "Male"
+msgstr "पुरुष"
 
-#: .\templates\electricity-bill-payment.html:499
-#: .\templates\electricity-complaint.html:249
-#: .\templates\electricity-duplicate-bill.html:343
-msgid "Please enter a valid consumer number (minimum 6 digits)"
-msgstr "कृपया एक वैध उपभोक्ता संख्या दर्ज करें (न्यूनतम ६ अंक)"
+#: .\templates\birth-certificate.html:207
+#: .\templates\death-certificate.html:224
+msgid "Female"
+msgstr "महिला"
 
-#: .\templates\electricity-bill-payment.html:544
-msgid "Pay"
-msgstr "भुगतान करें"
+#: .\templates\birth-certificate.html:208
+#: .\templates\death-certificate.html:225
+#: .\templates\electricity-complaint.html:561
+#: .\templates\electricity-load-enhancement.html:488
+#: .\templates\electricity-meter-replacement.html:350
+#: .\templates\electricity-name-transfer.html:735
+#: .\templates\gas-complaint.html:478 .\templates\grievance.html:498
+#: .\templates\marriage-registration.html:471
+#: .\templates\trade-license.html:445
+msgid "Other"
+msgstr "अन्य"
 
-#: .\templates\electricity-complaint.html:6
-msgid "Electricity Complaint - Civic Kiosk"
-msgstr "बिजली शिकायत - सिविक कियोस्क"
+#: .\templates\birth-certificate.html:213
+msgid "Place of Birth"
+msgstr "जन्म स्थान"
 
-#: .\templates\electricity-complaint.html:180
-#: .\templates\gas-complaint.html:307
-msgid "Lodge Complaint"
-msgstr "शिकायत दर्ज करें"
+#: .\templates\birth-certificate.html:218
+#: .\templates\death-certificate.html:231
+#: .\templates\marriage-registration.html:425
+#: .\templates\marriage-registration.html:446
+msgid "Father's Name"
+msgstr "पिता का नाम"
 
-#: .\templates\electricity-complaint.html:191
-#: .\templates\electricity-meter-replacement.html:140
-#: .\templates\electricity-solar.html:316 .\templates\gas-complaint.html:318
-msgid "Consumer Number"
-msgstr "उपभोक्ता संख्या"
+#: .\templates\birth-certificate.html:223
+#: .\templates\death-certificate.html:236
+msgid "Mother's Name"
+msgstr "माता का नाम"
 
-#: .\templates\electricity-complaint.html:196
-#: .\templates\gas-complaint.html:323
-msgid "Complaint Type"
-msgstr "शिकायत का प्रकार"
+#: .\templates\birth-certificate.html:228
+#: .\templates\death-certificate.html:241
+msgid "Permanent Address"
+msgstr "स्थायी पता"
 
-#: .\templates\electricity-complaint.html:198
-msgid "No Power"
-msgstr "बिजली नहीं"
+#: .\templates\birth-certificate.html:232
+#: .\templates\electricity-new-connection.html:578
+#: .\templates\gas-new-connection.html:496
+msgid "Submit Application"
+msgstr "आवेदन जमा करें"
 
-#: .\templates\electricity-complaint.html:199
-msgid "Voltage Issue"
-msgstr "वोल्टेज समस्या"
+#: .\templates\birth-certificate.html:324
+#, fuzzy
+#| msgid "Preferred date cannot be in the past"
+msgid "Date of birth cannot be in the future"
+msgstr "पसंदीदा तारीख अतीत में नहीं हो सकती"
 
-#: .\templates\electricity-complaint.html:200
-msgid "Meter Problem"
-msgstr "मीटर समस्या"
+#: .\templates\birth-certificate.html:337 .\templates\building-plan.html:346
+#: .\templates\death-certificate.html:360
+#: .\templates\marriage-registration.html:700
+#: .\templates\trade-license.html:699
+msgid "Please fill all required fields"
+msgstr "कृपया सभी आवश्यक फ़ील्ड भरें"
 
-#: .\templates\electricity-complaint.html:201
-#: .\templates\gas-complaint.html:328
-msgid "Billing Issue"
-msgstr "बिलिंग समस्या"
-
-#: .\templates\electricity-complaint.html:202
-msgid "Pole/Wire Issue"
-msgstr "खंभा/तार समस्या"
-
-#: .\templates\electricity-complaint.html:208
-#: .\templates\gas-complaint.html:335
-msgid "Description"
-msgstr "विवरण"
-
-#: .\templates\electricity-complaint.html:209
-msgid "Describe your complaint in detail..."
-msgstr "अपनी शिकायत का विस्तार से वर्णन करें..."
-
-#: .\templates\electricity-complaint.html:212
-#: .\templates\gas-complaint.html:339
-msgid "Submit Complaint"
-msgstr "शिकायत जमा करें"
-
-#: .\templates\electricity-complaint.html:220
-#: .\templates\gas-complaint.html:347
+#: .\templates\birth-certificate.html:345 .\templates\building-plan.html:378
+#: .\templates\death-certificate.html:368
+#: .\templates\electricity-complaint.html:590
+#: .\templates\gas-complaint.html:495 .\templates\grievance.html:448
 msgid "Submitting..."
 msgstr "जमा किया जा रहा है..."
 
-#: .\templates\electricity-complaint.html:224
-#: .\templates\gas-complaint.html:351
-msgid "Type your complaint here..."
-msgstr "अपनी शिकायत यहां टाइप करें..."
+#: .\templates\birth-certificate.html:487
+msgid "Please speak... name, place, father name, mother name, or address"
+msgstr ""
 
-#: .\templates\electricity-complaint.html:242
-msgid "Enter Consumer Number:"
-msgstr "उपभोक्ता संख्या दर्ज करें:"
+#: .\templates\birth-certificate.html:515
+#, fuzzy
+#| msgid "Pen drive detected:"
+msgid "Gender selected: Male"
+msgstr "पेन ड्राइव का पता चला:"
 
-#: .\templates\electricity-complaint.html:288
-#: .\templates\electricity-duplicate-bill.html:285
-#: .\templates\electricity-name-transfer.html:396
-#: .\templates\electricity-new-connection.html:390
-#: .\templates\electricity-solar.html:384
-#: .\templates\gas-booking-status.html:440 .\templates\gas-complaint.html:396
-#: .\templates\gas-new-connection.html:253 .\templates\grievance.html:265
-msgid "Shift"
-msgstr "शिफ्ट"
+#: .\templates\birth-certificate.html:520
+msgid "Gender selected: Female"
+msgstr ""
 
-#: .\templates\electricity-complaint.html:349
-#: .\templates\gas-complaint.html:453
-msgid "Please describe your complaint"
-msgstr "कृपया अपनी शिकायत का वर्णन करें"
+#: .\templates\birth-certificate.html:525
+msgid "Gender selected: Other"
+msgstr ""
 
-#: .\templates\electricity-complaint.html:354
+#: .\templates\birth-certificate.html:542 .\templates\building-plan.html:714
+#: .\templates\death-certificate.html:655
+#, fuzzy
+#| msgid "Last updated:"
+msgid "Field updated"
+msgstr "अंतिम अद्यतन:"
+
+#: .\templates\birth-certificate.html:627 .\templates\building-plan.html:798
+#: .\templates\death-certificate.html:739
+msgid "Field cleared"
+msgstr ""
+
+#: .\templates\birth-certificate.html:649
+msgid ""
+"Birth certificate application form. Fill child name, date of birth, gender, "
+"place of birth, father name, mother name, and permanent address. Press mic "
+"button for voice help."
+msgstr ""
+
+#: .\templates\building-plan.html:17
+msgid "Building Plan Approval - Civic Kiosk"
+msgstr "भवन योजना अनुमोदन - सिविक कियोस्क"
+
+#: .\templates\building-plan.html:194
+msgid "Building Plan Approval"
+msgstr "भवन योजना अनुमोदन"
+
+#: .\templates\building-plan.html:205 .\templates\trade-license.html:449
+msgid "Owner Name"
+msgstr "मालिक का नाम"
+
+#: .\templates\building-plan.html:210
+msgid "Property Address"
+msgstr "संपत्ति का पता"
+
+#: .\templates\building-plan.html:215
+msgid "Survey/Khasra Number"
+msgstr "सर्वे/खसरा संख्या"
+
+#: .\templates\building-plan.html:220
+msgid "Plot Area (sq m)"
+msgstr "प्लॉट क्षेत्र (वर्ग मीटर)"
+
+#: .\templates\building-plan.html:225
+msgid "Building Type"
+msgstr "भवन का प्रकार"
+
+#: .\templates\building-plan.html:235
+msgid "Number of Floors"
+msgstr "मंजिलों की संख्या"
+
+#: .\templates\building-plan.html:240
+msgid "Upload Building Plan (PDF/DWG - Max 25MB)"
+msgstr "भवन योजना अपलोड करें (PDF/DWG - अधिकतम २५एमबी)"
+
+#: .\templates\building-plan.html:245
+msgid "Submit for Approval"
+msgstr "अनुमोदन के लिए जमा करें"
+
+#: .\templates\building-plan.html:334
+msgid "Please upload building plan"
+msgstr ""
+
+#: .\templates\building-plan.html:358
+#, fuzzy
+#| msgid "Please enter a valid consumer number"
+msgid "Please enter valid plot area"
+msgstr "कृपया एक वैध उपभोक्ता संख्या दर्ज करें"
+
+#: .\templates\building-plan.html:370
+#, fuzzy
+#| msgid "Please enter a valid consumer number"
+msgid "Please enter valid number of floors (1-50)"
+msgstr "कृपया एक वैध उपभोक्ता संख्या दर्ज करें"
+
+#: .\templates\building-plan.html:525 .\templates\building-plan.html:529
+#, fuzzy
+#| msgid "Please enter consumer number"
+msgid "Please enter numbers only"
+msgstr "कृपया उपभोक्ता संख्या दर्ज करें"
+
+#: .\templates\building-plan.html:577
+msgid "File size exceeds 25MB limit"
+msgstr ""
+
+#: .\templates\building-plan.html:588
+msgid "Only PDF and DWG files are allowed"
+msgstr ""
+
+#: .\templates\building-plan.html:597
+#, fuzzy
+#| msgid "files selected"
+msgid "File selected"
+msgstr "फ़ाइलें चयनित"
+
+#: .\templates\building-plan.html:642
+msgid ""
+"Please speak... owner name, address, survey number, plot area, or number of "
+"floors"
+msgstr ""
+
+#: .\templates\building-plan.html:671
+#, fuzzy
+#| msgid "Residential"
+msgid "Selected Residential"
+msgstr "आवासीय"
+
+#: .\templates\building-plan.html:676
+#, fuzzy
+#| msgid "Commercial"
+msgid "Selected Commercial"
+msgstr "वाणिज्यिक"
+
+#: .\templates\building-plan.html:681
+#, fuzzy
+#| msgid "Selected Files:"
+msgid "Selected Mixed Use"
+msgstr "चयनित फ़ाइलें:"
+
+#: .\templates\building-plan.html:686
+#, fuzzy
+#| msgid "Industrial"
+msgid "Selected Industrial"
+msgstr "औद्योगिक"
+
+#: .\templates\building-plan.html:693
+#, fuzzy
+#| msgid "Please select files to upload"
+msgid "Please select file to upload"
+msgstr "कृपया अपलोड करने के लिए फ़ाइलें चुनें"
+
+#: .\templates\building-plan.html:820
+msgid ""
+"Building plan approval application. Fill owner name, property address, "
+"survey number, plot area, building type, and number of floors. Finally "
+"upload building plan. Press mic button for voice help."
+msgstr ""
+
+#: .\templates\death-certificate.html:17
+msgid "Death Certificate - Civic Kiosk"
+msgstr "मृत्यु प्रमाण पत्र - सिविक कियोस्क"
+
+#: .\templates\death-certificate.html:191
+#: .\templates\municipal-services.html:355
+#: .\templates\payment-history.html:426
+msgid "Death Certificate"
+msgstr "मृत्यु प्रमाण पत्र"
+
+#: .\templates\death-certificate.html:201
+#, fuzzy
+#| msgid "Register within 21 days of death"
+msgid "Please register within 21 days of death"
+msgstr "मृत्यु के २१ दिनों के भीतर पंजीकरण करें"
+
+#: .\templates\death-certificate.html:205
+msgid "Deceased Full Name"
+msgstr "मृतक का पूरा नाम"
+
+#: .\templates\death-certificate.html:210
+msgid "Date of Death"
+msgstr "मृत्यु तिथि"
+
+#: .\templates\death-certificate.html:215
+msgid "Place of Death"
+msgstr "मृत्यु स्थान"
+
+#: .\templates\death-certificate.html:222
+#, fuzzy
+#| msgid "Selected:"
+msgid "Select Gender"
+msgstr "चयनित:"
+
+#: .\templates\death-certificate.html:246
+msgid "Cause of Death"
+msgstr "मृत्यु का कारण"
+
+#: .\templates\death-certificate.html:250
+#, fuzzy
+#| msgid "Register Marriage"
+msgid "Register Death"
+msgstr "विवाह पंजीकृत करें"
+
+#: .\templates\death-certificate.html:256
+#: .\templates\electricity-complaint.html:599
+#: .\templates\electricity-name-transfer.html:793
+#: .\templates\electricity-new-connection.html:591
+#: .\templates\electricity-solar.html:493
+#: .\templates\gas-bill-payment.html:630
+#: .\templates\gas-new-connection.html:503 .\templates\grievance.html:530
+#: .\templates\marriage-registration.html:496
+#: .\templates\trade-license.html:483
+msgid "Type here..."
+msgstr "यहां टाइप करें..."
+
+#: .\templates\death-certificate.html:346
+#, fuzzy
+#| msgid "Preferred date cannot be in the past"
+msgid "Date of death cannot be in the future"
+msgstr "पसंदीदा तारीख अतीत में नहीं हो सकती"
+
+#: .\templates\death-certificate.html:595
+msgid ""
+"Please speak... deceased name, place of death, father name, mother name, "
+"address, or cause of death"
+msgstr ""
+
+#: .\templates\death-certificate.html:624
+#, fuzzy
+#| msgid "Selected Files:"
+msgid "Selected Male"
+msgstr "चयनित फ़ाइलें:"
+
+#: .\templates\death-certificate.html:629
+#, fuzzy
+#| msgid "Selected Files:"
+msgid "Selected Female"
+msgstr "चयनित फ़ाइलें:"
+
+#: .\templates\death-certificate.html:634
+#, fuzzy
+#| msgid "Selected:"
+msgid "Selected Other"
+msgstr "चयनित:"
+
+#: .\templates\death-certificate.html:761
+msgid ""
+"Death certificate application. Fill deceased name, date of death, place of "
+"death, gender, father name, mother name, permanent address, and cause of "
+"death. Press mic button for voice help."
+msgstr ""
+
+#: .\templates\document-upload-camera.html:17
+msgid "Camera Upload - Civic Kiosk"
+msgstr "कैमरा अपलोड - सिविक कियोस्क"
+
+#: .\templates\document-upload-camera.html:177
+msgid "Camera Upload"
+msgstr "कैमरा अपलोड"
+
+#: .\templates\document-upload-camera.html:184
+#, fuzzy
+#| msgid "Capture"
+msgid "Capture photo"
+msgstr "कैप्चर करें"
+
+#: .\templates\document-upload-camera.html:184
+msgid "Capture"
+msgstr "कैप्चर करें"
+
+#: .\templates\document-upload-camera.html:185
+#, fuzzy
+#| msgid "Switch"
+msgid "Switch camera"
+msgstr "स्विच करें"
+
+#: .\templates\document-upload-camera.html:185
+msgid "Switch"
+msgstr "स्विच करें"
+
+#: .\templates\document-upload-camera.html:189
+msgid "Captured Images"
+msgstr "कैप्चर की गई छवियाँ"
+
+#: .\templates\document-upload-camera.html:191
+#, fuzzy
+#| msgid "Upload All"
+msgid "Upload all images"
+msgstr "सभी अपलोड करें"
+
+#: .\templates\document-upload-camera.html:191
+msgid "Upload All"
+msgstr "सभी अपलोड करें"
+
+#: .\templates\document-upload-camera.html:427
+msgid "Remove image"
+msgstr ""
+
+#: .\templates\document-upload-camera.html:470
+#: .\templates\document-upload-pen.html:203
+#: .\templates\document-upload-pen.html:495
+msgid "Uploading..."
+msgstr "अपलोड हो रहा है..."
+
+#: .\templates\document-upload-camera.html:551
+msgid "Please say a command... capture, switch, upload, or remove"
+msgstr ""
+
+#: .\templates\document-upload-pen.html:17
+msgid "Pen Drive Upload - Civic Kiosk"
+msgstr "पेन ड्राइव अपलोड - सिविक कियोस्क"
+
+#: .\templates\document-upload-pen.html:169
+msgid "Pen Drive Upload"
+msgstr "पेन ड्राइव अपलोड"
+
+#: .\templates\document-upload-pen.html:180
+msgid "Insert Pen Drive to Continue"
+msgstr "जारी रखने के लिए पेन ड्राइव डालें"
+
+#: .\templates\document-upload-pen.html:181
+msgid "No drive detected"
+msgstr "कोई ड्राइव नहीं मिली"
+
+#: .\templates\document-upload-pen.html:184
+#, fuzzy
+#| msgid "Selected Files:"
+msgid "Select files"
+msgstr "चयनित फ़ाइलें:"
+
+#: .\templates\document-upload-pen.html:185
+msgid "Select Files from Computer"
+msgstr "कंप्यूटर से फ़ाइलें चुनें"
+
+#: .\templates\document-upload-pen.html:192
+msgid "files selected"
+msgstr "फ़ाइलें चयनित"
+
+#: .\templates\document-upload-pen.html:196
+#, fuzzy
+#| msgid "Upload Documents"
+msgid "Upload documents"
+msgstr "दस्तावेज़ अपलोड करें"
+
+#: .\templates\document-upload-pen.html:196
+#: .\templates\electricity-name-transfer.html:661
+msgid "Upload Documents"
+msgstr "दस्तावेज़ अपलोड करें"
+
+#: .\templates\document-upload-pen.html:442
+msgid "Remove file"
+msgstr ""
+
+#: .\templates\document-upload-pen.html:559
+#, fuzzy
+#| msgid "Please select files to upload"
+msgid "Please say a command... select files, upload, or back"
+msgstr "कृपया अपलोड करने के लिए फ़ाइलें चुनें"
+
+#: .\templates\document-upload-qr.html:17
+msgid "QR Upload - Civic Kiosk"
+msgstr "क्यूआर अपलोड - सिविक कियोस्क"
+
+#: .\templates\document-upload-qr.html:288
+msgid "QR Code Upload"
+msgstr "क्यूआर कोड अपलोड"
+
+#: .\templates\document-upload-qr.html:297 .\templates\receipt-print.html:457
+msgid "QR Code"
+msgstr "क्यूआर कोड"
+
+#: .\templates\document-upload-qr.html:297
+#: .\templates\document-upload-qr.html:519
+msgid "QR"
+msgstr ""
+
+#: .\templates\document-upload-qr.html:300
+#, fuzzy
+#| msgid "Refresh QR Code"
+msgid "Refresh QR code"
+msgstr "क्यूआर कोड रीफ्रेश करें"
+
+#: .\templates\document-upload-qr.html:300
+msgid "Refresh QR Code"
+msgstr "क्यूआर कोड रीफ्रेश करें"
+
+#: .\templates\document-upload-qr.html:302
+msgid "Waiting for upload..."
+msgstr "अपलोड की प्रतीक्षा..."
+
+#: .\templates\document-upload-qr.html:308
+#, fuzzy
+#| msgid "Continue to Menu"
+msgid "Continue to menu"
+msgstr "मेनू पर जारी रखें"
+
+#: .\templates\document-upload-qr.html:308
+msgid "Continue to Menu"
+msgstr "मेनू पर जारी रखें"
+
+#: .\templates\document-upload-qr.html:469
+#, fuzzy
+#| msgid "Document Type"
+msgid "Document"
+msgstr "दस्तावेज़ प्रकार"
+
+#: .\templates\document-upload-qr.html:470
+msgid "Photo"
+msgstr ""
+
+#: .\templates\document-upload-qr.html:471
+msgid "Form"
+msgstr ""
+
+#: .\templates\document-upload-qr.html:472
+#, fuzzy
+#| msgid "Birth Certificate"
+msgid "Certificate"
+msgstr "जन्म प्रमाण पत्र"
+
+#: .\templates\document-upload-qr.html:473
+#: .\templates\electricity-name-transfer.html:675
+msgid "ID Proof"
+msgstr ""
+
+#: .\templates\document-upload-qr.html:474
+#: .\templates\electricity-name-transfer.html:680
+#, fuzzy
+#| msgid "Address"
+msgid "Address Proof"
+msgstr "पता"
+
+#: .\templates\electricity-bill-payment.html:17
+msgid "Electricity Bill Payment - Civic Kiosk"
+msgstr "बिजली बिल भुगतान - सिविक कियोस्क"
+
+#: .\templates\electricity-bill-payment.html:656
+#: .\templates\payment-history.html:419
+msgid "Electricity Bill"
+msgstr "बिजली बिल"
+
+#: .\templates\electricity-bill-payment.html:674
+#, fuzzy
+#| msgid "Fetch Bill"
+msgid "Fetch bill"
+msgstr "बिल प्राप्त करें"
+
+#: .\templates\electricity-bill-payment.html:674
+#: .\templates\water-bill.html:563
+msgid "Fetch Bill"
+msgstr "बिल प्राप्त करें"
+
+#: .\templates\electricity-bill-payment.html:677
+#: .\templates\electricity-load-enhancement.html:449
+#: .\templates\electricity-name-transfer.html:651
+#: .\templates\gas-consumer-lookup.html:490
+#: .\templates\gas-cylinder-booking.html:473 .\templates\gas-subsidy.html:465
+#: .\templates\receipt-print.html:432 .\templates\water-bill.html:568
+msgid "Consumer No:"
+msgstr "उपभोक्ता संख्या:"
+
+#: .\templates\electricity-bill-payment.html:678
+#: .\templates\electricity-duplicate-bill.html:459
+#: .\templates\gas-bill-payment.html:551 .\templates\water-bill.html:576
+msgid "Bill Number:"
+msgstr "बिल संख्या:"
+
+#: .\templates\electricity-bill-payment.html:679
+#: .\templates\electricity-duplicate-bill.html:463
+#: .\templates\gas-bill-payment.html:556 .\templates\water-bill.html:580
+msgid "Bill Date:"
+msgstr "बिल तिथि:"
+
+#: .\templates\electricity-bill-payment.html:680
+#: .\templates\electricity-duplicate-bill.html:467
+#: .\templates\gas-bill-payment.html:561 .\templates\professional-tax.html:608
+#: .\templates\property-tax.html:610 .\templates\water-bill.html:584
+msgid "Due Date:"
+msgstr "नियत तिथि:"
+
+#: .\templates\electricity-bill-payment.html:681
+#: .\templates\electricity-duplicate-bill.html:471
+#: .\templates\water-bill.html:588
+msgid "Units Consumed:"
+msgstr "उपभोग की गई इकाइयाँ:"
+
+#: .\templates\electricity-bill-payment.html:686
+#: .\templates\professional-tax.html:623 .\templates\property-tax.html:617
+#: .\templates\water-bill.html:595
+#, fuzzy
+#| msgid "Payment Mode:"
+msgid "Select Payment Method"
+msgstr "भुगतान मोड:"
+
+#: .\templates\electricity-bill-payment.html:688
+#: .\templates\gas-bill-payment.html:575 .\templates\professional-tax.html:625
+#: .\templates\property-tax.html:619 .\templates\water-bill.html:597
+msgid "UPI"
+msgstr ""
+
+#: .\templates\electricity-bill-payment.html:689
+#: .\templates\gas-bill-payment.html:576 .\templates\professional-tax.html:626
+#: .\templates\property-tax.html:620 .\templates\water-bill.html:598
+#, fuzzy
+#| msgid "Aadhaar Card"
+msgid "ATM Card"
+msgstr "आधार कार्ड"
+
+#: .\templates\electricity-bill-payment.html:698
+#: .\templates\professional-tax.html:635 .\templates\property-tax.html:629
+#: .\templates\water-bill.html:607
+#, fuzzy
+#| msgid "Scan QR code with your phone"
+msgid "Scan this QR code with any UPI app to pay"
+msgstr "अपने फोन से क्यूआर कोड स्कैन करें"
+
+#: .\templates\electricity-bill-payment.html:706
+#: .\templates\gas-bill-payment.html:591 .\templates\professional-tax.html:643
+#: .\templates\property-tax.html:637 .\templates\water-bill.html:615
+#, fuzzy
+#| msgid "Consumer Number"
+msgid "Card Number"
+msgstr "उपभोक्ता संख्या"
+
+#: .\templates\electricity-bill-payment.html:707
+#, fuzzy
+#| msgid "Consumer Number"
+msgid "Card number"
+msgstr "उपभोक्ता संख्या"
+
+#: .\templates\electricity-bill-payment.html:711
+#: .\templates\electricity-bill-payment.html:712
+#: .\templates\gas-bill-payment.html:598 .\templates\professional-tax.html:648
+#: .\templates\property-tax.html:642 .\templates\water-bill.html:620
+msgid "CVV"
+msgstr ""
+
+#: .\templates\electricity-bill-payment.html:715
+#: .\templates\electricity-bill-payment.html:716
+#: .\templates\gas-bill-payment.html:604 .\templates\professional-tax.html:652
+#: .\templates\property-tax.html:646 .\templates\water-bill.html:624
+#, fuzzy
+#| msgid "PTIN:"
+msgid "PIN"
+msgstr "पीटीआईएन:"
+
+#: .\templates\electricity-bill-payment.html:722
+#, fuzzy
+#| msgid "Pay Now"
+msgid "Pay now"
+msgstr "अभी भुगतान करें"
+
+#: .\templates\electricity-bill-payment.html:722
+#: .\templates\electricity-duplicate-bill.html:478
+#: .\templates\gas-bill-payment.html:622 .\templates\professional-tax.html:659
+#: .\templates\property-tax.html:653 .\templates\water-bill.html:631
+msgid "Pay Now"
+msgstr "अभी भुगतान करें"
+
+#: .\templates\electricity-bill-payment.html:740
+#: .\templates\professional-tax.html:666 .\templates\property-tax.html:660
+#: .\templates\water-bill.html:638
+#, fuzzy
+#| msgid "Enter Full Name"
+msgid "Enter value"
+msgstr "पूरा नाम दर्ज करें"
+
+#: .\templates\electricity-bill-payment.html:889
+#: .\templates\electricity-complaint.html:763
+#: .\templates\electricity-duplicate-bill.html:646
+#: .\templates\electricity-meter-replacement.html:616
+#: .\templates\electricity-name-transfer.html:963
+#: .\templates\electricity-new-connection.html:766
+#: .\templates\electricity-solar.html:618
+#: .\templates\gas-bill-payment.html:790
+#: .\templates\gas-booking-status.html:680 .\templates\gas-complaint.html:648
+#: .\templates\gas-new-connection.html:631 .\templates\gas-subsidy.html:606
+#: .\templates\grievance.html:656 .\templates\professional-tax.html:771
+#: .\templates\property-tax.html:765 .\templates\trade-license.html:593
+#: .\templates\water-bill.html:749
+msgid "Clear"
+msgstr "साफ़ करें"
+
+#: .\templates\electricity-bill-payment.html:891
+#: .\templates\electricity-complaint.html:764
+#: .\templates\electricity-duplicate-bill.html:648
+#: .\templates\electricity-meter-replacement.html:618
+#: .\templates\electricity-name-transfer.html:964
+#: .\templates\electricity-new-connection.html:767
+#: .\templates\electricity-solar.html:619
+#: .\templates\gas-bill-payment.html:791
+#: .\templates\gas-booking-status.html:681 .\templates\gas-complaint.html:649
+#: .\templates\gas-new-connection.html:632 .\templates\gas-subsidy.html:608
+#: .\templates\grievance.html:657 .\templates\professional-tax.html:773
+#: .\templates\property-tax.html:767 .\templates\trade-license.html:594
+#: .\templates\water-bill.html:751
+msgid "OK"
+msgstr "ठीक है"
+
+#: .\templates\electricity-bill-payment.html:999
+#, fuzzy
+#| msgid "Payment Receipt"
+msgid "UPI payment selected"
+msgstr "भुगतान रसीद"
+
+#: .\templates\electricity-bill-payment.html:1005
+msgid "ATM card payment selected"
+msgstr ""
+
+#: .\templates\electricity-bill-payment.html:1030
+#: .\templates\electricity-duplicate-bill.html:726
 msgid "Please enter a valid consumer number"
 msgstr "कृपया एक वैध उपभोक्ता संख्या दर्ज करें"
 
-#: .\templates\electricity-duplicate-bill.html:6
+#: .\templates\electricity-bill-payment.html:1037
+#, fuzzy
+#| msgid "Fetch Tax Details"
+msgid "Fetching bill details"
+msgstr "कर विवरण प्राप्त करें"
+
+#: .\templates\electricity-bill-payment.html:1073
+msgid "Bill details fetched"
+msgstr ""
+
+#: .\templates\electricity-bill-payment.html:1095
+#, fuzzy
+#| msgid "Please fill all required fields"
+msgid "Please fill all card details"
+msgstr "कृपया सभी आवश्यक फ़ील्ड भरें"
+
+#: .\templates\electricity-bill-payment.html:1100
+msgid "Invalid card number"
+msgstr ""
+
+#: .\templates\electricity-bill-payment.html:1105
+msgid "Invalid CVV"
+msgstr ""
+
+#: .\templates\electricity-bill-payment.html:1110
+msgid "Invalid PIN"
+msgstr ""
+
+#: .\templates\electricity-bill-payment.html:1116
+msgid "Pay"
+msgstr "भुगतान करें"
+
+#: .\templates\electricity-bill-payment.html:1133
+#: .\templates\professional-tax.html:956 .\templates\property-tax.html:950
+#: .\templates\water-bill.html:915
+#, fuzzy
+#| msgid "Processing..."
+msgid "Processing payment"
+msgstr "प्रक्रिया हो रही है..."
+
+#: .\templates\electricity-bill-payment.html:1183
+#: .\templates\water-bill.html:974
+msgid "Please say a command... consumer number, fetch bill, UPI, ATM, or pay"
+msgstr ""
+
+#: .\templates\electricity-bill-payment.html:1213
+#: .\templates\electricity-bill-payment.html:1314
+#, fuzzy
+#| msgid "Consumer Number"
+msgid "Consumer number entered"
+msgstr "उपभोक्ता संख्या"
+
+#: .\templates\electricity-bill-payment.html:1238
+#: .\templates\electricity-bill-payment.html:1339
+#: .\templates\water-bill.html:1039 .\templates\water-bill.html:1141
+#, fuzzy
+#| msgid "Please enter mobile number"
+msgid "Please fetch bill first"
+msgstr "कृपया मोबाइल नंबर दर्ज करें"
+
+#: .\templates\electricity-bill-payment.html:1373
+msgid ""
+"Electricity bill payment page. Enter consumer number, say fetch bill, then "
+"select UPI or ATM and say pay."
+msgstr ""
+
+#: .\templates\electricity-complaint.html:17
+msgid "Electricity Complaint - Civic Kiosk"
+msgstr "बिजली शिकायत - सिविक कियोस्क"
+
+#: .\templates\electricity-complaint.html:515
+#: .\templates\gas-complaint.html:455
+msgid "Lodge Complaint"
+msgstr "शिकायत दर्ज करें"
+
+#: .\templates\electricity-complaint.html:528
+#: .\templates\electricity-meter-replacement.html:338
+#: .\templates\electricity-solar.html:454 .\templates\gas-complaint.html:466
+msgid "Consumer Number"
+msgstr "उपभोक्ता संख्या"
+
+#: .\templates\electricity-complaint.html:529
+#: .\templates\electricity-duplicate-bill.html:441
+#: .\templates\electricity-meter-replacement.html:339
+#, fuzzy
+#| msgid "Consumer Number"
+msgid "Consumer number"
+msgstr "उपभोक्ता संख्या"
+
+#: .\templates\electricity-complaint.html:534
+msgid "Contact Phone"
+msgstr ""
+
+#: .\templates\electricity-complaint.html:534
+msgid "for updates"
+msgstr ""
+
+#: .\templates\electricity-complaint.html:535
+#, fuzzy
+#| msgid "Please enter 10-digit mobile number"
+msgid "10-digit mobile number"
+msgstr "कृपया १०-अंकीय मोबाइल नंबर दर्ज करें"
+
+#: .\templates\electricity-complaint.html:535
+#, fuzzy
+#| msgid "Enter consumer number"
+msgid "Contact phone number"
+msgstr "उपभोक्ता संख्या दर्ज करें"
+
+#: .\templates\electricity-complaint.html:540
+#, fuzzy
+#| msgid "Complaint Type"
+msgid "Complaint Priority"
+msgstr "शिकायत का प्रकार"
+
+#: .\templates\electricity-complaint.html:542
+msgid "Normal"
+msgstr ""
+
+#: .\templates\electricity-complaint.html:543
+msgid "Urgent"
+msgstr ""
+
+#: .\templates\electricity-complaint.html:544
+msgid "Emergency"
+msgstr ""
+
+#: .\templates\electricity-complaint.html:550
+#: .\templates\electricity-complaint.html:897
+msgid "Estimated response: Within 24 hours"
+msgstr ""
+
+#: .\templates\electricity-complaint.html:554
+#: .\templates\gas-complaint.html:471
+msgid "Complaint Type"
+msgstr "शिकायत का प्रकार"
+
+#: .\templates\electricity-complaint.html:556
+msgid "No Power"
+msgstr "बिजली नहीं"
+
+#: .\templates\electricity-complaint.html:557
+msgid "Voltage Issue"
+msgstr "वोल्टेज समस्या"
+
+#: .\templates\electricity-complaint.html:558
+msgid "Meter Problem"
+msgstr "मीटर समस्या"
+
+#: .\templates\electricity-complaint.html:559
+#: .\templates\gas-complaint.html:476
+msgid "Billing Issue"
+msgstr "बिलिंग समस्या"
+
+#: .\templates\electricity-complaint.html:560
+msgid "Pole/Wire Issue"
+msgstr "खंभा/तार समस्या"
+
+#: .\templates\electricity-complaint.html:566
+#: .\templates\gas-complaint.html:483
+msgid "Description"
+msgstr "विवरण"
+
+#: .\templates\electricity-complaint.html:567
+msgid "Describe your complaint in detail..."
+msgstr "अपनी शिकायत का विस्तार से वर्णन करें..."
+
+#: .\templates\electricity-complaint.html:574
+msgid "Emergency Helpline:"
+msgstr ""
+
+#: .\templates\electricity-complaint.html:578
+msgid "Power Failure:"
+msgstr ""
+
+#: .\templates\electricity-complaint.html:582
+#, fuzzy
+#| msgid "Submit Complaint"
+msgid "Submit complaint"
+msgstr "शिकायत जमा करें"
+
+#: .\templates\electricity-complaint.html:582
+#: .\templates\gas-complaint.html:487
+msgid "Submit Complaint"
+msgstr "शिकायत जमा करें"
+
+#: .\templates\electricity-complaint.html:748
+#: .\templates\electricity-name-transfer.html:948
+#: .\templates\electricity-new-connection.html:751
+#: .\templates\electricity-solar.html:606
+#: .\templates\gas-bill-payment.html:778 .\templates\gas-complaint.html:636
+#: .\templates\gas-new-connection.html:629 .\templates\grievance.html:654
+#: .\templates\trade-license.html:581
+msgid "Space"
+msgstr "स्पेस"
+
+#: .\templates\electricity-complaint.html:761
+#: .\templates\electricity-name-transfer.html:961
+#: .\templates\electricity-new-connection.html:764
+#: .\templates\electricity-solar.html:616
+#: .\templates\gas-bill-payment.html:788
+#: .\templates\gas-booking-status.html:678 .\templates\gas-complaint.html:646
+#: .\templates\gas-new-connection.html:628 .\templates\grievance.html:653
+#: .\templates\trade-license.html:591
+msgid "Shift"
+msgstr "शिफ्ट"
+
+#: .\templates\electricity-complaint.html:889
+msgid "Estimated response: Within 30 minutes"
+msgstr ""
+
+#: .\templates\electricity-complaint.html:893
+msgid "Estimated response: Within 4 hours"
+msgstr ""
+
+#: .\templates\electricity-complaint.html:1044
+msgid ""
+"Please say a command... consumer number, phone number, priority, complaint "
+"type, description, or submit"
+msgstr ""
+
+#: .\templates\electricity-complaint.html:1313
+msgid ""
+"Electricity complaint page. Enter consumer number, phone number, priority, "
+"complaint type, then say submit."
+msgstr ""
+
+#: .\templates\electricity-duplicate-bill.html:17
 msgid "Duplicate Bill - Civic Kiosk"
 msgstr "डुप्लिकेट बिल - सिविक कियोस्क"
 
-#: .\templates\electricity-duplicate-bill.html:168
-#: .\templates\electricity-services.html:110
+#: .\templates\electricity-duplicate-bill.html:427
+#: .\templates\electricity-services.html:317
 msgid "Duplicate Bill"
 msgstr "डुप्लिकेट बिल"
 
-#: .\templates\electricity-duplicate-bill.html:177
-#: .\templates\gas-subsidy.html:74 .\templates\water-bill.html:75
+#: .\templates\electricity-duplicate-bill.html:441
+#: .\templates\gas-subsidy.html:458 .\templates\water-bill.html:561
 msgid "Enter Consumer No."
 msgstr "उपभोक्ता संख्या दर्ज करें"
 
-#: .\templates\electricity-duplicate-bill.html:179
-#: .\templates\gas-booking-status.html:330
-#: .\templates\professional-tax.html:74
+#: .\templates\electricity-duplicate-bill.html:442
+#, fuzzy
+#| msgid "Search"
+msgid "Search bills"
+msgstr "खोजें"
+
+#: .\templates\electricity-duplicate-bill.html:442
+#: .\templates\gas-booking-status.html:481
+#: .\templates\professional-tax.html:586
 msgid "Search"
 msgstr "खोजें"
 
-#: .\templates\electricity-duplicate-bill.html:192
-#: .\templates\electricity-duplicate-bill.html:204
-#: .\templates\electricity-duplicate-bill.html:214
-#: .\templates\electricity-duplicate-bill.html:224
+#: .\templates\electricity-duplicate-bill.html:447
+msgid "Show all bills"
+msgstr ""
+
+#: .\templates\electricity-duplicate-bill.html:447
+msgid "All"
+msgstr ""
+
+#: .\templates\electricity-duplicate-bill.html:448
+msgid "Show 2026 bills"
+msgstr ""
+
+#: .\templates\electricity-duplicate-bill.html:449
+msgid "Show 2025 bills"
+msgstr ""
+
+#: .\templates\electricity-duplicate-bill.html:475
+#, fuzzy
+#| msgid "Total Amount:"
+msgid "Amount:"
+msgstr "कुल राशि:"
+
+#: .\templates\electricity-duplicate-bill.html:478
+msgid "Pay this bill"
+msgstr ""
+
+#: .\templates\electricity-duplicate-bill.html:497
+#: .\templates\electricity-meter-replacement.html:468
+#: .\templates\gas-subsidy.html:507
+msgid "Enter consumer number"
+msgstr "उपभोक्ता संख्या दर्ज करें"
+
+#: .\templates\electricity-duplicate-bill.html:766
+#, fuzzy
+#| msgid "Selected:"
+msgid "Select"
+msgstr "चयनित:"
+
+#: .\templates\electricity-duplicate-bill.html:766
+#, fuzzy
+#| msgid "cylinder for ₹"
+msgid "bill for ₹"
+msgstr "₹ में सिलेंडर"
+
+#: .\templates\electricity-duplicate-bill.html:778
 msgid "Download"
 msgstr "डाउनलोड"
 
-#: .\templates\electricity-duplicate-bill.html:199
-#: .\templates\electricity-duplicate-bill.html:204
-msgid "February 2026"
-msgstr "फरवरी २०२६"
+#: .\templates\electricity-duplicate-bill.html:778
+msgid "bill"
+msgstr ""
 
-#: .\templates\electricity-duplicate-bill.html:209
-#: .\templates\electricity-duplicate-bill.html:214
-msgid "January 2026"
-msgstr "जनवरी २०२६"
+#: .\templates\electricity-duplicate-bill.html:860
+#: .\templates\electricity-duplicate-bill.html:882
+#, fuzzy
+#| msgid "Download"
+msgid "Downloading"
+msgstr "डाउनलोड"
 
-#: .\templates\electricity-duplicate-bill.html:219
-#: .\templates\electricity-duplicate-bill.html:224
-msgid "December 2025"
-msgstr "दिसंबर २०२५"
+#: .\templates\electricity-duplicate-bill.html:956
+msgid ""
+"Please say a command... consumer number, search, filter, download, or pay"
+msgstr ""
 
-#: .\templates\electricity-duplicate-bill.html:247
-msgid "Enter Consumer Number"
-msgstr "उपभोक्ता संख्या दर्ज करें"
+#: .\templates\electricity-duplicate-bill.html:1201
+msgid ""
+"Duplicate bill page. Enter consumer number or say number, then say search. "
+"Say month to view bill, download to download, pay to make payment."
+msgstr ""
 
-#: .\templates\electricity-duplicate-bill.html:367
-msgid "Downloading bill for"
-msgstr "के लिए बिल डाउनलोड हो रहा है"
-
-#: .\templates\electricity-load-enhancement.html:6
+#: .\templates\electricity-load-enhancement.html:17
 msgid "Load Enhancement - Civic Kiosk"
 msgstr "लोड संवर्धन - सिविक कियोस्क"
 
-#: .\templates\electricity-load-enhancement.html:171
-#: .\templates\electricity-services.html:106
+#: .\templates\electricity-load-enhancement.html:431
+#: .\templates\electricity-services.html:313
 msgid "Load Enhancement"
 msgstr "लोड संवर्धन"
 
-#: .\templates\electricity-load-enhancement.html:184
+#: .\templates\electricity-load-enhancement.html:445
+#: .\templates\electricity-load-enhancement.html:462
 msgid "Current Load:"
 msgstr "वर्तमान लोड:"
 
-#: .\templates\electricity-load-enhancement.html:194
+#: .\templates\electricity-load-enhancement.html:457
+#, fuzzy
+#| msgid "Selected:"
+msgid "Select Load:"
+msgstr "चयनित:"
+
+#: .\templates\electricity-load-enhancement.html:460
+msgid "Load slider"
+msgstr ""
+
+#: .\templates\electricity-load-enhancement.html:462
+msgid "Increase by:"
+msgstr ""
+
+#: .\templates\electricity-load-enhancement.html:468
+#, fuzzy
+#| msgid "Enter load in kW"
+msgid "Set load to 5 kW"
+msgstr "किलोवाट में लोड दर्ज करें"
+
+#: .\templates\electricity-load-enhancement.html:469
+msgid "Set load to 7.5 kW"
+msgstr ""
+
+#: .\templates\electricity-load-enhancement.html:470
+#, fuzzy
+#| msgid "Enter load in kW"
+msgid "Set load to 10 kW"
+msgstr "किलोवाट में लोड दर्ज करें"
+
+#: .\templates\electricity-load-enhancement.html:471
+msgid "Set load to 12.5 kW"
+msgstr ""
+
+#: .\templates\electricity-load-enhancement.html:472
+#, fuzzy
+#| msgid "Enter load in kW"
+msgid "Set load to 15 kW"
+msgstr "किलोवाट में लोड दर्ज करें"
+
+#: .\templates\electricity-load-enhancement.html:476
 msgid "Requested Load (kW)"
 msgstr "अनुरोधित लोड (किलोवाट)"
 
-#: .\templates\electricity-load-enhancement.html:195
+#: .\templates\electricity-load-enhancement.html:477
 msgid "Enter new load (e.g., 5, 7.5)"
 msgstr "नया लोड दर्ज करें (जैसे, ५, ७.५)"
 
-#: .\templates\electricity-load-enhancement.html:200
+#: .\templates\electricity-load-enhancement.html:478
+#, fuzzy
+#| msgid "Requested Load (kW)"
+msgid "Requested load"
+msgstr "अनुरोधित लोड (किलोवाट)"
+
+#: .\templates\electricity-load-enhancement.html:482
 msgid "Reason for Enhancement"
 msgstr "संवर्धन का कारण"
 
-#: .\templates\electricity-load-enhancement.html:202
+#: .\templates\electricity-load-enhancement.html:483
+#, fuzzy
+#| msgid "Reason for Enhancement"
+msgid "Reason for enhancement"
+msgstr "संवर्धन का कारण"
+
+#: .\templates\electricity-load-enhancement.html:484
 msgid "New Appliances"
 msgstr "नए उपकरण"
 
-#: .\templates\electricity-load-enhancement.html:203
+#: .\templates\electricity-load-enhancement.html:485
 msgid "Home Extension"
 msgstr "घर का विस्तार"
 
-#: .\templates\electricity-load-enhancement.html:204
+#: .\templates\electricity-load-enhancement.html:486
 msgid "Commercial Activity"
 msgstr "वाणिज्यिक गतिविधि"
 
-#: .\templates\electricity-load-enhancement.html:210
+#: .\templates\electricity-load-enhancement.html:487
+msgid "EV Charger Installation"
+msgstr ""
+
+#: .\templates\electricity-load-enhancement.html:494
+msgid "Please provide more details about your reason..."
+msgstr ""
+
+#: .\templates\electricity-load-enhancement.html:494
+msgid "Reason details"
+msgstr ""
+
+#: .\templates\electricity-load-enhancement.html:500
+msgid "Base Fee:"
+msgstr ""
+
+#: .\templates\electricity-load-enhancement.html:504
+#, fuzzy
+#| msgid "Application Fee:"
+msgid "Additional Load Fee:"
+msgstr "आवेदन शुल्क:"
+
+#: .\templates\electricity-load-enhancement.html:508
+#: .\templates\electricity-meter-replacement.html:441
+#: .\templates\electricity-name-transfer.html:766
+#, python-format
+msgid "GST (18%%):"
+msgstr ""
+
+#: .\templates\electricity-load-enhancement.html:512
+#: .\templates\electricity-meter-replacement.html:445
+#: .\templates\electricity-name-transfer.html:770
+#, fuzzy
+#| msgid "Total Amount:"
+msgid "Total:"
+msgstr "कुल राशि:"
+
+#: .\templates\electricity-load-enhancement.html:518
 msgid "Estimated Cost"
 msgstr "अनुमानित लागत"
 
-#: .\templates\electricity-load-enhancement.html:211
-#: .\templates\electricity-load-enhancement.html:343
-#: .\templates\electricity-load-enhancement.html:345
-#: .\templates\electricity-meter-replacement.html:188
-msgid "Taxes"
-msgstr "कर"
+#: .\templates\electricity-load-enhancement.html:522
+#, fuzzy
+#| msgid "Submit Transfer Request"
+msgid "Submit load enhancement request"
+msgstr "हस्तांतरण अनुरोध जमा करें"
 
-#: .\templates\electricity-load-enhancement.html:214
+#: .\templates\electricity-load-enhancement.html:522
 msgid "Submit Request"
 msgstr "अनुरोध जमा करें"
 
-#: .\templates\electricity-load-enhancement.html:226
+#: .\templates\electricity-load-enhancement.html:539
 msgid "Enter load in kW"
 msgstr "किलोवाट में लोड दर्ज करें"
 
-#: .\templates\electricity-load-enhancement.html:343
-msgid "Minimum charges"
-msgstr "न्यूनतम शुल्क"
-
-#: .\templates\electricity-load-enhancement.html:372
-msgid "Please enter requested load"
+#: .\templates\electricity-load-enhancement.html:930
+#, fuzzy
+#| msgid "Please enter requested load"
+msgid "Please enter a valid load"
 msgstr "कृपया अनुरोधित लोड दर्ज करें"
 
-#: .\templates\electricity-load-enhancement.html:379
-#: .\templates\electricity-new-connection.html:485
-msgid "Please enter a valid load value (positive number)"
-msgstr "कृपया एक वैध लोड मान दर्ज करें (सकारात्मक संख्या)"
+#: .\templates\electricity-load-enhancement.html:1038
+msgid "Please say a command... load value, reason, or submit"
+msgstr ""
 
-#: .\templates\electricity-load-enhancement.html:385
-msgid "Requested load must be greater than current load"
-msgstr "अनुरोधित लोड वर्तमान लोड से अधिक होना चाहिए"
-
-#: .\templates\electricity-load-enhancement.html:390
+#: .\templates\electricity-load-enhancement.html:1291
 msgid ""
-"Maximum load enhancement is 50 kW. Please contact commercial office for "
-"higher loads."
-msgstr "अधिकतम लोड संवर्धन ५० किलोवाट है। अधिक लोड के लिए कृपया वाणिज्यिक कार्यालय से संपर्क करें।"
+"Load enhancement page. Choose load from slider or say value, select reason, "
+"then say submit."
+msgstr ""
 
-#: .\templates\electricity-meter-replacement.html:6
+#: .\templates\electricity-meter-replacement.html:17
 msgid "Meter Replacement - Civic Kiosk"
 msgstr "मीटर प्रतिस्थापन - सिविक कियोस्क"
 
-#: .\templates\electricity-meter-replacement.html:127
-#: .\templates\electricity-services.html:108
+#: .\templates\electricity-meter-replacement.html:324
+#: .\templates\electricity-services.html:315
 msgid "Meter Replacement"
 msgstr "मीटर प्रतिस्थापन"
 
-#: .\templates\electricity-meter-replacement.html:145
+#: .\templates\electricity-meter-replacement.html:343
 msgid "Reason for Replacement"
 msgstr "प्रतिस्थापन का कारण"
 
-#: .\templates\electricity-meter-replacement.html:147
+#: .\templates\electricity-meter-replacement.html:344
+#, fuzzy
+#| msgid "Reason for Replacement"
+msgid "Reason for replacement"
+msgstr "प्रतिस्थापन का कारण"
+
+#: .\templates\electricity-meter-replacement.html:345
 msgid "Meter faulty/not working"
 msgstr "मीटर खराब/काम नहीं कर रहा"
 
-#: .\templates\electricity-meter-replacement.html:148
+#: .\templates\electricity-meter-replacement.html:346
 msgid "Meter damaged"
 msgstr "मीटर क्षतिग्रस्त"
 
-#: .\templates\electricity-meter-replacement.html:149
+#: .\templates\electricity-meter-replacement.html:347
 msgid "Upgrade to smart meter"
 msgstr "स्मार्ट मीटर में अपग्रेड करें"
 
-#: .\templates\electricity-meter-replacement.html:150
+#: .\templates\electricity-meter-replacement.html:348
 msgid "Meter showing error"
 msgstr "मीटर में त्रुटि दिख रही है"
 
-#: .\templates\electricity-meter-replacement.html:151
+#: .\templates\electricity-meter-replacement.html:349
 msgid "Meter stolen"
 msgstr "मीटर चोरी"
 
-#: .\templates\electricity-meter-replacement.html:157
+#: .\templates\electricity-meter-replacement.html:355
 msgid "Select Meter Type"
 msgstr "मीटर प्रकार चुनें"
 
-#: .\templates\electricity-meter-replacement.html:160
+#: .\templates\electricity-meter-replacement.html:358
+#, fuzzy
+#| msgid "Single Phase"
+msgid "Single Phase meter, ₹1,200"
+msgstr "सिंगल फेज"
+
+#: .\templates\electricity-meter-replacement.html:359
 msgid "Single Phase"
 msgstr "सिंगल फेज"
 
-#: .\templates\electricity-meter-replacement.html:164
+#: .\templates\electricity-meter-replacement.html:362
+#: .\templates\electricity-new-connection.html:559
+msgid "Residential"
+msgstr "आवासीय"
+
+#: .\templates\electricity-meter-replacement.html:363
+msgid "Basic"
+msgstr ""
+
+#: .\templates\electricity-meter-replacement.html:367
+msgid "Three Phase meter, ₹2,500"
+msgstr ""
+
+#: .\templates\electricity-meter-replacement.html:368
 msgid "Three Phase"
 msgstr "थ्री फेज"
 
-#: .\templates\electricity-meter-replacement.html:168
+#: .\templates\electricity-meter-replacement.html:371
+#: .\templates\electricity-new-connection.html:560
+#: .\templates\gas-cylinder-booking.html:511
+msgid "Commercial"
+msgstr "वाणिज्यिक"
+
+#: .\templates\electricity-meter-replacement.html:372
+#: .\templates\electricity-meter-replacement.html:391
+#: .\templates\electricity-new-connection.html:561
+msgid "Industrial"
+msgstr "औद्योगिक"
+
+#: .\templates\electricity-meter-replacement.html:376
+#, fuzzy
+#| msgid "Smart Meter"
+msgid "Smart meter, ₹3,000"
+msgstr "स्मार्ट मीटर"
+
+#: .\templates\electricity-meter-replacement.html:377
 msgid "Smart Meter"
 msgstr "स्मार्ट मीटर"
 
-#: .\templates\electricity-meter-replacement.html:172
+#: .\templates\electricity-meter-replacement.html:380
+msgid "WiFi"
+msgstr ""
+
+#: .\templates\electricity-meter-replacement.html:381
+msgid "App"
+msgstr ""
+
+#: .\templates\electricity-meter-replacement.html:382
+msgid "Real-time"
+msgstr ""
+
+#: .\templates\electricity-meter-replacement.html:386
+msgid "CT meter, ₹4,500"
+msgstr ""
+
+#: .\templates\electricity-meter-replacement.html:387
 msgid "CT Meter"
 msgstr "सीटी मीटर"
 
-#: .\templates\electricity-meter-replacement.html:179
-msgid "Preferred Date"
+#: .\templates\electricity-meter-replacement.html:390
+msgid "High Load"
+msgstr ""
+
+#: .\templates\electricity-meter-replacement.html:399
+#, fuzzy
+#| msgid "Preferred Date"
+msgid "Preferred Date & Time"
 msgstr "पसंदीदा तारीख"
 
-#: .\templates\electricity-meter-replacement.html:186
+#: .\templates\electricity-meter-replacement.html:400
+#, fuzzy
+#| msgid "Preferred Date"
+msgid "Preferred date"
+msgstr "पसंदीदा तारीख"
+
+#: .\templates\electricity-meter-replacement.html:404
+msgid "9 AM to 12 PM slot"
+msgstr ""
+
+#: .\templates\electricity-meter-replacement.html:405
+msgid "12 PM to 3 PM slot"
+msgstr ""
+
+#: .\templates\electricity-meter-replacement.html:406
+msgid "3 PM to 6 PM slot"
+msgstr ""
+
+#: .\templates\electricity-meter-replacement.html:411
+#, fuzzy
+#| msgid "All Services"
+msgid "Additional Services"
+msgstr "सभी सेवाएं"
+
+#: .\templates\electricity-meter-replacement.html:413
+msgid "Meter calibration service"
+msgstr ""
+
+#: .\templates\electricity-meter-replacement.html:414
+#, fuzzy
+#| msgid "Meter stolen"
+msgid "Meter Calibration"
+msgstr "मीटर चोरी"
+
+#: .\templates\electricity-meter-replacement.html:417
+msgid "Wiring check service"
+msgstr ""
+
+#: .\templates\electricity-meter-replacement.html:418
+msgid "Wiring Check"
+msgstr ""
+
+#: .\templates\electricity-meter-replacement.html:421
+msgid "New meter seal service"
+msgstr ""
+
+#: .\templates\electricity-meter-replacement.html:422
+msgid "New Meter Seal"
+msgstr ""
+
+#: .\templates\electricity-meter-replacement.html:429
+#, fuzzy
+#| msgid "Meter stolen"
+msgid "Meter Cost:"
+msgstr "मीटर चोरी"
+
+#: .\templates\electricity-meter-replacement.html:433
+#, fuzzy
+#| msgid "All Services"
+msgid "Additional Services:"
+msgstr "सभी सेवाएं"
+
+#: .\templates\electricity-meter-replacement.html:437
+#, fuzzy
+#| msgid "Application Fee:"
+msgid "Installation Fee:"
+msgstr "आवेदन शुल्क:"
+
+#: .\templates\electricity-meter-replacement.html:451
 msgid "Estimated Total"
 msgstr "अनुमानित कुल"
 
-#: .\templates\electricity-meter-replacement.html:192
+#: .\templates\electricity-meter-replacement.html:455
+#, fuzzy
+#| msgid "Submit Transfer Request"
+msgid "Submit meter replacement request"
+msgstr "हस्तांतरण अनुरोध जमा करें"
+
+#: .\templates\electricity-meter-replacement.html:455
 msgid "Request Replacement"
 msgstr "प्रतिस्थापन का अनुरोध करें"
 
-#: .\templates\electricity-meter-replacement.html:242
-msgid "Please select a preferred date"
-msgstr "कृपया एक पसंदीदा तारीख चुनें"
-
-#: .\templates\electricity-meter-replacement.html:252
-msgid "Preferred date cannot be in the past"
-msgstr "पसंदीदा तारीख अतीत में नहीं हो सकती"
-
-#: .\templates\electricity-name-transfer.html:6
+#: .\templates\electricity-name-transfer.html:148
 msgid "Name Transfer - Civic Kiosk"
 msgstr "नाम हस्तांतरण - सिविक कियोस्क"
 
-#: .\templates\electricity-name-transfer.html:303
-#: .\templates\electricity-services.html:107
+#: .\templates\electricity-name-transfer.html:647
+#: .\templates\electricity-services.html:314
 msgid "Name Transfer"
 msgstr "नाम हस्तांतरण"
 
-#: .\templates\electricity-name-transfer.html:306
+#: .\templates\electricity-name-transfer.html:650
 msgid "Current Owner:"
 msgstr "वर्तमान मालिक:"
 
-#: .\templates\electricity-name-transfer.html:308
-#: .\templates\gas-consumer-lookup.html:108
+#: .\templates\electricity-name-transfer.html:652
+#: .\templates\gas-consumer-lookup.html:498
 msgid "Address:"
 msgstr "पता:"
 
-#: .\templates\electricity-name-transfer.html:312
+#: .\templates\electricity-name-transfer.html:656
 msgid "Required Documents: Sale Deed, NOC, ID Proof, Address Proof"
 msgstr "आवश्यक दस्तावेज़: बिक्री विलेख, एनओसी, पहचान प्रमाण, पता प्रमाण"
 
-#: .\templates\electricity-name-transfer.html:325
+#: .\templates\electricity-name-transfer.html:663
+#, fuzzy
+#| msgid "Upload All"
+msgid "Upload sale deed"
+msgstr "सभी अपलोड करें"
+
+#: .\templates\electricity-name-transfer.html:665
+msgid "Sale Deed"
+msgstr ""
+
+#: .\templates\electricity-name-transfer.html:666
+#: .\templates\electricity-name-transfer.html:671
+#: .\templates\electricity-name-transfer.html:676
+#: .\templates\electricity-name-transfer.html:681
+#, fuzzy
+#| msgid "QR Code Upload"
+msgid "Not Uploaded"
+msgstr "क्यूआर कोड अपलोड"
+
+#: .\templates\electricity-name-transfer.html:668
+#, fuzzy
+#| msgid "Upload All"
+msgid "Upload NOC"
+msgstr "सभी अपलोड करें"
+
+#: .\templates\electricity-name-transfer.html:670
+msgid "NOC"
+msgstr ""
+
+#: .\templates\electricity-name-transfer.html:673
+msgid "Upload ID proof"
+msgstr ""
+
+#: .\templates\electricity-name-transfer.html:678
+msgid "Upload address proof"
+msgstr ""
+
+#: .\templates\electricity-name-transfer.html:705
 msgid "New Owner Name"
 msgstr "नए मालिक का नाम"
 
-#: .\templates\electricity-name-transfer.html:326
+#: .\templates\electricity-name-transfer.html:706
 msgid "Enter new owner name"
 msgstr "नए मालिक का नाम दर्ज करें"
 
-#: .\templates\electricity-name-transfer.html:331
+#: .\templates\electricity-name-transfer.html:707
+#, fuzzy
+#| msgid "New Owner Name"
+msgid "New owner name"
+msgstr "नए मालिक का नाम"
+
+#: .\templates\electricity-name-transfer.html:711
 msgid "New Owner Aadhaar"
 msgstr "नए मालिक का आधार"
 
-#: .\templates\electricity-name-transfer.html:332
+#: .\templates\electricity-name-transfer.html:712
 msgid "12 digit Aadhaar"
 msgstr "१२ अंकीय आधार"
 
-#: .\templates\electricity-name-transfer.html:337
+#: .\templates\electricity-name-transfer.html:713
+#, fuzzy
+#| msgid "New Owner Aadhaar"
+msgid "New owner Aadhaar"
+msgstr "नए मालिक का आधार"
+
+#: .\templates\electricity-name-transfer.html:718
+#, fuzzy
+#| msgid "New Owner Name"
+msgid "New Owner Phone"
+msgstr "नए मालिक का नाम"
+
+#: .\templates\electricity-name-transfer.html:719
+#, fuzzy
+#| msgid "10 digit mobile"
+msgid "10 digit mobile number"
+msgstr "१० अंकीय मोबाइल"
+
+#: .\templates\electricity-name-transfer.html:720
+#, fuzzy
+#| msgid "New Owner Name"
+msgid "New owner phone"
+msgstr "नए मालिक का नाम"
+
+#: .\templates\electricity-name-transfer.html:724
+#, fuzzy
+#| msgid "New Owner Name"
+msgid "New Owner Email"
+msgstr "नए मालिक का नाम"
+
+#: .\templates\electricity-name-transfer.html:725
+#, fuzzy
+#| msgid "Enter complete address"
+msgid "Email address"
+msgstr "पूरा पता दर्ज करें"
+
+#: .\templates\electricity-name-transfer.html:726
+#, fuzzy
+#| msgid "New Owner Name"
+msgid "New owner email"
+msgstr "नए मालिक का नाम"
+
+#: .\templates\electricity-name-transfer.html:730
 msgid "Relationship"
 msgstr "संबंध"
 
-#: .\templates\electricity-name-transfer.html:339
+#: .\templates\electricity-name-transfer.html:731
+msgid "Relationship with current owner"
+msgstr ""
+
+#: .\templates\electricity-name-transfer.html:732
 msgid "Purchaser"
 msgstr "क्रेता"
 
-#: .\templates\electricity-name-transfer.html:340
+#: .\templates\electricity-name-transfer.html:733
 msgid "Family Member"
 msgstr "परिवार का सदस्य"
 
-#: .\templates\electricity-name-transfer.html:341
+#: .\templates\electricity-name-transfer.html:734
 msgid "Legal Heir"
 msgstr "कानूनी उत्तराधिकारी"
 
-#: .\templates\electricity-name-transfer.html:346
+#: .\templates\electricity-name-transfer.html:742
+msgid "Help Desk:"
+msgstr ""
+
+#: .\templates\electricity-name-transfer.html:746
+msgid "Email:"
+msgstr ""
+
+#: .\templates\electricity-name-transfer.html:750
+#, fuzzy
+#| msgid "Processing..."
+msgid "Processing Time:"
+msgstr "प्रक्रिया हो रही है..."
+
+#: .\templates\electricity-name-transfer.html:751
+msgid "7-10 working days"
+msgstr ""
+
+#: .\templates\electricity-name-transfer.html:758
+#, fuzzy
+#| msgid "Name Transfer"
+msgid "Transfer Fee:"
+msgstr "नाम हस्तांतरण"
+
+#: .\templates\electricity-name-transfer.html:762
+#, fuzzy
+#| msgid "Death Certificate"
+msgid "Document Verification:"
+msgstr "मृत्यु प्रमाण पत्र"
+
+#: .\templates\electricity-name-transfer.html:775
+#, fuzzy
+#| msgid "Submit Transfer Request"
+msgid "Submit transfer request"
+msgstr "हस्तांतरण अनुरोध जमा करें"
+
+#: .\templates\electricity-name-transfer.html:775
 msgid "Submit Transfer Request"
 msgstr "हस्तांतरण अनुरोध जमा करें"
 
-#: .\templates\electricity-name-transfer.html:467
-msgid "Please enter new owner name"
-msgstr "कृपया नए मालिक का नाम दर्ज करें"
-
-#: .\templates\electricity-name-transfer.html:472
-msgid "Please enter new owner Aadhaar number"
-msgstr "कृपया नए मालिक का आधार नंबर दर्ज करें"
-
-#: .\templates\electricity-name-transfer.html:479
-msgid "Please enter a valid 12-digit Aadhaar number"
-msgstr "कृपया एक वैध १२-अंकीय आधार संख्या दर्ज करें"
-
-#: .\templates\electricity-new-connection.html:6
+#: .\templates\electricity-new-connection.html:176
 msgid "New Electricity Connection - Civic Kiosk"
 msgstr "नया बिजली कनेक्शन - सिविक कियोस्क"
 
-#: .\templates\electricity-new-connection.html:293
+#: .\templates\electricity-new-connection.html:531
 msgid "New Electricity Connection"
 msgstr "नया बिजली कनेक्शन"
 
-#: .\templates\electricity-new-connection.html:294
-#: .\templates\gas-new-connection.html:176
+#: .\templates\electricity-new-connection.html:532
+#: .\templates\gas-new-connection.html:465
 msgid "Your data is secure"
 msgstr "आपका डेटा सुरक्षित है"
 
-#: .\templates\electricity-new-connection.html:307
-#: .\templates\gas-new-connection.html:182
-#: .\templates\marriage-registration.html:113
-#: .\templates\marriage-registration.html:134
+#: .\templates\electricity-new-connection.html:545
+#: .\templates\gas-new-connection.html:471
+#: .\templates\marriage-registration.html:413
+#: .\templates\marriage-registration.html:434
 msgid "Full Name"
 msgstr "पूरा नाम"
 
-#: .\templates\electricity-new-connection.html:308
+#: .\templates\electricity-new-connection.html:546
 msgid "Enter your full name"
 msgstr "अपना पूरा नाम दर्ज करें"
 
-#: .\templates\electricity-new-connection.html:313
-#: .\templates\gas-new-connection.html:187
+#: .\templates\electricity-new-connection.html:547
+#, fuzzy
+#| msgid "Full Name"
+msgid "Full name"
+msgstr "पूरा नाम"
+
+#: .\templates\electricity-new-connection.html:551
+#: .\templates\electricity-new-connection.html:553
+#: .\templates\gas-new-connection.html:476
 msgid "Address"
 msgstr "पता"
 
-#: .\templates\electricity-new-connection.html:314
-#: .\templates\trade-license.html:89
+#: .\templates\electricity-new-connection.html:552
+#: .\templates\trade-license.html:454
 msgid "Enter complete address"
 msgstr "पूरा पता दर्ज करें"
 
-#: .\templates\electricity-new-connection.html:319
+#: .\templates\electricity-new-connection.html:557
 msgid "Property Type"
 msgstr "संपत्ति का प्रकार"
 
-#: .\templates\electricity-new-connection.html:324
+#: .\templates\electricity-new-connection.html:558
+#, fuzzy
+#| msgid "Property Type"
+msgid "Property type"
+msgstr "संपत्ति का प्रकार"
+
+#: .\templates\electricity-new-connection.html:562
 msgid "Agricultural"
 msgstr "कृषि"
 
-#: .\templates\electricity-new-connection.html:329
+#: .\templates\electricity-new-connection.html:567
 msgid "Load Required (kW)"
 msgstr "आवश्यक लोड (किलोवाट)"
 
-#: .\templates\electricity-new-connection.html:330
+#: .\templates\electricity-new-connection.html:568
 msgid "e.g., 5"
 msgstr "जैसे, ५"
 
-#: .\templates\electricity-new-connection.html:335
-#: .\templates\gas-new-connection.html:192 .\templates\grievance.html:207
+#: .\templates\electricity-new-connection.html:569
+#, fuzzy
+#| msgid "Load Required (kW)"
+msgid "Load required in kilowatts"
+msgstr "आवश्यक लोड (किलोवाट)"
+
+#: .\templates\electricity-new-connection.html:573
+#: .\templates\gas-new-connection.html:481 .\templates\grievance.html:509
 msgid "Mobile Number"
 msgstr "मोबाइल नंबर"
 
-#: .\templates\electricity-new-connection.html:336
+#: .\templates\electricity-new-connection.html:574
 msgid "10 digit mobile"
 msgstr "१० अंकीय मोबाइल"
 
-#: .\templates\electricity-new-connection.html:469
-msgid "Please enter your full name"
-msgstr "कृपया अपना पूरा नाम दर्ज करें"
+#: .\templates\electricity-new-connection.html:575
+#, fuzzy
+#| msgid "Mobile Number"
+msgid "Mobile number"
+msgstr "मोबाइल नंबर"
 
-#: .\templates\electricity-new-connection.html:474
-msgid "Please enter your address"
-msgstr "कृपया अपना पता दर्ज करें"
+#: .\templates\electricity-new-connection.html:578
+#, fuzzy
+#| msgid "Submit Application"
+msgid "Submit application"
+msgstr "आवेदन जमा करें"
 
-#: .\templates\electricity-new-connection.html:479
-msgid "Please enter load required"
-msgstr "कृपया आवश्यक लोड दर्ज करें"
-
-#: .\templates\electricity-new-connection.html:490
-msgid "Please enter mobile number"
-msgstr "कृपया मोबाइल नंबर दर्ज करें"
-
-#: .\templates\electricity-new-connection.html:496
-msgid "Please enter a valid 10-digit mobile number"
-msgstr "कृपया एक वैध १०-अंकीय मोबाइल नंबर दर्ज करें"
-
-#: .\templates\electricity-services.html:4
+#: .\templates\electricity-services.html:6
 msgid "Electricity Services - Civic Kiosk"
 msgstr "बिजली सेवाएं - सिविक कियोस्क"
 
-#: .\templates\electricity-services.html:100
+#: .\templates\electricity-services.html:307
 msgid "Electricity Services"
 msgstr "बिजली सेवाएं"
 
-#: .\templates\electricity-services.html:103 .\templates\gas-services.html:65
+#: .\templates\electricity-services.html:310 .\templates\gas-services.html:378
 msgid "Bill Payment"
 msgstr "बिल भुगतान"
 
-#: .\templates\electricity-services.html:104 .\templates\gas-services.html:63
+#: .\templates\electricity-services.html:311 .\templates\gas-services.html:376
 msgid "New Connection"
 msgstr "नया कनेक्शन"
 
-#: .\templates\electricity-services.html:105 .\templates\gas-services.html:66
+#: .\templates\electricity-services.html:312 .\templates\gas-services.html:379
 msgid "Complaint"
 msgstr "शिकायत"
 
-#: .\templates\electricity-services.html:109
-#: .\templates\electricity-solar.html:298
+#: .\templates\electricity-services.html:316
+#: .\templates\electricity-solar.html:436
 msgid "Solar Net Metering"
 msgstr "सोलर नेट मीटरिंग"
 
-#: .\templates\electricity-solar.html:65
+#: .\templates\electricity-solar.html:119
 msgid "Solar Net Metering - Civic Kiosk"
 msgstr "सोलर नेट मीटरिंग - सिविक कियोस्क"
 
-#: .\templates\electricity-solar.html:301
+#: .\templates\electricity-solar.html:439
 msgid "Government Subsidy Available!"
 msgstr "सरकारी सब्सिडी उपलब्ध!"
 
-#: .\templates\electricity-solar.html:302
+#: .\templates\electricity-solar.html:440
 #, python-format
 msgid "Up to 40%% subsidy on solar installations for residential consumers."
 msgstr "आवासीय उपभोक्ताओं के लिए सौर प्रतिष्ठानों पर ४०%% तक सब्सिडी।"
 
-#: .\templates\electricity-solar.html:306
+#: .\templates\electricity-solar.html:444
 msgid "₹8,000/yr"
 msgstr "₹८,०००/वर्ष"
 
-#: .\templates\electricity-solar.html:306
+#: .\templates\electricity-solar.html:444
 msgid "Estimated Savings"
 msgstr "अनुमानित बचत"
 
-#: .\templates\electricity-solar.html:307
+#: .\templates\electricity-solar.html:445
 msgid "5-7 years"
 msgstr "५-७ वर्ष"
 
-#: .\templates\electricity-solar.html:307
+#: .\templates\electricity-solar.html:445
 msgid "Payback Period"
 msgstr "भुगतान अवधि"
 
-#: .\templates\electricity-solar.html:308
+#: .\templates\electricity-solar.html:446
 msgid "25 years"
 msgstr "२५ वर्ष"
 
-#: .\templates\electricity-solar.html:308
+#: .\templates\electricity-solar.html:446
 msgid "Panel Life"
 msgstr "पैनल जीवन"
 
-#: .\templates\electricity-solar.html:309
+#: .\templates\electricity-solar.html:447
 #, python-format
 msgid "40%%"
 msgstr "४०%%"
 
-#: .\templates\electricity-solar.html:309 .\templates\gas-services.html:64
+#: .\templates\electricity-solar.html:447 .\templates\gas-services.html:377
 msgid "Subsidy"
 msgstr "सब्सिडी"
 
-#: .\templates\electricity-solar.html:321
+#: .\templates\electricity-solar.html:459
 msgid "Proposed Solar Capacity (kW)"
 msgstr "प्रस्तावित सौर क्षमता (किलोवाट)"
 
-#: .\templates\electricity-solar.html:328
+#: .\templates\electricity-solar.html:466
 msgid "Above 5 kW"
 msgstr "५ किलोवाट से ऊपर"
 
-#: .\templates\electricity-solar.html:333
+#: .\templates\electricity-solar.html:471
 msgid "Roof Area Available (sq ft)"
 msgstr "उपलब्ध छत क्षेत्र (वर्ग फुट)"
 
-#: .\templates\electricity-solar.html:334
+#: .\templates\electricity-solar.html:472
 msgid "e.g., 500"
 msgstr "जैसे, ५००"
 
-#: .\templates\electricity-solar.html:338
+#: .\templates\electricity-solar.html:476
 msgid "Estimated Cost (After Subsidy)"
 msgstr "अनुमानित लागत (सब्सिडी के बाद)"
 
-#: .\templates\electricity-solar.html:339
-msgid "₹ 45,000 - ₹ 2,10,000"
-msgstr "₹ ४५,००० - ₹ २,१०,०००"
+#: .\templates\electricity-solar.html:477
+msgid "Select capacity to see estimate"
+msgstr ""
 
-#: .\templates\electricity-solar.html:342
+#: .\templates\electricity-solar.html:480
 msgid "Apply for Net Metering"
 msgstr "नेट मीटरिंग के लिए आवेदन करें"
 
-#: .\templates\electricity-solar.html:442
-msgid "Solar net metering application submitted! Reference:"
-msgstr "सोलर नेट मीटरिंग आवेदन जमा किया गया! संदर्भ:"
-
-#: .\templates\electricity-solar.html:445
-msgid "Error:"
-msgstr "त्रुटि:"
-
-#: .\templates\electricity-solar.html:450
-msgid "Solar net metering application submitted! Reference: SOLAR"
-msgstr "सोलर नेट मीटरिंग आवेदन जमा किया गया! संदर्भ: सोलर"
-
-#: .\templates\gas-bill-payment.html:73
+#: .\templates\gas-bill-payment.html:271
 msgid "Gas Bill Payment - Civic Kiosk"
 msgstr "गैस बिल भुगतान - सिविक कियोस्क"
 
-#: .\templates\gas-bill-payment.html:120
+#: .\templates\gas-bill-payment.html:505
+#, fuzzy
+#| msgid "Processing..."
+msgid "Processing Payment..."
+msgstr "प्रक्रिया हो रही है..."
+
+#: .\templates\gas-bill-payment.html:541
 msgid "Gas Bill Payment"
 msgstr "गैस बिल भुगतान"
 
-#: .\templates\gas-bill-payment.html:128
+#: .\templates\gas-bill-payment.html:546
 msgid "Consumer Number:"
 msgstr "उपभोक्ता संख्या:"
 
-#: .\templates\gas-bill-payment.html:150
+#: .\templates\gas-bill-payment.html:566
 msgid "Period:"
 msgstr "अवधि:"
 
-#: .\templates\gas-bill-payment.html:151
+#: .\templates\gas-bill-payment.html:567
 msgid "Jan 2026"
 msgstr "जनवरी २०२६"
 
-#: .\templates\gas-booking-status.html:6
+#: .\templates\gas-bill-payment.html:583
+#, fuzzy
+#| msgid "Scan QR code with your phone"
+msgid "Scan QR code with any UPI app"
+msgstr "अपने फोन से क्यूआर कोड स्कैन करें"
+
+#: .\templates\gas-bill-payment.html:592
+#, fuzzy
+#| msgid "Please enter 12-digit Aadhaar number"
+msgid "Enter 15-16 digit card number"
+msgstr "कृपया १२-अंकीय आधार संख्या दर्ज करें"
+
+#: .\templates\gas-bill-payment.html:593
+msgid "Card number must be at least 15 digits"
+msgstr ""
+
+#: .\templates\gas-bill-payment.html:599
+msgid "3 digits"
+msgstr ""
+
+#: .\templates\gas-bill-payment.html:600
+msgid "CVV must be 3 digits"
+msgstr ""
+
+#: .\templates\gas-bill-payment.html:605
+msgid "4 digits"
+msgstr ""
+
+#: .\templates\gas-bill-payment.html:606
+msgid "PIN must be 4 digits"
+msgstr ""
+
+#: .\templates\gas-booking-status.html:119
 msgid "Gas Booking Status - Civic Kiosk"
 msgstr "गैस बुकिंग स्थिति - सिविक कियोस्क"
 
-#: .\templates\gas-booking-status.html:319 .\templates\gas-services.html:68
+#: .\templates\gas-booking-status.html:470 .\templates\gas-services.html:381
 msgid "Booking Status"
 msgstr "बुकिंग स्थिति"
 
-#: .\templates\gas-booking-status.html:328
+#: .\templates\gas-booking-status.html:479
 msgid "Enter Reference No. (e.g., CYL251234)"
 msgstr "संदर्भ संख्या दर्ज करें (जैसे, CYL२५१२३४)"
 
-#: .\templates\gas-booking-status.html:335
+#: .\templates\gas-booking-status.html:486
 msgid "Booking #"
 msgstr "बुकिंग #"
 
-#: .\templates\gas-booking-status.html:340
-#: .\templates\gas-booking-status.html:375
+#: .\templates\gas-booking-status.html:491
+#: .\templates\gas-booking-status.html:526
 msgid "Booked"
 msgstr "बुक हुआ"
 
-#: .\templates\gas-booking-status.html:344
-#: .\templates\gas-booking-status.html:376
+#: .\templates\gas-booking-status.html:495
+#: .\templates\gas-booking-status.html:527
 msgid "Processed"
 msgstr "संसाधित"
 
-#: .\templates\gas-booking-status.html:348
-#: .\templates\gas-booking-status.html:377
+#: .\templates\gas-booking-status.html:499
+#: .\templates\gas-booking-status.html:528
 msgid "Out for Delivery"
 msgstr "डिलीवरी के लिए निकला"
 
-#: .\templates\gas-booking-status.html:352
-#: .\templates\gas-booking-status.html:378
+#: .\templates\gas-booking-status.html:503
+#: .\templates\gas-booking-status.html:529
 msgid "Delivered"
 msgstr "डिलीवर हुआ"
 
-#: .\templates\gas-booking-status.html:357
-#: .\templates\gas-booking-status.html:382
+#: .\templates\gas-booking-status.html:508
+#: .\templates\gas-booking-status.html:533
 msgid "Booked on:"
 msgstr "बुक हुआ:"
 
-#: .\templates\gas-booking-status.html:358
-#: .\templates\gas-booking-status.html:383
+#: .\templates\gas-booking-status.html:509
+#: .\templates\gas-booking-status.html:534
 msgid "Expected delivery:"
 msgstr "अपेक्षित डिलीवरी:"
 
-#: .\templates\gas-booking-status.html:360
-#: .\templates\gas-booking-status.html:384
+#: .\templates\gas-booking-status.html:511
+#: .\templates\gas-booking-status.html:535
 msgid "Delivery person:"
 msgstr "डिलीवरी व्यक्ति:"
 
-#: .\templates\gas-booking-status.html:363
+#: .\templates\gas-booking-status.html:514
 msgid "Delivered on:"
 msgstr "डिलीवर हुआ:"
 
-#: .\templates\gas-booking-status.html:372
+#: .\templates\gas-booking-status.html:523
 msgid "Booking #CYL251234"
 msgstr "बुकिंग #CYL२५१२३४"
 
-#: .\templates\gas-booking-status.html:383
+#: .\templates\gas-booking-status.html:534
 msgid "Today (25 Feb) by 6 PM"
 msgstr "आज (२५ फरवरी) शाम ६ बजे तक"
 
-#: .\templates\gas-booking-status.html:388
+#: .\templates\gas-booking-status.html:539
 msgid "Domestic Cylinder"
 msgstr "घरेलू सिलेंडर"
 
-#: .\templates\gas-booking-status.html:399
+#: .\templates\gas-booking-status.html:550
+#: .\templates\gas-consumer-lookup.html:425
 msgid "Searching..."
 msgstr "खोज रहे हैं..."
 
-#: .\templates\gas-booking-status.html:403
+#: .\templates\gas-booking-status.html:555
 msgid "Enter reference number"
 msgstr "संदर्भ संख्या दर्ज करें"
 
-#: .\templates\gas-booking-status.html:495
-msgid "Please enter reference number"
-msgstr "कृपया संदर्भ संख्या दर्ज करें"
-
-#: .\templates\gas-complaint.html:6
+#: .\templates\gas-complaint.html:119
 msgid "Gas Complaint - Civic Kiosk"
 msgstr "गैस शिकायत - सिविक कियोस्क"
 
-#: .\templates\gas-complaint.html:325
+#: .\templates\gas-complaint.html:473
 msgid "Gas Leakage"
 msgstr "गैस रिसाव"
 
-#: .\templates\gas-complaint.html:326
+#: .\templates\gas-complaint.html:474
 msgid "Cylinder Issue"
 msgstr "सिलेंडर समस्या"
 
-#: .\templates\gas-complaint.html:327
+#: .\templates\gas-complaint.html:475
 msgid "Regulator Fault"
 msgstr "रेगुलेटर खराबी"
 
-#: .\templates\gas-complaint.html:329
+#: .\templates\gas-complaint.html:477
 msgid "Delivery Delay"
 msgstr "डिलीवरी में देरी"
 
-#: .\templates\gas-complaint.html:336
+#: .\templates\gas-complaint.html:484
 msgid "Describe your complaint in detail"
 msgstr "अपनी शिकायत का विस्तार से वर्णन करें"
 
-#: .\templates\gas-complaint.html:458
-msgid "Please provide a more detailed description (minimum 10 characters)"
-msgstr "कृपया अधिक विस्तृत विवरण प्रदान करें (न्यूनतम १० अक्षर)"
+#: .\templates\gas-complaint.html:500
+msgid "Type your complaint here..."
+msgstr "अपनी शिकायत यहां टाइप करें..."
 
-#: .\templates\gas-consumer-lookup.html:4
+#: .\templates\gas-consumer-lookup.html:119
 msgid "Consumer Lookup - Civic Kiosk"
 msgstr "उपभोक्ता खोज - सिविक कियोस्क"
 
-#: .\templates\gas-consumer-lookup.html:72 .\templates\gas-services.html:69
+#: .\templates\gas-consumer-lookup.html:462 .\templates\gas-services.html:382
 msgid "Consumer Lookup"
 msgstr "उपभोक्ता खोज"
 
-#: .\templates\gas-consumer-lookup.html:76
+#: .\templates\gas-consumer-lookup.html:466
 msgid "Enter Aadhaar Number"
 msgstr "आधार संख्या दर्ज करें"
 
-#: .\templates\gas-consumer-lookup.html:95
+#: .\templates\gas-consumer-lookup.html:485
 msgid "Lookup Consumer"
 msgstr "उपभोक्ता खोजें"
 
-#: .\templates\gas-consumer-lookup.html:104
-#: .\templates\professional-tax.html:84 .\templates\water-bill.html:86
+#: .\templates\gas-consumer-lookup.html:494
+#: .\templates\professional-tax.html:596 .\templates\water-bill.html:572
 msgid "Name:"
 msgstr "नाम:"
 
-#: .\templates\gas-consumer-lookup.html:112
+#: .\templates\gas-consumer-lookup.html:502
 msgid "Distributor:"
 msgstr "वितरक:"
 
-#: .\templates\gas-consumer-lookup.html:125
+#: .\templates\gas-consumer-lookup.html:515
 msgid "Last Booking:"
 msgstr "अंतिम बुकिंग:"
 
-#: .\templates\gas-consumer-lookup.html:191
-msgid "Please enter complete 12-digit Aadhaar"
-msgstr "कृपया पूरा १२-अंकीय आधार दर्ज करें"
-
-#: .\templates\gas-cylinder-booking.html:4
+#: .\templates\gas-cylinder-booking.html:146
 msgid "Cylinder Booking - Civic Kiosk"
 msgstr "सिलेंडर बुकिंग - सिविक कियोस्क"
 
-#: .\templates\gas-cylinder-booking.html:276
+#: .\templates\gas-cylinder-booking.html:466
 msgid "Book Cylinder"
 msgstr "सिलेंडर बुक करें"
 
-#: .\templates\gas-cylinder-booking.html:287 .\templates\gas-subsidy.html:85
+#: .\templates\gas-cylinder-booking.html:477 .\templates\gas-subsidy.html:469
 msgid "Subsidy Status:"
 msgstr "सब्सिडी स्थिति:"
 
-#: .\templates\gas-cylinder-booking.html:289 .\templates\gas-subsidy.html:87
+#: .\templates\gas-cylinder-booking.html:479 .\templates\gas-subsidy.html:471
 msgid "Active"
 msgstr "सक्रिय"
 
-#: .\templates\gas-cylinder-booking.html:289 .\templates\gas-subsidy.html:89
+#: .\templates\gas-cylinder-booking.html:479 .\templates\gas-subsidy.html:473
 msgid "Inactive"
 msgstr "निष्क्रिय"
 
-#: .\templates\gas-cylinder-booking.html:294
+#: .\templates\gas-cylinder-booking.html:484
 msgid "Remaining Subsidies:"
 msgstr "शेष सब्सिडी:"
 
-#: .\templates\gas-cylinder-booking.html:295
+#: .\templates\gas-cylinder-booking.html:485
 msgid "cylinders"
 msgstr "सिलेंडर"
 
-#: .\templates\gas-cylinder-booking.html:300
+#: .\templates\gas-cylinder-booking.html:490
 msgid "Select Cylinder Type"
 msgstr "सिलेंडर प्रकार चुनें"
 
-#: .\templates\gas-cylinder-booking.html:308
-#: .\templates\gas-cylinder-booking.html:314
+#: .\templates\gas-cylinder-booking.html:498
+#: .\templates\gas-cylinder-booking.html:504
 msgid "Subsidized"
 msgstr "सब्सिडी वाला"
 
-#: .\templates\gas-cylinder-booking.html:313
-#: .\templates\gas-cylinder-booking.html:317
+#: .\templates\gas-cylinder-booking.html:503
+#: .\templates\gas-cylinder-booking.html:507
 msgid "Domestic"
 msgstr "घरेलू"
 
-#: .\templates\gas-cylinder-booking.html:330
+#: .\templates\gas-cylinder-booking.html:520
 msgid "Book Now"
 msgstr "अभी बुक करें"
 
-#: .\templates\gas-cylinder-booking.html:347
-msgid "Book"
-msgstr "बुक करें"
-
-#: .\templates\gas-cylinder-booking.html:347
-msgid "cylinder for ₹"
-msgstr "₹ में सिलेंडर"
-
-#: .\templates\gas-new-connection.html:4
+#: .\templates\gas-new-connection.html:146
 msgid "New Gas Connection - Civic Kiosk"
 msgstr "नया गैस कनेक्शन - सिविक कियोस्क"
 
-#: .\templates\gas-new-connection.html:175
+#: .\templates\gas-new-connection.html:464
 msgid "New Gas Connection"
 msgstr "नया गैस कनेक्शन"
 
-#: .\templates\gas-new-connection.html:183
+#: .\templates\gas-new-connection.html:472
 msgid "Enter Full Name"
 msgstr "पूरा नाम दर्ज करें"
 
-#: .\templates\gas-new-connection.html:188
+#: .\templates\gas-new-connection.html:477
 msgid "Enter Address"
 msgstr "पता दर्ज करें"
 
-#: .\templates\gas-new-connection.html:193
+#: .\templates\gas-new-connection.html:482
 msgid "Enter Mobile Number"
 msgstr "मोबाइल नंबर दर्ज करें"
 
-#: .\templates\gas-new-connection.html:193 .\templates\grievance.html:208
+#: .\templates\gas-new-connection.html:482 .\templates\grievance.html:510
 msgid "Please enter 10-digit mobile number"
 msgstr "कृपया १०-अंकीय मोबाइल नंबर दर्ज करें"
 
-#: .\templates\gas-new-connection.html:197
+#: .\templates\gas-new-connection.html:486
 msgid "Document Type"
 msgstr "दस्तावेज़ प्रकार"
 
-#: .\templates\gas-new-connection.html:199
+#: .\templates\gas-new-connection.html:488
 msgid "Select Document Type"
 msgstr "दस्तावेज़ प्रकार चुनें"
 
-#: .\templates\gas-new-connection.html:200
+#: .\templates\gas-new-connection.html:489
 msgid "Aadhaar Card"
 msgstr "आधार कार्ड"
 
-#: .\templates\gas-new-connection.html:201
+#: .\templates\gas-new-connection.html:490
 msgid "Voter ID"
 msgstr "वोटर आईडी"
 
-#: .\templates\gas-new-connection.html:202
+#: .\templates\gas-new-connection.html:491
 msgid "Passport"
 msgstr "पासपोर्ट"
 
-#: .\templates\gas-new-connection.html:203
+#: .\templates\gas-new-connection.html:492
 msgid "Driving License"
 msgstr "ड्राइविंग लाइसेंस"
 
-#: .\templates\gas-new-connection.html:305 .\templates\grievance.html:322
-msgid "Please fill all required fields"
-msgstr "कृपया सभी आवश्यक फ़ील्ड भरें"
-
-#: .\templates\gas-services.html:4
+#: .\templates\gas-services.html:119
 msgid "Gas Services - Civic Kiosk"
 msgstr "गैस सेवाएं - सिविक कियोस्क"
 
-#: .\templates\gas-services.html:61
+#: .\templates\gas-services.html:373
 msgid "Gas Services"
 msgstr "गैस सेवाएं"
 
-#: .\templates\gas-services.html:67
+#: .\templates\gas-services.html:380
 msgid "Cylinder Booking"
 msgstr "सिलेंडर बुकिंग"
 
-#: .\templates\gas-services.html:80
+#: .\templates\gas-services.html:393
 msgid "Active Consumer:"
 msgstr "सक्रिय उपभोक्ता:"
 
-#: .\templates\gas-subsidy.html:4
+#: .\templates\gas-subsidy.html:6
 msgid "Gas Subsidy - Civic Kiosk"
 msgstr "गैस सब्सिडी - सिविक कियोस्क"
 
-#: .\templates\gas-subsidy.html:69
+#: .\templates\gas-subsidy.html:453
 msgid "Subsidy Management"
 msgstr "सब्सिडी प्रबंधन"
 
-#: .\templates\gas-subsidy.html:76
+#: .\templates\gas-subsidy.html:460
 msgid "Check Subsidy"
 msgstr "सब्सिडी जांचें"
 
-#: .\templates\gas-subsidy.html:93
+#: .\templates\gas-subsidy.html:477
 msgid "Subsidy Amount:"
 msgstr "सब्सिडी राशि:"
 
-#: .\templates\gas-subsidy.html:94 .\templates\gas-subsidy.html:111
-#: .\templates\professional-tax.html:101 .\templates\professional-tax.html:105
-#: .\templates\professional-tax.html:107 .\templates\property-tax.html:103
-#: .\templates\receipt-print.html:109 .\templates\trade-license.html:98
-#: .\templates\trade-license.html:107 .\templates\water-bill.html:105
+#: .\templates\gas-subsidy.html:478 .\templates\gas-subsidy.html:495
+#: .\templates\professional-tax.html:613 .\templates\professional-tax.html:617
+#: .\templates\professional-tax.html:619 .\templates\property-tax.html:613
+#: .\templates\receipt-print.html:449 .\templates\trade-license.html:463
+#: .\templates\trade-license.html:472 .\templates\water-bill.html:591
 msgid "₹"
 msgstr "₹"
 
-#: .\templates\gas-subsidy.html:94
+#: .\templates\gas-subsidy.html:478
 msgid "per cylinder"
 msgstr "प्रति सिलेंडर"
 
-#: .\templates\gas-subsidy.html:97
+#: .\templates\gas-subsidy.html:481
 msgid "Cylinders/Year:"
 msgstr "सिलेंडर/वर्ष:"
 
-#: .\templates\gas-subsidy.html:98
+#: .\templates\gas-subsidy.html:482
 msgid "remaining"
 msgstr "शेष"
 
-#: .\templates\gas-subsidy.html:101
+#: .\templates\gas-subsidy.html:485
 msgid "Next Eligibility:"
 msgstr "अगली पात्रता:"
 
-#: .\templates\gas-subsidy.html:105
+#: .\templates\gas-subsidy.html:489
 msgid "Bank Account:"
 msgstr "बैंक खाता:"
 
-#: .\templates\gas-subsidy.html:110
+#: .\templates\gas-subsidy.html:494
 msgid "Last Subsidy:"
 msgstr "अंतिम सब्सिडी:"
 
-#: .\templates\gas-subsidy.html:111
+#: .\templates\gas-subsidy.html:495
 msgid "on"
 msgstr "को"
 
-#: .\templates\gas-subsidy.html:116
+#: .\templates\gas-subsidy.html:500
 msgid "Last updated:"
 msgstr "अंतिम अद्यतन:"
 
-#: .\templates\gas-subsidy.html:134 .\templates\water-bill.html:122
+#: .\templates\gas-subsidy.html:690 .\templates\water-bill.html:886
 msgid "Please enter consumer number"
 msgstr "कृपया उपभोक्ता संख्या दर्ज करें"
 
-#: .\templates\grievance.html:4
+#: .\templates\gas-subsidy.html:703 .\templates\gas-subsidy.html:799
+#: .\templates\gas-subsidy.html:887
+#, fuzzy
+#| msgid "Check Subsidy"
+msgid "Checking subsidy status"
+msgstr "सब्सिडी जांचें"
+
+#: .\templates\gas-subsidy.html:754
+#, fuzzy
+#| msgid "Please enter a valid consumer number"
+msgid "Please say a command... consumer number, check, or back"
+msgstr "कृपया एक वैध उपभोक्ता संख्या दर्ज करें"
+
+#: .\templates\gas-subsidy.html:808 .\templates\gas-subsidy.html:890
+#: .\templates\water-bill.html:1031 .\templates\water-bill.html:1133
+#, fuzzy
+#| msgid "Please enter consumer number"
+msgid "Please enter consumer number first"
+msgstr "कृपया उपभोक्ता संख्या दर्ज करें"
+
+#: .\templates\gas-subsidy.html:925
+msgid ""
+"Gas subsidy page. Enter consumer number, then say check to view subsidy "
+"status."
+msgstr ""
+
+#: .\templates\gas-subsidy.html:935
+#, fuzzy
+#| msgid "Subsidy Status:"
+msgid "Subsidy status is"
+msgstr "सब्सिडी स्थिति:"
+
+#: .\templates\gas-subsidy.html:935
+msgid "Say check with a new number to check again."
+msgstr ""
+
+#: .\templates\grievance.html:146
 msgid "Grievance - Civic Kiosk"
 msgstr "शिकायत - सिविक कियोस्क"
 
-#: .\templates\grievance.html:183
+#: .\templates\grievance.html:485
 msgid "Lodge Grievance"
 msgstr "शिकायत दर्ज करें"
 
-#: .\templates\grievance.html:189
+#: .\templates\grievance.html:491
 msgid "Department"
 msgstr "विभाग"
 
-#: .\templates\grievance.html:191 .\templates\payment-history.html:81
+#: .\templates\grievance.html:493 .\templates\payment-history.html:407
 msgid "Water"
 msgstr "जल"
 
-#: .\templates\grievance.html:192
+#: .\templates\grievance.html:494
 msgid "Sewage"
 msgstr "सीवेज"
 
-#: .\templates\grievance.html:193
+#: .\templates\grievance.html:495
 msgid "Roads"
 msgstr "सड़कें"
 
-#: .\templates\grievance.html:194
+#: .\templates\grievance.html:496
 msgid "Street Light"
 msgstr "स्ट्रीट लाइट"
 
-#: .\templates\grievance.html:195
+#: .\templates\grievance.html:497
 msgid "Garbage"
 msgstr "कचरा"
 
-#: .\templates\grievance.html:202
+#: .\templates\grievance.html:504
 msgid "Your Name"
 msgstr "आपका नाम"
 
-#: .\templates\grievance.html:212
+#: .\templates\grievance.html:514
 msgid "Address/Location"
 msgstr "पता/स्थान"
 
-#: .\templates\grievance.html:217
+#: .\templates\grievance.html:519
 msgid "Grievance Description"
 msgstr "शिकायत विवरण"
 
-#: .\templates\grievance.html:221
+#: .\templates\grievance.html:523
 msgid "Submit Grievance"
 msgstr "शिकायत जमा करें"
 
-#: .\templates\index.html:36
-msgid "Civic Services Kiosk - Language"
-msgstr "सिविक सेवा कियोस्क - भाषा"
-
-#: .\templates\index.html:235
-msgid "भाषा चुनें"
-msgstr "भाषा चुनें"
-
-#: .\templates\index.html:235
-msgid "Select Language"
-msgstr "भाषा चुनें"
-
-#: .\templates\index.html:237
-msgid "English"
-msgstr "अंग्रेज़ी"
-
-#: .\templates\index.html:238
-msgid "हिंदी"
-msgstr "हिंदी"
-
-#: .\templates\index.html:239
-msgid "ଓଡ଼ିଆ"
-msgstr "ଓଡ଼ିଆ"
-
-#: .\templates\index.html:240
-msgid "বাংলা"
-msgstr "বাংলা"
-
-#: .\templates\index.html:241
-msgid "தமிழ்"
-msgstr "தமிழ்"
-
-#: .\templates\index.html:242
-msgid "తెలుగు"
-msgstr "తెలుగు"
-
-#: .\templates\marriage-registration.html:4
+#: .\templates\marriage-registration.html:6
 msgid "Marriage Registration - Kiosk"
 msgstr "विवाह पंजीकरण - कियोस्क"
 
-#: .\templates\marriage-registration.html:103
-#: .\templates\municipal-services.html:68 .\templates\payment-history.html:101
+#: .\templates\marriage-registration.html:403
+#: .\templates\municipal-services.html:356
+#: .\templates\payment-history.html:427
 msgid "Marriage Registration"
 msgstr "विवाह पंजीकरण"
 
-#: .\templates\marriage-registration.html:111
+#: .\templates\marriage-registration.html:411
 msgid "Groom Details"
 msgstr "दूल्हे का विवरण"
 
-#: .\templates\marriage-registration.html:121
-#: .\templates\marriage-registration.html:142
+#: .\templates\marriage-registration.html:421
+#: .\templates\marriage-registration.html:442
 msgid "Aadhaar"
 msgstr "आधार"
 
-#: .\templates\marriage-registration.html:122
-#: .\templates\marriage-registration.html:143
+#: .\templates\marriage-registration.html:422
+#: .\templates\marriage-registration.html:443
 msgid "Please enter 12-digit Aadhaar number"
 msgstr "कृपया १२-अंकीय आधार संख्या दर्ज करें"
 
-#: .\templates\marriage-registration.html:132
+#: .\templates\marriage-registration.html:432
 msgid "Bride Details"
 msgstr "दुल्हन का विवरण"
 
-#: .\templates\marriage-registration.html:153
+#: .\templates\marriage-registration.html:453
 msgid "Marriage Details"
 msgstr "विवाह विवरण"
 
-#: .\templates\marriage-registration.html:156
+#: .\templates\marriage-registration.html:456
 msgid "Date"
 msgstr "तारीख"
 
-#: .\templates\marriage-registration.html:160
+#: .\templates\marriage-registration.html:460
 msgid "Place"
 msgstr "स्थान"
 
-#: .\templates\marriage-registration.html:164
+#: .\templates\marriage-registration.html:464
 msgid "Type"
 msgstr "प्रकार"
 
-#: .\templates\marriage-registration.html:166
+#: .\templates\marriage-registration.html:466
 msgid "Select Type"
 msgstr "प्रकार चुनें"
 
-#: .\templates\marriage-registration.html:167
+#: .\templates\marriage-registration.html:467
 msgid "Hindu Marriage Act"
 msgstr "हिंदू विवाह अधिनियम"
 
-#: .\templates\marriage-registration.html:168
+#: .\templates\marriage-registration.html:468
 msgid "Special Marriage Act"
 msgstr "विशेष विवाह अधिनियम"
 
-#: .\templates\marriage-registration.html:169
+#: .\templates\marriage-registration.html:469
 msgid "Muslim Personal Law"
 msgstr "मुस्लिम व्यक्तिगत कानून"
 
-#: .\templates\marriage-registration.html:170
+#: .\templates\marriage-registration.html:470
 msgid "Christian Marriage Act"
 msgstr "ईसाई विवाह अधिनियम"
 
-#: .\templates\marriage-registration.html:177
+#: .\templates\marriage-registration.html:477
 msgid "Witness 1 Name"
 msgstr "गवाह १ का नाम"
 
-#: .\templates\marriage-registration.html:181
+#: .\templates\marriage-registration.html:481
 msgid "Witness 2 Name"
 msgstr "गवाह २ का नाम"
 
-#: .\templates\marriage-registration.html:189
+#: .\templates\marriage-registration.html:489
 msgid "Register Marriage"
 msgstr "विवाह पंजीकृत करें"
 
-#: .\templates\menu.html:64
+#: .\templates\marriage-registration.html:716
+#, fuzzy
+#| msgid "Please enter a valid 12-digit Aadhaar number"
+msgid "Please enter valid 12-digit Aadhaar numbers"
+msgstr "कृपया एक वैध १२-अंकीय आधार संख्या दर्ज करें"
+
+#: .\templates\marriage-registration.html:729
+#, fuzzy
+#| msgid "Marriage Registration"
+msgid "Submitting marriage registration"
+msgstr "विवाह पंजीकरण"
+
+#: .\templates\marriage-registration.html:779
+msgid ""
+"Please say a command... groom name, bride name, aadhaar, place, witness, or "
+"submit"
+msgstr ""
+
+#: .\templates\marriage-registration.html:1188
+msgid ""
+"Fill groom and bride details, then marriage details, then say submit to "
+"register"
+msgstr ""
+
+#: .\templates\menu.html:173
 msgid "Civic Services Kiosk - Main Menu"
 msgstr "सिविक सेवा कियोस्क - मुख्य मेनू"
 
-#: .\templates\menu.html:655
+#: .\templates\menu.html:845
 msgid "Session about to expire"
 msgstr "सत्र समाप्त होने वाला है"
 
-#: .\templates\menu.html:656
+#: .\templates\menu.html:846
 msgid "Continue Session"
 msgstr "सत्र जारी रखें"
 
-#: .\templates\menu.html:673
+#: .\templates\menu.html:853
+#, fuzzy
+#| msgid "Processing..."
+msgid "Processing voice command..."
+msgstr "प्रक्रिया हो रही है..."
+
+#: .\templates\menu.html:869
 msgid "सेवाएं / Services"
 msgstr "सेवाएं / सेवाएं"
 
-#: .\templates\menu.html:674
+#: .\templates\menu.html:870
 msgid "आपका आधार सुरक्षित रूप से कनेक्ट है"
 msgstr "आपका आधार सुरक्षित रूप से कनेक्ट है"
 
-#: .\templates\menu.html:679 .\templates\payment-history.html:79
+#: .\templates\menu.html:873
+#, fuzzy
+#| msgid "Gas Services"
+msgid "Gas services"
+msgstr "गैस सेवाएं"
+
+#: .\templates\menu.html:875 .\templates\payment-history.html:405
 msgid "Gas"
 msgstr "गैस"
 
-#: .\templates\menu.html:684 .\templates\payment-history.html:80
+#: .\templates\menu.html:878
+#, fuzzy
+#| msgid "Electricity Services"
+msgid "Electricity services"
+msgstr "बिजली सेवाएं"
+
+#: .\templates\menu.html:880 .\templates\payment-history.html:406
 msgid "Electricity"
 msgstr "बिजली"
 
-#: .\templates\menu.html:689 .\templates\payment-history.html:82
+#: .\templates\menu.html:883
+#, fuzzy
+#| msgid "Municipal Services"
+msgid "Municipal services"
+msgstr "नगर निगम सेवाएं"
+
+#: .\templates\menu.html:885 .\templates\payment-history.html:408
 msgid "Municipal"
 msgstr "नगर निगम"
 
-#: .\templates\menu.html:694
+#: .\templates\menu.html:888
+#, fuzzy
+#| msgid "Transport"
+msgid "Transport services"
+msgstr "परिवहन"
+
+#: .\templates\menu.html:890
 msgid "Transport"
 msgstr "परिवहन"
 
-#: .\templates\menu.html:699
+#: .\templates\menu.html:893
+#, fuzzy
+#| msgid "Revenue"
+msgid "Revenue services"
+msgstr "राजस्व"
+
+#: .\templates\menu.html:895
 msgid "Revenue"
 msgstr "राजस्व"
 
-#: .\templates\menu.html:704
+#: .\templates\menu.html:898
+#, fuzzy
+#| msgid "Application Status"
+msgid "Application status"
+msgstr "आवेदन की स्थिति"
+
+#: .\templates\menu.html:900
 msgid "Status"
 msgstr "स्थिति"
 
-#: .\templates\menu.html:819
-msgid "Listening..."
-msgstr "सुन रहे हैं..."
+#: .\templates\menu.html:1065
+msgid ""
+"Please say a service... Gas, Electricity, Municipal, Transport, Revenue, or "
+"Status"
+msgstr ""
 
-#: .\templates\municipal-services.html:4
+#: .\templates\menu.html:1094
+#, fuzzy
+#| msgid "Gas Services"
+msgid "Opening Gas services"
+msgstr "गैस सेवाएं"
+
+#: .\templates\menu.html:1101
+#, fuzzy
+#| msgid "Electricity Services"
+msgid "Opening Electricity services"
+msgstr "बिजली सेवाएं"
+
+#: .\templates\menu.html:1108
+#, fuzzy
+#| msgid "Municipal Services"
+msgid "Opening Municipal services"
+msgstr "नगर निगम सेवाएं"
+
+#: .\templates\menu.html:1115
+msgid "Opening Transport services"
+msgstr ""
+
+#: .\templates\menu.html:1122
+msgid "Opening Revenue services"
+msgstr ""
+
+#: .\templates\menu.html:1136 .\templates\under-development.html:697
+#: .\templates\under-development.html:795
+msgid "Going back"
+msgstr ""
+
+#: .\templates\menu.html:1216
+msgid ""
+"Main menu. Choose Gas, Electricity, Municipal, Transport, Revenue, or Status "
+"services. Press mic button for voice help."
+msgstr ""
+
+#: .\templates\municipal-services.html:6
 msgid "Municipal Services - Civic Kiosk"
 msgstr "नगर निगम सेवाएं - सिविक कियोस्क"
 
-#: .\templates\municipal-services.html:61
+#: .\templates\municipal-services.html:344
+#: .\templates\payment-history.html:394 .\templates\under-development.html:513
+#, fuzzy
+#| msgid "Uploading..."
+msgid "Loading..."
+msgstr "अपलोड हो रहा है..."
+
+#: .\templates\municipal-services.html:349
 msgid "Municipal Services"
 msgstr "नगर निगम सेवाएं"
 
-#: .\templates\municipal-services.html:63 .\templates\payment-history.html:96
-#: .\templates\property-tax.html:68
+#: .\templates\municipal-services.html:351
+#: .\templates\payment-history.html:422 .\templates\property-tax.html:578
 msgid "Property Tax"
 msgstr "संपत्ति कर"
 
-#: .\templates\municipal-services.html:64 .\templates\payment-history.html:95
-#: .\templates\water-bill.html:70
+#: .\templates\municipal-services.html:352
+#: .\templates\payment-history.html:421 .\templates\water-bill.html:556
 msgid "Water Bill"
 msgstr "जल बिल"
 
-#: .\templates\municipal-services.html:65 .\templates\payment-history.html:98
-#: .\templates\trade-license.html:64
+#: .\templates\municipal-services.html:353
+#: .\templates\payment-history.html:424 .\templates\trade-license.html:429
 msgid "Trade License"
 msgstr "व्यापार लाइसेंस"
 
-#: .\templates\municipal-services.html:69
+#: .\templates\municipal-services.html:357
 msgid "Building Plan"
 msgstr "भवन योजना"
 
-#: .\templates\municipal-services.html:70
+#: .\templates\municipal-services.html:358
 msgid "Grievance"
 msgstr "शिकायत"
 
-#: .\templates\municipal-services.html:71 .\templates\payment-history.html:97
-#: .\templates\professional-tax.html:68
+#: .\templates\municipal-services.html:359
+#: .\templates\payment-history.html:423 .\templates\professional-tax.html:580
 msgid "Professional Tax"
 msgstr "व्यावसायिक कर"
 
-#: .\templates\otp.html:34
+#: .\templates\municipal-services.html:508
+msgid ""
+"Please say a service... property tax, water bill, trade license, birth "
+"certificate, death certificate, marriage registration, building plan, "
+"grievance, or professional tax"
+msgstr ""
+
+#: .\templates\municipal-services.html:584
+msgid "Going to home page"
+msgstr ""
+
+#: .\templates\municipal-services.html:708
+msgid ""
+"Municipal services menu. Choose property tax, water bill, trade license, "
+"birth certificate, death certificate, marriage registration, building plan, "
+"grievance, or professional tax. Press mic button for voice help."
+msgstr ""
+
+#: .\templates\otp.html:177
 msgid "Civic Services Kiosk - OTP Verification"
 msgstr "सिविक सेवा कियोस्क - ओटीपी सत्यापन"
 
-#: .\templates\otp.html:443
+#: .\templates\otp.html:654
 msgid "Verify OTP for"
 msgstr "के लिए ओटीपी सत्यापित करें"
 
-#: .\templates\otp.html:447
+#: .\templates\otp.html:658
 msgid "Sending OTP..."
 msgstr "ओटीपी भेजा जा रहा है..."
 
-#: .\templates\otp.html:462
+#: .\templates\otp.html:680
 msgid "Enter 6-digit OTP"
 msgstr "६-अंकीय ओटीपी दर्ज करें"
 
-#: .\templates\otp.html:488
-msgid "Verify"
-msgstr "सत्यापित करें"
+#: .\templates\otp.html:691
+#, fuzzy
+#| msgid "Processing..."
+msgid "Processing voice..."
+msgstr "प्रक्रिया हो रही है..."
 
-#: .\templates\otp.html:494
+#: .\templates\otp.html:716
 msgid "Resend OTP"
 msgstr "ओटीपी पुनः भेजें"
 
-#: .\templates\otp.html:643
-msgid "Please enter 6-digit OTP"
-msgstr "कृपया ६-अंकीय ओटीपी दर्ज करें"
+#: .\templates\otp.html:912
+msgid "OTP digit"
+msgstr ""
 
-#: .\templates\otp.html:673
-msgid "OTP expired. Please request a new one."
-msgstr "ओटीपी की अवधि समाप्त हो गई। कृपया नया अनुरोध करें।"
+#: .\templates\otp.html:934
+msgid "Enter 6-digit OTP using keypad or speak the numbers"
+msgstr ""
 
-#: .\templates\payment-history.html:4
+#: .\templates\otp.html:1068
+#, fuzzy
+#| msgid "Sending OTP..."
+msgid "Sending..."
+msgstr "ओटीपी भेजा जा रहा है..."
+
+#: .\templates\payment-history.html:6
 msgid "Payment History - Civic Kiosk"
 msgstr "भुगतान इतिहास - सिविक कियोस्क"
 
-#: .\templates\payment-history.html:78
+#: .\templates\payment-history.html:404
 msgid "All Services"
 msgstr "सभी सेवाएं"
 
-#: .\templates\payment-history.html:94
+#: .\templates\payment-history.html:420
 msgid "Gas Bill"
 msgstr "गैस बिल"
 
-#: .\templates\payment-history.html:105
+#: .\templates\payment-history.html:431
 msgid "Ref:"
 msgstr "संदर्भ:"
 
-#: .\templates\payment-history.html:115
+#: .\templates\payment-history.html:441
 msgid "No payment history found"
 msgstr "कोई भुगतान इतिहास नहीं मिला"
 
-#: .\templates\professional-tax.html:4
+#: .\templates\payment-history.html:547
+#, fuzzy
+#| msgid "Printing receipt..."
+msgid "Viewing receipt"
+msgstr "रसीद प्रिंट हो रही है..."
+
+#: .\templates\payment-history.html:615
+msgid ""
+"Please say a command... show all, gas, electricity, water, municipal, first, "
+"last, or count"
+msgstr ""
+
+#: .\templates\payment-history.html:648 .\templates\payment-history.html:836
+#, fuzzy
+#| msgid "All Services"
+msgid "Showing all services"
+msgstr "सभी सेवाएं"
+
+#: .\templates\payment-history.html:661 .\templates\payment-history.html:842
+msgid "Showing gas payments only"
+msgstr ""
+
+#: .\templates\payment-history.html:674 .\templates\payment-history.html:848
+msgid "Showing electricity payments only"
+msgstr ""
+
+#: .\templates\payment-history.html:687 .\templates\payment-history.html:854
+msgid "Showing water payments only"
+msgstr ""
+
+#: .\templates\payment-history.html:700 .\templates\payment-history.html:860
+msgid "Showing municipal payments only"
+msgstr ""
+
+#: .\templates\payment-history.html:726 .\templates\payment-history.html:875
+#, fuzzy
+#| msgid "Receipt No:"
+msgid "Receipt not found"
+msgstr "रसीद संख्या:"
+
+#: .\templates\payment-history.html:758 .\templates\payment-history.html:899
+#, fuzzy
+#| msgid "No payment history found"
+msgid "payments found"
+msgstr "कोई भुगतान इतिहास नहीं मिला"
+
+#: .\templates\payment-history.html:766 .\templates\payment-history.html:901
+#, fuzzy
+#| msgid "No payment history found"
+msgid "No payments found"
+msgstr "कोई भुगतान इतिहास नहीं मिला"
+
+#: .\templates\payment-history.html:939
+#, fuzzy
+#| msgid "Payment History"
+msgid "Payment history. "
+msgstr "भुगतान इतिहास"
+
+#: .\templates\payment-history.html:939
+msgid ""
+"payments found. Say filter by gas, electricity, water, or municipal, or say "
+"view first or last receipt."
+msgstr ""
+
+#: .\templates\payment-history.html:947
+#, fuzzy
+#| msgid "No payment history found"
+msgid "No payment history found."
+msgstr "कोई भुगतान इतिहास नहीं मिला"
+
+#: .\templates\professional-tax.html:6
 msgid "Professional Tax - Civic Kiosk"
 msgstr "व्यावसायिक कर - सिविक कियोस्क"
 
-#: .\templates\professional-tax.html:73
+#: .\templates\professional-tax.html:585
 msgid "Enter PTIN"
 msgstr "पीटीआईएन दर्ज करें"
 
-#: .\templates\professional-tax.html:80
+#: .\templates\professional-tax.html:592
 msgid "PTIN:"
 msgstr "पीटीआईएन:"
 
-#: .\templates\professional-tax.html:88
+#: .\templates\professional-tax.html:600
 msgid "Profession:"
 msgstr "व्यवसाय:"
 
-#: .\templates\professional-tax.html:92 .\templates\property-tax.html:96
+#: .\templates\professional-tax.html:604 .\templates\property-tax.html:606
 msgid "Assessment Year:"
 msgstr "मूल्यांकन वर्ष:"
 
-#: .\templates\professional-tax.html:100
+#: .\templates\professional-tax.html:612
 msgid "Half-yearly Tax:"
 msgstr "अर्ध-वार्षिक कर:"
 
-#: .\templates\professional-tax.html:104
+#: .\templates\professional-tax.html:616
 msgid "Penalty (if any):"
 msgstr "दंड (यदि कोई हो):"
 
-#: .\templates\professional-tax.html:132
+#: .\templates\professional-tax.html:927
 msgid "Please enter PTIN"
 msgstr "कृपया पीटीआईएन दर्ज करें"
 
-#: .\templates\professional-tax.html:140 .\templates\property-tax.html:136
-#: .\templates\water-bill.html:131
-msgid "Pay ₹"
-msgstr "₹ का भुगतान करें"
+#: .\templates\professional-tax.html:938
+#: .\templates\professional-tax.html:1061
+#: .\templates\professional-tax.html:1163
+#, fuzzy
+#| msgid "Fetch Tax Details"
+msgid "Searching for tax details"
+msgstr "कर विवरण प्राप्त करें"
 
-#: .\templates\property-tax.html:4
+#: .\templates\professional-tax.html:948 .\templates\property-tax.html:942
+#: .\templates\water-bill.html:907
+#, fuzzy
+#| msgid "Pay Now"
+msgid "Pay "
+msgstr "अभी भुगतान करें"
+
+#: .\templates\professional-tax.html:1007
+msgid "Please say a command... PTIN, search tax, UPI, ATM, or pay"
+msgstr ""
+
+#: .\templates\professional-tax.html:1064
+#: .\templates\professional-tax.html:1166
+#, fuzzy
+#| msgid "Please enter PTIN"
+msgid "Please enter PTIN first"
+msgstr "कृपया पीटीआईएन दर्ज करें"
+
+#: .\templates\professional-tax.html:1072
+#: .\templates\professional-tax.html:1174
+#, fuzzy
+#| msgid "Please enter your address"
+msgid "Please search for tax details first"
+msgstr "कृपया अपना पता दर्ज करें"
+
+#: .\templates\professional-tax.html:1213
+msgid "Professional tax page. Enter PTIN or say number, then say search tax."
+msgstr ""
+
+#: .\templates\professional-tax.html:1222
+#, fuzzy
+#| msgid "Professional Tax"
+msgid "Professional tax due"
+msgstr "व्यावसायिक कर"
+
+#: .\templates\professional-tax.html:1222 .\templates\property-tax.html:1218
+#: .\templates\water-bill.html:1189
+msgid "Select UPI or ATM and say pay."
+msgstr ""
+
+#: .\templates\property-tax.html:6
 msgid "Property Tax - Civic Kiosk"
 msgstr "संपत्ति कर - सिविक कियोस्क"
 
-#: .\templates\property-tax.html:73
+#: .\templates\property-tax.html:583
 msgid "Enter Property ID"
 msgstr "संपत्ति आईडी दर्ज करें"
 
-#: .\templates\property-tax.html:75
+#: .\templates\property-tax.html:585
 msgid "Fetch Tax Details"
 msgstr "कर विवरण प्राप्त करें"
 
-#: .\templates\property-tax.html:80
+#: .\templates\property-tax.html:590
 msgid "Property ID:"
 msgstr "संपत्ति आईडी:"
 
-#: .\templates\property-tax.html:84
+#: .\templates\property-tax.html:594
 msgid "Owner Name:"
 msgstr "मालिक का नाम:"
 
-#: .\templates\property-tax.html:88
+#: .\templates\property-tax.html:598
 msgid "Property Type:"
 msgstr "संपत्ति प्रकार:"
 
-#: .\templates\property-tax.html:92
+#: .\templates\property-tax.html:602
 msgid "Area (sq ft):"
 msgstr "क्षेत्र (वर्ग फुट):"
 
-#: .\templates\property-tax.html:128
+#: .\templates\property-tax.html:921
 msgid "Please enter property ID"
 msgstr "कृपया संपत्ति आईडी दर्ज करें"
 
-#: .\templates\receipt-print.html:4
+#: .\templates\property-tax.html:932 .\templates\property-tax.html:1056
+#: .\templates\property-tax.html:1159
+#, fuzzy
+#| msgid "Fetch Tax Details"
+msgid "Fetching property tax details"
+msgstr "कर विवरण प्राप्त करें"
+
+#: .\templates\property-tax.html:1001
+msgid "Please say a command... property ID, fetch tax, UPI, ATM, or pay"
+msgstr ""
+
+#: .\templates\property-tax.html:1059 .\templates\property-tax.html:1162
+#, fuzzy
+#| msgid "Please enter property ID"
+msgid "Please enter property ID first"
+msgstr "कृपया संपत्ति आईडी दर्ज करें"
+
+#: .\templates\property-tax.html:1067 .\templates\property-tax.html:1170
+msgid "Please fetch tax details first"
+msgstr ""
+
+#: .\templates\property-tax.html:1209
+msgid ""
+"Property tax page. Enter property ID starting with PT or say number, then "
+"say fetch tax."
+msgstr ""
+
+#: .\templates\property-tax.html:1218
+#, fuzzy
+#| msgid "Property Tax"
+msgid "Property tax due"
+msgstr "संपत्ति कर"
+
+#: .\templates\receipt-print.html:6
 msgid "Payment Receipt - Civic Kiosk"
 msgstr "भुगतान रसीद - सिविक कियोस्क"
 
-#: .\templates\receipt-print.html:71 .\templates\receipt-print.html:76
+#: .\templates\receipt-print.html:411 .\templates\receipt-print.html:416
 msgid "Payment Receipt"
 msgstr "भुगतान रसीद"
 
-#: .\templates\receipt-print.html:74
+#: .\templates\receipt-print.html:414
 msgid "CIVIC KIOSK"
 msgstr "सिविक कियोस्क"
 
-#: .\templates\receipt-print.html:80
+#: .\templates\receipt-print.html:420
 msgid "Receipt No:"
 msgstr "रसीद संख्या:"
 
-#: .\templates\receipt-print.html:84
+#: .\templates\receipt-print.html:424
 msgid "Date & Time:"
 msgstr "तारीख और समय:"
 
-#: .\templates\receipt-print.html:88
+#: .\templates\receipt-print.html:428
 msgid "Service:"
 msgstr "सेवा:"
 
-#: .\templates\receipt-print.html:96
+#: .\templates\receipt-print.html:436
 msgid "Bill Period:"
 msgstr "बिल अवधि:"
 
-#: .\templates\receipt-print.html:100
+#: .\templates\receipt-print.html:440
 msgid "Payment Mode:"
 msgstr "भुगतान मोड:"
 
-#: .\templates\receipt-print.html:104
+#: .\templates\receipt-print.html:444
 msgid "Transaction ID:"
 msgstr "लेन-देन आईडी:"
 
-#: .\templates\receipt-print.html:108
+#: .\templates\receipt-print.html:448
 msgid "Total Amount:"
 msgstr "कुल राशि:"
 
-#: .\templates\receipt-print.html:117
-msgid "QR Code"
-msgstr "क्यूआर कोड"
-
-#: .\templates\receipt-print.html:120
+#: .\templates\receipt-print.html:460
 msgid "Scan to verify receipt"
 msgstr "रसीद सत्यापित करने के लिए स्कैन करें"
 
-#: .\templates\receipt-print.html:121
+#: .\templates\receipt-print.html:461
 msgid "Thank you for using Civic Kiosk"
 msgstr "सिविक कियोस्क का उपयोग करने के लिए धन्यवाद"
 
-#: .\templates\receipt-print.html:122
+#: .\templates\receipt-print.html:462
 msgid "This is a computer generated receipt"
 msgstr "यह एक कंप्यूटर जनरेटेड रसीद है"
 
-#: .\templates\receipt-print.html:129
+#: .\templates\receipt-print.html:469
 msgid "Print"
 msgstr "प्रिंट करें"
 
-#: .\templates\receipt-print.html:131
+#: .\templates\receipt-print.html:471
 msgid "Home"
 msgstr "होम"
 
-#: .\templates\receipt-print.html:158
+#: .\templates\receipt-print.html:585 .\templates\receipt-print.html:861
+#, fuzzy
+#| msgid "Receipt No:"
+msgid "Receipt"
+msgstr "रसीद संख्या:"
+
+#: .\templates\receipt-print.html:585 .\templates\receipt-print.html:861
+msgid "generated. Say print, home, or back."
+msgstr ""
+
+#: .\templates\receipt-print.html:608
+#, fuzzy
+#| msgid "Printing receipt..."
+msgid "Printing receipt"
+msgstr "रसीद प्रिंट हो रही है..."
+
+#: .\templates\receipt-print.html:619
 msgid "Printing receipt..."
 msgstr "रसीद प्रिंट हो रही है..."
 
-#: .\templates\trade-license.html:4
+#: .\templates\receipt-print.html:666
+msgid "Please say a command... print, home, back, or receipt number"
+msgstr ""
+
+#: .\templates\receipt-print.html:699 .\templates\receipt-print.html:829
+msgid "Receipt number is"
+msgstr ""
+
+#: .\templates\receipt-print.html:715 .\templates\receipt-print.html:837
+#, fuzzy
+#| msgid "Total Amount:"
+msgid "Total amount is"
+msgstr "कुल राशि:"
+
+#: .\templates\receipt-print.html:735 .\templates\receipt-print.html:811
+msgid "Going to main menu"
+msgstr ""
+
+#: .\templates\receipt-print.html:747 .\templates\receipt-print.html:816
+#, fuzzy
+#| msgid "No payment history found"
+msgid "Going back to payment history"
+msgstr "कोई भुगतान इतिहास नहीं मिला"
+
+#: .\templates\trade-license.html:6
 msgid "Trade License - Civic Kiosk"
 msgstr "व्यापार लाइसेंस - सिविक कियोस्क"
 
-#: .\templates\trade-license.html:68
+#: .\templates\trade-license.html:433
 msgid "Business Name"
 msgstr "व्यवसाय का नाम"
 
-#: .\templates\trade-license.html:69
+#: .\templates\trade-license.html:434
 msgid "Enter business name"
 msgstr "व्यवसाय का नाम दर्ज करें"
 
-#: .\templates\trade-license.html:72
+#: .\templates\trade-license.html:437
 msgid "Business Type"
 msgstr "व्यवसाय का प्रकार"
 
-#: .\templates\trade-license.html:74
+#: .\templates\trade-license.html:439
 msgid "Select Business Type"
 msgstr "व्यवसाय का प्रकार चुनें"
 
-#: .\templates\trade-license.html:75
+#: .\templates\trade-license.html:440
 msgid "Retail Shop"
 msgstr "खुदरा दुकान"
 
-#: .\templates\trade-license.html:76
+#: .\templates\trade-license.html:441
 msgid "Restaurant"
 msgstr "रेस्तरां"
 
-#: .\templates\trade-license.html:77
+#: .\templates\trade-license.html:442
 msgid "Manufacturing"
 msgstr "विनिर्माण"
 
-#: .\templates\trade-license.html:78
+#: .\templates\trade-license.html:443
 msgid "Service Provider"
 msgstr "सेवा प्रदाता"
 
-#: .\templates\trade-license.html:79
+#: .\templates\trade-license.html:444
 msgid "Warehouse"
 msgstr "गोदाम"
 
-#: .\templates\trade-license.html:85
+#: .\templates\trade-license.html:450
 msgid "Enter owner name"
 msgstr "मालिक का नाम दर्ज करें"
 
-#: .\templates\trade-license.html:88
+#: .\templates\trade-license.html:453
 msgid "Business Address"
 msgstr "व्यवसाय का पता"
 
-#: .\templates\trade-license.html:92
+#: .\templates\trade-license.html:457
 msgid "GST Number (if applicable)"
 msgstr "जीएसटी नंबर (यदि लागू हो)"
 
-#: .\templates\trade-license.html:93
+#: .\templates\trade-license.html:458
 msgid "Enter GST number"
 msgstr "जीएसटी नंबर दर्ज करें"
 
-#: .\templates\trade-license.html:97
+#: .\templates\trade-license.html:462
 msgid "Application Fee:"
 msgstr "आवेदन शुल्क:"
 
-#: .\templates\trade-license.html:101
+#: .\templates\trade-license.html:466
 msgid "License Fee (Annual):"
 msgstr "लाइसेंस शुल्क (वार्षिक):"
 
-#: .\templates\trade-license.html:106
+#: .\templates\trade-license.html:471
 msgid "Estimated Total:"
 msgstr "अनुमानित कुल:"
 
-#: .\templates\trade-license.html:111
+#: .\templates\trade-license.html:476
 msgid "Apply for License"
 msgstr "लाइसेंस के लिए आवेदन करें"
 
-#: .\templates\under-development.html:5
+#: .\templates\trade-license.html:712
+#, fuzzy
+#| msgid "Submit Application"
+msgid "Submitting license application"
+msgstr "आवेदन जमा करें"
+
+#: .\templates\trade-license.html:762
+msgid ""
+"Please say a command... business name, type, owner name, address, or submit"
+msgstr ""
+
+#: .\templates\trade-license.html:1100
+msgid ""
+"Trade license application page. Enter business name, type, owner name, "
+"address, then say submit."
+msgstr ""
+
+#: .\templates\under-development.html:7
 msgid "Civic Kiosk - Under Development"
 msgstr "सिविक कियोस्क - विकासाधीन"
 
-#: .\templates\under-development.html:261
+#: .\templates\under-development.html:524
 msgid "Module Under Development"
 msgstr "मॉड्यूल विकासाधीन"
 
-#: .\templates\under-development.html:265
+#: .\templates\under-development.html:528
 msgid "This digital service module is currently being configured and deployed."
 msgstr "यह डिजिटल सेवा मॉड्यूल वर्तमान में कॉन्फ़िगर और तैनात किया जा रहा है।"
 
-#: .\templates\under-development.html:266
+#: .\templates\under-development.html:529
 msgid "Please check back soon for activation."
 msgstr "सक्रियण के लिए कृपया जल्द ही पुनः जांच करें।"
 
-#: .\templates\under-development.html:270
+#: .\templates\under-development.html:533
 msgid "Back to Home"
 msgstr "होम पर वापस जाएं"
 
-#: .\templates\under-development.html:275
+#: .\templates\under-development.html:538
 msgid "Digital Civic Services Portal | Development Mode |"
 msgstr "डिजिटल नागरिक सेवा पोर्टल | विकास मोड |"
 
-#: .\templates\water-bill.html:4
+#: .\templates\under-development.html:653
+msgid "Please say a command... home or back"
+msgstr ""
+
+#: .\templates\under-development.html:685
+#: .\templates\under-development.html:790
+msgid "Going to home menu"
+msgstr ""
+
+#: .\templates\under-development.html:712
+#: .\templates\under-development.html:803
+msgid "This module is under development. Please check back later."
+msgstr ""
+
+#: .\templates\under-development.html:831
+msgid ""
+"This module is under development. Say home or back to return to the main "
+"menu."
+msgstr ""
+
+#: .\templates\water-bill.html:6
 msgid "Water Bill - Civic Kiosk"
 msgstr "जल बिल - सिविक कियोस्क"
+
+#: .\templates\water-bill.html:897 .\templates\water-bill.html:1028
+#: .\templates\water-bill.html:1130
+#, fuzzy
+#| msgid "Fetch Bill"
+msgid "Fetching water bill"
+msgstr "बिल प्राप्त करें"
+
+#: .\templates\water-bill.html:1180
+msgid ""
+"Water bill page. Enter consumer number starting with WC or say number, then "
+"say fetch bill."
+msgstr ""
+
+#: .\templates\water-bill.html:1189
+#, fuzzy
+#| msgid "Water Bill"
+msgid "Water bill due"
+msgstr "जल बिल"
+
+#~ msgid "Voice assistant activated"
+#~ msgstr "वॉयस असिस्टेंट सक्रिय हो गया है"
+
+#~ msgid "Listen"
+#~ msgstr "सुनें"
+
+#~ msgid "Enter child's name"
+#~ msgstr "बच्चे का नाम दर्ज करें"
+
+#~ msgid "Hospital/Clinic name or Address"
+#~ msgstr "अस्पताल/क्लिनिक का नाम या पता"
+
+#~ msgid "Enter father's full name"
+#~ msgstr "पिता का पूरा नाम दर्ज करें"
+
+#~ msgid "Enter mother's full name"
+#~ msgstr "माता का पूरा नाम दर्ज करें"
+
+#~ msgid "Enter permanent address"
+#~ msgstr "स्थायी पता दर्ज करें"
+
+#~ msgid "Mixed Use"
+#~ msgstr "मिश्रित उपयोग"
+
+#~ msgid "Father's/Spouse Name"
+#~ msgstr "पिता/पति का नाम"
+
+#~ msgid "Informant Name"
+#~ msgstr "सूचना देने वाले का नाम"
+
+#~ msgid "Informant Aadhaar"
+#~ msgstr "सूचना देने वाले का आधार"
+
+#~ msgid "Camera access denied or not available"
+#~ msgstr "कैमरा पहुंच अस्वीकृत या उपलब्ध नहीं है"
+
+#~ msgid "Please capture at least one image"
+#~ msgstr "कृपया कम से कम एक छवि कैप्चर करें"
+
+#~ msgid "Uploading"
+#~ msgstr "अपलोड हो रहा है"
+
+#~ msgid "images..."
+#~ msgstr "छवियाँ..."
+
+#~ msgid "Images uploaded successfully!"
+#~ msgstr "छवियाँ सफलतापूर्वक अपलोड हो गईं!"
+
+#~ msgid "Supported: PDF, JPG, PNG (Max 10 files, 25MB each)"
+#~ msgstr "समर्थित: PDF, JPG, PNG (अधिकतम १० फ़ाइलें, प्रत्येक २५एमबी)"
+
+#~ msgid "Maximum"
+#~ msgstr "अधिकतम"
+
+#~ msgid "files allowed. You selected"
+#~ msgstr "फ़ाइलें अनुमत हैं। आपने चयन किया"
+
+#~ msgid "files."
+#~ msgstr "फ़ाइलें।"
+
+#~ msgid "Some files exceed"
+#~ msgstr "कुछ फ़ाइलें अधिक हैं"
+
+#~ msgid "limit:"
+#~ msgstr "सीमा:"
+
+#~ msgid "files uploaded successfully!"
+#~ msgstr "फ़ाइलें सफलतापूर्वक अपलोड हो गईं!"
+
+#~ msgid "Open DigiLocker or any scanner app"
+#~ msgstr "DigiLocker या कोई स्कैनर ऐप खोलें"
+
+#~ msgid "Scan this QR code"
+#~ msgstr "इस क्यूआर कोड को स्कैन करें"
+
+#~ msgid "Upload documents from your phone"
+#~ msgstr "अपने फोन से दस्तावेज़ अपलोड करें"
+
+#~ msgid "Documents will appear here automatically"
+#~ msgstr "दस्तावेज़ स्वचालित रूप से यहां दिखाई देंगे"
+
+#~ msgid "Received Documents:"
+#~ msgstr "प्राप्त दस्तावेज़:"
+
+#~ msgid "documents received successfully via QR scan!"
+#~ msgstr "क्यूआर स्कैन के माध्यम से दस्तावेज़ सफलतापूर्वक प्राप्त हुए!"
+
+#~ msgid "Please enter a valid consumer number (minimum 6 digits)"
+#~ msgstr "कृपया एक वैध उपभोक्ता संख्या दर्ज करें (न्यूनतम ६ अंक)"
+
+#~ msgid "Enter Consumer Number:"
+#~ msgstr "उपभोक्ता संख्या दर्ज करें:"
+
+#~ msgid "Please describe your complaint"
+#~ msgstr "कृपया अपनी शिकायत का वर्णन करें"
+
+#~ msgid "February 2026"
+#~ msgstr "फरवरी २०२६"
+
+#~ msgid "January 2026"
+#~ msgstr "जनवरी २०२६"
+
+#~ msgid "December 2025"
+#~ msgstr "दिसंबर २०२५"
+
+#~ msgid "Enter Consumer Number"
+#~ msgstr "उपभोक्ता संख्या दर्ज करें"
+
+#~ msgid "Downloading bill for"
+#~ msgstr "के लिए बिल डाउनलोड हो रहा है"
+
+#~ msgid "Taxes"
+#~ msgstr "कर"
+
+#~ msgid "Minimum charges"
+#~ msgstr "न्यूनतम शुल्क"
+
+#~ msgid "Please enter a valid load value (positive number)"
+#~ msgstr "कृपया एक वैध लोड मान दर्ज करें (सकारात्मक संख्या)"
+
+#~ msgid "Requested load must be greater than current load"
+#~ msgstr "अनुरोधित लोड वर्तमान लोड से अधिक होना चाहिए"
+
+#~ msgid ""
+#~ "Maximum load enhancement is 50 kW. Please contact commercial office for "
+#~ "higher loads."
+#~ msgstr ""
+#~ "अधिकतम लोड संवर्धन ५० किलोवाट है। अधिक लोड के लिए कृपया वाणिज्यिक कार्यालय से "
+#~ "संपर्क करें।"
+
+#~ msgid "Please select a preferred date"
+#~ msgstr "कृपया एक पसंदीदा तारीख चुनें"
+
+#~ msgid "Please enter new owner name"
+#~ msgstr "कृपया नए मालिक का नाम दर्ज करें"
+
+#~ msgid "Please enter new owner Aadhaar number"
+#~ msgstr "कृपया नए मालिक का आधार नंबर दर्ज करें"
+
+#~ msgid "Please enter your full name"
+#~ msgstr "कृपया अपना पूरा नाम दर्ज करें"
+
+#~ msgid "Please enter load required"
+#~ msgstr "कृपया आवश्यक लोड दर्ज करें"
+
+#~ msgid "Please enter a valid 10-digit mobile number"
+#~ msgstr "कृपया एक वैध १०-अंकीय मोबाइल नंबर दर्ज करें"
+
+#~ msgid "₹ 45,000 - ₹ 2,10,000"
+#~ msgstr "₹ ४५,००० - ₹ २,१०,०००"
+
+#~ msgid "Solar net metering application submitted! Reference:"
+#~ msgstr "सोलर नेट मीटरिंग आवेदन जमा किया गया! संदर्भ:"
+
+#~ msgid "Error:"
+#~ msgstr "त्रुटि:"
+
+#~ msgid "Solar net metering application submitted! Reference: SOLAR"
+#~ msgstr "सोलर नेट मीटरिंग आवेदन जमा किया गया! संदर्भ: सोलर"
+
+#~ msgid "Please enter reference number"
+#~ msgstr "कृपया संदर्भ संख्या दर्ज करें"
+
+#~ msgid "Please provide a more detailed description (minimum 10 characters)"
+#~ msgstr "कृपया अधिक विस्तृत विवरण प्रदान करें (न्यूनतम १० अक्षर)"
+
+#~ msgid "Please enter complete 12-digit Aadhaar"
+#~ msgstr "कृपया पूरा १२-अंकीय आधार दर्ज करें"
+
+#~ msgid "Book"
+#~ msgstr "बुक करें"
+
+#~ msgid "Civic Services Kiosk - Language"
+#~ msgstr "सिविक सेवा कियोस्क - भाषा"
+
+#~ msgid "भाषा चुनें"
+#~ msgstr "भाषा चुनें"
+
+#~ msgid "Select Language"
+#~ msgstr "भाषा चुनें"
+
+#~ msgid "English"
+#~ msgstr "अंग्रेज़ी"
+
+#~ msgid "हिंदी"
+#~ msgstr "हिंदी"
+
+#~ msgid "ଓଡ଼ିଆ"
+#~ msgstr "ଓଡ଼ିଆ"
+
+#~ msgid "বাংলা"
+#~ msgstr "বাংলা"
+
+#~ msgid "தமிழ்"
+#~ msgstr "தமிழ்"
+
+#~ msgid "తెలుగు"
+#~ msgstr "తెలుగు"
+
+#~ msgid "Verify"
+#~ msgstr "सत्यापित करें"
+
+#~ msgid "Please enter 6-digit OTP"
+#~ msgstr "कृपया ६-अंकीय ओटीपी दर्ज करें"
+
+#~ msgid "OTP expired. Please request a new one."
+#~ msgstr "ओटीपी की अवधि समाप्त हो गई। कृपया नया अनुरोध करें।"
+
+#~ msgid "Pay ₹"
+#~ msgstr "₹ का भुगतान करें"

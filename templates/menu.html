@@ -3,6 +3,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Security Meta Tags -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://upload.wikimedia.org https://www.cdac.in; font-src 'self';">
+    <meta name="referrer" content="same-origin">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Cache Control -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
 
     <style>
         /* Hide Google Translate elements */
@@ -30,6 +40,133 @@
             height: 0 !important;
             overflow: hidden !important;
         }
+
+        /* Timeout warning popup */
+        .timeout-warning {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border: 4px solid #ff9933;
+            border-radius: 40px;
+            padding: 30px;
+            text-align: center;
+            z-index: 2000;
+            display: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .timeout-warning p {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .timeout-warning button {
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            padding: 15px 30px;
+            font-size: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            margin: 10px;
+            min-width: 150px;
+        }
+
+        .timeout-warning .logout-btn {
+            background: #dc3545;
+        }
+        
+        .timeout-warning button:active {
+            transform: translateY(3px);
+        }
+
+        /* Voice status indicator */
+        .voice-status-indicator {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-size: 16px;
+            font-weight: 600;
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            border: 2px solid #ff9933;
+        }
+
+        .voice-status-indicator.active {
+            display: flex;
+        }
+
+        .voice-pulse {
+            width: 12px;
+            height: 12px;
+            background: #28a745;
+            border-radius: 50%;
+            animation: voicePulse 1.5s infinite;
+        }
+
+        @keyframes voicePulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* CSRF Token (hidden) */
+        #csrf_token {
+            display: none;
+        }
+
+        /* Security Note Bottom */
+        .security-note-bottom {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            font-size: 10px;
+            color: #666;
+            background: rgba(255,255,255,0.8);
+            padding: 3px 8px;
+            border-radius: 12px;
+            z-index: 999;
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #1e5fbf;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 
     <meta charset="UTF-8">
@@ -46,6 +183,7 @@
             box-sizing: border-box;
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         html, body {
@@ -122,6 +260,10 @@
             transition: all 0.2s;
         }
 
+        .voice-corner-btn:hover {
+            background: #ffaa44;
+        }
+
         .voice-corner-btn.listening {
             background: #28a745;
             animation: pulse 1s infinite;
@@ -162,6 +304,11 @@
             transition: all 0.1s;
         }
 
+        .back-btn:hover {
+            background: #1e5fbf;
+            color: white;
+        }
+
         .back-btn:active {
             transform: translateY(4px);
             box-shadow: 0 1px 0 #0a3d7a;
@@ -179,7 +326,7 @@
             align-items: center;
             justify-content: center;
             padding: 15px;
-            overflow: hidden;
+            overflow-y: auto;
         }
 
         .content-wrapper {
@@ -245,9 +392,18 @@
             justify-content: center;
         }
 
+        .menu-card:hover {
+            background: #e3f2fd;
+        }
+
         .menu-card:active {
             transform: translateY(6px);
             box-shadow: 0 2px 0 #0a3d7a;
+        }
+
+        .menu-card:focus-visible {
+            outline: 3px solid #ff9933;
+            outline-offset: 2px;
         }
 
         .menu-icon {
@@ -425,6 +581,13 @@
             box-shadow: 0 2px 0 #1e7e34;
         }
 
+        .primary-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 7px 0 #1e7e34;
+        }
+
         /* ===== SUCCESS MESSAGE (Left Side) ===== */
         .success-message {
             position: fixed;
@@ -443,6 +606,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            max-width: calc(100% - 130px);
         }
 
         .success-message::before {
@@ -453,6 +617,11 @@
         @keyframes slideInLeft {
             from { transform: translateX(-100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideOutLeft {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(-100%); opacity: 0; }
         }
 
         /* ===== SECURITY NOTE ===== */
@@ -528,67 +697,7 @@
             margin: 10px auto;
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* ===== TIMEOUT WARNING ===== */
-        .timeout-warning {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            border: 4px solid #ff9933;
-            border-radius: 40px;
-            padding: 30px;
-            text-align: center;
-            z-index: 2000;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            max-width: 500px;
-        }
-
-        .timeout-warning p {
-            font-size: 28px;
-            color: #1e5fbf;
-            margin-bottom: 20px;
-            font-weight: 700;
-        }
-
-        .timeout-warning button {
-            background: #28a745;
-            color: white;
-            border: none;
-            border-radius: 40px;
-            padding: 15px 30px;
-            font-size: 28px;
-            font-weight: 700;
-            cursor: pointer;
-            margin: 10px;
-            min-width: 200px;
-            box-shadow: 0 5px 0 #1e7e34;
-        }
-
-        .timeout-warning button:active {
-            transform: translateY(5px);
-            box-shadow: 0 1px 0 #1e7e34;
-        }
-
-        .timeout-warning .logout-btn {
-            background: #dc3545;
-            box-shadow: 0 5px 0 #a71d2a;
-        }
-
-        /* ===== UTILITY CLASSES ===== */
-        .hidden {
-            display: none !important;
-        }
-
-        .text-center {
-            text-align: center;
-        }
-        
+        /* ===== DEPARTMENT CARDS ===== */
         .dept-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -609,11 +718,21 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            transition: all 0.1s;
+        }
+        
+        .dept-card:hover {
+            background: #e3f2fd;
         }
         
         .dept-card:active { 
             transform: translateY(8px); 
             box-shadow: 0 2px 0 #0a3d7a; 
+        }
+        
+        .dept-card:focus-visible {
+            outline: 3px solid #ff9933;
+            outline-offset: 2px;
         }
         
         .dept-icon { 
@@ -626,9 +745,78 @@
             font-weight: 700; 
             color: #1e5fbf; 
         }
+
+        /* ===== UTILITY CLASSES ===== */
+        .hidden {
+            display: none !important;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .dept-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+            .dept-icon { font-size: 56px; }
+            .dept-name { font-size: 24px; }
+            h1 { font-size: 28px; }
+        }
+
+        @media (max-width: 480px) {
+            .voice-corner {
+                top: 75px;
+                right: 10px;
+            }
+            .voice-corner-btn {
+                width: 45px;
+                height: 45px;
+                font-size: 24px;
+            }
+            .back-btn {
+                top: 75px;
+                left: 10px;
+                padding: 4px 12px;
+                font-size: 16px;
+            }
+            .success-message {
+                top: 75px;
+                left: 10px;
+                right: 70px;
+                padding: 8px 15px;
+                font-size: 14px;
+                max-width: none;
+            }
+            .dept-card {
+                padding: 20px 10px;
+                min-height: 180px;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- CSRF Token for JavaScript -->
+    {% csrf_token %}
+    <input type="hidden" id="csrf_token" value="{{ csrf_token }}">
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Voice Status Indicator -->
+    <div id="voiceStatusIndicator" class="voice-status-indicator">
+        <div class="voice-pulse"></div>
+        <span id="voiceStatusText">{% trans "Listening..." %}</span>
+    </div>
+
+    <!-- Security Note Bottom -->
+    <div class="security-note-bottom">
+        🔒 {% trans "Secured by Government of India" %}
+    </div>
+
     <div class="header">
         <div class="header-left">
             <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India">
@@ -645,12 +833,12 @@
 
     <!-- Voice Button -->
     <div class="voice-corner">
-        <div class="voice-corner-btn" id="voiceBtn" onclick="toggleVoiceInput()">🎤</div>
+        <div class="voice-corner-btn" id="voiceBtn" onclick="toggleVoiceInput()" aria-label="{% trans 'Voice input' %}">🎤</div>
         <div class="voice-corner-text" id="voiceStatus">{% trans "Click" %}</div>
     </div>
 
-    <!-- Django Back URL -->
-    <div class="back-btn" onclick="window.location='{% url 'index' %}'">← {% trans "Back" %}</div>
+    <!-- Back Button -->
+    <div class="back-btn" onclick="window.location='{% url 'index' %}'" aria-label="{% trans 'Go back' %}">← {% trans "Back" %}</div>
 
     <!-- Timeout Warning -->
     <div id="timeoutWarning" class="timeout-warning hidden">
@@ -669,7 +857,7 @@
     {% if messages %}
         {% for message in messages %}
             {% if message.tags == 'success' %}
-                <div class="success-message">
+                <div class="success-message" id="successMessage">
                     {{ message }}
                 </div>
             {% endif %}
@@ -682,32 +870,32 @@
             <div class="security-note">🔒 {% trans "आपका आधार सुरक्षित रूप से कनेक्ट है" %}</div>
 
             <div class="dept-grid">
-                <div class="dept-card" onclick="window.location='{% url 'gas-services' %}'">
+                <div class="dept-card" onclick="window.location='{% url 'gas-services' %}'" role="button" tabindex="0" onkeypress="if(event.key==='Enter') window.location='{% url 'gas-services' %}'" aria-label="{% trans 'Gas services' %}">
                     <div class="dept-icon">🔥</div>
                     <div class="dept-name">{% trans "Gas" %}</div>
                 </div>
 
-                <div class="dept-card" onclick="window.location='{% url 'electricity-services' %}'">
+                <div class="dept-card" onclick="window.location='{% url 'electricity-services' %}'" role="button" tabindex="0" onkeypress="if(event.key==='Enter') window.location='{% url 'electricity-services' %}'" aria-label="{% trans 'Electricity services' %}">
                     <div class="dept-icon">⚡</div>
                     <div class="dept-name">{% trans "Electricity" %}</div>
                 </div>
 
-                <div class="dept-card" onclick="window.location='{% url 'municipal-services' %}'">
+                <div class="dept-card" onclick="window.location='{% url 'municipal-services' %}'" role="button" tabindex="0" onkeypress="if(event.key==='Enter') window.location='{% url 'municipal-services' %}'" aria-label="{% trans 'Municipal services' %}">
                     <div class="dept-icon">🏛️</div>
                     <div class="dept-name">{% trans "Municipal" %}</div>
                 </div>
 
-                <div class="dept-card" onclick="window.location='{% url 'transport-services' %}'">
+                <div class="dept-card" onclick="window.location='{% url 'transport-services' %}'" role="button" tabindex="0" onkeypress="if(event.key==='Enter') window.location='{% url 'transport-services' %}'" aria-label="{% trans 'Transport services' %}">
                     <div class="dept-icon">🚗</div>
                     <div class="dept-name">{% trans "Transport" %}</div>
                 </div>
 
-                <div class="dept-card" onclick="window.location='{% url 'revenue-services' %}'">
+                <div class="dept-card" onclick="window.location='{% url 'revenue-services' %}'" role="button" tabindex="0" onkeypress="if(event.key==='Enter') window.location='{% url 'revenue-services' %}'" aria-label="{% trans 'Revenue services' %}">
                     <div class="dept-icon">📜</div>
                     <div class="dept-name">{% trans "Revenue" %}</div>
                 </div>
 
-                <div class="dept-card" onclick="window.location='{% url 'application-status' %}'">
+                <div class="dept-card" onclick="window.location='{% url 'application-status' %}'" role="button" tabindex="0" onkeypress="if(event.key==='Enter') window.location='{% url 'application-status' %}'" aria-label="{% trans 'Application status' %}">
                     <div class="dept-icon">📊</div>
                     <div class="dept-name">{% trans "Status" %}</div>
                 </div>
@@ -715,29 +903,51 @@
         </div>
     </div>
 
-    <!-- Auto-hide success message after 3 seconds -->
-    <script>
-        setTimeout(function() {
-            const successMsg = document.querySelector('.success-message');
-            if (successMsg) {
-                successMsg.style.animation = 'slideOutLeft 0.3s ease';
-                setTimeout(function() {
-                    if (successMsg) successMsg.remove();
-                }, 300);
-            }
-        }, 3000);
-    </script>
-
     <script src="{% static 'js/voice.js' %}"></script>
 
-    <style>
-        @keyframes slideOutLeft {
-            from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(-100%); opacity: 0; }
-        }
-    </style>
-
     <script>
+        // ================= SECURITY ENHANCEMENTS =================
+
+        // Disable keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
+            if (e.key === 'F12' || 
+                (e.ctrlKey && e.shiftKey && e.key === 'I') ||
+                (e.ctrlKey && e.shiftKey && e.key === 'J') ||
+                (e.ctrlKey && e.key === 'U')) {
+                e.preventDefault();
+                return false;
+            }
+            
+            // Prevent backspace from navigating back
+            if (e.key === 'Backspace' && !e.target.matches('input, textarea, [contenteditable], button')) {
+                e.preventDefault();
+            }
+        });
+
+        // Disable right-click
+        document.addEventListener('contextmenu', event => event.preventDefault());
+
+        // Auto-hide cursor on touch devices
+        let cursorTimeout;
+        document.addEventListener('touchstart', function() {
+            document.body.style.cursor = 'default';
+            clearTimeout(cursorTimeout);
+            cursorTimeout = setTimeout(function() {
+                document.body.style.cursor = 'none';
+            }, 3000);
+        });
+
+        // Prevent page zoom on double tap
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function(event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+
         // ===== LANGUAGE MAP =====
         const languageMap = {
             "en": "en-IN",
@@ -768,10 +978,53 @@
             speechSynthesis.speak(utterance);
         }
 
+        // ===== SESSION TIMER =====
+        let sessionTimer;
+        let timeoutWarningTimer;
+        const SESSION_DURATION = 240000; // 4 minutes
+        const WARNING_TIME = 60000; // Show warning 1 minute before expiry
+
+        function startSessionTimer() {
+            clearTimeout(sessionTimer);
+            clearTimeout(timeoutWarningTimer);
+            
+            sessionTimer = setTimeout(() => {
+                showTimeoutWarning();
+            }, SESSION_DURATION - WARNING_TIME);
+        }
+
+        function showTimeoutWarning() {
+            const warning = document.getElementById('timeoutWarning');
+            if (warning) {
+                warning.classList.remove('hidden');
+                
+                timeoutWarningTimer = setTimeout(() => {
+                    window.location.href = "{% url 'index' %}";
+                }, WARNING_TIME);
+            }
+        }
+
+        function extendSession() {
+            const warning = document.getElementById('timeoutWarning');
+            if (warning) {
+                warning.classList.add('hidden');
+            }
+            clearTimeout(sessionTimer);
+            clearTimeout(timeoutWarningTimer);
+            startSessionTimer();
+        }
+
+        function resetSessionTimer() {
+            clearTimeout(sessionTimer);
+            clearTimeout(timeoutWarningTimer);
+            startSessionTimer();
+        }
+
         // ===== VOICE INPUT =====
         let recognition = null;
         let isListening = false;
         let voiceTimeout = null;
+        let voiceRestartTimeout = null;
 
         function toggleVoiceInput() {
             if(isListening) {
@@ -801,6 +1054,7 @@
                 isListening = true;
                 document.getElementById("voiceBtn").classList.add("listening");
                 document.getElementById("voiceStatus").innerText = "{% trans 'Listening...' %}";
+                document.getElementById('voiceStatusIndicator').classList.add('active');
                 
                 const langCode = getCurrentLangCode();
                 if (langCode === 'hi') {
@@ -813,6 +1067,7 @@
             };
 
             recognition.onresult = function(event) {
+                resetSessionTimer();
                 document.getElementById('voiceLoadingBuffer').classList.remove('hidden');
                 
                 if (voiceTimeout) clearTimeout(voiceTimeout);
@@ -834,49 +1089,57 @@
                 console.log("Voice command:", command);
                 
                 // Process the voice command
-                if (command.includes("gas") || command.includes("cylinder") || command.includes("गैस")) {
+                if (command.includes("gas") || command.includes("cylinder") || command.includes("गैस") || command.includes("🔥")) {
+                    document.getElementById('voiceLoadingBuffer').classList.add('hidden');
                     speak("{% trans 'Opening Gas services' %}");
                     setTimeout(() => {
                         window.location.href = "{% url 'gas-services' %}";
                     }, 500);
                 }
-                else if (command.includes("electricity") || command.includes("बिजली")) {
+                else if (command.includes("electricity") || command.includes("बिजली") || command.includes("⚡")) {
+                    document.getElementById('voiceLoadingBuffer').classList.add('hidden');
                     speak("{% trans 'Opening Electricity services' %}");
                     setTimeout(() => {
                         window.location.href = "{% url 'electricity-services' %}";
                     }, 500);
                 }
-                else if (command.includes("municipal") || command.includes("नगर")) {
+                else if (command.includes("municipal") || command.includes("नगर") || command.includes("🏛️")) {
+                    document.getElementById('voiceLoadingBuffer').classList.add('hidden');
                     speak("{% trans 'Opening Municipal services' %}");
                     setTimeout(() => {
                         window.location.href = "{% url 'municipal-services' %}";
                     }, 500);
                 }
                 else if (command.includes("transport") || command.includes("परिवहन") || command.includes("🚗")) {
+                    document.getElementById('voiceLoadingBuffer').classList.add('hidden');
                     speak("{% trans 'Opening Transport services' %}");
                     setTimeout(() => {
                         window.location.href = "{% url 'transport-services' %}";
                     }, 500);
                 }
-                else if (command.includes("revenue") || command.includes("राजस्व")) {
+                else if (command.includes("revenue") || command.includes("राजस्व") || command.includes("📜")) {
+                    document.getElementById('voiceLoadingBuffer').classList.add('hidden');
                     speak("{% trans 'Opening Revenue services' %}");
                     setTimeout(() => {
                         window.location.href = "{% url 'revenue-services' %}";
                     }, 500);
                 }
-                else if (command.includes("status") || command.includes("स्थिति")) {
+                else if (command.includes("status") || command.includes("स्थिति") || command.includes("📊")) {
+                    document.getElementById('voiceLoadingBuffer').classList.add('hidden');
                     speak("{% trans 'Opening Application Status' %}");
                     setTimeout(() => {
                         window.location.href = "{% url 'application-status' %}";
                     }, 500);
                 }
                 else if (command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
+                    document.getElementById('voiceLoadingBuffer').classList.add('hidden');
                     speak("{% trans 'Going back' %}");
                     setTimeout(() => {
                         window.location.href = "/" + getCurrentLangCode() + "/";
                     }, 500);
                 }
                 else if (command.includes("home") || command.includes("होम") || command.includes("ଘର")) {
+                    document.getElementById('voiceLoadingBuffer').classList.add('hidden');
                     speak("{% trans 'Going to home' %}");
                     setTimeout(() => {
                         window.location.href = "/" + getCurrentLangCode() + "/";
@@ -902,15 +1165,19 @@
             recognition.onend = function() {
                 document.getElementById('voiceLoadingBuffer').classList.add('hidden');
                 if (isListening) {
-                    try {
-                        recognition.start();
-                    } catch(e) {
-                        console.error("Failed to restart recognition:", e);
-                        stopVoiceInput();
-                    }
+                    if (voiceRestartTimeout) clearTimeout(voiceRestartTimeout);
+                    voiceRestartTimeout = setTimeout(() => {
+                        try {
+                            recognition.start();
+                        } catch(e) {
+                            console.error("Failed to restart recognition:", e);
+                            stopVoiceInput();
+                        }
+                    }, 1000);
                 } else {
                     document.getElementById("voiceBtn").classList.remove("listening");
                     document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
+                    document.getElementById('voiceStatusIndicator').classList.remove('active');
                 }
             };
 
@@ -931,58 +1198,14 @@
             }
             document.getElementById("voiceBtn").classList.remove("listening");
             document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
+            document.getElementById('voiceStatusIndicator').classList.remove('active');
             document.getElementById('voiceLoadingBuffer').classList.add('hidden');
             if (voiceTimeout) clearTimeout(voiceTimeout);
+            if (voiceRestartTimeout) clearTimeout(voiceRestartTimeout);
         }
 
-        // ===== ORIGINAL JS (PRESERVED) =====
-        function playAudioGuidance(text, lang = 'hi-IN') {
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = lang;
-                utterance.rate = 0.9;
-                window.speechSynthesis.speak(utterance);
-            }
-        }
-
-        let sessionTimer;
-        let timeoutWarningTimer;
-        const SESSION_DURATION = 120000;
-        const WARNING_TIME = 10000;
-
-        function startSessionTimer() {
-            sessionTimer = setTimeout(() => {
-                showTimeoutWarning();
-            }, SESSION_DURATION - WARNING_TIME);
-        }
-
-        function showTimeoutWarning() {
-            const warning = document.getElementById('timeoutWarning');
-            if (warning) {
-                warning.classList.remove('hidden');
-                timeoutWarningTimer = setTimeout(() => {
-                    window.location.href = "{% url 'index' %}";
-                }, WARNING_TIME);
-            }
-        }
-
-        function extendSession() {
-            const warning = document.getElementById('timeoutWarning');
-            if (warning) {
-                warning.classList.add('hidden');
-            }
-            clearTimeout(sessionTimer);
-            clearTimeout(timeoutWarningTimer);
-            startSessionTimer();
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            startSessionTimer();
-            document.addEventListener('click', extendSession);
-            document.addEventListener('touchstart', extendSession);
-            
-            // Auto-read menu options
+        // ===== AUTO READ PAGE =====
+        function autoReadPage() {
             setTimeout(() => {
                 const langCode = getCurrentLangCode();
                 if (langCode === 'hi') {
@@ -993,16 +1216,16 @@
                     speak("{% trans 'Main menu. Choose Gas, Electricity, Municipal, Transport, Revenue, or Status services. Press mic button for voice help.' %}");
                 }
             }, 1000);
-        });
+        }
 
-        // Extend voice.js handleCommand for main menu navigation
+        // ===== OVERRIDE VOICE COMMANDS =====
         const originalHandleCommand = window.handleCommand;
         window.handleCommand = function(command) {
             command = command.toLowerCase();
             console.log("Main menu command:", command);
             
             // Department navigation
-            if(command.includes("gas") || command.includes("cylinder") || command.includes("गैस")) {
+            if(command.includes("gas") || command.includes("cylinder") || command.includes("गैस") || command.includes("🔥")) {
                 window.location.href = "{% url 'gas-services' %}";
                 return;
             }
@@ -1034,6 +1257,10 @@
                 window.location.href = "/" + getCurrentLangCode() + "/";
                 return;
             }
+            else if(command.includes("stop listening") || command.includes("stop voice")) {
+                stopVoiceInput();
+                return;
+            }
             
             // If not menu-specific, pass to original handler
             if(originalHandleCommand) {
@@ -1041,16 +1268,52 @@
             }
         };
 
-        // Override autoReadPage to read main menu options
-        const originalAutoRead = window.autoReadPage;
-        window.autoReadPage = function() {
-            if(originalAutoRead) originalAutoRead();
-            setTimeout(() => {
-                if(typeof speak === 'function') {
-                    speak("{% trans 'Main menu. Choose Gas, Electricity, Municipal, Transport, Revenue, or Status services' %}");
-                }
-            }, 2000);
-        };
+        // ===== INIT =====
+        document.addEventListener('DOMContentLoaded', () => {
+            startSessionTimer();
+            
+            // Add activity listeners
+            document.addEventListener('click', resetSessionTimer);
+            document.addEventListener('keypress', resetSessionTimer);
+            document.addEventListener('touchstart', resetSessionTimer);
+            document.addEventListener('mousemove', resetSessionTimer);
+            
+            // Auto-read menu options
+            setTimeout(autoReadPage, 1000);
+            
+            // Check for auto-start voice
+            const autoStartVoice = sessionStorage.getItem('autoStartVoice');
+            if (autoStartVoice === 'true') {
+                sessionStorage.removeItem('autoStartVoice');
+                setTimeout(() => {
+                    toggleVoiceInput();
+                }, 1500);
+            }
+        });
+
+        // Auto-hide success message after 3 seconds
+        setTimeout(function() {
+            const successMsg = document.getElementById('successMessage');
+            if (successMsg) {
+                successMsg.style.animation = 'slideOutLeft 0.3s ease';
+                setTimeout(function() {
+                    if (successMsg) successMsg.remove();
+                }, 300);
+            }
+        }, 3000);
+
+        window.addEventListener('beforeunload', function() {
+            if (sessionTimer) {
+                clearTimeout(sessionTimer);
+            }
+            if (timeoutWarningTimer) {
+                clearTimeout(timeoutWarningTimer);
+            }
+            stopVoiceInput();
+        });
+
+        // Override autoReadPage
+        window.autoReadPage = autoReadPage;
     </script>
 </body>
 </html>
