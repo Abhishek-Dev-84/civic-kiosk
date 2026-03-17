@@ -648,6 +648,8 @@ def electricity_duplicate_bill(request):
 @kiosk_login_required
 def electricity_solar(request):
     """Solar net metering application"""
+    consumer_id = request.session.get('consumer_id')
+    
     if request.method == 'POST':
         consumer_number = sanitize_input(request.POST.get('consumer_number'), 20)
         solar_capacity = sanitize_input(request.POST.get('solar_capacity'))
@@ -657,7 +659,25 @@ def electricity_solar(request):
             messages.error(request, 'Please fill in all required fields')
             return render(request, 'electricity-solar.html')
         
+        # Generate reference number
         ref_number = f"SOLAR{random.randint(100000, 999999)}"
+        
+        # Save to database (create a SolarApplication model if needed)
+        # For now, just log it
+        try:
+            consumer = Consumer.objects.get(id=consumer_id)
+            AuditLog.objects.create(
+                consumer=consumer,
+                action='SOLAR_APPLICATION',
+                model_name='Solar',
+                object_id='',
+                changes={'reference': ref_number, 'capacity': solar_capacity},
+                ip_address=get_client_ip(request),
+                user_agent=request.META.get('HTTP_USER_AGENT', '')[:255]
+            )
+        except Exception as e:
+            logger.error(f"Error logging solar application: {e}")
+        
         messages.success(request, f'Solar net metering application submitted! Reference: {ref_number}')
         return redirect('electricity-services')
     
@@ -667,6 +687,8 @@ def electricity_solar(request):
 @kiosk_login_required
 def electricity_new_connection(request):
     """New electricity connection application"""
+    consumer_id = request.session.get('consumer_id')
+    
     if request.method == 'POST':
         full_name = sanitize_input(request.POST.get('full_name'), 100)
         address = sanitize_input(request.POST.get('address'), 500)
@@ -702,8 +724,40 @@ def electricity_new_connection(request):
             messages.error(request, 'Please enter a valid 10-digit mobile number')
             return render(request, 'electricity-new-connection.html')
         
+        # Generate reference number
         ref_number = f"ELEC{random.randint(100000, 999999)}"
-        messages.success(request, f'New connection application submitted successfully! Reference: {ref_number}')
+        
+        try:
+            consumer = Consumer.objects.get(id=consumer_id)
+            
+            # Create electricity consumer record (pending status)
+            elec_consumer = ElectricityConsumer.objects.create(
+                consumer=consumer,
+                consumer_number=ref_number,
+                connection_type=property_type,
+                sanctioned_load=load_value,
+                connection_date=None,
+                address=address
+            )
+            
+            # Create notification
+            Notification.objects.create(
+                consumer=consumer,
+                notification_type='APPLICATION_UPDATE',
+                title='New Connection Application',
+                message=f'Your new connection application {ref_number} has been submitted successfully.'
+            )
+            
+            messages.success(request, f'New connection application submitted successfully! Reference: {ref_number}')
+            
+        except Consumer.DoesNotExist:
+            messages.error(request, 'Consumer not found')
+            return render(request, 'electricity-new-connection.html')
+        except Exception as e:
+            logger.error(f"Error creating new connection: {e}")
+            messages.error(request, 'An error occurred. Please try again.')
+            return render(request, 'electricity-new-connection.html')
+        
         return redirect('electricity-services')
     
     return render(request, 'electricity-new-connection.html')
@@ -713,9 +767,9 @@ def electricity_new_connection(request):
 def electricity_name_transfer(request):
     """Name transfer request"""
     context = {}
+    consumer_id = request.session.get('consumer_id')
     
     # Get current consumer details
-    consumer_id = request.session.get('consumer_id')
     try:
         consumer = Consumer.objects.get(id=consumer_id)
         context['current_owner'] = consumer.name
@@ -798,8 +852,42 @@ def electricity_name_transfer(request):
             messages.error(request, f'Please upload all required documents. Missing: {", ".join(missing_docs)}')
             return render(request, 'electricity-name-transfer.html', context)
         
+        # Generate reference number
         ref_number = f"TRAN{random.randint(100000, 999999)}"
-        messages.success(request, f'Name transfer request submitted successfully! Reference: {ref_number}')
+        
+        try:
+            consumer = Consumer.objects.get(id=consumer_id)
+            
+            # Create name transfer request
+            transfer = NameTransferRequest.objects.create(
+                consumer=consumer,
+                request_number=ref_number,
+                new_owner_name=new_owner_name,
+                new_owner_aadhaar=aadhaar_clean,
+                new_owner_phone=new_owner_phone,
+                new_owner_email=new_owner_email,
+                relationship=relationship,
+                transfer_fee=500,
+                document_fee=200,
+                total_amount=826,
+                status='PENDING'
+            )
+            
+            # Create notification
+            Notification.objects.create(
+                consumer=consumer,
+                notification_type='APPLICATION_UPDATE',
+                title='Name Transfer Request',
+                message=f'Your name transfer request {ref_number} has been submitted successfully.'
+            )
+            
+            messages.success(request, f'Name transfer request submitted successfully! Reference: {ref_number}')
+            
+        except Exception as e:
+            logger.error(f"Error creating name transfer: {e}")
+            messages.error(request, 'An error occurred. Please try again.')
+            return render(request, 'electricity-name-transfer.html', context)
+        
         return redirect('electricity-services')
     
     return render(request, 'electricity-name-transfer.html', context)
@@ -808,6 +896,8 @@ def electricity_name_transfer(request):
 @kiosk_login_required
 def electricity_meter_replacement(request):
     """Meter replacement request"""
+    consumer_id = request.session.get('consumer_id')
+    
     if request.method == 'POST':
         consumer_number = sanitize_input(request.POST.get('consumer_number', '123456789012'), 20)
         meter_type = sanitize_input(request.POST.get('meter_type'), 20)
@@ -853,8 +943,43 @@ def electricity_meter_replacement(request):
         subtotal = meter_price_float + installation_fee + additional_cost
         total_with_gst = subtotal * 1.18
         
+        # Generate reference number
         ref_number = f"METER{random.randint(100000, 999999)}"
-        messages.success(request, f'Meter replacement request submitted successfully! Reference: {ref_number}')
+        
+        try:
+            consumer = Consumer.objects.get(id=consumer_id)
+            
+            # Create meter replacement request
+            meter_req = MeterReplacementRequest.objects.create(
+                consumer=consumer,
+                request_number=ref_number,
+                reason=reason,
+                current_meter_type='SINGLE_PHASE',  # Default
+                requested_meter_type=meter_type,
+                meter_price=meter_price_float,
+                preferred_date=pref_date,
+                preferred_time=preferred_time,
+                additional_services=additional_services_list,
+                installation_fee=installation_fee,
+                total_cost=total_with_gst,
+                status='PENDING'
+            )
+            
+            # Create notification
+            Notification.objects.create(
+                consumer=consumer,
+                notification_type='APPLICATION_UPDATE',
+                title='Meter Replacement Request',
+                message=f'Your meter replacement request {ref_number} has been submitted successfully.'
+            )
+            
+            messages.success(request, f'Meter replacement request submitted successfully! Reference: {ref_number}')
+            
+        except Exception as e:
+            logger.error(f"Error creating meter replacement: {e}")
+            messages.error(request, 'An error occurred. Please try again.')
+            return render(request, 'electricity-meter-replacement.html')
+        
         return redirect('electricity-services')
     
     return render(request, 'electricity-meter-replacement.html')
@@ -863,6 +988,8 @@ def electricity_meter_replacement(request):
 @kiosk_login_required
 def electricity_load_enhancement(request):
     """Load enhancement request"""
+    consumer_id = request.session.get('consumer_id')
+    
     if request.method == 'POST':
         consumer_number = sanitize_input(request.POST.get('consumer_number', '123456789012'), 20)
         current_load = sanitize_input(request.POST.get('current_load', '3'))
@@ -897,8 +1024,39 @@ def electricity_load_enhancement(request):
             messages.error(request, f'Please provide details for {reason} reason')
             return render(request, 'electricity-load-enhancement.html')
         
+        # Generate reference number
         ref_number = f"LOAD{random.randint(100000, 999999)}"
-        messages.success(request, f'Load enhancement request submitted successfully! Reference: {ref_number}')
+        
+        try:
+            consumer = Consumer.objects.get(id=consumer_id)
+            
+            # Create load enhancement request
+            load_req = LoadEnhancementRequest.objects.create(
+                consumer=consumer,
+                request_number=ref_number,
+                current_load=current_load_float,
+                requested_load=requested_load_float,
+                reason=reason,
+                reason_details=reason_details,
+                status='PENDING',
+                fee_amount=2500  # Default fee
+            )
+            
+            # Create notification
+            Notification.objects.create(
+                consumer=consumer,
+                notification_type='APPLICATION_UPDATE',
+                title='Load Enhancement Request',
+                message=f'Your load enhancement request {ref_number} has been submitted successfully.'
+            )
+            
+            messages.success(request, f'Load enhancement request submitted successfully! Reference: {ref_number}')
+            
+        except Exception as e:
+            logger.error(f"Error creating load enhancement: {e}")
+            messages.error(request, 'An error occurred. Please try again.')
+            return render(request, 'electricity-load-enhancement.html')
+        
         return redirect('electricity-services')
     
     return render(request, 'electricity-load-enhancement.html')
@@ -907,6 +1065,8 @@ def electricity_load_enhancement(request):
 @kiosk_login_required
 def electricity_complaint(request):
     """Electricity complaint registration"""
+    consumer_id = request.session.get('consumer_id')
+    
     if request.method == 'POST':
         consumer_number = sanitize_input(request.POST.get('consumer_number', '123456789012'), 20)
         complaint_type = sanitize_input(request.POST.get('complaint_type'), 50)
@@ -930,16 +1090,57 @@ def electricity_complaint(request):
             messages.error(request, 'Please enter a valid 10-digit mobile number')
             return render(request, 'electricity-complaint.html')
         
-        # Priority-based response message
-        response_times = {
-            'Normal': '24 hours',
-            'Urgent': '4 hours',
-            'Emergency': '30 minutes'
-        }
-        response_time = response_times.get(complaint_priority, '24 hours')
-        
+        # Generate reference number
         ref_number = f"ELC{random.randint(100000, 999999)}"
-        messages.success(request, f'Complaint registered successfully! Reference: {ref_number}. Expected response time: {response_time}')
+        
+        try:
+            consumer = Consumer.objects.get(id=consumer_id)
+            
+            # Create electricity consumer if not exists
+            elec_consumer, created = ElectricityConsumer.objects.get_or_create(
+                consumer=consumer,
+                defaults={
+                    'consumer_number': consumer_number_clean,
+                    'connection_type': 'RESIDENTIAL',
+                    'sanctioned_load': 3.0,
+                    'address': consumer.address
+                }
+            )
+            
+            # Create complaint
+            complaint = ElectricityComplaint.objects.create(
+                consumer=elec_consumer,
+                complaint_number=ref_number,
+                complaint_type=complaint_type,
+                priority=complaint_priority,
+                description=complaint_description,
+                contact_phone=contact_phone or consumer.mobile,
+                status='PENDING'
+            )
+            
+            # Create notification
+            Notification.objects.create(
+                consumer=consumer,
+                notification_type='COMPLAINT_UPDATE',
+                title='Complaint Registered',
+                message=f'Your complaint {ref_number} has been registered successfully.'
+            )
+            
+            # Priority-based response message
+            response_times = {
+                'Normal': '24 hours',
+                'Urgent': '4 hours',
+                'Emergency': '30 minutes'
+            }
+            response_time = response_times.get(complaint_priority, '24 hours')
+            
+            messages.success(request, f'Complaint registered successfully! Reference: {ref_number}. Expected response time: {response_time}')
+            
+        except Exception as e:
+            logger.error(f"Error creating complaint: {e}")
+            messages.error(request, 'An error occurred. Please try again.')
+            return render(request, 'electricity-complaint.html')
+        
         return redirect('electricity-services')
     
     return render(request, 'electricity-complaint.html')
@@ -950,6 +1151,8 @@ def electricity_complaint(request):
 @kiosk_login_required
 def water_bill(request):
     """Water bill payment page"""
+    consumer_id = request.session.get('consumer_id')
+    
     if request.method == 'POST':
         action = sanitize_input(request.POST.get('action'))
         consumer_no = sanitize_input(request.POST.get('consumer_no'), 20)
@@ -973,6 +1176,28 @@ def water_bill(request):
                 messages.error(request, 'Please enter consumer number')
                 return render(request, 'water-bill.html')
             
+            # Try to fetch from database
+            try:
+                water_consumer = WaterConsumer.objects.filter(consumer_number=consumer_no).first()
+                if water_consumer:
+                    # Get latest bill
+                    latest_bill = WaterBill.objects.filter(consumer=water_consumer).order_by('-bill_date').first()
+                    if latest_bill:
+                        context = {
+                            'show_bill': True,
+                            'consumer_no': consumer_no,
+                            'consumer_name': water_consumer.consumer.name,
+                            'bill_number': latest_bill.bill_number,
+                            'bill_date': latest_bill.bill_date.strftime('%d %b %Y'),
+                            'due_date': latest_bill.due_date.strftime('%d %b %Y'),
+                            'units_consumed': latest_bill.units_consumed,
+                            'bill_amount': latest_bill.total_amount
+                        }
+                        return render(request, 'water-bill.html', context)
+            except Exception as e:
+                logger.error(f"Error fetching water bill: {e}")
+            
+            # Fallback to sample data
             context = {
                 'show_bill': True,
                 'consumer_no': consumer_no,
@@ -999,6 +1224,8 @@ def municipal_services(request):
 @kiosk_login_required
 def trade_license(request):
     """Trade license application"""
+    consumer_id = request.session.get('consumer_id')
+    
     if request.method == 'POST':
         business_name = sanitize_input(request.POST.get('business_name'), 100)
         business_type = sanitize_input(request.POST.get('business_type'), 50)
@@ -1008,22 +1235,62 @@ def trade_license(request):
         
         if not all([business_name, business_type, owner_name, address]):
             messages.error(request, 'Please fill in all required fields')
-            return render(request, 'trade-license.html')
+            return render(request, 'trade-license.html', {'form_data': request.POST})
         
         # Optional GST validation
         if gst_number and len(gst_number) != 15:
             messages.warning(request, 'GST number should be 15 characters if provided')
         
+        # Generate reference number
         ref_number = f"TL{random.randint(100000, 999999)}"
-        messages.success(request, f'Trade license application submitted! Reference: {ref_number}')
+        
+        try:
+            consumer = Consumer.objects.get(id=consumer_id)
+            
+            # Create trade license application
+            license = TradeLicense.objects.create(
+                consumer=consumer,
+                license_number=ref_number,
+                business_name=business_name,
+                business_type=business_type,
+                owner_name=owner_name,
+                address=address,
+                gst_number=gst_number,
+                issue_date=datetime.now().date(),
+                expiry_date=datetime.now().date() + timedelta(days=365),
+                license_fee=2500,
+                status='ACTIVE'
+            )
+            
+            # Create notification
+            Notification.objects.create(
+                consumer=consumer,
+                notification_type='APPLICATION_UPDATE',
+                title='Trade License Application',
+                message=f'Your trade license application {ref_number} has been submitted successfully.'
+            )
+            
+            messages.success(request, f'Trade license application submitted! Reference: {ref_number}')
+            
+        except Exception as e:
+            logger.error(f"Error creating trade license: {e}")
+            messages.error(request, 'An error occurred. Please try again.')
+            return render(request, 'trade-license.html', {'form_data': request.POST})
+        
         return redirect('municipal-services')
     
-    return render(request, 'trade-license.html')
+    context = {
+        'application_fee': '500',
+        'license_fee_range': '₹1,000 - ₹5,000*'
+    }
+    return render(request, 'trade-license.html', context)
 
 
 @kiosk_login_required
 def property_tax(request):
     """Property tax payment"""
+    context = {}
+    
     if request.method == 'POST':
         action = sanitize_input(request.POST.get('action'))
         property_id = sanitize_input(request.POST.get('property_id'), 20)
@@ -1034,7 +1301,7 @@ def property_tax(request):
             
             if not property_id or not tax_amount:
                 messages.error(request, 'Invalid tax details')
-                return render(request, 'property-tax.html')
+                return render(request, 'property-tax.html', context)
             
             # Generate transaction ID
             transaction_id = f"PTX{datetime.now().strftime('%y%m%d%H%M%S')}{random.randint(100, 999)}"
@@ -1045,8 +1312,29 @@ def property_tax(request):
         elif action == 'fetch':
             if not property_id:
                 messages.error(request, 'Please enter property ID')
-                return render(request, 'property-tax.html')
+                return render(request, 'property-tax.html', context)
             
+            # Try to fetch from database
+            try:
+                property_obj = Property.objects.filter(property_id=property_id).first()
+                if property_obj:
+                    tax = PropertyTax.objects.filter(property=property_obj).first()
+                    if tax:
+                        context['show_tax'] = True
+                        context['tax_details'] = {
+                            'property_id': property_obj.property_id,
+                            'owner_name': property_obj.consumer.name,
+                            'property_type': property_obj.property_type,
+                            'area': property_obj.area_sqft,
+                            'assessment_year': tax.assessment_year,
+                            'due_date': tax.due_date.strftime('%d %b %Y'),
+                            'amount': tax.tax_amount
+                        }
+                        return render(request, 'property-tax.html', context)
+            except Exception as e:
+                logger.error(f"Error fetching property tax: {e}")
+            
+            # Fallback to sample data
             context = {
                 'show_tax': True,
                 'property_id': property_id,
@@ -1065,6 +1353,8 @@ def property_tax(request):
 @kiosk_login_required
 def professional_tax(request):
     """Professional tax payment"""
+    context = {}
+    
     if request.method == 'POST':
         action = sanitize_input(request.POST.get('action'))
         ptin = sanitize_input(request.POST.get('ptin'), 20)
@@ -1075,7 +1365,7 @@ def professional_tax(request):
             
             if not ptin or not tax_amount:
                 messages.error(request, 'Invalid tax details')
-                return render(request, 'professional-tax.html')
+                return render(request, 'professional-tax.html', context)
             
             # Generate transaction ID
             transaction_id = f"PRF{datetime.now().strftime('%y%m%d%H%M%S')}{random.randint(100, 999)}"
@@ -1086,8 +1376,28 @@ def professional_tax(request):
         elif action == 'fetch':
             if not ptin:
                 messages.error(request, 'Please enter PTIN')
-                return render(request, 'professional-tax.html')
+                return render(request, 'professional-tax.html', context)
             
+            # Try to fetch from database
+            try:
+                tax = ProfessionalTax.objects.filter(ptin=ptin).first()
+                if tax:
+                    context['show_tax'] = True
+                    context['tax_details'] = {
+                        'ptin': tax.ptin,
+                        'name': tax.consumer.name,
+                        'profession': tax.profession,
+                        'assessment_year': tax.assessment_year,
+                        'due_date': tax.due_date.strftime('%d %b %Y'),
+                        'half_yearly_tax': tax.half_yearly_tax,
+                        'penalty': tax.penalty,
+                        'amount': tax.half_yearly_tax + tax.penalty
+                    }
+                    return render(request, 'professional-tax.html', context)
+            except Exception as e:
+                logger.error(f"Error fetching professional tax: {e}")
+            
+            # Fallback to sample data
             context = {
                 'show_tax': True,
                 'ptin': ptin,
@@ -1105,278 +1415,10 @@ def professional_tax(request):
 
 
 @kiosk_login_required
-def application_status(request):
-    """Application and complaint status"""
-    context = {}
-    
-    if request.method == 'POST':
-        reference_number = sanitize_input(request.POST.get('reference_number'), 50)
-        
-        if not reference_number:
-            messages.error(request, 'Please enter a reference number')
-            return render(request, 'application-status.html', context)
-        
-        # Search in all tables for the reference number
-        found = False
-        
-        # Check Electricity tables
-        try:
-            bill = ElectricityBill.objects.filter(bill_number=reference_number).first()
-            if bill:
-                try:
-                    consumer = Consumer.objects.get(id=bill.consumer.consumer_id)
-                except:
-                    consumer = None
-                context['application'] = {
-                    'application_id': bill.bill_number,
-                    'department': 'Electricity',
-                    'submitted_date': bill.bill_date,
-                    'current_stage': f'Bill {bill.status}',
-                    'assigned_officer': 'System',
-                    'expected_completion': bill.due_date,
-                    'amount': bill.total_amount,
-                    'units': bill.units_consumed
-                }
-                found = True
-        except:
-            pass
-        
-        if not found:
-            try:
-                complaint = ElectricityComplaint.objects.filter(complaint_number=reference_number).first()
-                if complaint:
-                    context['complaint'] = {
-                        'complaint_id': complaint.complaint_number,
-                        'status': complaint.status,
-                        'work_completed': 100 if complaint.status == 'RESOLVED' else 50,
-                        'officer_remark': complaint.remarks or 'Under process',
-                        'deadline': complaint.resolution_date or (datetime.now().date() + timedelta(days=7))
-                    }
-                    found = True
-            except:
-                pass
-        
-        if not found:
-            try:
-                load_req = LoadEnhancementRequest.objects.filter(request_number=reference_number).first()
-                if load_req:
-                    context['application'] = {
-                        'application_id': load_req.request_number,
-                        'department': 'Electricity - Load Enhancement',
-                        'submitted_date': load_req.created_at.date(),
-                        'current_stage': load_req.status,
-                        'assigned_officer': 'Technical Team',
-                        'expected_completion': load_req.inspection_date or (datetime.now().date() + timedelta(days=10)),
-                        'load': f"{load_req.current_load}kW → {load_req.requested_load}kW"
-                    }
-                    found = True
-            except:
-                pass
-        
-        if not found:
-            try:
-                meter_req = MeterReplacementRequest.objects.filter(request_number=reference_number).first()
-                if meter_req:
-                    context['application'] = {
-                        'application_id': meter_req.request_number,
-                        'department': 'Electricity - Meter Replacement',
-                        'submitted_date': meter_req.created_at.date(),
-                        'current_stage': meter_req.status,
-                        'assigned_officer': 'Metering Department',
-                        'expected_completion': meter_req.preferred_date,
-                        'meter_type': meter_req.requested_meter_type
-                    }
-                    found = True
-            except:
-                pass
-        
-        if not found:
-            try:
-                name_transfer = NameTransferRequest.objects.filter(request_number=reference_number).first()
-                if name_transfer:
-                    context['application'] = {
-                        'application_id': name_transfer.request_number,
-                        'department': 'Electricity - Name Transfer',
-                        'submitted_date': name_transfer.created_at.date(),
-                        'current_stage': name_transfer.status,
-                        'assigned_officer': 'Customer Service',
-                        'expected_completion': datetime.now().date() + timedelta(days=15),
-                        'new_owner': name_transfer.new_owner_name
-                    }
-                    found = True
-            except:
-                pass
-        
-        # Check Gas tables
-        if not found:
-            try:
-                gas_booking = GasCylinderBooking.objects.filter(booking_number=reference_number).first()
-                if gas_booking:
-                    status_map = {
-                        'PENDING': 'Pending',
-                        'PROCESSED': 'Processed',
-                        'OUT_FOR_DELIVERY': 'Out for Delivery',
-                        'DELIVERED': 'Delivered'
-                    }
-                    context['application'] = {
-                        'application_id': gas_booking.booking_number,
-                        'department': 'Gas - Cylinder Booking',
-                        'submitted_date': gas_booking.booking_date.date(),
-                        'current_stage': status_map.get(gas_booking.status, gas_booking.status),
-                        'assigned_officer': gas_booking.delivery_person or 'Delivery Team',
-                        'expected_completion': gas_booking.expected_delivery_date,
-                        'cylinder_type': gas_booking.get_cylinder_type_display()
-                    }
-                    found = True
-            except:
-                pass
-        
-        if not found:
-            try:
-                gas_complaint = GasComplaint.objects.filter(complaint_number=reference_number).first()
-                if gas_complaint:
-                    context['complaint'] = {
-                        'complaint_id': gas_complaint.complaint_number,
-                        'status': gas_complaint.status,
-                        'work_completed': 100 if gas_complaint.status == 'RESOLVED' else 50,
-                        'officer_remark': 'Under investigation',
-                        'deadline': datetime.now().date() + timedelta(days=5)
-                    }
-                    found = True
-            except:
-                pass
-        
-        if not found:
-            try:
-                gas_consumer = GasConsumer.objects.filter(consumer_number=reference_number).first()
-                if gas_consumer:
-                    context['application'] = {
-                        'application_id': gas_consumer.consumer_number,
-                        'department': 'Gas - Consumer Information',
-                        'submitted_date': gas_consumer.created_at.date(),
-                        'current_stage': 'Active' if gas_consumer.subsidy_status else 'Inactive',
-                        'assigned_officer': gas_consumer.distributor,
-                        'expected_completion': 'N/A',
-                        'cylinders_remaining': gas_consumer.cylinders_remaining
-                    }
-                    found = True
-            except:
-                pass
-        
-        # Check Water tables
-        if not found:
-            try:
-                water_bill = WaterBill.objects.filter(bill_number=reference_number).first()
-                if water_bill:
-                    context['application'] = {
-                        'application_id': water_bill.bill_number,
-                        'department': 'Water',
-                        'submitted_date': water_bill.bill_date,
-                        'current_stage': f'Bill {water_bill.status}',
-                        'assigned_officer': 'Water Department',
-                        'expected_completion': water_bill.due_date,
-                        'amount': water_bill.total_amount,
-                        'units': water_bill.units_consumed
-                    }
-                    found = True
-            except:
-                pass
-        
-        # Check Property tables
-        if not found:
-            try:
-                property_tax = PropertyTax.objects.filter(tax_id=reference_number).first()
-                if property_tax:
-                    context['application'] = {
-                        'application_id': property_tax.tax_id,
-                        'department': 'Property Tax',
-                        'submitted_date': property_tax.created_at.date(),
-                        'current_stage': property_tax.status,
-                        'assigned_officer': 'Municipal Corporation',
-                        'expected_completion': property_tax.due_date,
-                        'amount': property_tax.tax_amount
-                    }
-                    found = True
-            except:
-                pass
-        
-        # Check Certificate tables
-        if not found:
-            try:
-                birth_cert = BirthCertificateApplication.objects.filter(application_number=reference_number).first()
-                if birth_cert:
-                    context['application'] = {
-                        'application_id': birth_cert.application_number,
-                        'department': 'Birth Certificate',
-                        'submitted_date': birth_cert.created_at.date(),
-                        'current_stage': birth_cert.status,
-                        'assigned_officer': 'Municipal Corporation',
-                        'expected_completion': birth_cert.issue_date or (datetime.now().date() + timedelta(days=21)),
-                        'child_name': birth_cert.child_name
-                    }
-                    found = True
-            except:
-                pass
-        
-        if not found:
-            try:
-                death_cert = DeathCertificateApplication.objects.filter(application_number=reference_number).first()
-                if death_cert:
-                    context['application'] = {
-                        'application_id': death_cert.application_number,
-                        'department': 'Death Certificate',
-                        'submitted_date': death_cert.created_at.date(),
-                        'current_stage': death_cert.status,
-                        'assigned_officer': 'Municipal Corporation',
-                        'expected_completion': death_cert.issue_date or (datetime.now().date() + timedelta(days=14)),
-                        'deceased_name': death_cert.deceased_name
-                    }
-                    found = True
-            except:
-                pass
-        
-        if not found:
-            try:
-                marriage_reg = MarriageRegistration.objects.filter(application_number=reference_number).first()
-                if marriage_reg:
-                    context['application'] = {
-                        'application_id': marriage_reg.application_number,
-                        'department': 'Marriage Registration',
-                        'submitted_date': marriage_reg.registration_date,
-                        'current_stage': marriage_reg.status,
-                        'assigned_officer': 'Marriage Registrar',
-                        'expected_completion': marriage_reg.registration_date + timedelta(days=7),
-                        'couple': f"{marriage_reg.groom_name} & {marriage_reg.bride_name}"
-                    }
-                    found = True
-            except:
-                pass
-        
-        # Check Grievance
-        if not found:
-            try:
-                grievance = Grievance.objects.filter(grievance_number=reference_number).first()
-                if grievance:
-                    context['complaint'] = {
-                        'complaint_id': grievance.grievance_number,
-                        'status': grievance.status,
-                        'work_completed': 100 if grievance.status == 'RESOLVED' else 50,
-                        'officer_remark': grievance.remarks or 'Under investigation',
-                        'deadline': grievance.resolution_date or (datetime.now().date() + timedelta(days=10))
-                    }
-                    found = True
-            except:
-                pass
-        
-        if not found:
-            messages.error(request, f'No record found with reference number: {reference_number}')
-    
-    return render(request, 'application-status.html', context)
-
-
-@kiosk_login_required
 def building_plan(request):
     """Building plan approval application"""
+    consumer_id = request.session.get('consumer_id')
+    
     if request.method == 'POST':
         owner_name = sanitize_input(request.POST.get('owner_name'), 100)
         property_address = sanitize_input(request.POST.get('property_address'), 500)
@@ -1388,25 +1430,82 @@ def building_plan(request):
         
         if not all([owner_name, property_address, survey_number, plot_area, building_type, num_floors]):
             messages.error(request, 'Please fill in all required fields')
-            return render(request, 'building-plan.html')
+            return render(request, 'building-plan.html', {'form_data': request.POST})
         
         if not building_plan:
             messages.error(request, 'Please upload the building plan file')
-            return render(request, 'building-plan.html')
+            return render(request, 'building-plan.html', {'form_data': request.POST})
         
         # Validate file
         is_valid_ext, ext = validate_file_extension(building_plan.name, ['.pdf', '.dwg'])
         if not is_valid_ext:
             messages.error(request, 'Only PDF and DWG files are allowed')
-            return render(request, 'building-plan.html')
+            return render(request, 'building-plan.html', {'form_data': request.POST})
         
         is_valid_size, size = validate_file_size(building_plan, 25)
         if not is_valid_size:
             messages.error(request, 'File size exceeds 25MB limit')
-            return render(request, 'building-plan.html')
+            return render(request, 'building-plan.html', {'form_data': request.POST})
         
+        # Validate plot area
+        try:
+            area = float(plot_area)
+            if area <= 0:
+                messages.error(request, 'Plot area must be positive')
+                return render(request, 'building-plan.html', {'form_data': request.POST})
+        except ValueError:
+            messages.error(request, 'Please enter a valid plot area')
+            return render(request, 'building-plan.html', {'form_data': request.POST})
+        
+        # Validate number of floors
+        try:
+            floors = int(num_floors)
+            if floors < 1 or floors > 50:
+                messages.error(request, 'Number of floors must be between 1 and 50')
+                return render(request, 'building-plan.html', {'form_data': request.POST})
+        except ValueError:
+            messages.error(request, 'Please enter a valid number of floors')
+            return render(request, 'building-plan.html', {'form_data': request.POST})
+        
+        # Generate reference number
         ref_number = f"BLD{random.randint(100000, 999999)}"
-        messages.success(request, f'Building plan application submitted successfully! Reference: {ref_number}')
+        
+        try:
+            consumer = Consumer.objects.get(id=consumer_id)
+            
+            # Save the file
+            # In production, you would save to media folder
+            file_path = f"building_plans/{ref_number}_{building_plan.name}"
+            
+            # Create building plan application
+            plan = BuildingPlanApplication.objects.create(
+                consumer=consumer,
+                application_number=ref_number,
+                owner_name=owner_name,
+                property_address=property_address,
+                survey_number=survey_number,
+                plot_area=area,
+                building_type=building_type,
+                num_floors=floors,
+                building_plan_file=file_path,
+                status='PENDING'
+            )
+            
+            # Create notification
+            Notification.objects.create(
+                consumer=consumer,
+                notification_type='APPLICATION_UPDATE',
+                title='Building Plan Application',
+                message=f'Your building plan application {ref_number} has been submitted successfully.'
+            )
+            
+            messages.success(request, f'Building plan application submitted successfully! Reference: {ref_number}')
+            
+        except Exception as e:
+            logger.error(f"Error creating building plan: {e}")
+            messages.error(request, 'An error occurred. Please try again.')
+            return render(request, 'building-plan.html', {'form_data': request.POST})
+        
         return redirect('municipal-services')
     
     return render(request, 'building-plan.html')
@@ -1610,7 +1709,26 @@ def gas_cylinder_booking(request):
                 'subsidy_active': gas_consumer.subsidy_status,
                 'remaining_subsidies': gas_consumer.cylinders_remaining
             }
-    except:
+        else:
+            # Create temporary gas consumer for demo
+            gas_consumer = GasConsumer.objects.create(
+                consumer=consumer,
+                consumer_number=f"GAS{random.randint(10000, 99999)}",
+                distributor='HP Gas',
+                distributor_code='HP123',
+                subsidy_status=True,
+                subsidy_amount=200.00,
+                total_cylinders_per_year=12,
+                cylinders_remaining=12,
+                address=consumer.address
+            )
+            context['consumer'] = {
+                'consumer_no': gas_consumer.consumer_number,
+                'subsidy_active': gas_consumer.subsidy_status,
+                'remaining_subsidies': gas_consumer.cylinders_remaining
+            }
+    except Exception as e:
+        logger.error(f"Error getting gas consumer: {e}")
         context['consumer'] = {
             'consumer_no': '1234 5678 9012',
             'subsidy_active': True,
@@ -1638,7 +1756,7 @@ def gas_cylinder_booking(request):
             gas_consumer = GasConsumer.objects.filter(consumer=consumer).first()
             
             if not gas_consumer:
-                # Create temporary gas consumer for demo
+                # Create temporary gas consumer
                 gas_consumer = GasConsumer.objects.create(
                     consumer=consumer,
                     consumer_number=f"GAS{random.randint(10000, 99999)}",
@@ -2134,6 +2252,607 @@ def grievance(request):
     return render(request, 'grievance.html')
 
 
+# ================= BIRTH CERTIFICATE =================
+
+@kiosk_login_required
+def birth_certificate(request):
+    """Birth certificate application"""
+    consumer_id = request.session.get('consumer_id')
+    
+    if request.method == 'POST':
+        child_name = sanitize_input(request.POST.get('child_name'), 100)
+        dob = sanitize_input(request.POST.get('dob'), 10)
+        gender = sanitize_input(request.POST.get('gender'), 10)
+        birth_place = sanitize_input(request.POST.get('birth_place'), 100)
+        father_name = sanitize_input(request.POST.get('father_name'), 100)
+        mother_name = sanitize_input(request.POST.get('mother_name'), 100)
+        permanent_address = sanitize_input(request.POST.get('permanent_address'), 500)
+        
+        if not all([child_name, dob, gender, birth_place, father_name, mother_name, permanent_address]):
+            messages.error(request, 'Please fill in all required fields')
+            return render(request, 'birth-certificate.html', {'form_data': request.POST})
+        
+        # Validate date of birth (not in future)
+        from datetime import date
+        try:
+            birth_date = date.fromisoformat(dob)
+            if birth_date > date.today():
+                messages.error(request, 'Date of birth cannot be in the future')
+                return render(request, 'birth-certificate.html', {'form_data': request.POST})
+        except ValueError:
+            messages.error(request, 'Invalid date format')
+            return render(request, 'birth-certificate.html', {'form_data': request.POST})
+        
+        try:
+            # Get the consumer
+            consumer = Consumer.objects.get(id=consumer_id)
+            
+            # Generate reference number
+            ref_number = f"BRTH{random.randint(100000, 999999)}"
+            
+            # Create birth certificate application
+            birth_cert = BirthCertificateApplication.objects.create(
+                consumer=consumer,
+                application_number=ref_number,
+                child_name=child_name,
+                date_of_birth=birth_date,
+                gender=gender,
+                place_of_birth=birth_place,
+                father_name=father_name,
+                mother_name=mother_name,
+                permanent_address=permanent_address,
+                status='PENDING'
+            )
+            
+            # Create notification
+            Notification.objects.create(
+                consumer=consumer,
+                notification_type='APPLICATION_UPDATE',
+                title='Birth Certificate Application',
+                message=f'Your birth certificate application {ref_number} has been submitted successfully.'
+            )
+            
+            messages.success(request, f'Birth certificate application submitted successfully! Reference: {ref_number}')
+            
+        except Exception as e:
+            logger.error(f"Error creating birth certificate: {e}")
+            messages.error(request, 'An error occurred. Please try again.')
+            return render(request, 'birth-certificate.html', {'form_data': request.POST})
+        
+        return redirect('municipal-services')
+    
+    return render(request, 'birth-certificate.html')
+
+
+# ================= DEATH CERTIFICATE =================
+
+@kiosk_login_required
+def death_certificate(request):
+    """Death certificate application"""
+    consumer_id = request.session.get('consumer_id')
+    
+    if request.method == 'POST':
+        deceased_name = sanitize_input(request.POST.get('deceased_name'), 100)
+        date_of_death = sanitize_input(request.POST.get('date_of_death'), 10)
+        place_of_death = sanitize_input(request.POST.get('place_of_death'), 100)
+        gender = sanitize_input(request.POST.get('gender'), 10)
+        father_name = sanitize_input(request.POST.get('father_name'), 100)
+        mother_name = sanitize_input(request.POST.get('mother_name'), 100)
+        permanent_address = sanitize_input(request.POST.get('permanent_address'), 500)
+        cause_of_death = sanitize_input(request.POST.get('cause_of_death'), 500)
+        
+        if not all([deceased_name, date_of_death, place_of_death, gender, father_name, mother_name, permanent_address, cause_of_death]):
+            messages.error(request, 'Please fill in all required fields')
+            return render(request, 'death-certificate.html', {'form_data': request.POST})
+        
+        from datetime import date
+        if date_of_death:
+            try:
+                death_date = date.fromisoformat(date_of_death)
+                if death_date > date.today():
+                    messages.error(request, 'Date of death cannot be in the future')
+                    return render(request, 'death-certificate.html', {'form_data': request.POST})
+            except ValueError:
+                messages.error(request, 'Invalid date format')
+                return render(request, 'death-certificate.html', {'form_data': request.POST})
+        
+        try:
+            # Get the consumer
+            consumer = Consumer.objects.get(id=consumer_id)
+            
+            # Generate reference number
+            ref_number = f"DTH{random.randint(100000, 999999)}"
+            
+            # Create death certificate application
+            death_cert = DeathCertificateApplication.objects.create(
+                consumer=consumer,
+                application_number=ref_number,
+                deceased_name=deceased_name,
+                date_of_death=death_date,
+                place_of_death=place_of_death,
+                gender=gender,
+                father_name=father_name,
+                mother_name=mother_name,
+                permanent_address=permanent_address,
+                cause_of_death=cause_of_death,
+                status='PENDING'
+            )
+            
+            # Create notification
+            Notification.objects.create(
+                consumer=consumer,
+                notification_type='APPLICATION_UPDATE',
+                title='Death Certificate Application',
+                message=f'Your death certificate application {ref_number} has been submitted successfully.'
+            )
+            
+            messages.success(request, f'Death certificate application submitted successfully! Reference: {ref_number}')
+            
+        except Exception as e:
+            logger.error(f"Error creating death certificate: {e}")
+            messages.error(request, 'An error occurred. Please try again.')
+            return render(request, 'death-certificate.html', {'form_data': request.POST})
+        
+        return redirect('municipal-services')
+    
+    return render(request, 'death-certificate.html')
+
+
+# ================= MARRIAGE REGISTRATION =================
+
+@kiosk_login_required
+def marriage_registration(request):
+    """Marriage registration application"""
+    consumer_id = request.session.get('consumer_id')
+    
+    if request.method == 'POST':
+        groom_name = sanitize_input(request.POST.get('groom_name'), 100)
+        groom_dob = sanitize_input(request.POST.get('groom_dob'), 10)
+        groom_aadhaar = sanitize_input(request.POST.get('groom_aadhaar'), 12)
+        groom_father_name = sanitize_input(request.POST.get('groom_father_name'), 100)
+        bride_name = sanitize_input(request.POST.get('bride_name'), 100)
+        bride_dob = sanitize_input(request.POST.get('bride_dob'), 10)
+        bride_aadhaar = sanitize_input(request.POST.get('bride_aadhaar'), 12)
+        bride_father_name = sanitize_input(request.POST.get('bride_father_name'), 100)
+        marriage_date = sanitize_input(request.POST.get('marriage_date'), 10)
+        marriage_place = sanitize_input(request.POST.get('marriage_place'), 100)
+        marriage_type = sanitize_input(request.POST.get('marriage_type'), 50)
+        witness1_name = sanitize_input(request.POST.get('witness1_name'), 100)
+        witness2_name = sanitize_input(request.POST.get('witness2_name'), 100)
+        
+        if not all([groom_name, bride_name, marriage_date, marriage_place, marriage_type]):
+            messages.error(request, 'Please fill in all required fields')
+            return render(request, 'marriage-registration.html', {'form_data': request.POST})
+        
+        # Validate marriage date (not in future)
+        from datetime import date
+        try:
+            mar_date = date.fromisoformat(marriage_date)
+            if mar_date > date.today():
+                messages.error(request, 'Marriage date cannot be in the future')
+                return render(request, 'marriage-registration.html', {'form_data': request.POST})
+        except ValueError:
+            messages.error(request, 'Invalid marriage date format')
+            return render(request, 'marriage-registration.html', {'form_data': request.POST})
+        
+        # Validate Aadhaar if provided
+        if groom_aadhaar and (len(groom_aadhaar) != 12 or not groom_aadhaar.isdigit()):
+            messages.error(request, 'Please enter a valid 12-digit Aadhaar for groom')
+            return render(request, 'marriage-registration.html', {'form_data': request.POST})
+        
+        if bride_aadhaar and (len(bride_aadhaar) != 12 or not bride_aadhaar.isdigit()):
+            messages.error(request, 'Please enter a valid 12-digit Aadhaar for bride')
+            return render(request, 'marriage-registration.html', {'form_data': request.POST})
+        
+        try:
+            # Get the consumer
+            consumer = Consumer.objects.get(id=consumer_id)
+            
+            # Generate reference number
+            ref_number = f"MAR{random.randint(100000, 999999)}"
+            
+            # Create marriage registration
+            marriage = MarriageRegistration.objects.create(
+                application_number=ref_number,
+                groom_name=groom_name,
+                groom_dob=groom_dob,
+                groom_aadhaar=groom_aadhaar,
+                groom_father_name=groom_father_name,
+                bride_name=bride_name,
+                bride_dob=bride_dob,
+                bride_aadhaar=bride_aadhaar,
+                bride_father_name=bride_father_name,
+                marriage_date=mar_date,
+                marriage_place=marriage_place,
+                marriage_type=marriage_type,
+                witness1_name=witness1_name,
+                witness2_name=witness2_name,
+                status='PENDING'
+            )
+            
+            # Create notification
+            Notification.objects.create(
+                consumer=consumer,
+                notification_type='APPLICATION_UPDATE',
+                title='Marriage Registration',
+                message=f'Your marriage registration application {ref_number} has been submitted successfully.'
+            )
+            
+            messages.success(request, f'Marriage registration submitted successfully! Reference: {ref_number}')
+            
+        except Exception as e:
+            logger.error(f"Error creating marriage registration: {e}")
+            messages.error(request, 'An error occurred. Please try again.')
+            return render(request, 'marriage-registration.html', {'form_data': request.POST})
+        
+        return redirect('municipal-services')
+    
+    return render(request, 'marriage-registration.html')
+
+
+# ================= APPLICATION STATUS =================
+
+@kiosk_login_required
+def application_status(request):
+    """Application and complaint status"""
+    context = {}
+    consumer_id = request.session.get('consumer_id')
+    
+    if request.method == 'POST':
+        reference_number = sanitize_input(request.POST.get('reference_number'), 50)
+        
+        if not reference_number:
+            messages.error(request, 'Please enter a reference number')
+            return render(request, 'application-status.html', context)
+        
+        # Search in all tables for the reference number
+        found = False
+        
+        # Check Electricity tables
+        try:
+            bill = ElectricityBill.objects.filter(bill_number=reference_number).first()
+            if bill:
+                try:
+                    consumer = Consumer.objects.get(id=bill.consumer.consumer_id)
+                except:
+                    consumer = None
+                context['application'] = {
+                    'application_id': bill.bill_number,
+                    'department': 'Electricity',
+                    'submitted_date': bill.bill_date,
+                    'current_stage': f'Bill {bill.status}',
+                    'assigned_officer': 'System',
+                    'expected_completion': bill.due_date,
+                    'amount': bill.total_amount,
+                    'units': bill.units_consumed
+                }
+                found = True
+        except:
+            pass
+        
+        if not found:
+            try:
+                complaint = ElectricityComplaint.objects.filter(complaint_number=reference_number).first()
+                if complaint:
+                    context['complaint'] = {
+                        'complaint_id': complaint.complaint_number,
+                        'status': complaint.status,
+                        'work_completed': 100 if complaint.status == 'RESOLVED' else 50,
+                        'officer_remark': complaint.remarks or 'Under process',
+                        'deadline': complaint.resolution_date or (datetime.now().date() + timedelta(days=7))
+                    }
+                    found = True
+            except:
+                pass
+        
+        if not found:
+            try:
+                load_req = LoadEnhancementRequest.objects.filter(request_number=reference_number).first()
+                if load_req:
+                    context['application'] = {
+                        'application_id': load_req.request_number,
+                        'department': 'Electricity - Load Enhancement',
+                        'submitted_date': load_req.created_at.date(),
+                        'current_stage': load_req.status,
+                        'assigned_officer': 'Technical Team',
+                        'expected_completion': load_req.inspection_date or (datetime.now().date() + timedelta(days=10)),
+                        'load': f"{load_req.current_load}kW → {load_req.requested_load}kW"
+                    }
+                    found = True
+            except:
+                pass
+        
+        if not found:
+            try:
+                meter_req = MeterReplacementRequest.objects.filter(request_number=reference_number).first()
+                if meter_req:
+                    context['application'] = {
+                        'application_id': meter_req.request_number,
+                        'department': 'Electricity - Meter Replacement',
+                        'submitted_date': meter_req.created_at.date(),
+                        'current_stage': meter_req.status,
+                        'assigned_officer': 'Metering Department',
+                        'expected_completion': meter_req.preferred_date,
+                        'meter_type': meter_req.requested_meter_type
+                    }
+                    found = True
+            except:
+                pass
+        
+        if not found:
+            try:
+                name_transfer = NameTransferRequest.objects.filter(request_number=reference_number).first()
+                if name_transfer:
+                    context['application'] = {
+                        'application_id': name_transfer.request_number,
+                        'department': 'Electricity - Name Transfer',
+                        'submitted_date': name_transfer.created_at.date(),
+                        'current_stage': name_transfer.status,
+                        'assigned_officer': 'Customer Service',
+                        'expected_completion': datetime.now().date() + timedelta(days=15),
+                        'new_owner': name_transfer.new_owner_name
+                    }
+                    found = True
+            except:
+                pass
+        
+        # Check Gas tables
+        if not found:
+            try:
+                gas_booking = GasCylinderBooking.objects.filter(booking_number=reference_number).first()
+                if gas_booking:
+                    status_map = {
+                        'PENDING': 'Pending',
+                        'PROCESSED': 'Processed',
+                        'OUT_FOR_DELIVERY': 'Out for Delivery',
+                        'DELIVERED': 'Delivered'
+                    }
+                    context['application'] = {
+                        'application_id': gas_booking.booking_number,
+                        'department': 'Gas - Cylinder Booking',
+                        'submitted_date': gas_booking.booking_date.date(),
+                        'current_stage': status_map.get(gas_booking.status, gas_booking.status),
+                        'assigned_officer': gas_booking.delivery_person or 'Delivery Team',
+                        'expected_completion': gas_booking.expected_delivery_date,
+                        'cylinder_type': gas_booking.get_cylinder_type_display()
+                    }
+                    found = True
+            except:
+                pass
+        
+        if not found:
+            try:
+                gas_complaint = GasComplaint.objects.filter(complaint_number=reference_number).first()
+                if gas_complaint:
+                    context['complaint'] = {
+                        'complaint_id': gas_complaint.complaint_number,
+                        'status': gas_complaint.status,
+                        'work_completed': 100 if gas_complaint.status == 'RESOLVED' else 50,
+                        'officer_remark': 'Under investigation',
+                        'deadline': datetime.now().date() + timedelta(days=5)
+                    }
+                    found = True
+            except:
+                pass
+        
+        if not found:
+            try:
+                gas_consumer = GasConsumer.objects.filter(consumer_number=reference_number).first()
+                if gas_consumer:
+                    context['application'] = {
+                        'application_id': gas_consumer.consumer_number,
+                        'department': 'Gas - Consumer Information',
+                        'submitted_date': gas_consumer.created_at.date(),
+                        'current_stage': 'Active' if gas_consumer.subsidy_status else 'Inactive',
+                        'assigned_officer': gas_consumer.distributor,
+                        'expected_completion': 'N/A',
+                        'cylinders_remaining': gas_consumer.cylinders_remaining
+                    }
+                    found = True
+            except:
+                pass
+        
+        # Check Water tables
+        if not found:
+            try:
+                water_bill = WaterBill.objects.filter(bill_number=reference_number).first()
+                if water_bill:
+                    context['application'] = {
+                        'application_id': water_bill.bill_number,
+                        'department': 'Water',
+                        'submitted_date': water_bill.bill_date,
+                        'current_stage': f'Bill {water_bill.status}',
+                        'assigned_officer': 'Water Department',
+                        'expected_completion': water_bill.due_date,
+                        'amount': water_bill.total_amount,
+                        'units': water_bill.units_consumed
+                    }
+                    found = True
+            except:
+                pass
+        
+        if not found:
+            try:
+                water_consumer = WaterConsumer.objects.filter(consumer_number=reference_number).first()
+                if water_consumer:
+                    context['application'] = {
+                        'application_id': water_consumer.consumer_number,
+                        'department': 'Water - Connection',
+                        'submitted_date': water_consumer.created_at.date(),
+                        'current_stage': 'Active',
+                        'assigned_officer': 'Water Department',
+                        'expected_completion': 'N/A',
+                        'property_type': water_consumer.property_type
+                    }
+                    found = True
+            except:
+                pass
+        
+        # Check Property tables
+        if not found:
+            try:
+                property_tax = PropertyTax.objects.filter(tax_id=reference_number).first()
+                if property_tax:
+                    context['application'] = {
+                        'application_id': property_tax.tax_id,
+                        'department': 'Property Tax',
+                        'submitted_date': property_tax.created_at.date(),
+                        'current_stage': property_tax.status,
+                        'assigned_officer': 'Municipal Corporation',
+                        'expected_completion': property_tax.due_date,
+                        'amount': property_tax.tax_amount
+                    }
+                    found = True
+            except:
+                pass
+        
+        if not found:
+            try:
+                property_obj = Property.objects.filter(property_id=reference_number).first()
+                if property_obj:
+                    context['application'] = {
+                        'application_id': property_obj.property_id,
+                        'department': 'Property Registration',
+                        'submitted_date': property_obj.created_at.date(),
+                        'current_stage': 'Active',
+                        'assigned_officer': 'Municipal Corporation',
+                        'expected_completion': 'N/A',
+                        'property_type': property_obj.property_type,
+                        'area': property_obj.area_sqft
+                    }
+                    found = True
+            except:
+                pass
+        
+        # Check Trade License
+        if not found:
+            try:
+                trade_license = TradeLicense.objects.filter(license_number=reference_number).first()
+                if trade_license:
+                    context['application'] = {
+                        'application_id': trade_license.license_number,
+                        'department': 'Trade License',
+                        'submitted_date': trade_license.created_at.date(),
+                        'current_stage': trade_license.status,
+                        'assigned_officer': 'Municipal Corporation',
+                        'expected_completion': trade_license.expiry_date,
+                        'business_name': trade_license.business_name
+                    }
+                    found = True
+            except:
+                pass
+        
+        # Check Professional Tax
+        if not found:
+            try:
+                prof_tax = ProfessionalTax.objects.filter(ptin=reference_number).first()
+                if prof_tax:
+                    context['application'] = {
+                        'application_id': prof_tax.ptin,
+                        'department': 'Professional Tax',
+                        'submitted_date': prof_tax.created_at.date(),
+                        'current_stage': prof_tax.status,
+                        'assigned_officer': 'Commercial Tax Department',
+                        'expected_completion': prof_tax.due_date,
+                        'amount': prof_tax.half_yearly_tax + prof_tax.penalty
+                    }
+                    found = True
+            except:
+                pass
+        
+        # Check Building Plan
+        if not found:
+            try:
+                building_plan = BuildingPlanApplication.objects.filter(application_number=reference_number).first()
+                if building_plan:
+                    context['application'] = {
+                        'application_id': building_plan.application_number,
+                        'department': 'Building Plan',
+                        'submitted_date': building_plan.created_at.date(),
+                        'current_stage': building_plan.status,
+                        'assigned_officer': 'Town Planning Department',
+                        'expected_completion': building_plan.created_at.date() + timedelta(days=30),
+                        'building_type': building_plan.building_type,
+                        'floors': building_plan.num_floors
+                    }
+                    found = True
+            except:
+                pass
+        
+        # Check Certificate tables
+        if not found:
+            try:
+                birth_cert = BirthCertificateApplication.objects.filter(application_number=reference_number).first()
+                if birth_cert:
+                    context['application'] = {
+                        'application_id': birth_cert.application_number,
+                        'department': 'Birth Certificate',
+                        'submitted_date': birth_cert.created_at.date(),
+                        'current_stage': birth_cert.status,
+                        'assigned_officer': 'Municipal Corporation',
+                        'expected_completion': birth_cert.issue_date or (datetime.now().date() + timedelta(days=21)),
+                        'child_name': birth_cert.child_name
+                    }
+                    found = True
+            except:
+                pass
+        
+        if not found:
+            try:
+                death_cert = DeathCertificateApplication.objects.filter(application_number=reference_number).first()
+                if death_cert:
+                    context['application'] = {
+                        'application_id': death_cert.application_number,
+                        'department': 'Death Certificate',
+                        'submitted_date': death_cert.created_at.date(),
+                        'current_stage': death_cert.status,
+                        'assigned_officer': 'Municipal Corporation',
+                        'expected_completion': death_cert.issue_date or (datetime.now().date() + timedelta(days=14)),
+                        'deceased_name': death_cert.deceased_name
+                    }
+                    found = True
+            except:
+                pass
+        
+        if not found:
+            try:
+                marriage_reg = MarriageRegistration.objects.filter(application_number=reference_number).first()
+                if marriage_reg:
+                    context['application'] = {
+                        'application_id': marriage_reg.application_number,
+                        'department': 'Marriage Registration',
+                        'submitted_date': marriage_reg.registration_date,
+                        'current_stage': marriage_reg.status,
+                        'assigned_officer': 'Marriage Registrar',
+                        'expected_completion': marriage_reg.registration_date + timedelta(days=7),
+                        'couple': f"{marriage_reg.groom_name} & {marriage_reg.bride_name}"
+                    }
+                    found = True
+            except:
+                pass
+        
+        # Check Grievance
+        if not found:
+            try:
+                grievance = Grievance.objects.filter(grievance_number=reference_number).first()
+                if grievance:
+                    context['complaint'] = {
+                        'complaint_id': grievance.grievance_number,
+                        'status': grievance.status,
+                        'work_completed': 100 if grievance.status == 'RESOLVED' else 50,
+                        'officer_remark': grievance.remarks or 'Under investigation',
+                        'deadline': grievance.resolution_date or (datetime.now().date() + timedelta(days=10))
+                    }
+                    found = True
+            except:
+                pass
+        
+        if not found:
+            messages.error(request, f'No record found with reference number: {reference_number}')
+    
+    return render(request, 'application-status.html', context)
+
+
 # ================= TRANSPORT & REVENUE SERVICES =================
 
 @kiosk_login_required
@@ -2158,60 +2877,103 @@ def payment_history(request):
     
     payments = []
     
+    # Try to fetch from database
     try:
-        # In production, fetch from database
-        # This would query all payment-related tables
-        pass
+        consumer = Consumer.objects.get(id=consumer_id)
+        
+        # Get electricity payments
+        elec_payments = ElectricityPayment.objects.filter(bill__consumer__consumer=consumer).order_by('-payment_date')[:10]
+        for payment in elec_payments:
+            payments.append({
+                'reference_no': payment.transaction_id,
+                'service': 'electricity',
+                'service_name': 'Electricity Bill',
+                'date': payment.payment_date,
+                'amount': payment.amount,
+                'status': payment.status.lower()
+            })
+        
+        # Get gas payments (from audit logs for now)
+        gas_payments = AuditLog.objects.filter(
+            consumer=consumer,
+            action='GAS_PAYMENT'
+        ).order_by('-created_at')[:5]
+        
+        for log in gas_payments:
+            try:
+                changes = log.changes
+                payments.append({
+                    'reference_no': changes.get('transaction', ''),
+                    'service': 'gas',
+                    'service_name': 'Gas Bill',
+                    'date': log.created_at,
+                    'amount': float(changes.get('amount', 0)),
+                    'status': 'success'
+                })
+            except:
+                pass
+        
     except Exception as e:
-        logger.error(f"Error fetching payment history: {e}")
+        logger.error(f"Error fetching payments: {e}")
     
-    # Sample payment data for now
-    payments = [
-        {
-            'reference_no': 'PAY123456',
-            'service': 'electricity',
-            'service_name': 'Electricity Bill',
-            'date': datetime.now() - timedelta(days=2),
-            'amount': 1250.00,
-            'status': 'success'
-        },
-        {
-            'reference_no': 'PAY123457',
-            'service': 'water',
-            'service_name': 'Water Bill',
-            'date': datetime.now() - timedelta(days=5),
-            'amount': 450.00,
-            'status': 'success'
-        },
-        {
-            'reference_no': 'PAY123458',
-            'service': 'gas',
-            'service_name': 'Gas Bill',
-            'date': datetime.now() - timedelta(days=7),
-            'amount': 856.00,
-            'status': 'success'
-        },
-        {
-            'reference_no': 'PAY123459',
-            'service': 'property_tax',
-            'service_name': 'Property Tax',
-            'date': datetime.now() - timedelta(days=10),
-            'amount': 3450.00,
-            'status': 'success'
-        },
-        {
-            'reference_no': 'PAY123460',
-            'service': 'professional_tax',
-            'service_name': 'Professional Tax',
-            'date': datetime.now() - timedelta(days=12),
-            'amount': 1250.00,
-            'status': 'success'
-        }
-    ]
+    # If no payments found, use sample data
+    if not payments:
+        payments = [
+            {
+                'reference_no': 'PAY123456',
+                'service': 'electricity',
+                'service_name': 'Electricity Bill',
+                'date': datetime.now() - timedelta(days=2),
+                'amount': 1250.00,
+                'status': 'success'
+            },
+            {
+                'reference_no': 'PAY123457',
+                'service': 'water',
+                'service_name': 'Water Bill',
+                'date': datetime.now() - timedelta(days=5),
+                'amount': 450.00,
+                'status': 'success'
+            },
+            {
+                'reference_no': 'PAY123458',
+                'service': 'gas',
+                'service_name': 'Gas Bill',
+                'date': datetime.now() - timedelta(days=7),
+                'amount': 856.00,
+                'status': 'success'
+            },
+            {
+                'reference_no': 'PAY123459',
+                'service': 'property_tax',
+                'service_name': 'Property Tax',
+                'date': datetime.now() - timedelta(days=10),
+                'amount': 3450.00,
+                'status': 'success'
+            },
+            {
+                'reference_no': 'PAY123460',
+                'service': 'professional_tax',
+                'service_name': 'Professional Tax',
+                'date': datetime.now() - timedelta(days=12),
+                'amount': 1250.00,
+                'status': 'success'
+            }
+        ]
     
     # Filter payments
     if filter_param != 'all':
-        payments = [p for p in payments if p['service'] == filter_param]
+        filtered_payments = []
+        for p in payments:
+            if filter_param == 'gas' and p['service'] == 'gas':
+                filtered_payments.append(p)
+            elif filter_param == 'electricity' and p['service'] == 'electricity':
+                filtered_payments.append(p)
+            elif filter_param == 'water' and p['service'] == 'water':
+                filtered_payments.append(p)
+            elif filter_param == 'municipal' and p['service'] in ['property_tax', 'professional_tax', 'trade_license']:
+                filtered_payments.append(p)
+        payments = filtered_payments
     
     context = {
         'payments': payments,
@@ -2243,104 +3005,6 @@ def receipt_print(request):
         return render(request, 'receipt-print.html', {'receipt': receipt})
     
     return redirect('payment-history')
-
-
-# ================= OTHER SERVICES / PAGES =================
-
-@kiosk_login_required
-def birth_certificate(request):
-    """Birth certificate application"""
-    if request.method == 'POST':
-        child_name = sanitize_input(request.POST.get('child_name'), 100)
-        dob = sanitize_input(request.POST.get('dob'), 10)
-        gender = sanitize_input(request.POST.get('gender'), 10)
-        birth_place = sanitize_input(request.POST.get('birth_place'), 100)
-        father_name = sanitize_input(request.POST.get('father_name'), 100)
-        mother_name = sanitize_input(request.POST.get('mother_name'), 100)
-        permanent_address = sanitize_input(request.POST.get('permanent_address'), 500)
-        
-        if not all([child_name, dob, gender, birth_place, father_name, mother_name, permanent_address]):
-            messages.error(request, 'Please fill in all required fields')
-            return render(request, 'birth-certificate.html')
-        
-        ref_number = f"BRTH{random.randint(100000, 999999)}"
-        messages.success(request, f'Birth certificate application submitted successfully! Reference: {ref_number}')
-        return redirect('municipal-services')
-    
-    return render(request, 'birth-certificate.html')
-
-
-@kiosk_login_required
-def death_certificate(request):
-    """Death certificate application"""
-    if request.method == 'POST':
-        deceased_name = sanitize_input(request.POST.get('deceased_name'), 100)
-        date_of_death = sanitize_input(request.POST.get('date_of_death'), 10)
-        place_of_death = sanitize_input(request.POST.get('place_of_death'), 100)
-        gender = sanitize_input(request.POST.get('gender'), 10)
-        father_name = sanitize_input(request.POST.get('father_name'), 100)
-        mother_name = sanitize_input(request.POST.get('mother_name'), 100)
-        permanent_address = sanitize_input(request.POST.get('permanent_address'), 500)
-        cause_of_death = sanitize_input(request.POST.get('cause_of_death'), 500)
-        
-        if not all([deceased_name, date_of_death, place_of_death, gender, father_name, mother_name, permanent_address, cause_of_death]):
-            messages.error(request, 'Please fill in all required fields')
-            return render(request, 'death-certificate.html')
-        
-        from datetime import date
-        if date_of_death:
-            try:
-                death_date = date.fromisoformat(date_of_death)
-                if death_date > date.today():
-                    messages.error(request, 'Date of death cannot be in the future')
-                    return render(request, 'death-certificate.html')
-            except ValueError:
-                messages.error(request, 'Invalid date format')
-                return render(request, 'death-certificate.html')
-        
-        ref_number = f"DTH{random.randint(100000, 999999)}"
-        messages.success(request, f'Death certificate application submitted successfully! Reference: {ref_number}')
-        return redirect('municipal-services')
-    
-    return render(request, 'death-certificate.html')
-
-
-@kiosk_login_required
-def marriage_registration(request):
-    """Marriage registration application"""
-    if request.method == 'POST':
-        groom_name = sanitize_input(request.POST.get('groom_name'), 100)
-        groom_dob = sanitize_input(request.POST.get('groom_dob'), 10)
-        groom_aadhaar = sanitize_input(request.POST.get('groom_aadhaar'), 12)
-        groom_father_name = sanitize_input(request.POST.get('groom_father_name'), 100)
-        bride_name = sanitize_input(request.POST.get('bride_name'), 100)
-        bride_dob = sanitize_input(request.POST.get('bride_dob'), 10)
-        bride_aadhaar = sanitize_input(request.POST.get('bride_aadhaar'), 12)
-        bride_father_name = sanitize_input(request.POST.get('bride_father_name'), 100)
-        marriage_date = sanitize_input(request.POST.get('marriage_date'), 10)
-        marriage_place = sanitize_input(request.POST.get('marriage_place'), 100)
-        marriage_type = sanitize_input(request.POST.get('marriage_type'), 50)
-        witness1_name = sanitize_input(request.POST.get('witness1_name'), 100)
-        witness2_name = sanitize_input(request.POST.get('witness2_name'), 100)
-        
-        if not all([groom_name, bride_name, marriage_date, marriage_place, marriage_type]):
-            messages.error(request, 'Please fill in all required fields')
-            return render(request, 'marriage-registration.html')
-        
-        # Validate Aadhaar if provided
-        if groom_aadhaar and (len(groom_aadhaar) != 12 or not groom_aadhaar.isdigit()):
-            messages.error(request, 'Please enter a valid 12-digit Aadhaar for groom')
-            return render(request, 'marriage-registration.html')
-        
-        if bride_aadhaar and (len(bride_aadhaar) != 12 or not bride_aadhaar.isdigit()):
-            messages.error(request, 'Please enter a valid 12-digit Aadhaar for bride')
-            return render(request, 'marriage-registration.html')
-        
-        ref_number = f"MAR{random.randint(100000, 999999)}"
-        messages.success(request, f'Marriage registration submitted successfully! Reference: {ref_number}')
-        return redirect('municipal-services')
-    
-    return render(request, 'marriage-registration.html')
 
 
 # ================= DOCUMENT UPLOADS =================
@@ -2416,6 +3080,12 @@ def document_upload_pen_view(request):
             # In production, save files to database/media
             file_names = [f.name for f in valid_files]
             
+            # Log upload
+            log_security_event(request, 'PEN_UPLOAD', {
+                'count': len(valid_files),
+                'files': ','.join(f.name for f in valid_files)
+            })
+            
             messages.success(request, f'Successfully uploaded {len(valid_files)} files!')
             
         else:
@@ -2454,9 +3124,15 @@ def document_upload_camera_view(request):
                 file_data = ContentFile(base64.b64decode(imgstr), name=file_name)
                 saved_images.append(file_name)
             
+            # Log upload
+            log_security_event(request, 'CAMERA_UPLOAD', {
+                'count': len(saved_images)
+            })
+            
             messages.success(request, f'Successfully uploaded {len(saved_images)} images!')
             
         except Exception as e:
+            logger.error(f"Error processing camera images: {e}")
             messages.error(request, f'Error uploading images: {str(e)}')
             return render(request, 'document-upload-camera.html')
         
