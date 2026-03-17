@@ -166,28 +166,25 @@
         }
 
         /* MAIN CONTAINER */
-        .container {
-            position:fixed;
-            top:70px;
-            left:0;
-            right:0;
-            bottom:0;
-            display:flex;
-            flex-direction:column;
-            align-items:center;
-            justify-content:flex-start;
-            padding:20px 10px 10px 10px;
-            overflow-y:auto;
-            z-index:1;
-        }
-        .content-wrapper {
-            width:100%;
-            max-width:800px;
-            display:flex;
-            flex-direction:column;
-            gap:20px;
-            padding:10px 0 20px 0;
-        }
+        /* MAIN CONTAINER - FIXED for vertical centering */
+.container {
+    position: fixed;
+    top: 70px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;  /* This centers vertically */
+    justify-content: center;
+    padding: 20px 10px;
+    overflow-y: auto;
+    z-index: 1;
+}
+.content-wrapper {
+    width: 100%;
+    max-width: 800px;
+    margin: auto;  /* This helps with centering */
+}
 
         h1 {
             color:#1e5fbf;
