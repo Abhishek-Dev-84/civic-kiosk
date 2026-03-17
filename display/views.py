@@ -19,6 +19,7 @@ from django.conf import settings
 from django.db import IntegrityError, DatabaseError
 from django.core.cache import cache
 import traceback
+import uuid
 
 # Import models
 from .models import (
@@ -185,7 +186,6 @@ def index(request):
     return render(request, 'index.html')
 
 
-# REMOVED rate limiting - let users try as many times as needed
 def auth(request):
     """Aadhaar authentication page"""
     # Clear any existing messages
@@ -268,7 +268,6 @@ def auth(request):
     return render(request, 'auth.html')
 
 
-# REMOVED rate limiting
 def otp(request):
     """OTP verification page"""
     # Check if aadhaar is in session
@@ -1124,7 +1123,10 @@ def application_status(request):
         try:
             bill = ElectricityBill.objects.filter(bill_number=reference_number).first()
             if bill:
-                consumer = Consumer.objects.get(id=bill.consumer.consumer_id)
+                try:
+                    consumer = Consumer.objects.get(id=bill.consumer.consumer_id)
+                except:
+                    consumer = None
                 context['application'] = {
                     'application_id': bill.bill_number,
                     'department': 'Electricity',
@@ -1205,6 +1207,7 @@ def application_status(request):
             except:
                 pass
         
+        # Check Gas tables
         if not found:
             try:
                 gas_booking = GasCylinderBooking.objects.filter(booking_number=reference_number).first()
@@ -1222,12 +1225,45 @@ def application_status(request):
                         'current_stage': status_map.get(gas_booking.status, gas_booking.status),
                         'assigned_officer': gas_booking.delivery_person or 'Delivery Team',
                         'expected_completion': gas_booking.expected_delivery_date,
-                        'cylinder_type': gas_booking.cylinder_type
+                        'cylinder_type': gas_booking.get_cylinder_type_display()
                     }
                     found = True
             except:
                 pass
         
+        if not found:
+            try:
+                gas_complaint = GasComplaint.objects.filter(complaint_number=reference_number).first()
+                if gas_complaint:
+                    context['complaint'] = {
+                        'complaint_id': gas_complaint.complaint_number,
+                        'status': gas_complaint.status,
+                        'work_completed': 100 if gas_complaint.status == 'RESOLVED' else 50,
+                        'officer_remark': 'Under investigation',
+                        'deadline': datetime.now().date() + timedelta(days=5)
+                    }
+                    found = True
+            except:
+                pass
+        
+        if not found:
+            try:
+                gas_consumer = GasConsumer.objects.filter(consumer_number=reference_number).first()
+                if gas_consumer:
+                    context['application'] = {
+                        'application_id': gas_consumer.consumer_number,
+                        'department': 'Gas - Consumer Information',
+                        'submitted_date': gas_consumer.created_at.date(),
+                        'current_stage': 'Active' if gas_consumer.subsidy_status else 'Inactive',
+                        'assigned_officer': gas_consumer.distributor,
+                        'expected_completion': 'N/A',
+                        'cylinders_remaining': gas_consumer.cylinders_remaining
+                    }
+                    found = True
+            except:
+                pass
+        
+        # Check Water tables
         if not found:
             try:
                 water_bill = WaterBill.objects.filter(bill_number=reference_number).first()
@@ -1246,6 +1282,7 @@ def application_status(request):
             except:
                 pass
         
+        # Check Property tables
         if not found:
             try:
                 property_tax = PropertyTax.objects.filter(tax_id=reference_number).first()
@@ -1263,6 +1300,7 @@ def application_status(request):
             except:
                 pass
         
+        # Check Certificate tables
         if not found:
             try:
                 birth_cert = BirthCertificateApplication.objects.filter(application_number=reference_number).first()
@@ -1314,6 +1352,7 @@ def application_status(request):
             except:
                 pass
         
+        # Check Grievance
         if not found:
             try:
                 grievance = Grievance.objects.filter(grievance_number=reference_number).first()
@@ -1378,57 +1417,179 @@ def building_plan(request):
 @kiosk_login_required
 def gas_services(request):
     """Gas services main menu"""
-    return render(request, 'gas-services.html')
+    consumer_id = request.session.get('consumer_id')
+    context = {}
+    
+    try:
+        consumer = Consumer.objects.get(id=consumer_id)
+        # Check if user has gas connection
+        try:
+            gas_consumer = GasConsumer.objects.get(consumer=consumer)
+            context['user_consumer_info'] = f"{gas_consumer.consumer_number} - {gas_consumer.distributor}"
+            context['has_connection'] = True
+        except GasConsumer.DoesNotExist:
+            context['has_connection'] = False
+    except:
+        pass
+    
+    return render(request, 'gas-services.html', context)
 
 
 @kiosk_login_required
 def gas_subsidy(request):
     """Gas subsidy status and information"""
-    if request.method == 'POST':
-        action = sanitize_input(request.POST.get('action'))
-        
-        if action == 'fetch':
-            consumer_no = sanitize_input(request.POST.get('consumer_no'), 20)
-            
-            if not consumer_no:
-                messages.error(request, 'Please enter consumer number')
-                return render(request, 'gas-subsidy.html')
-            
-            context = {
-                'show_subsidy': True,
-                'consumer_no': consumer_no,
-                'status': 'Active' if random.choice([True, False]) else 'Inactive',
-                'amount_per_cylinder': '200',
-                'total_cylinders': '12',
-                'remaining_cylinders': random.randint(0, 12),
-                'next_eligibility': (datetime.now().date() + timedelta(days=30)).strftime('%d %b %Y'),
-                'bank_account': 'XXXXXX1234'
-            }
-            return render(request, 'gas-subsidy.html', context)
+    consumer_id = request.session.get('consumer_id')
+    context = {}
     
-    return render(request, 'gas-subsidy.html')
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        consumer_no = sanitize_input(request.POST.get('consumer_no'), 20)
+        
+        if consumer_no:
+            # Try to find gas consumer by consumer number
+            try:
+                gas_consumer = GasConsumer.objects.filter(consumer_number=consumer_no).first()
+                
+                if gas_consumer:
+                    # Get subsidy information
+                    try:
+                        subsidy = GasSubsidy.objects.get(consumer=gas_consumer)
+                        
+                        # Calculate remaining cylinders
+                        cylinders_used = subsidy.cylinders_used
+                        total_cylinders = subsidy.total_cylinders_allotted
+                        remaining = total_cylinders - cylinders_used
+                        
+                        context['show_subsidy'] = True
+                        context['consumer_no'] = gas_consumer.consumer_number
+                        context['subsidy'] = {
+                            'status': 'Active' if subsidy.is_active else 'Inactive',
+                            'amount_per_cylinder': subsidy.amount_per_cylinder,
+                            'total_cylinders': total_cylinders,
+                            'remaining_cylinders': remaining,
+                            'next_eligibility': subsidy.next_eligible_date.strftime('%d %b %Y'),
+                            'bank_account': f"XXXXXX{subsidy.bank_account_number[-4:]}" if subsidy.bank_account_number else 'Not available'
+                        }
+                        
+                        # Get last transaction if any
+                        last_booking = GasCylinderBooking.objects.filter(
+                            consumer=gas_consumer, 
+                            status='DELIVERED'
+                        ).order_by('-actual_delivery_date').first()
+                        
+                        if last_booking:
+                            context['subsidy']['last_transaction'] = {
+                                'amount': last_booking.cylinder_price,
+                                'date': last_booking.actual_delivery_date.strftime('%d %b %Y')
+                            }
+                            
+                    except GasSubsidy.DoesNotExist:
+                        # Consumer exists but no subsidy record
+                        context['show_subsidy'] = True
+                        context['consumer_no'] = gas_consumer.consumer_number
+                        context['subsidy'] = {
+                            'status': 'Not Enrolled',
+                            'amount_per_cylinder': 0,
+                            'total_cylinders': 0,
+                            'remaining_cylinders': 0,
+                            'next_eligibility': 'N/A',
+                            'bank_account': 'Not available'
+                        }
+                else:
+                    # No gas consumer found - show sample data for demo
+                    context['show_subsidy'] = True
+                    context['consumer_no'] = consumer_no
+                    context['subsidy'] = {
+                        'status': 'Active' if random.choice([True, False]) else 'Inactive',
+                        'amount_per_cylinder': '200',
+                        'total_cylinders': '12',
+                        'remaining_cylinders': random.randint(0, 12),
+                        'next_eligibility': (datetime.now().date() + timedelta(days=30)).strftime('%d %b %Y'),
+                        'bank_account': 'XXXXXX1234'
+                    }
+            except Exception as e:
+                logger.error(f"Error fetching gas subsidy: {e}")
+                messages.error(request, 'Error fetching subsidy information. Please try again.')
+    
+    context['last_updated'] = datetime.now().strftime('%d %b %Y')
+    return render(request, 'gas-subsidy.html', context)
 
 
 @kiosk_login_required
 def gas_new_connection(request):
     """New gas connection application"""
+    consumer_id = request.session.get('consumer_id')
+    
     if request.method == 'POST':
         full_name = sanitize_input(request.POST.get('full_name'), 100)
         address = sanitize_input(request.POST.get('address'), 500)
         mobile = sanitize_input(request.POST.get('mobile'), 10)
         document_type = sanitize_input(request.POST.get('document_type'), 50)
         
+        # Validate required fields
         if not all([full_name, address, mobile, document_type]):
             messages.error(request, 'Please fill in all required fields')
-            return render(request, 'gas-new-connection.html')
+            return render(request, 'gas-new-connection.html', {'form_data': request.POST})
         
         if not mobile.isdigit() or len(mobile) != 10:
             messages.error(request, 'Please enter a valid 10-digit mobile number')
-            return render(request, 'gas-new-connection.html')
+            return render(request, 'gas-new-connection.html', {'form_data': request.POST})
         
-        ref_number = f"GAS{random.randint(100000, 999999)}"
-        messages.success(request, f'New gas connection application submitted! Reference: {ref_number}')
-        return redirect('gas-services')
+        try:
+            # Get the consumer
+            consumer = Consumer.objects.get(id=consumer_id)
+            
+            # Generate unique consumer number
+            consumer_number = f"GAS{random.randint(10000, 99999)}{random.randint(100, 999)}"
+            
+            # Create gas consumer record
+            gas_consumer = GasConsumer.objects.create(
+                consumer=consumer,
+                consumer_number=consumer_number,
+                distributor='HP Gas',  # Default distributor
+                distributor_code='HP' + str(random.randint(100, 999)),
+                subsidy_status=True,
+                subsidy_amount=200.00,
+                total_cylinders_per_year=12,
+                cylinders_remaining=12,
+                address=address
+            )
+            
+            # Create notification
+            try:
+                Notification.objects.create(
+                    consumer=consumer,
+                    notification_type='APPLICATION_UPDATE',
+                    title='Gas Connection Application Submitted',
+                    message=f'Your gas connection application has been submitted. Your consumer number is {consumer_number}'
+                )
+            except Exception as e:
+                logger.error(f"Failed to create notification: {e}")
+            
+            # Log the action
+            try:
+                AuditLog.objects.create(
+                    consumer=consumer,
+                    action='GAS_NEW_CONNECTION',
+                    model_name='GasConsumer',
+                    object_id=gas_consumer.id,
+                    changes={'consumer_number': consumer_number},
+                    ip_address=get_client_ip(request),
+                    user_agent=request.META.get('HTTP_USER_AGENT', '')[:255]
+                )
+            except Exception as e:
+                logger.error(f"Failed to create audit log: {e}")
+            
+            messages.success(request, f'New gas connection application submitted! Your consumer number is {consumer_number}')
+            return redirect('gas-services')
+            
+        except Consumer.DoesNotExist:
+            messages.error(request, 'Consumer not found. Please login again.')
+            return redirect('auth')
+        except Exception as e:
+            logger.error(f"Error creating gas connection: {e}")
+            messages.error(request, 'An error occurred. Please try again.')
+            return render(request, 'gas-new-connection.html', {'form_data': request.POST})
     
     return render(request, 'gas-new-connection.html')
 
@@ -1436,56 +1597,200 @@ def gas_new_connection(request):
 @kiosk_login_required
 def gas_cylinder_booking(request):
     """Gas cylinder booking"""
+    consumer_id = request.session.get('consumer_id')
+    context = {}
+    
+    # Get consumer's gas connection if exists
+    try:
+        consumer = Consumer.objects.get(id=consumer_id)
+        gas_consumer = GasConsumer.objects.filter(consumer=consumer).first()
+        if gas_consumer:
+            context['consumer'] = {
+                'consumer_no': gas_consumer.consumer_number,
+                'subsidy_active': gas_consumer.subsidy_status,
+                'remaining_subsidies': gas_consumer.cylinders_remaining
+            }
+    except:
+        context['consumer'] = {
+            'consumer_no': '1234 5678 9012',
+            'subsidy_active': True,
+            'remaining_subsidies': 8
+        }
+    
+    # Define cylinder types
+    context['cylinders'] = [
+        {'type': '14.2kg', 'name': '14.2 kg Domestic', 'price': 856, 'subsidized': True, 'selected': True},
+        {'type': '5kg', 'name': '5 kg Domestic', 'price': 425, 'subsidized': False, 'selected': False},
+        {'type': '19kg', 'name': '19 kg Commercial', 'price': 1850, 'subsidized': False, 'selected': False},
+    ]
+    
     if request.method == 'POST':
         cylinder_type = sanitize_input(request.POST.get('cylinder_type'), 20)
-        cylinder_price = sanitize_input(request.POST.get('cylinder_price_hidden'))
+        cylinder_price = request.POST.get('cylinder_price_hidden')
         
         if not cylinder_type:
             messages.error(request, 'Please select a cylinder type')
-            return render(request, 'gas-cylinder-booking.html')
+            return render(request, 'gas-cylinder-booking.html', context)
         
-        ref_number = f"BOOK{random.randint(100000, 999999)}"
-        messages.success(request, f'Cylinder booked successfully! Reference: {ref_number}')
-        return redirect('gas-services')
+        try:
+            # Get the consumer
+            consumer = Consumer.objects.get(id=consumer_id)
+            gas_consumer = GasConsumer.objects.filter(consumer=consumer).first()
+            
+            if not gas_consumer:
+                # Create temporary gas consumer for demo
+                gas_consumer = GasConsumer.objects.create(
+                    consumer=consumer,
+                    consumer_number=f"GAS{random.randint(10000, 99999)}",
+                    distributor='HP Gas',
+                    distributor_code='HP123',
+                    subsidy_status=True,
+                    subsidy_amount=200.00,
+                    total_cylinders_per_year=12,
+                    cylinders_remaining=12,
+                    address=consumer.address
+                )
+            
+            # Check if cylinders are available (for subsidized cylinders)
+            if cylinder_type == '14.2kg' and gas_consumer.cylinders_remaining <= 0:
+                messages.error(request, 'No subsidized cylinders remaining. Please try commercial cylinder.')
+                return render(request, 'gas-cylinder-booking.html', context)
+            
+            # Generate booking number
+            booking_number = f"BOOK{random.randint(10000, 99999)}{random.randint(100, 999)}"
+            
+            # Calculate expected delivery date (2-3 days from now)
+            expected_delivery = datetime.now().date() + timedelta(days=random.randint(2, 3))
+            
+            # Create booking
+            booking = GasCylinderBooking.objects.create(
+                consumer=gas_consumer,
+                booking_number=booking_number,
+                cylinder_type=cylinder_type,
+                cylinder_price=cylinder_price,
+                status='PENDING',
+                expected_delivery_date=expected_delivery
+            )
+            
+            # Update remaining cylinders for subsidized booking
+            if cylinder_type == '14.2kg':
+                gas_consumer.cylinders_remaining -= 1
+                gas_consumer.save()
+            
+            # Create notification
+            try:
+                Notification.objects.create(
+                    consumer=consumer,
+                    notification_type='APPLICATION_UPDATE',
+                    title='Cylinder Booked',
+                    message=f'Your cylinder has been booked. Booking number: {booking_number}'
+                )
+            except Exception as e:
+                logger.error(f"Failed to create notification: {e}")
+            
+            # Log the action
+            try:
+                AuditLog.objects.create(
+                    consumer=consumer,
+                    action='CYLINDER_BOOKING',
+                    model_name='GasCylinderBooking',
+                    object_id=booking.id,
+                    changes={'booking_number': booking_number, 'type': cylinder_type},
+                    ip_address=get_client_ip(request),
+                    user_agent=request.META.get('HTTP_USER_AGENT', '')[:255]
+                )
+            except Exception as e:
+                logger.error(f"Failed to create audit log: {e}")
+            
+            messages.success(request, f'Cylinder booked successfully! Reference: {booking_number}')
+            return redirect('gas-services')
+            
+        except Consumer.DoesNotExist:
+            messages.error(request, 'Consumer not found. Please login again.')
+            return redirect('auth')
+        except Exception as e:
+            logger.error(f"Error booking cylinder: {e}")
+            messages.error(request, 'An error occurred. Please try again.')
     
-    return render(request, 'gas-cylinder-booking.html')
+    return render(request, 'gas-cylinder-booking.html', context)
 
 
 @kiosk_login_required
 def gas_consumer_lookup(request):
     """Gas consumer lookup by Aadhaar"""
+    context = {}
+    
     if request.method == 'POST':
         aadhaar_number = sanitize_input(request.POST.get('aadhaar_number'), 12)
         
         if not aadhaar_number or len(aadhaar_number) != 12:
             messages.error(request, 'Please enter a valid 12-digit Aadhaar number')
-            return render(request, 'gas-consumer-lookup.html')
+            return render(request, 'gas-consumer-lookup.html', context)
         
         # Simple Aadhaar validation
         if not aadhaar_number.isdigit():
             messages.error(request, 'Aadhaar must contain only digits')
-            return render(request, 'gas-consumer-lookup.html')
+            return render(request, 'gas-consumer-lookup.html', context)
         
-        # Simulate consumer lookup
-        context = {
-            'show_result': True,
-            'consumer': {
-                'consumer_no': '1234 5678 9012',
-                'name': 'Rajesh Kumar',
-                'address': '123, Gandhi Nagar',
-                'distributor': 'HP Gas - Indane',
-                'status': 'Active',
-                'last_booking': '15 Feb 2026'
-            }
-        }
-        return render(request, 'gas-consumer-lookup.html', context)
+        try:
+            # Try to find consumer by Aadhaar
+            consumer = Consumer.objects.filter(aadhaar_number=aadhaar_number).first()
+            
+            if consumer:
+                # Try to find gas consumer
+                gas_consumer = GasConsumer.objects.filter(consumer=consumer).first()
+                
+                if gas_consumer:
+                    # Get last booking
+                    last_booking = GasCylinderBooking.objects.filter(
+                        consumer=gas_consumer
+                    ).order_by('-booking_date').first()
+                    
+                    context['show_result'] = True
+                    context['consumer'] = {
+                        'consumer_no': ' '.join([gas_consumer.consumer_number[i:i+4] for i in range(0, len(gas_consumer.consumer_number), 4)]),
+                        'name': consumer.name,
+                        'address': consumer.address,
+                        'distributor': gas_consumer.distributor,
+                        'status': 'Active' if gas_consumer.subsidy_status else 'Inactive',
+                        'last_booking': last_booking.booking_date.strftime('%d %b %Y') if last_booking else 'No bookings yet'
+                    }
+                else:
+                    # Consumer exists but no gas connection
+                    context['show_result'] = True
+                    context['consumer'] = {
+                        'consumer_no': 'No gas connection',
+                        'name': consumer.name,
+                        'address': consumer.address,
+                        'distributor': 'Not registered',
+                        'status': 'No Connection',
+                        'last_booking': 'N/A'
+                    }
+            else:
+                # No consumer found - use sample data
+                context['show_result'] = True
+                context['consumer'] = {
+                    'consumer_no': '1234 5678 9012',
+                    'name': 'Rajesh Kumar',
+                    'address': '123, Gandhi Nagar',
+                    'distributor': 'HP Gas - Indane',
+                    'status': 'Active',
+                    'last_booking': '15 Feb 2026'
+                }
+                
+        except Exception as e:
+            logger.error(f"Error in consumer lookup: {e}")
+            messages.error(request, 'An error occurred. Please try again.')
     
-    return render(request, 'gas-consumer-lookup.html')
+    return render(request, 'gas-consumer-lookup.html', context)
 
 
 @kiosk_login_required
 def gas_complaint(request):
     """Gas complaint registration"""
+    consumer_id = request.session.get('consumer_id')
+    context = {}
+    
     if request.method == 'POST':
         consumer_number = sanitize_input(request.POST.get('consumer_number', '123456789012'), 20)
         complaint_type = sanitize_input(request.POST.get('complaint_type'), 50)
@@ -1493,21 +1798,85 @@ def gas_complaint(request):
         
         if not complaint_type:
             messages.error(request, 'Please select a complaint type')
-            return render(request, 'gas-complaint.html')
+            return render(request, 'gas-complaint.html', context)
         
         if not description or description.strip() == '':
             messages.error(request, 'Please describe your complaint')
-            return render(request, 'gas-complaint.html')
+            return render(request, 'gas-complaint.html', context)
         
         if len(description.strip()) < 10:
             messages.error(request, 'Please provide a more detailed description (minimum 10 characters)')
-            return render(request, 'gas-complaint.html')
+            return render(request, 'gas-complaint.html', context)
         
-        ref_number = f"CMP{random.randint(100000, 999999)}"
-        messages.success(request, f'Complaint registered successfully! Reference: {ref_number}')
-        return redirect('gas-services')
+        try:
+            # Get the consumer
+            consumer = Consumer.objects.get(id=consumer_id)
+            
+            # Try to find gas consumer
+            gas_consumer = GasConsumer.objects.filter(consumer=consumer).first()
+            
+            if not gas_consumer:
+                # Create temporary gas consumer for complaint
+                gas_consumer = GasConsumer.objects.create(
+                    consumer=consumer,
+                    consumer_number=consumer_number.replace(' ', ''),
+                    distributor='HP Gas',
+                    distributor_code='HP123',
+                    subsidy_status=True,
+                    subsidy_amount=200.00,
+                    total_cylinders_per_year=12,
+                    cylinders_remaining=12,
+                    address=consumer.address
+                )
+            
+            # Generate complaint number
+            complaint_number = f"GASCMP{random.randint(10000, 99999)}"
+            
+            # Create complaint
+            complaint = GasComplaint.objects.create(
+                consumer=gas_consumer,
+                complaint_number=complaint_number,
+                complaint_type=complaint_type,
+                description=description,
+                status='PENDING'
+            )
+            
+            # Create notification
+            try:
+                Notification.objects.create(
+                    consumer=consumer,
+                    notification_type='COMPLAINT_UPDATE',
+                    title='Complaint Registered',
+                    message=f'Your complaint {complaint_number} has been registered successfully.'
+                )
+            except Exception as e:
+                logger.error(f"Failed to create notification: {e}")
+            
+            # Log the action
+            try:
+                AuditLog.objects.create(
+                    consumer=consumer,
+                    action='GAS_COMPLAINT',
+                    model_name='GasComplaint',
+                    object_id=complaint.id,
+                    changes={'complaint_number': complaint_number, 'type': complaint_type},
+                    ip_address=get_client_ip(request),
+                    user_agent=request.META.get('HTTP_USER_AGENT', '')[:255]
+                )
+            except Exception as e:
+                logger.error(f"Failed to create audit log: {e}")
+            
+            messages.success(request, f'Complaint registered successfully! Reference: {complaint_number}')
+            return redirect('gas-services')
+            
+        except Consumer.DoesNotExist:
+            messages.error(request, 'Consumer not found. Please login again.')
+            return redirect('auth')
+        except Exception as e:
+            logger.error(f"Error registering complaint: {e}")
+            messages.error(request, 'An error occurred. Please try again.')
     
-    return render(request, 'gas-complaint.html')
+    return render(request, 'gas-complaint.html', context)
 
 
 @kiosk_login_required
@@ -1532,17 +1901,24 @@ def gas_bookings_status(request):
                     'OUT_FOR_DELIVERY': 'out_for_delivery',
                     'DELIVERED': 'delivered'
                 }
+                
+                # Get delivery person info
+                delivery_info = ''
+                if booking.delivery_person:
+                    delivery_info = f"{booking.delivery_person} ({booking.delivery_person_phone})" if booking.delivery_person_phone else booking.delivery_person
+                
                 context['booking'] = {
                     'reference_number': booking.booking_number,
                     'booked_date': booking.booking_date.strftime('%d %b %Y, %I:%M %p'),
                     'expected_delivery': booking.expected_delivery_date.strftime('%d %b %Y') if booking.expected_delivery_date else 'Not scheduled',
-                    'delivery_person': booking.delivery_person or 'To be assigned',
-                    'cylinder_type': dict(GasCylinderBooking.CYLINDER_TYPES).get(booking.cylinder_type, booking.cylinder_type),
+                    'actual_delivery': booking.actual_delivery_date.strftime('%d %b %Y, %I:%M %p') if booking.actual_delivery_date else None,
+                    'delivery_person': delivery_info or 'To be assigned',
+                    'cylinder_type': booking.get_cylinder_type_display(),
                     'status': status_map.get(booking.status, 'pending')
                 }
                 return render(request, 'gas-booking-status.html', context)
-        except:
-            pass
+        except Exception as e:
+            logger.error(f"Error fetching booking: {e}")
         
         # Fallback to sample data
         today = datetime.now().date()
@@ -1594,16 +1970,168 @@ def gas_bookings_status(request):
 @kiosk_login_required
 def gas_bill_payment(request):
     """Gas bill payment"""
+    consumer_id = request.session.get('consumer_id')
+    
     if request.method == 'POST':
         consumer_number = sanitize_input(request.POST.get('consumer_number'), 20)
         amount = sanitize_input(request.POST.get('amount'))
         payment_method = sanitize_input(request.POST.get('payment_method', 'upi'), 10)
+        card_number = sanitize_input(request.POST.get('card_number'), 19)
+        cvv = sanitize_input(request.POST.get('cvv'), 3)
+        pin = sanitize_input(request.POST.get('pin'), 4)
         
+        if not consumer_number or not amount:
+            messages.error(request, 'Invalid payment details')
+            return render(request, 'gas-bill-payment.html')
+        
+        # Validate amount
+        try:
+            amount_value = float(amount)
+            if amount_value <= 0:
+                messages.error(request, 'Invalid amount')
+                return render(request, 'gas-bill-payment.html')
+        except ValueError:
+            messages.error(request, 'Invalid amount')
+            return render(request, 'gas-bill-payment.html')
+        
+        # Validate card details if ATM payment
+        if payment_method == 'atm':
+            card_clean = card_number.replace(' ', '')
+            if len(card_clean) < 15 or not card_clean.isdigit():
+                messages.error(request, 'Please enter a valid card number')
+                return render(request, 'gas-bill-payment.html')
+            if len(cvv) != 3 or not cvv.isdigit():
+                messages.error(request, 'Please enter a valid CVV')
+                return render(request, 'gas-bill-payment.html')
+            if len(pin) != 4 or not pin.isdigit():
+                messages.error(request, 'Please enter a valid PIN')
+                return render(request, 'gas-bill-payment.html')
+        
+        # Generate transaction ID
         transaction_id = f"GAS{datetime.now().strftime('%y%m%d%H%M%S')}{random.randint(100, 999)}"
+        
+        try:
+            # Get the consumer
+            consumer = Consumer.objects.get(id=consumer_id)
+            
+            # Log payment
+            try:
+                AuditLog.objects.create(
+                    consumer=consumer,
+                    action='GAS_PAYMENT',
+                    model_name='Payment',
+                    object_id='',
+                    changes={'amount': amount, 'transaction': transaction_id, 'method': payment_method},
+                    ip_address=get_client_ip(request),
+                    user_agent=request.META.get('HTTP_USER_AGENT', '')[:255]
+                )
+            except Exception as e:
+                logger.error(f"Failed to create audit log: {e}")
+            
+            # Create notification
+            try:
+                Notification.objects.create(
+                    consumer=consumer,
+                    notification_type='PAYMENT_SUCCESS',
+                    title='Payment Successful',
+                    message=f'Your gas bill payment of ₹{amount} was successful. Transaction ID: {transaction_id}'
+                )
+            except Exception as e:
+                logger.error(f"Failed to create notification: {e}")
+                
+        except Exception as e:
+            logger.error(f"Error processing payment: {e}")
+        
         messages.success(request, f'Gas bill payment of ₹{amount} successful! Transaction ID: {transaction_id}')
         return redirect('gas-services')
     
     return render(request, 'gas-bill-payment.html')
+
+
+# ================= GRIEVANCE =================
+
+@kiosk_login_required
+def grievance(request):
+    """General grievance registration"""
+    consumer_id = request.session.get('consumer_id')
+    
+    if request.method == 'POST':
+        name = sanitize_input(request.POST.get('name'), 100)
+        mobile = sanitize_input(request.POST.get('mobile'), 10)
+        location = sanitize_input(request.POST.get('location'), 200)
+        description = sanitize_input(request.POST.get('description'), 1000)
+        department = sanitize_input(request.POST.get('department'), 50)
+        
+        # Validate required fields
+        if not all([name, mobile, location, description, department]):
+            messages.error(request, 'Please fill in all required fields')
+            return render(request, 'grievance.html', {'form_data': request.POST})
+        
+        if not mobile.isdigit() or len(mobile) != 10:
+            messages.error(request, 'Please enter a valid 10-digit mobile number')
+            return render(request, 'grievance.html', {'form_data': request.POST})
+        
+        # Validate description length
+        if len(description.strip()) < 10:
+            messages.error(request, 'Please provide a more detailed description (minimum 10 characters)')
+            return render(request, 'grievance.html', {'form_data': request.POST})
+        
+        try:
+            # Get the consumer
+            consumer = Consumer.objects.get(id=consumer_id)
+            
+            # Generate grievance number
+            grievance_number = f"GRV{random.randint(10000, 99999)}"
+            
+            # Create grievance
+            grievance = Grievance.objects.create(
+                consumer=consumer,
+                grievance_number=grievance_number,
+                department=department,
+                name=name,
+                mobile=mobile,
+                location=location,
+                description=description,
+                status='PENDING'
+            )
+            
+            # Create notification
+            try:
+                Notification.objects.create(
+                    consumer=consumer,
+                    notification_type='APPLICATION_UPDATE',
+                    title='Grievance Registered',
+                    message=f'Your grievance has been registered. Reference number: {grievance_number}'
+                )
+            except Exception as e:
+                logger.error(f"Failed to create notification: {e}")
+            
+            # Log the action
+            try:
+                AuditLog.objects.create(
+                    consumer=consumer,
+                    action='GRIEVANCE_SUBMITTED',
+                    model_name='Grievance',
+                    object_id=grievance.id,
+                    changes={'grievance_number': grievance_number, 'department': department},
+                    ip_address=get_client_ip(request),
+                    user_agent=request.META.get('HTTP_USER_AGENT', '')[:255]
+                )
+            except Exception as e:
+                logger.error(f"Failed to create audit log: {e}")
+            
+            messages.success(request, f'Grievance registered successfully! Reference: {grievance_number}')
+            return redirect('municipal-services')
+            
+        except Consumer.DoesNotExist:
+            messages.error(request, 'Consumer not found. Please login again.')
+            return redirect('auth')
+        except Exception as e:
+            logger.error(f"Error registering grievance: {e}")
+            messages.error(request, 'An error occurred. Please try again.')
+            return render(request, 'grievance.html', {'form_data': request.POST})
+    
+    return render(request, 'grievance.html')
 
 
 # ================= TRANSPORT & REVENUE SERVICES =================
@@ -1626,8 +2154,18 @@ def revenue_services(request):
 def payment_history(request):
     """Payment history page"""
     filter_param = sanitize_input(request.GET.get('filter', 'all'), 20)
+    consumer_id = request.session.get('consumer_id')
     
-    # Sample payment data - in production, fetch from database
+    payments = []
+    
+    try:
+        # In production, fetch from database
+        # This would query all payment-related tables
+        pass
+    except Exception as e:
+        logger.error(f"Error fetching payment history: {e}")
+    
+    # Sample payment data for now
     payments = [
         {
             'reference_no': 'PAY123456',
@@ -1925,31 +2463,6 @@ def document_upload_camera_view(request):
         return redirect('menu')
     
     return render(request, 'document-upload-camera.html')
-
-
-@kiosk_login_required
-def grievance(request):
-    """General grievance registration"""
-    if request.method == 'POST':
-        name = sanitize_input(request.POST.get('name'), 100)
-        mobile = sanitize_input(request.POST.get('mobile'), 10)
-        location = sanitize_input(request.POST.get('location'), 200)
-        description = sanitize_input(request.POST.get('description'), 1000)
-        department = sanitize_input(request.POST.get('department'), 50)
-        
-        if not all([name, mobile, location, description, department]):
-            messages.error(request, 'Please fill in all required fields')
-            return render(request, 'grievance.html')
-        
-        if not mobile.isdigit() or len(mobile) != 10:
-            messages.error(request, 'Please enter a valid 10-digit mobile number')
-            return render(request, 'grievance.html')
-        
-        ref_number = f"GRV{random.randint(100000, 999999)}"
-        messages.success(request, f'Grievance registered successfully! Reference: {ref_number}')
-        return redirect('municipal-services')
-    
-    return render(request, 'grievance.html')
 
 
 # ================= UNDER DEVELOPMENT =================
