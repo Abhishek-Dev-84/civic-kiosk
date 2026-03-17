@@ -55,8 +55,6 @@
             z-index: 2000;
             display: none;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            width: 90%;
-            max-width: 500px;
         }
         
         .timeout-warning p {
@@ -90,21 +88,20 @@
         /* Voice status indicator */
         .voice-status-indicator {
             position: fixed;
-            bottom: 30px;
+            bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0,0,0,0.9);
+            background: rgba(0,0,0,0.8);
             color: white;
-            padding: 15px 30px;
-            border-radius: 50px;
-            font-size: 18px;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-size: 16px;
             font-weight: 600;
             z-index: 2000;
             display: none;
             align-items: center;
-            gap: 12px;
-            border: 3px solid #ff9933;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            gap: 10px;
+            border: 2px solid #ff9933;
         }
 
         .voice-status-indicator.active {
@@ -112,8 +109,8 @@
         }
 
         .voice-pulse {
-            width: 14px;
-            height: 14px;
+            width: 12px;
+            height: 12px;
             background: #28a745;
             border-radius: 50%;
             animation: voicePulse 1.5s infinite;
@@ -128,15 +125,14 @@
         /* Kiosk Security Styles */
         .security-note {
             position: fixed;
-            bottom: 15px;
-            right: 20px;
-            font-size: 12px;
+            bottom: 10px;
+            right: 10px;
+            font-size: 10px;
             color: #666;
-            background: rgba(255,255,255,0.9);
-            padding: 5px 12px;
-            border-radius: 20px;
+            background: rgba(255,255,255,0.8);
+            padding: 3px 8px;
+            border-radius: 12px;
             z-index: 999;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
         /* Loading Overlay */
@@ -146,7 +142,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(255,255,255,0.9);
+            background: rgba(255,255,255,0.8);
             display: none;
             align-items: center;
             justify-content: center;
@@ -154,11 +150,11 @@
         }
         
         .loading-spinner {
-            border: 6px solid #f3f3f3;
-            border-top: 6px solid #1e5fbf;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #1e5fbf;
             border-radius: 50%;
-            width: 60px;
-            height: 60px;
+            width: 50px;
+            height: 50px;
             animation: spin 1s linear infinite;
         }
 
@@ -169,7 +165,7 @@
             left: 50%;
             transform: translateX(-50%);
             width: 90%;
-            max-width: 600px;
+            max-width: 500px;
             z-index: 1500;
             pointer-events: none;
         }
@@ -177,9 +173,7 @@
         .message-container .message {
             pointer-events: auto;
             margin-bottom: 10px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-            font-size: 18px;
-            padding: 15px 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
     </style>
 
@@ -201,10 +195,10 @@
             width: 100vw;
             height: 100vh;
             overflow: hidden;
-            background: linear-gradient(135deg, #f0f7ff 0%, #e6f0fa 100%);
+            background: #f0f7ff;
         }
 
-        /* HEADER - Fixed at top */
+        /* HEADER */
         .header {
             position: fixed;
             top: 0;
@@ -215,63 +209,61 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 30px;
-            border-bottom: 3px solid #1e5fbf;
+            padding: 0 20px;
+            border-bottom: 2px solid #1e5fbf;
             z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
         .header-left {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 10px;
         }
 
         .header-left img {
-            height: 45px;
+            height: 35px;
         }
 
         .header-left div {
-            font-size: 14px;
+            font-size: 12px;
             font-weight: 600;
             color: #1e5fbf;
-            line-height: 1.2;
+            line-height: 1.1;
         }
 
         .header-right img {
-            height: 40px;
+            height: 30px;
         }
 
         /* Voice button */
         .voice-corner {
             position: fixed;
-            top: 85px;
-            right: 20px;
+            top: 80px;
+            right: 15px;
             z-index: 1000;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 5px;
+            gap: 3px;
         }
 
         .voice-corner-btn {
             background: #ff9933;
-            width: 55px;
-            height: 55px;
+            width: 45px;
+            height: 45px;
             border-radius: 50%;
-            border: 3px solid white;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            border: 2px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 28px;
+            font-size: 24px;
             transition: all 0.2s;
         }
 
         .voice-corner-btn:hover {
             background: #ffaa44;
-            transform: scale(1.05);
         }
 
         .voice-corner-btn.listening {
@@ -287,29 +279,28 @@
 
         .voice-corner-text {
             background: white;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 15px;
+            font-size: 10px;
             font-weight: 600;
             color: #ff9933;
             border: 1px solid #ff9933;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
         /* Back button */
         .back-btn {
             position: fixed;
-            top: 85px;
-            left: 20px;
+            top: 80px;
+            left: 15px;
             background: white;
             border: 2px solid #1e5fbf;
-            border-radius: 40px;
-            padding: 8px 20px;
-            font-size: 20px;
+            border-radius: 30px;
+            padding: 5px 15px;
+            font-size: 18px;
             font-weight: 700;
             cursor: pointer;
             color: #1e5fbf;
-            box-shadow: 0 4px 0 #0a3d7a;
+            box-shadow: 0 3px 0 #0a3d7a;
             z-index: 1000;
             transition: all 0.1s;
         }
@@ -320,11 +311,11 @@
         }
 
         .back-btn:active {
-            transform: translateY(4px);
+            transform: translateY(3px);
             box-shadow: 0 1px 0 #0a3d7a;
         }
 
-        /* Main container - Perfectly centered */
+        /* Main container - No scrolling */
         .kiosk-container {
             position: fixed;
             top: 70px;
@@ -334,39 +325,25 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 15px;
             overflow: hidden;
         }
 
         .content-wrapper {
             width: 100%;
-            max-width: 700px;
+            max-width: 600px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
-            background: rgba(255,255,255,0.5);
-            padding: 30px 40px;
-            border-radius: 60px;
-            backdrop-filter: blur(5px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            gap: 15px;
         }
 
         /* Title */
         h1 {
             color: #1e5fbf;
-            font-size: 40px;
+            font-size: 32px;
             font-weight: 800;
             text-align: center;
             margin: 0;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.05);
-        }
-
-        .label {
-            color: #1e5fbf;
-            font-size: 22px;
-            font-weight: 600;
-            text-align: center;
-            margin: 5px 0;
         }
 
         /* Aadhaar boxes */
@@ -374,23 +351,23 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 12px;
-            margin: 15px 0 25px 0;
+            gap: 8px;
+            margin: 20px 0;
             flex-wrap: nowrap;
         }
 
         .aadhaar-box {
-            width: 60px;
-            height: 70px;
-            border: 4px solid #1e5fbf;
-            border-radius: 15px;
-            font-size: 38px;
+            width: 50px;
+            height: 60px;
+            border: 3px solid #1e5fbf;
+            border-radius: 10px;
+            font-size: 32px;
             font-weight: 800;
             text-align: center;
-            line-height: 70px;
+            line-height: 60px;
             background: white;
             color: #1e5fbf;
-            box-shadow: 0 5px 0 #0a3d7a;
+            box-shadow: 0 4px 0 #0a3d7a;
             flex-shrink: 0;
         }
 
@@ -400,8 +377,8 @@
 
         .aadhaar-box.highlight {
             border-color: #ff9933;
-            border-width: 5px;
-            box-shadow: 0 5px 0 #cc6600;
+            border-width: 4px;
+            box-shadow: 0 4px 0 #cc6600;
         }
 
         /* Keypad */
@@ -409,21 +386,21 @@
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 15px;
-            margin: 15px 0;
+            margin: 10px 0;
         }
 
         .key {
             background: white;
-            border: 4px solid #1e5fbf;
-            border-radius: 25px;
-            padding: 20px 5px;
-            font-size: 48px;
+            border: 3px solid #1e5fbf;
+            border-radius: 20px;
+            padding: 18px 5px;
+            font-size: 40px;
             font-weight: 800;
             cursor: pointer;
             color: #1e5fbf;
-            box-shadow: 0 6px 0 #0a3d7a;
+            box-shadow: 0 5px 0 #0a3d7a;
             text-align: center;
-            min-height: 90px;
+            min-height: 85px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -431,7 +408,7 @@
         }
 
         .key:active {
-            transform: translateY(6px);
+            transform: translateY(5px);
             box-shadow: 0 1px 0 #0a3d7a;
         }
 
@@ -439,18 +416,14 @@
             background: #ff9933;
             color: white;
             border-color: #cc6600;
-            box-shadow: 0 6px 0 #b35900;
-        }
-
-        .key.special:active {
-            box-shadow: 0 1px 0 #b35900;
+            box-shadow: 0 5px 0 #b35900;
         }
 
         .key:disabled {
             opacity: 0.5;
             cursor: not-allowed;
             transform: none;
-            box-shadow: 0 6px 0 #0a3d7a;
+            box-shadow: 0 5px 0 #0a3d7a;
         }
 
         /* Proceed button */
@@ -458,20 +431,20 @@
             background: #28a745;
             border: none;
             color: white;
-            font-size: 40px;
+            font-size: 32px;
             font-weight: 800;
-            padding: 18px;
-            border-radius: 50px;
+            padding: 14px;
+            border-radius: 40px;
             cursor: pointer;
-            box-shadow: 0 7px 0 #1e7e34;
-            border: 3px solid white;
+            box-shadow: 0 5px 0 #1e7e34;
+            border: 2px solid white;
             width: 100%;
-            margin: 15px 0 10px 0;
+            margin: 8px 0 5px 0;
             transition: all 0.1s;
         }
 
         .btn-proceed:active {
-            transform: translateY(7px);
+            transform: translateY(5px);
             box-shadow: 0 1px 0 #1e7e34;
         }
 
@@ -483,30 +456,30 @@
             opacity: 0.6;
             cursor: not-allowed;
             transform: none;
-            box-shadow: 0 7px 0 #1e7e34;
+            box-shadow: 0 5px 0 #1e7e34;
         }
 
         /* Status */
         .error {
             color: #dc3545;
-            font-size: 20px;
+            font-size: 18px;
             text-align: center;
             font-weight: 700;
             background: #ffe6e6;
-            padding: 15px;
-            border-radius: 40px;
-            border: 2px solid #dc3545;
+            padding: 12px;
+            border-radius: 25px;
+            border: 1px solid #dc3545;
             margin: 5px 0;
         }
 
         .loader {
-            border: 6px solid #f3f3f3;
-            border-top: 6px solid #1e5fbf;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #1e5fbf;
             border-radius: 50%;
-            width: 45px;
-            height: 45px;
+            width: 35px;
+            height: 35px;
             animation: spin 1s linear infinite;
-            margin: 10px auto;
+            margin: 5px auto;
         }
 
         @keyframes spin {
@@ -518,17 +491,26 @@
             display: none;
         }
 
-        /* Django messages styling */
+        /* Label */
+        .label {
+            color: #1e5fbf;
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+            margin: 5px 0;
+        }
+
+        /* Django messages styling - moved to fixed container */
         .error-message {
             color: #dc3545;
             font-size: 18px;
             text-align: center;
             font-weight: 700;
             background: #ffe6e6;
-            padding: 15px 25px;
+            padding: 12px 20px;
             border-radius: 50px;
             border: 2px solid #dc3545;
-            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
+            box-shadow: 0 4px 10px rgba(220, 53, 69, 0.2);
             width: 100%;
         }
 
@@ -538,58 +520,56 @@
             text-align: center;
             font-weight: 700;
             background: #e8f5e9;
-            padding: 15px 25px;
+            padding: 12px 20px;
             border-radius: 50px;
             border: 2px solid #28a745;
-            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+            box-shadow: 0 4px 10px rgba(40, 167, 69, 0.2);
             width: 100%;
         }
 
-        /* Rate limit info - Now visible at bottom */
+        /* Rate limit info */
         .rate-limit-info {
-            font-size: 16px;
-            color: #1e5fbf;
+            font-size: 14px;
+            color: #666;
             text-align: center;
             margin-top: 10px;
-            font-weight: 600;
-            background: white;
-            padding: 10px 20px;
-            border-radius: 30px;
-            border: 2px solid #1e5fbf;
-            display: inline-block;
-            align-self: center;
         }
 
-        /* Responsive adjustments for 15.6" laptop */
-        @media (min-width: 1366px) {
-            .content-wrapper {
-                max-width: 800px;
-                padding: 40px 50px;
+        @media (max-width: 480px) {
+            .voice-corner {
+                top: 75px;
+                right: 10px;
             }
-            
-            h1 {
-                font-size: 48px;
+            .voice-corner-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 22px;
             }
-            
-            .label {
-                font-size: 26px;
+            .back-btn {
+                top: 75px;
+                left: 10px;
+                padding: 4px 10px;
+                font-size: 16px;
             }
-            
+            h1 { font-size: 28px; }
             .aadhaar-box {
-                width: 70px;
-                height: 80px;
-                font-size: 44px;
-                line-height: 80px;
+                width: 40px;
+                height: 50px;
+                font-size: 26px;
+                line-height: 50px;
             }
-            
             .key {
-                font-size: 54px;
-                min-height: 100px;
+                font-size: 32px;
+                padding: 12px 3px;
+                min-height: 70px;
             }
-            
-            .btn-proceed {
-                font-size: 44px;
-                padding: 20px;
+            .message-container {
+                top: 75px;
+                width: 95%;
+            }
+            .error-message, .success-message {
+                font-size: 16px;
+                padding: 10px 15px;
             }
         }
     </style>
@@ -625,7 +605,7 @@
     <div id="timeoutWarning" class="timeout-warning">
         <p>⏰ {% trans "Session about to expire!" %}</p>
         <button onclick="extendSession()">{% trans "Continue" %}</button>
-        <button class="logout-btn" onclick="window.location='/';">{% trans "Logout" %}</button>
+        <button class="logout-btn" onclick="window.location='{% url 'index' %}'">{% trans "Logout" %}</button>
     </div>
 
     <!-- HEADER -->
@@ -655,6 +635,7 @@
     <!-- Main Container -->
     <div class="kiosk-container">
         <div class="content-wrapper">
+
             <h1>🔐 {% trans "Enter Aadhaar" %}</h1>
             <div class="label">{% trans "12-digit Aadhaar Number" %}</div>
 
@@ -681,18 +662,18 @@
 
             <div id="loader" class="loader hidden"></div>
             
-            <!-- Rate limit info - Now properly positioned -->
+            <!-- Rate limit info (optional) -->
             {% if request.rate_limit_remaining is not None %}
             <div class="rate-limit-info">
                 {% trans "Attempts remaining" %}: {{ request.rate_limit_remaining }}
             </div>
             {% endif %}
+            
+            <!-- Security Note -->
+            <div class="security-note">
+                🔒 {% trans "Secured by Government of India" %}
+            </div>
         </div>
-    </div>
-
-    <!-- Security Note -->
-    <div class="security-note">
-        🔒 {% trans "Secured by Government of India" %}
     </div>
 
     <!-- Hidden form for fallback -->
@@ -702,7 +683,7 @@
     </form>
 
     <!-- Hidden error div for client-side validation -->
-    <div id="error" class="hidden error-message" style="position: fixed; top: 80px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 600px; z-index: 1500;"></div>
+    <div id="error" class="hidden error-message" style="position: fixed; top: 80px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 500px; z-index: 1500;"></div>
 
 <script>
 /* ================= SECURITY ENHANCEMENTS ================= */
