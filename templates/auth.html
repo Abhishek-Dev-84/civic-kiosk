@@ -85,6 +85,43 @@
             transform: translateY(3px);
         }
 
+        /* Voice status indicator */
+        .voice-status-indicator {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-size: 16px;
+            font-weight: 600;
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            border: 2px solid #ff9933;
+        }
+
+        .voice-status-indicator.active {
+            display: flex;
+        }
+
+        .voice-pulse {
+            width: 12px;
+            height: 12px;
+            background: #28a745;
+            border-radius: 50%;
+            animation: voicePulse 1.5s infinite;
+        }
+
+        @keyframes voicePulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
         /* Kiosk Security Styles */
         .security-note {
             position: fixed;
@@ -96,6 +133,29 @@
             padding: 3px 8px;
             border-radius: 12px;
             z-index: 999;
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #1e5fbf;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
         }
     </style>
 
@@ -181,6 +241,11 @@
             align-items: center;
             justify-content: center;
             font-size: 24px;
+            transition: all 0.2s;
+        }
+
+        .voice-corner-btn:hover {
+            background: #ffaa44;
         }
 
         .voice-corner-btn.listening {
@@ -219,6 +284,12 @@
             color: #1e5fbf;
             box-shadow: 0 3px 0 #0a3d7a;
             z-index: 1000;
+            transition: all 0.1s;
+        }
+
+        .back-btn:hover {
+            background: #1e5fbf;
+            color: white;
         }
 
         .back-btn:active {
@@ -315,6 +386,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: all 0.1s;
         }
 
         .key:active {
@@ -327,6 +399,13 @@
             color: white;
             border-color: #cc6600;
             box-shadow: 0 5px 0 #b35900;
+        }
+
+        .key:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 5px 0 #0a3d7a;
         }
 
         /* Proceed button */
@@ -343,11 +422,16 @@
             border: 2px solid white;
             width: 100%;
             margin: 8px 0 5px 0;
+            transition: all 0.1s;
         }
 
         .btn-proceed:active {
             transform: translateY(5px);
             box-shadow: 0 1px 0 #1e7e34;
+        }
+
+        .btn-proceed:hover {
+            background: #2fcB4f;
         }
 
         .btn-proceed:disabled {
@@ -432,12 +516,53 @@
             text-align: center;
             margin-top: 10px;
         }
+
+        @media (max-width: 480px) {
+            .voice-corner {
+                top: 75px;
+                right: 10px;
+            }
+            .voice-corner-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 22px;
+            }
+            .back-btn {
+                top: 75px;
+                left: 10px;
+                padding: 4px 10px;
+                font-size: 16px;
+            }
+            h1 { font-size: 28px; }
+            .aadhaar-box {
+                width: 40px;
+                height: 50px;
+                font-size: 26px;
+                line-height: 50px;
+            }
+            .key {
+                font-size: 32px;
+                padding: 12px 3px;
+                min-height: 70px;
+            }
+        }
     </style>
 </head>
 <body>
     <!-- CSRF Token for JavaScript -->
     {% csrf_token %}
     <input type="hidden" id="csrf_token" value="{{ csrf_token }}">
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Voice Status Indicator -->
+    <div id="voiceStatusIndicator" class="voice-status-indicator">
+        <div class="voice-pulse"></div>
+        <span id="voiceStatusText">{% trans "Listening..." %}</span>
+    </div>
 
     <!-- Timeout Warning Popup -->
     <div id="timeoutWarning" class="timeout-warning">
@@ -463,12 +588,12 @@
 
     <!-- Voice Button -->
     <div class="voice-corner">
-        <div class="voice-corner-btn" id="voiceBtn" onclick="toggleVoiceInput()">🎤</div>
+        <div class="voice-corner-btn" id="voiceBtn" onclick="toggleVoiceInput()" aria-label="{% trans 'Voice input' %}">🎤</div>
         <div class="voice-corner-text" id="voiceStatus">{% trans "Click" %}</div>
     </div>
 
     <!-- Back Button -->
-    <div class="back-btn" onclick="goBack()">← {% trans "Back" %}</div>
+    <div class="back-btn" onclick="goBack()" aria-label="{% trans 'Go back' %}">← {% trans "Back" %}</div>
 
     <!-- Main Container -->
     <div class="kiosk-container">
@@ -526,7 +651,7 @@
         </div>
     </div>
 
-    <!-- Hidden form for CSRF fallback -->
+    <!-- Hidden form for fallback -->
     <form id="authForm" method="POST" action="{% url 'auth' %}" style="display: none;">
         {% csrf_token %}
         <input type="hidden" name="aadhaar_number" id="aadhaarInput">
@@ -550,7 +675,7 @@ document.addEventListener('keydown', function(e) {
     }
     
     // Prevent backspace from navigating back
-    if (e.key === 'Backspace' && !e.target.matches('input, textarea')) {
+    if (e.key === 'Backspace' && !e.target.matches('input, textarea, [contenteditable]')) {
         e.preventDefault();
     }
 });
@@ -620,22 +745,59 @@ function speak(text) {
 /* ================= SESSION TIMER ================= */
 
 let sessionTimer;
-const SESSION_DURATION = 240000; // 4 minutes (increased from 2)
+let timeoutWarningTimer;
+const SESSION_DURATION = 240000; // 4 minutes
+const WARNING_TIME = 60000; // Show warning 1 minute before expiry
 
 function startSessionTimer() {
     clearTimeout(sessionTimer);
+    clearTimeout(timeoutWarningTimer);
+    
     sessionTimer = setTimeout(() => {
-        document.getElementById('timeoutWarning').style.display = 'block';
-    }, SESSION_DURATION);
+        showTimeoutWarning();
+    }, SESSION_DURATION - WARNING_TIME);
+}
+
+function showTimeoutWarning() {
+    const warning = document.getElementById('timeoutWarning');
+    if (warning) {
+        warning.style.display = 'block';
+        
+        const langCode = getCurrentLangCode();
+        const warnings = {
+            'en': 'Your session is about to expire. Please continue to stay logged in.',
+            'hi': 'आपका सत्र समाप्त होने वाला है। कृपया जारी रखें।',
+            'or': 'ଆପଣଙ୍କର ସତ୍ର ସମାପ୍ତ ହେବାକୁ ଯାଉଛି। ଦୟାକରି ଜାରି ରଖନ୍ତୁ।'
+        };
+        speak(warnings[langCode] || warnings['en']);
+        
+        timeoutWarningTimer = setTimeout(() => {
+            window.location.href = "/" + langCode + "/";
+        }, WARNING_TIME);
+    }
 }
 
 function extendSession() {
-    document.getElementById('timeoutWarning').style.display = 'none';
+    const warning = document.getElementById('timeoutWarning');
+    if (warning) {
+        warning.style.display = 'none';
+    }
+    clearTimeout(sessionTimer);
+    clearTimeout(timeoutWarningTimer);
     startSessionTimer();
+    
+    const langCode = getCurrentLangCode();
+    const messages = {
+        'en': 'Session extended. You may continue.',
+        'hi': 'सत्र बढ़ा दिया गया। आप जारी रख सकते हैं।',
+        'or': 'ସତ୍ର ବୃଦ୍ଧି କରାଯାଇଛି। ଆପଣ ଜାରି ରଖିପାରିବେ।'
+    };
+    speak(messages[langCode] || messages['en']);
 }
 
 function resetSessionTimer() {
     clearTimeout(sessionTimer);
+    clearTimeout(timeoutWarningTimer);
     startSessionTimer();
 }
 
@@ -650,6 +812,7 @@ const aadhaarRow = document.getElementById('aadhaarRow');
 for(let i = 0; i < 12; i++) {
     let box = document.createElement('div');
     box.className = 'aadhaar-box';
+    box.setAttribute('aria-label', `{% trans "Aadhaar digit" %} ${i+1}`);
     aadhaarRow.appendChild(box);
     aadhaarBoxes.push(box);
 }
@@ -711,6 +874,7 @@ function getAadhaarNumber() {
 
 function goBack() {
     resetSessionTimer();
+    stopVoiceInput();
     window.location.href = '/' + getCurrentLangCode() + '/';
 }
 
@@ -748,6 +912,7 @@ function proceedToOTP() {
     
     document.getElementById("error").classList.add("hidden");
     document.getElementById("loader").classList.remove("hidden");
+    document.getElementById("loadingOverlay").style.display = 'flex';
     
     // Speak in selected language
     const langCode = getCurrentLangCode();
@@ -759,50 +924,15 @@ function proceedToOTP() {
         speak("{% trans 'Processing' %}");
     }
     
-    // Get CSRF token
-    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
     const aadhaarNumber = getAadhaarNumber();
     
-    // Submit via fetch API for better error handling
-    fetch('{% url "auth" %}', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'X-CSRFToken': csrfToken
-        },
-        body: new URLSearchParams({
-            'csrfmiddlewaretoken': csrfToken,
-            'aadhaar_number': aadhaarNumber
-        })
-    })
-    .then(response => {
-        if (response.redirected) {
-            window.location.href = response.url;
-        } else {
-            return response.text();
-        }
-    })
-    .then(html => {
-        // If we get HTML back, there was an error
-        document.getElementById("loader").classList.add("hidden");
-        proceedBtn.disabled = false;
-        proceedBtn.innerHTML = '{% trans "Proceed" %} →';
-        isSubmitting = false;
-        
-        // Reload page to show error
-        window.location.reload();
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        document.getElementById("loader").classList.add("hidden");
-        proceedBtn.disabled = false;
-        proceedBtn.innerHTML = '{% trans "Proceed" %} →';
-        isSubmitting = false;
-        
-        // Fallback to form submit
-        document.getElementById('aadhaarInput').value = aadhaarNumber;
+    // Use standard form submission instead of fetch for better compatibility
+    document.getElementById('aadhaarInput').value = aadhaarNumber;
+    
+    // Add a small delay to ensure loading indicator is visible
+    setTimeout(() => {
         document.getElementById('authForm').submit();
-    });
+    }, 500);
 }
 
 /* ================= VOICE INPUT ================= */
@@ -811,6 +941,7 @@ let recognition;
 let isListening = false;
 let lastProcessedLength = 0;
 let voiceTimeout = null;
+let voiceRestartTimeout = null;
 
 // Auto-start voice from session storage (set by index.html)
 document.addEventListener('DOMContentLoaded', function() {
@@ -829,6 +960,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener('click', resetSessionTimer);
     document.addEventListener('keypress', resetSessionTimer);
     document.addEventListener('touchstart', resetSessionTimer);
+    document.addEventListener('mousemove', resetSessionTimer);
     
     // Highlight first box
     if (aadhaarBoxes[0]) {
@@ -868,6 +1000,7 @@ function toggleVoiceInput() {
         lastProcessedLength = 0;
         document.getElementById("voiceBtn").classList.add("listening");
         document.getElementById("voiceStatus").innerText = "{% trans 'Listening...' %}";
+        document.getElementById('voiceStatusIndicator').classList.add('active');
         
         const langCode = getCurrentLangCode();
         if (langCode === 'hi') {
@@ -929,8 +1062,8 @@ function toggleVoiceInput() {
         
         console.log("Transcript:", transcript, "Digits:", digits, "Length:", digits.length);
         
-        // Only update if we have new digits and they're different from what we already have
-        if (digits.length > 0) {
+        // Only update if we have new digits and we're not submitting
+        if (digits.length > 0 && !isSubmitting) {
             // Check if this is a completely new utterance (reset if it's shorter than current)
             if (digits.length < aadhaarPos && digits.length > 0) {
                 // New shorter utterance - likely a correction, clear and start fresh
@@ -974,17 +1107,21 @@ function toggleVoiceInput() {
     };
 
     recognition.onend = function() {
-        // Restart if we're still supposed to be listening
-        if (isListening) {
-            try {
-                recognition.start();
-            } catch(e) {
-                console.error("Failed to restart recognition:", e);
-                stopVoiceInput();
-            }
+        // Restart if we're still supposed to be listening and not submitting
+        if (isListening && !isSubmitting) {
+            if (voiceRestartTimeout) clearTimeout(voiceRestartTimeout);
+            voiceRestartTimeout = setTimeout(() => {
+                try {
+                    recognition.start();
+                } catch(e) {
+                    console.error("Failed to restart recognition:", e);
+                    stopVoiceInput();
+                }
+            }, 1000);
         } else {
             document.getElementById("voiceBtn").classList.remove("listening");
             document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
+            document.getElementById('voiceStatusIndicator').classList.remove('active');
         }
     };
 
@@ -1005,8 +1142,12 @@ function stopVoiceInput() {
     }
     document.getElementById("voiceBtn").classList.remove("listening");
     document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
+    document.getElementById('voiceStatusIndicator').classList.remove('active');
     if (voiceTimeout) {
         clearTimeout(voiceTimeout);
+    }
+    if (voiceRestartTimeout) {
+        clearTimeout(voiceRestartTimeout);
     }
 }
 
@@ -1105,6 +1246,9 @@ window.autoReadPage = function() {
 window.addEventListener('beforeunload', function() {
     if (sessionTimer) {
         clearTimeout(sessionTimer);
+    }
+    if (timeoutWarningTimer) {
+        clearTimeout(timeoutWarningTimer);
     }
     stopVoiceInput();
 });
