@@ -157,6 +157,24 @@
             height: 50px;
             animation: spin 1s linear infinite;
         }
+
+        /* Message Container - Fixed at top center */
+        .message-container {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 500px;
+            z-index: 1500;
+            pointer-events: none;
+        }
+
+        .message-container .message {
+            pointer-events: auto;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
     </style>
 
     <meta charset="UTF-8">
@@ -297,7 +315,7 @@
             box-shadow: 0 1px 0 #0a3d7a;
         }
 
-        /* Main container */
+        /* Main container - No scrolling */
         .kiosk-container {
             position: fixed;
             top: 70px;
@@ -305,18 +323,18 @@
             right: 0;
             bottom: 0;
             display: flex;
-            flex-direction: column;
-            padding: 15px 20px 20px 20px;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
             overflow: hidden;
         }
 
         .content-wrapper {
-            flex: 1;
+            width: 100%;
+            max-width: 600px;
             display: flex;
             flex-direction: column;
-            max-width: 600px;
-            margin: 0 auto;
-            width: 100%;
+            gap: 15px;
         }
 
         /* Title */
@@ -325,7 +343,7 @@
             font-size: 32px;
             font-weight: 800;
             text-align: center;
-            margin: 10px 0 15px 0;
+            margin: 0;
         }
 
         /* Aadhaar boxes */
@@ -334,7 +352,7 @@
             justify-content: center;
             align-items: center;
             gap: 8px;
-            margin: 20px 0 45px 0;
+            margin: 20px 0;
             flex-wrap: nowrap;
         }
 
@@ -368,7 +386,7 @@
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 15px;
-            margin-bottom: 8px;
+            margin: 10px 0;
         }
 
         .key {
@@ -448,7 +466,7 @@
             text-align: center;
             font-weight: 700;
             background: #ffe6e6;
-            padding: 8px;
+            padding: 12px;
             border-radius: 25px;
             border: 1px solid #dc3545;
             margin: 5px 0;
@@ -479,23 +497,21 @@
             font-size: 18px;
             font-weight: 600;
             text-align: center;
-            margin: 5px 0 10px 0;
+            margin: 5px 0;
         }
 
-        /* Django messages styling */
-        .messages {
-            margin-bottom: 15px;
-        }
-
+        /* Django messages styling - moved to fixed container */
         .error-message {
             color: #dc3545;
             font-size: 18px;
             text-align: center;
             font-weight: 700;
             background: #ffe6e6;
-            padding: 8px;
-            border-radius: 25px;
-            border: 1px solid #dc3545;
+            padding: 12px 20px;
+            border-radius: 50px;
+            border: 2px solid #dc3545;
+            box-shadow: 0 4px 10px rgba(220, 53, 69, 0.2);
+            width: 100%;
         }
 
         .success-message {
@@ -504,9 +520,11 @@
             text-align: center;
             font-weight: 700;
             background: #e8f5e9;
-            padding: 8px;
-            border-radius: 25px;
-            border: 1px solid #28a745;
+            padding: 12px 20px;
+            border-radius: 50px;
+            border: 2px solid #28a745;
+            box-shadow: 0 4px 10px rgba(40, 167, 69, 0.2);
+            width: 100%;
         }
 
         /* Rate limit info */
@@ -545,6 +563,14 @@
                 padding: 12px 3px;
                 min-height: 70px;
             }
+            .message-container {
+                top: 75px;
+                width: 95%;
+            }
+            .error-message, .success-message {
+                font-size: 16px;
+                padding: 10px 15px;
+            }
         }
     </style>
 </head>
@@ -562,6 +588,17 @@
     <div id="voiceStatusIndicator" class="voice-status-indicator">
         <div class="voice-pulse"></div>
         <span id="voiceStatusText">{% trans "Listening..." %}</span>
+    </div>
+
+    <!-- Fixed Message Container at Top Center -->
+    <div id="messageContainer" class="message-container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="message {% if message.tags == 'error' %}error-message{% else %}success-message{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
     </div>
 
     <!-- Timeout Warning Popup -->
@@ -599,17 +636,6 @@
     <div class="kiosk-container">
         <div class="content-wrapper">
 
-            <!-- Django Messages -->
-            {% if messages %}
-            <div class="messages">
-                {% for message in messages %}
-                <div class="{% if message.tags == 'error' %}error-message{% else %}success-message{% endif %}">
-                    {{ message }}
-                </div>
-                {% endfor %}
-            </div>
-            {% endif %}
-
             <h1>🔐 {% trans "Enter Aadhaar" %}</h1>
             <div class="label">{% trans "12-digit Aadhaar Number" %}</div>
 
@@ -635,7 +661,6 @@
             </button>
 
             <div id="loader" class="loader hidden"></div>
-            <div id="error" class="error hidden"></div>
             
             <!-- Rate limit info (optional) -->
             {% if request.rate_limit_remaining is not None %}
@@ -656,6 +681,9 @@
         {% csrf_token %}
         <input type="hidden" name="aadhaar_number" id="aadhaarInput">
     </form>
+
+    <!-- Hidden error div for client-side validation -->
+    <div id="error" class="hidden error-message" style="position: fixed; top: 80px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 500px; z-index: 1500;"></div>
 
 <script>
 /* ================= SECURITY ENHANCEMENTS ================= */
@@ -878,6 +906,17 @@ function goBack() {
     window.location.href = '/' + getCurrentLangCode() + '/';
 }
 
+function showError(message) {
+    const errorDiv = document.getElementById('error');
+    errorDiv.innerText = message;
+    errorDiv.classList.remove('hidden');
+    
+    // Auto-hide after 3 seconds
+    setTimeout(() => {
+        errorDiv.classList.add('hidden');
+    }, 3000);
+}
+
 function proceedToOTP() {
     resetSessionTimer();
     
@@ -885,8 +924,7 @@ function proceedToOTP() {
     if (isSubmitting) return;
     
     if(aadhaarPos !== 12) {
-        document.getElementById("error").innerText = "{% trans 'Please enter 12 digits' %}";
-        document.getElementById("error").classList.remove("hidden");
+        showError("{% trans 'Please enter 12 digits' %}");
         
         // Speak in selected language
         const langCode = getCurrentLangCode();
@@ -897,10 +935,6 @@ function proceedToOTP() {
         } else {
             speak("{% trans 'Please enter 12 digits' %}");
         }
-        
-        setTimeout(() => {
-            document.getElementById("error").classList.add("hidden");
-        }, 3000);
         return;
     }
 
@@ -910,7 +944,6 @@ function proceedToOTP() {
     proceedBtn.disabled = true;
     proceedBtn.innerHTML = '{% trans "Processing..." %}';
     
-    document.getElementById("error").classList.add("hidden");
     document.getElementById("loader").classList.remove("hidden");
     document.getElementById("loadingOverlay").style.display = 'flex';
     
@@ -926,7 +959,7 @@ function proceedToOTP() {
     
     const aadhaarNumber = getAadhaarNumber();
     
-    // Use standard form submission instead of fetch for better compatibility
+    // Use standard form submission
     document.getElementById('aadhaarInput').value = aadhaarNumber;
     
     // Add a small delay to ensure loading indicator is visible
@@ -966,6 +999,20 @@ document.addEventListener('DOMContentLoaded', function() {
     if (aadhaarBoxes[0]) {
         aadhaarBoxes[0].classList.add('highlight');
     }
+    
+    // Auto-hide Django messages after 5 seconds
+    setTimeout(() => {
+        const messages = document.querySelectorAll('.message');
+        messages.forEach(msg => {
+            msg.style.opacity = '0';
+            msg.style.transition = 'opacity 0.3s ease';
+            setTimeout(() => {
+                if (msg && msg.parentNode) {
+                    msg.remove();
+                }
+            }, 300);
+        });
+    }, 5000);
 });
 
 function toggleVoiceInput() {

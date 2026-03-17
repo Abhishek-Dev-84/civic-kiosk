@@ -166,6 +166,48 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        /* Message Container for errors/success */
+        .message-container {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 500px;
+            z-index: 1500;
+            pointer-events: none;
+        }
+
+        .message-container .message {
+            pointer-events: auto;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 18px;
+            text-align: center;
+            font-weight: 700;
+            background: #ffe6e6;
+            padding: 12px 20px;
+            border-radius: 50px;
+            border: 2px solid #dc3545;
+            width: 100%;
+        }
+
+        .success-message {
+            color: #28a745;
+            font-size: 18px;
+            text-align: center;
+            font-weight: 700;
+            background: #e8f5e9;
+            padding: 12px 20px;
+            border-radius: 50px;
+            border: 2px solid #28a745;
+            width: 100%;
+        }
     </style>
 
     <meta charset="UTF-8" />
@@ -352,6 +394,17 @@
     {% csrf_token %}
     <input type="hidden" id="csrf_token" value="{{ csrf_token }}">
 
+    <!-- Message Container for Django Messages -->
+    <div id="messageContainer" class="message-container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="message {% if message.tags == 'error' %}error-message{% else %}success-message{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
     <!-- Loading Overlay -->
     <div id="loadingOverlay" class="loading-overlay">
         <div class="loading-spinner"></div>
@@ -445,6 +498,20 @@
             }
             lastTouchEnd = now;
         }, false);
+
+        // Auto-hide messages after 5 seconds
+        setTimeout(function() {
+            const messages = document.querySelectorAll('.message');
+            messages.forEach(msg => {
+                msg.style.opacity = '0';
+                msg.style.transition = 'opacity 0.3s ease';
+                setTimeout(() => {
+                    if (msg && msg.parentNode) {
+                        msg.remove();
+                    }
+                }, 300);
+            });
+        }, 5000);
 
         // ================= LANGUAGE MAP =================
         const languageMap = {
@@ -566,9 +633,15 @@
             
             speak(langNames[langCode] + ' selected. Redirecting to authentication page.');
             
+            // FIXED: Use proper URL construction with current domain
+            const currentDomain = window.location.origin;
+            const redirectUrl = currentDomain + '/' + langCode + '/auth/';
+            
+            console.log('Redirecting to:', redirectUrl);
+            
             // Navigate to auth page with language code
             setTimeout(() => {
-                window.location.href = '/' + langCode + '/auth/';
+                window.location.href = redirectUrl;
             }, 500);
         }
 
