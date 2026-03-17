@@ -1999,7 +1999,7 @@ def api_calculate_meter_cost(request):
     """API endpoint to calculate meter replacement cost"""
     if request.method == 'POST':
         try:
-            data = json.loads request.body
+            data = json.loads(request.body)
             meter_price = float(data.get('meter_price', 1200))
             additional_services = data.get('additional_services', [])
             
