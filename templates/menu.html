@@ -167,6 +167,86 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        /* ===== NAMASTE GREETING STYLES ===== */
+        .greeting-container {
+            background: linear-gradient(135deg, #ff9933 0%, #ffaa44 100%);
+            border-radius: 60px;
+            padding: 20px 30px;
+            margin: 10px 0 20px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 4px solid white;
+            box-shadow: 0 8px 0 #b35900;
+            color: white;
+        }
+
+        .greeting-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .namaste-icon {
+            font-size: 48px;
+            background: white;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 0 #b35900;
+        }
+
+        .greeting-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .namaste-word {
+            font-size: 28px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .user-name {
+            font-size: 36px;
+            font-weight: 800;
+            line-height: 1.2;
+            text-shadow: 2px 2px 0 #b35900;
+        }
+
+        .greeting-right {
+            background: rgba(255,255,255,0.2);
+            border-radius: 40px;
+            padding: 10px 20px;
+            font-size: 18px;
+            font-weight: 600;
+            border: 2px solid white;
+        }
+
+        .greeting-right span {
+            font-size: 24px;
+            margin-right: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .greeting-container {
+                padding: 15px 20px;
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            .greeting-left {
+                flex-direction: column;
+                text-align: center;
+            }
+            .user-name {
+                font-size: 28px;
+            }
+        }
     </style>
 
     <meta charset="UTF-8">
@@ -324,7 +404,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             padding: 15px;
             overflow-y: auto;
         }
@@ -335,6 +415,7 @@
             display: flex;
             flex-direction: column;
             gap: 15px;
+            padding: 20px 0;
         }
 
         /* ===== TYPOGRAPHY ===== */
@@ -866,6 +947,21 @@
 
     <div class="kiosk-container">
         <div class="content-wrapper">
+            
+            <!-- ===== NAMASTE GREETING WITH USER NAME ===== -->
+            <div class="greeting-container">
+                <div class="greeting-left">
+                    <div class="namaste-icon">🙏</div>
+                    <div class="greeting-text">
+                        <span class="namaste-word">{% trans "Namaste" %},</span>
+                        <span class="user-name">{{ consumer_name|default:"Pragyan" }}</span>
+                    </div>
+                </div>
+                <div class="greeting-right">
+                    <span>🆔</span> {{ consumer_aadhaar|default:"XXXX" }}
+                </div>
+            </div>
+
             <h1>🏛️ {% trans "सेवाएं / Services" %}</h1>
             <div class="security-note">🔒 {% trans "आपका आधार सुरक्षित रूप से कनेक्ट है" %}</div>
 
@@ -900,6 +996,13 @@
                     <div class="dept-name">{% trans "Status" %}</div>
                 </div>
             </div>
+
+            <!-- Optional: Display pending applications count if any -->
+            {% if pending_applications and pending_applications > 0 %}
+            <div style="background: #ff9933; color: white; padding: 10px; border-radius: 30px; text-align: center; font-weight: 600; margin-top: 10px;">
+                ⏳ {% trans "You have" %} {{ pending_applications }} {% trans "pending application(s)" %}
+            </div>
+            {% endif %}
         </div>
     </div>
 
@@ -1057,12 +1160,14 @@
                 document.getElementById('voiceStatusIndicator').classList.add('active');
                 
                 const langCode = getCurrentLangCode();
+                const userName = "{{ consumer_name|default:'Pragyan' }}";
+                
                 if (langCode === 'hi') {
-                    speak("कृपया सेवा बोलें... गैस, बिजली, नगर, परिवहन, राजस्व, या स्थिति");
+                    speak("नमस्ते " + userName + "। कृपया सेवा बोलें... गैस, बिजली, नगर, परिवहन, राजस्व, या स्थिति");
                 } else if (langCode === 'or') {
-                    speak("ଦୟାକରି ସେବା କୁହନ୍ତୁ... ଗ୍ୟାସ୍, ବିଜୁଳି, ନଗର, ପରିବହନ, ରାଜସ୍ୱ, କିମ୍ବା ସ୍ଥିତି");
+                    speak("ନମସ୍କାର " + userName + "। ଦୟାକରି ସେବା କୁହନ୍ତୁ... ଗ୍ୟାସ୍, ବିଜୁଳି, ନଗର, ପରିବହନ, ରାଜସ୍ୱ, କିମ୍ବା ସ୍ଥିତି");
                 } else {
-                    speak("{% trans 'Please say a service... Gas, Electricity, Municipal, Transport, Revenue, or Status' %}");
+                    speak("Namaste " + userName + ". {% trans 'Please say a service... Gas, Electricity, Municipal, Transport, Revenue, or Status' %}");
                 }
             };
 
@@ -1208,12 +1313,14 @@
         function autoReadPage() {
             setTimeout(() => {
                 const langCode = getCurrentLangCode();
+                const userName = "{{ consumer_name|default:'Pragyan' }}";
+                
                 if (langCode === 'hi') {
-                    speak("मुख्य मेनू। गैस, बिजली, नगर, परिवहन, राजस्व, या स्थिति सेवाएं चुनें। मदद के लिए माइक बटन दबाएं।");
+                    speak("नमस्ते " + userName + "। मुख्य मेनू। गैस, बिजली, नगर, परिवहन, राजस्व, या स्थिति सेवाएं चुनें। मदद के लिए माइक बटन दबाएं।");
                 } else if (langCode === 'or') {
-                    speak("ମୁଖ୍ୟ ମେନୁ। ଗ୍ୟାସ୍, ବିଜୁଳି, ନଗର, ପରିବହନ, ରାଜସ୍ୱ, କିମ୍ବା ସ୍ଥିତି ସେବା ଚୟନ କରନ୍ତୁ। ସାହାଯ୍ୟ ପାଇଁ ମାଇକ୍ ବଟନ୍ ଦବାନ୍ତୁ।");
+                    speak("ନମସ୍କାର " + userName + "। ମୁଖ୍ୟ ମେନୁ। ଗ୍ୟାସ୍, ବିଜୁଳି, ନଗର, ପରିବହନ, ରାଜସ୍ୱ, କିମ୍ବା ସ୍ଥିତି ସେବା ଚୟନ କରନ୍ତୁ। ସାହାଯ୍ୟ ପାଇଁ ମାଇକ୍ ବଟନ୍ ଦବାନ୍ତୁ।");
                 } else {
-                    speak("{% trans 'Main menu. Choose Gas, Electricity, Municipal, Transport, Revenue, or Status services. Press mic button for voice help.' %}");
+                    speak("Namaste " + userName + ". {% trans 'Main menu. Choose Gas, Electricity, Municipal, Transport, Revenue, or Status services. Press mic button for voice help.' %}");
                 }
             }, 1000);
         }
@@ -1278,7 +1385,7 @@
             document.addEventListener('touchstart', resetSessionTimer);
             document.addEventListener('mousemove', resetSessionTimer);
             
-            // Auto-read menu options
+            // Auto-read menu options with user name
             setTimeout(autoReadPage, 1000);
             
             // Check for auto-start voice
