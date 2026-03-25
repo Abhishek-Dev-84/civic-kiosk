@@ -1,221 +1,86 @@
-{% extends 'base.html' %}
-{% load i18n static %}
-
-{% block title %}{% trans "Municipal Services - Civic Kiosk" %}{% endblock %}
-
-{% block extra_head %}
-<style>
-        /* HEADER */
+<!DOCTYPE html>
+{% load i18n %}
+{% load static %}
+<html>
+<head>
+    <title>{% trans "Municipal Services - Civic Kiosk" %}</title>
+    
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif; user-select:none; }
+        body { width:100vw; height:100vh; overflow:hidden; background:#f0f7ff; }
+        .header { height:70px; background:white; display:flex; align-items:center; justify-content:space-between; padding:0 20px; border-bottom:2px solid #1e5fbf; }
+        .header-left { display:flex; align-items:center; gap:10px; }
         .header-left img { height:40px; }
         .header-left div { font-size:12px; font-weight:600; color:#1e5fbf; line-height:1.2; }
         .header-right img { height:35px; }
-        /* VOICE BUTTON */
-        .voice-corner-btn:hover { background:#ffaa44; }
-        .voice-corner-btn.listening {
-            background:#28a745;
-            animation:pulse 1s infinite;
-            transform:scale(1.1);
-        }
-            50% { transform:scale(1.1); }
-            100% { transform:scale(1); }
-        }
-        /* BACK BUTTON */
-        .back-btn:hover { background:#1e5fbf; color:white; }
-        .back-btn:active { transform:translateY(4px); box-shadow:0 1px 0 #0a3d7a; }
-        /* TIMEOUT WARNING */
-        .timeout-warning p {
-            font-size:28px;
-            color:#1e5fbf;
-            margin-bottom:20px;
-            font-weight:700;
-        }
-        .timeout-warning button {
-            background:#28a745;
-            color:white;
-            border:none;
-            border-radius:40px;
-            padding:15px 30px;
-            font-size:28px;
-            font-weight:700;
-            cursor:pointer;
-            margin:10px;
-            min-width:200px;
-            box-shadow:0 5px 0 #1e7e34;
-        }
-        .timeout-warning button:active { transform:translateY(5px); box-shadow:0 1px 0 #1e7e34; }
-        .timeout-warning .logout-btn { background:#dc3545; box-shadow:0 5px 0 #a71d2a; }
-        /* SUCCESS MESSAGE */
-        .success-message::before { content:"✅"; font-size:20px; }
-            to { transform:translateX(0); opacity:1; }
-        }
-            to { transform:translateX(-100%); opacity:0; }
-        }
-        /* MAIN CONTAINER */
-        /* MAIN CONTAINER - FIXED for vertical centering */
-.container {
-    position: fixed;
-    top: 70px;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    display: flex;
-    align-items: center;  /* This centers vertically */
-    justify-content: center;
-    padding: 20px 10px;
-    overflow-y: auto;
-    z-index: 1;
-}
-        h1 {
-            color:#1e5fbf;
-            font-size:42px;
-            font-weight:800;
-            text-align:center;
-            margin:0 0 10px 0;
-        }
-        /* Message styles */
-        .messages {
-            position:fixed;
-            top:75px;
-            left:50%;
-            transform:translateX(-50%);
-            z-index:1002;
-            width:90%;
-            max-width:800px;
-        }
-        .message {
-            padding:10px;
-            border-radius:5px;
-            margin-bottom:5px;
-            text-align:center;
-        }
-        .message.success { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
-        .message.error { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
-        .message.info { background:#d1ecf1; color:#0c5460; border:1px solid #bee5eb; }
-        /* Menu Grid */
-        .menu-grid {
-            display:grid;
-            grid-template-columns:repeat(2,1fr);
-            gap:20px;
-        }
-        .menu-card {
-            background:white;
-            border:3px solid #1e5fbf;
-            border-radius:30px;
-            padding:25px;
-            text-align:center;
-            cursor:pointer;
-            box-shadow:0 6px 0 #0a3d7a;
-            font-size:24px;
-            font-weight:700;
-            color:#1e5fbf;
-            transition:all 0.1s;
-        }
-        .menu-card:hover { background:#e3f2fd; }
+        .voice-corner { position:fixed; top:80px; right:15px; z-index:1000; display:flex; flex-direction:column; align-items:center; gap:3px; }
+        .voice-corner-btn { background:#ff9933; width:45px; height:45px; border-radius:50%; border:2px solid white; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:24px; box-shadow:0 2px 5px rgba(0,0,0,0.2); }
+        .voice-corner-text { background:white; padding:2px 8px; border-radius:12px; font-size:10px; color:#ff9933; border:1px solid #ff9933; }
+        .back-btn { position:fixed; top:80px; left:15px; background:white; border:2px solid #1e5fbf; border-radius:30px; padding:5px 15px; font-size:18px; font-weight:700; cursor:pointer; color:#1e5fbf; box-shadow:0 3px 0 #0a3d7a; z-index:1000; }
+        .back-btn:active { transform:translateY(3px); box-shadow:0 1px 0 #0a3d7a; }
+        .container { position:fixed; top:70px; left:0; right:0; bottom:0; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:10px; overflow:hidden; }
+        .content-wrapper { width:100%; max-width:800px; }
+        h1 { color:#1e5fbf; font-size:42px; text-align:center; margin-bottom:30px; }
+        .menu-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:20px; }
+        .menu-card { background:white; border:3px solid #1e5fbf; border-radius:30px; padding:25px; text-align:center; cursor:pointer; box-shadow:0 6px 0 #0a3d7a; font-size:24px; font-weight:700; color:#1e5fbf; transition: transform 0.1s; }
         .menu-card:active { transform:translateY(6px); box-shadow:0 2px 0 #0a3d7a; }
-        /* LOADING INDICATOR */
-        .loading {
-            display:none;
-            position:fixed;
-            top:0;
-            left:0;
-            right:0;
-            bottom:0;
-            background:rgba(0,0,0,0.5);
-            z-index:2000;
-            justify-content:center;
-            align-items:center;
-            color:white;
-            font-size:24px;
-        }
-        .loading.show { display:flex; }
-        .spinner {
-            border:4px solid rgba(255,255,255,0.3);
-            border-radius:50%;
-            border-top:4px solid white;
-            width:50px;
-            height:50px;
-            animation:spin 1s linear infinite;
-            margin-right:10px;
-        }
-        @keyframes spin { 0%{transform:rotate(0deg);} 100%{transform:rotate(360deg);} }
-        /* MOBILE RESPONSIVE */
-        @media (max-width: 768px) {
-            .menu-grid { grid-template-columns:1fr; }
-            h1 { font-size:32px; }
-        }
-        @media (max-width: 480px) {
-            h1 { font-size:28px; }
-            .menu-card { padding:20px; font-size:20px; }
-        }
-
-
-</style>
-{% endblock %}
-
-{% block content %}
-     Loading Indicator 
-<div class="loading" id="loadingIndicator">
-<div class="spinner"></div>
-<div>{% trans "Loading..." %}</div>
-</div>
-<div class="container">
-<div class="content-wrapper">
-<h1>🏛️ {% trans "Municipal Services" %}</h1>
-<div class="menu-grid">
-<div class="menu-card" data-service="property-tax" onclick="window.location='{% url 'property-tax' %}'">{% trans "Property Tax" %}</div>
-<div class="menu-card" data-service="water-bill" onclick="window.location='{% url 'water-bill' %}'">{% trans "Water Bill" %}</div>
-<div class="menu-card" data-service="trade-license" onclick="window.location='{% url 'trade-license' %}'">{% trans "Trade License" %}</div>
-<div class="menu-card" data-service="birth-certificate" onclick="window.location='{% url 'birth-certificate' %}'">{% trans "Birth Certificate" %}</div>
-<div class="menu-card" data-service="death-certificate" onclick="window.location='{% url 'death-certificate' %}'">{% trans "Death Certificate" %}</div>
-<div class="menu-card" data-service="marriage-registration" onclick="window.location='{% url 'marriage-registration' %}'">{% trans "Marriage Registration" %}</div>
-<div class="menu-card" data-service="building-plan" onclick="window.location='{% url 'building-plan' %}'">{% trans "Building Plan" %}</div>
-<div class="menu-card" data-service="grievance" onclick="window.location='{% url 'grievance' %}'">{% trans "Grievance" %}</div>
-<div class="menu-card" data-service="professional-tax" onclick="window.location='{% url 'professional-tax' %}'">{% trans "Professional Tax" %}</div>
+        .messages { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); z-index: 2000; width: 90%; max-width: 800px; }
+        .message { padding: 10px; border-radius: 5px; margin-bottom: 5px; }
+        .message.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .message.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .message.info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India">
+            <div>{% trans "Ministry of Electronics &" %}<br>{% trans "Information Technology" %}<br>{% trans "Government of India" %}</div>
+        </div>
+        <div class="header-right">
+            <img src="https://www.cdac.in/img/cdac-logo.png" alt="CDAC Logo">
+        </div>
+    </div>
+    
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <div class="voice-corner">
+        <div class="voice-corner-btn" onclick="alert('{% trans "Voice assistant activated" %}')">🎤</div>
+        <div class="voice-corner-text">{% trans "Click" %}</div>
+    </div>
+    <div class="back-btn" onclick="window.location='{% url 'menu' %}'">← {% trans "Back" %}</div>
+    <div class="container">
+        <div class="content-wrapper">
+            <h1>🏛️ {% trans "Municipal Services" %}</h1>
+            <div class="menu-grid">
+                <div class="menu-card" onclick="window.location='{% url 'property-tax' %}'">{% trans "Property Tax" %}</div>
+                <div class="menu-card" onclick="window.location='{% url 'water-bill' %}'">{% trans "Water Bill" %}</div>
+                <div class="menu-card" onclick="window.location='{% url 'trade-license' %}'">{% trans "Trade License" %}</div>
+                <div class="menu-card" onclick="window.location='{% url 'birth-certificate' %}'">{% trans "Birth Certificate" %}</div>
+                <div class="menu-card" onclick="window.location='{% url 'death-certificate' %}'">{% trans "Death Certificate" %}</div>
+                <div class="menu-card" onclick="window.location='{% url 'marriage-registration' %}'">{% trans "Marriage Registration" %}</div>
+                <div class="menu-card" onclick="window.location='{% url 'building-plan' %}'">{% trans "Building Plan" %}</div>
+                <div class="menu-card" onclick="window.location='{% url 'grievance' %}'">{% trans "Grievance" %}</div>
+                <div class="menu-card" onclick="window.location='{% url 'professional-tax' %}'">{% trans "Professional Tax" %}</div>
+                
                 {% if additional_services %}
                     {% for service in additional_services %}
-                    <div class="menu-card" data-service="{{ service.url_name }}" onclick="window.location='{% url service.url_name %}'">{{ service.name }}</div>
+                    <div class="menu-card" onclick="window.location='{% url service.url_name %}'">{{ service.name }}</div>
                     {% endfor %}
                 {% endif %}
             </div>
-</div>
-</div>
-<script src="{% static 'js/voice.js' %}"></script>
-{% endblock %}
-
-{% block extra_scripts %}
-<script>
-        /* ================= LANGUAGE MAP ================= */
-        const languageMap = {
-            "en": "en-IN",
-            "hi": "hi-IN",
-            "ta": "ta-IN",
-            "te": "te-IN",
-            "bn": "bn-IN",
-            "or": "or-IN"
-        };
-        function getCurrentLang() {
-            let path = window.location.pathname.split('/');
-            const langCode = path[1] || "en";
-            return languageMap[langCode] || "en-IN";
-        }
-        function getCurrentLangCode() {
-            let path = window.location.pathname.split('/');
-            return path[1] || "en";
-        }
-        function speak(text) {
-            if(!('speechSynthesis' in window)) return;
-            speechSynthesis.cancel();
-            let u = new SpeechSynthesisUtterance(text);
-            u.lang = getCurrentLang();
-            u.rate = 1;
-            speechSynthesis.speak(u);
-        }
-        /* ================= SESSION TIMER ================= */
-        function resetSessionTimer() {
-            clearTimeout(sessionTimer);
-            clearTimeout(timeoutWarningTimer);
-            startSessionTimer();
-        }
+        </div>
+    </div>
+    
+    <script>
         // Auto-hide messages after 5 seconds
         setTimeout(function() {
             const messages = document.querySelectorAll('.message');
@@ -223,260 +88,16 @@
                 message.style.display = 'none';
             });
         }, 5000);
-        // Auto-hide success messages after 3 seconds
-        setTimeout(function() {
-            const successMsg = document.querySelector('.success-message');
-            if (successMsg) {
-                successMsg.style.animation = 'slideOutLeft 0.3s ease';
-                setTimeout(function() {
-                    if (successMsg) successMsg.remove();
-                }, 300);
-            }
-        }, 3000);
+        
         // Optional: Add keyboard navigation
         document.addEventListener('keydown', function(e) {
             if(e.key === 'Escape') {
                 window.location.href = '{% url 'menu' %}';
             }
         });
-        /* ================= VOICE INPUT ================= */
-        let recognition;
-        let isListening = false;
-        function toggleVoiceInput() {
-            resetSessionTimer();
-            if(isListening) {
-                stopVoiceInput();
-                return;
-            }
-            const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if(!SR) {
-                alert("{% trans 'Speech not supported' %}");
-                return;
-            }
-            if (recognition) {
-                try {
-                    recognition.stop();
-                } catch(e) {}
-            }
-            recognition = new SR();
-            recognition.lang = getCurrentLang();
-            recognition.continuous = true;
-            recognition.interimResults = true;
-            recognition.maxAlternatives = 1;
-            recognition.onstart = function() {
-                isListening = true;
-                document.getElementById("voiceBtn").classList.add("listening");
-                document.getElementById("voiceStatus").innerText = "{% trans 'Listening...' %}";
-                const langCode = getCurrentLangCode();
-                if (langCode === 'hi') {
-                    speak("कृपया सेवा बोलें... संपत्ति कर, पानी बिल, व्यापार लाइसेंस, जन्म प्रमाण पत्र, मृत्यु प्रमाण पत्र, विवाह पंजीकरण, भवन नक्शा, शिकायत, या व्यावसायिक कर");
-                } else if (langCode === 'or') {
-                    speak("ଦୟାକରି ସେବା କୁହନ୍ତୁ... ସମ୍ପତ୍ତି କର, ପାଣି ବିଲ୍, ବାଣିଜ୍ୟ ଲାଇସେନ୍ସ, ଜନ୍ମ ପ୍ରମାଣପତ୍ର, ମୃତ୍ୟୁ ପ୍ରମାଣପତ୍ର, ବିବାହ ପଞ୍ଜୀକରଣ, ଭବନ ନକ୍ସା, ଅଭିଯୋଗ, କିମ୍ବା ବୃତ୍ତିଗତ କର");
-                } else {
-                    speak("{% trans 'Please say a service... property tax, water bill, trade license, birth certificate, death certificate, marriage registration, building plan, grievance, or professional tax' %}");
-                }
-            };
-            recognition.onresult = function(e) {
-                resetSessionTimer();
-                let finalTranscript = '';
-                let interimTranscript = '';
-                for (let i = 0; i < e.results.length; i++) {
-                    const result = e.results[i];
-                    if (result.isFinal) {
-                        finalTranscript += result[0].transcript;
-                    } else {
-                        interimTranscript += result[0].transcript;
-                    }
-                }
-                const transcript = finalTranscript || interimTranscript;
-                const command = transcript.toLowerCase();
-                console.log("Municipal services menu command:", command);
-                // Map of service keywords to URLs
-                const serviceMap = [
-                    { keywords: ["property tax", "tax", "संपत्ति कर", "ସମ୍ପତ୍ତି କର"], url: "{% url 'property-tax' %}", name: "Property Tax" },
-                    { keywords: ["water bill", "water", "पानी बिल", "ପାଣି ବିଲ୍"], url: "{% url 'water-bill' %}", name: "Water Bill" },
-                    { keywords: ["trade license", "license", "व्यापार लाइसेंस", "ବାଣିଜ୍ୟ ଲାଇସେନ୍ସ"], url: "{% url 'trade-license' %}", name: "Trade License" },
-                    { keywords: ["birth certificate", "birth", "जन्म प्रमाण पत्र", "ଜନ୍ମ ପ୍ରମାଣପତ୍ର"], url: "{% url 'birth-certificate' %}", name: "Birth Certificate" },
-                    { keywords: ["death certificate", "death", "मृत्यु प्रमाण पत्र", "ମୃତ୍ୟୁ ପ୍ରମାଣପତ୍ର"], url: "{% url 'death-certificate' %}", name: "Death Certificate" },
-                    { keywords: ["marriage registration", "marriage", "विवाह पंजीकरण", "ବିବାହ ପଞ୍ଜୀକରଣ"], url: "{% url 'marriage-registration' %}", name: "Marriage Registration" },
-                    { keywords: ["building plan", "building", "भवन नक्शा", "ଭବନ ନକ୍ସା"], url: "{% url 'building-plan' %}", name: "Building Plan" },
-                    { keywords: ["grievance", "complaint", "शिकायत", "ଅଭିଯୋଗ"], url: "{% url 'grievance' %}", name: "Grievance" },
-                    { keywords: ["professional tax", "professional", "व्यावसायिक कर", "ବୃତ୍ତିଗତ କର"], url: "{% url 'professional-tax' %}", name: "Professional Tax" }
-                ];
-                // Check each service
-                for (let service of serviceMap) {
-                    for (let keyword of service.keywords) {
-                        if (command.includes(keyword)) {
-                            const langCode = getCurrentLangCode();
-                            if (langCode === 'hi') {
-                                speak(service.name + " खोला जा रहा है");
-                            } else if (langCode === 'or') {
-                                speak(service.name + " ଖୋଲା ଯାଉଛି");
-                            } else {
-                                if (typeof speak === 'function') speak("Opening " + service.name);
-                            }
-                            setTimeout(() => {
-                                window.location.href = service.url;
-                            }, 500);
-                            return;
-                        }
-                    }
-                }
-                // Back and home commands
-                if (command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
-                    const langCode = getCurrentLangCode();
-                    if (langCode === 'hi') {
-                        speak("मुख्य मेनू पर वापस जा रहे हैं");
-                    } else if (langCode === 'or') {
-                        speak("ମୁଖ୍ୟ ମେନୁକୁ ଫେରୁଛି");
-                    } else {
-                        if (typeof speak === 'function') speak("{% trans 'Going back to main menu' %}");
-                    }
-                    window.location.href = "/" + getCurrentLangCode() + "/menu/";
-                    return;
-                }
-                else if (command.includes("home") || command.includes("होम") || command.includes("ଘର")) {
-                    const langCode = getCurrentLangCode();
-                    if (langCode === 'hi') {
-                        speak("होम पेज पर जा रहे हैं");
-                    } else if (langCode === 'or') {
-                        speak("ହୋମ୍ ପୃଷ୍ଠାକୁ ଯାଉଛି");
-                    } else {
-                        if (typeof speak === 'function') speak("{% trans 'Going to home page' %}");
-                    }
-                    window.location.href = "/" + getCurrentLangCode() + "/";
-                    return;
-                }
-                else if (command.includes("stop listening") || command.includes("stop voice")) {
-                    stopVoiceInput();
-                    return;
-                }
-                // If no match found
-                const langCode = getCurrentLangCode();
-                if (langCode === 'hi') {
-                    speak("आदेश पहचाना नहीं गया। कृपया फिर से कहें।");
-                } else if (langCode === 'or') {
-                    speak("ନିର୍ଦ୍ଦେଶ ଚିହ୍ନଟ ହୋଇନାହିଁ। ଦୟାକରି ପୁନର୍ବାର କୁହନ୍ତୁ।");
-                } else {
-                    if (typeof speak === 'function') speak("Command not recognized. Please try again.");
-                }
-            };
-            recognition.onerror = function(event) {
-                console.error("Recognition error:", event.error);
-                if (event.error === 'no-speech') return;
-                stopVoiceInput();
-            };
-            recognition.onend = function() {
-                if (isListening) {
-                    try {
-                        recognition.start();
-                    } catch(e) {
-                        console.error("Failed to restart recognition:", e);
-                        stopVoiceInput();
-                    }
-                } else {
-                    document.getElementById("voiceBtn").classList.remove("listening");
-                    document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
-                }
-            };
-            try {
-                recognition.start();
-            } catch(e) {
-                console.error("Failed to start recognition:", e);
-                stopVoiceInput();
-            }
-        }
-        function stopVoiceInput() {
-            isListening = false;
-            if (recognition) {
-                try {
-                    recognition.stop();
-                } catch(e) {}
-            }
-            document.getElementById("voiceBtn").classList.remove("listening");
-            document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
-        }
-        /* ================= OVERRIDE VOICE COMMANDS ================= */
-        const originalHandleCommand = window.handleCommand;
-        window.handleCommand = function(command) {
-            command = command.toLowerCase();
-            console.log("Municipal services menu command:", command);
-            // Map of service keywords to URLs
-            const serviceMap = [
-                { keywords: ["property tax", "tax", "संपत्ति कर", "ସମ୍ପତ୍ତି କର"], url: "{% url 'property-tax' %}" },
-                { keywords: ["water bill", "water", "पानी बिल", "ପାଣି ବିଲ୍"], url: "{% url 'water-bill' %}" },
-                { keywords: ["trade license", "license", "व्यापार लाइसेंस", "ବାଣିଜ୍ୟ ଲାଇସେନ୍ସ"], url: "{% url 'trade-license' %}" },
-                { keywords: ["birth certificate", "birth", "जन्म प्रमाण पत्र", "ଜନ୍ମ ପ୍ରମାଣପତ୍ର"], url: "{% url 'birth-certificate' %}" },
-                { keywords: ["death certificate", "death", "मृत्यु प्रमाण पत्र", "ମୃତ୍ୟୁ ପ୍ରମାଣପତ୍ର"], url: "{% url 'death-certificate' %}" },
-                { keywords: ["marriage registration", "marriage", "विवाह पंजीकरण", "ବିବାହ ପଞ୍ଜୀକରଣ"], url: "{% url 'marriage-registration' %}" },
-                { keywords: ["building plan", "building", "भवन नक्शा", "ଭବନ ନକ୍ସା"], url: "{% url 'building-plan' %}" },
-                { keywords: ["grievance", "complaint", "शिकायत", "ଅଭିଯୋଗ"], url: "{% url 'grievance' %}" },
-                { keywords: ["professional tax", "professional", "व्यावसायिक कर", "ବୃତ୍ତିଗତ କର"], url: "{% url 'professional-tax' %}" }
-            ];
-            // Check each service
-            for (let service of serviceMap) {
-                for (let keyword of service.keywords) {
-                    if (command.includes(keyword)) {
-                        if (typeof speak === 'function') speak("Opening service");
-                        setTimeout(() => {
-                            window.location.href = service.url;
-                        }, 500);
-                        return;
-                    }
-                }
-            }
-            // Back and home commands
-            if (command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
-                window.location.href = "/" + getCurrentLangCode() + "/menu/";
-                return;
-            }
-            else if (command.includes("home") || command.includes("होम") || command.includes("ଘର")) {
-                window.location.href = "/" + getCurrentLangCode() + "/";
-                return;
-            }
-            else if (command.includes("stop listening") || command.includes("stop voice")) {
-                stopVoiceInput();
-                return;
-            }
-            // If not menu-specific, pass to original handler
-            if (originalHandleCommand) {
-                originalHandleCommand(command);
-            }
-        };
-        // Override autoReadPage to read municipal services menu
-        const originalAutoRead = window.autoReadPage;
-        window.autoReadPage = function() {
-            if (originalAutoRead) originalAutoRead();
-            setTimeout(() => {
-                if (typeof speak === 'function') {
-                    const langCode = getCurrentLangCode();
-                    if (langCode === 'hi') {
-                        speak("नगर सेवा मेनू। संपत्ति कर, पानी बिल, व्यापार लाइसेंस, जन्म प्रमाण पत्र, मृत्यु प्रमाण पत्र, विवाह पंजीकरण, भवन नक्शा, शिकायत, या व्यावसायिक कर चुनें। मदद के लिए माइक बटन दबाएं।");
-                    } else if (langCode === 'or') {
-                        speak("ନଗର ସେବା ମେନୁ। ସମ୍ପତ୍ତି କର, ପାଣି ବିଲ୍, ବାଣିଜ୍ୟ ଲାଇସେନ୍ସ, ଜନ୍ମ ପ୍ରମାଣପତ୍ର, ମୃତ୍ୟୁ ପ୍ରମାଣପତ୍ର, ବିବାହ ପଞ୍ଜୀକରଣ, ଭବନ ନକ୍ସା, ଅଭିଯୋଗ, କିମ୍ବା ବୃତ୍ତିଗତ କର ଚୟନ କରନ୍ତୁ। ସାହାଯ୍ୟ ପାଇଁ ମାଇକ୍ ବଟନ୍ ଦବାନ୍ତୁ।");
-                    } else {
-                        speak("{% trans 'Municipal services menu. Choose property tax, water bill, trade license, birth certificate, death certificate, marriage registration, building plan, grievance, or professional tax. Press mic button for voice help.' %}");
-                    }
-                }
-            }, 2000);
-        };
-        /* ================= INIT ================= */
-        document.addEventListener('DOMContentLoaded', function() {
-            startSessionTimer();
-            document.addEventListener('click', resetSessionTimer);
-            document.addEventListener('keypress', resetSessionTimer);
-            document.addEventListener('touchstart', resetSessionTimer);
-            setTimeout(autoReadPage, 2000);
-        });
-        window.addEventListener('beforeunload', function() {
-            if (sessionTimer) {
-                clearTimeout(sessionTimer);
-            }
-            stopVoiceInput();
-        });
+        
         // Log page view (optional analytics)
-        console.log('Municipal Services page loaded with voice support');
-
-
-</script>
-{% endblock %}
+        console.log('Municipal Services page loaded');
+    </script>
+</body>
+</html>

@@ -1,640 +1,488 @@
-{% extends 'base.html' %}
-{% load i18n static %}
+{% load i18n %}
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+<title>{% trans "Building Plan Approval - Civic Kiosk" %}</title>
 
-{% block title %}{% trans "Building Plan Approval - Civic Kiosk" %}{% endblock %}
-
-{% block extra_head %}
 <style>
-        /* ====== YOUR ORIGINAL CSS (UNCHANGED) ====== */
-        .header-left img{height:42px;}
-        .header-left div{font-size:12px;font-weight:600;color:#1e5fbf;line-height:1.2;}
-        .header-right img{height:36px;}
-        /* ===== VOICE BUTTON ===== */
-        .voice-corner-btn.listening{background:#28a745;animation:pulse 1s infinite;}
-        50%{transform:scale(1.1);}100%{transform:scale(1);}}
-        /* ===== BACK BUTTON ===== */
-        .back-btn:active{transform:translateY(4px);box-shadow:0 1px 0 #0a3d7a;}
-        .back-btn:hover{background:#1e5fbf;color:white;}
-        /* ===== TIMEOUT WARNING ===== */
-        .timeout-warning p{font-size:28px;color:#1e5fbf;margin-bottom:20px;font-weight:700;}
-        .timeout-warning button{background:#28a745;color:white;border:none;border-radius:40px;padding:15px 30px;font-size:28px;font-weight:700;cursor:pointer;margin:10px;min-width:200px;box-shadow:0 5px 0 #1e7e34;}
-        .timeout-warning button:active{transform:translateY(5px);box-shadow:0 1px 0 #1e7e34;}
-        .timeout-warning .logout-btn{background:#dc3545;box-shadow:0 5px 0 #a71d2a;}
-        /* ===== SUCCESS MESSAGE ===== */
-        .success-message::before{content:"✅";font-size:20px;}
-        to{transform:translateX(0);opacity:1;}}
-        to{transform:translateX(-100%);opacity:0;}}
-        /* ===== SECURITY NOTE ===== */
-        /* ===== MAIN CONTAINER ===== */
-        .container{position:fixed;top:70px;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto;}
-        h1{grid-column:1/-1;text-align:center;font-size:38px;color:#1e5fbf;margin-bottom:10px;}
-        .messages{grid-column:1/-1;margin-bottom:15px;}
-        .message{padding:12px;border-radius:10px;margin-bottom:8px;text-align:center;font-size:16px;}
-        .message.success{background:#d4edda;color:#155724;border:1px solid #c3e6cb;}
-        .message.error{background:#f8d7da;color:#721c24;border:1px solid #f5c6cb;}
-        .message.info{background:#d1ecf1;color:#0c5460;border:1px solid #bee5eb;}
-        .form-group{display:flex;flex-direction:column;}
-        label{font-size:20px;color:#1e5fbf;margin-bottom:6px;}
-        .large-input{height:55px;border:3px solid #1e5fbf;border-radius:18px;font-size:20px;padding:0 15px;background:white;cursor:pointer;width:100%;}
-        .large-input:focus{outline:none;border-color:#ff9933;}
-        .large-input[readonly]{background:#f9f9f9;cursor:pointer;}
-        select.large-input{appearance:none;background-image:url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");background-repeat:no-repeat;background-position:right 15px center;background-size:20px;padding-right:45px;}
-        .file-upload{grid-column:1/-1;background:#e3f2fd;border:3px dashed #1e5fbf;border-radius:25px;padding:20px;text-align:center;font-size:18px;cursor:pointer;transition:background 0.3s;}
-        .file-upload:hover{background:#bbdefb;}
-        .file-upload.active{background:#bbdefb;border-color:#ff9933;}
-        .submit-btn{grid-column:1/-1;justify-self:center;width:350px;background:#28a745;color:white;font-size:24px;padding:12px;border-radius:35px;border:none;margin-top:10px;cursor:pointer;transition:all 0.1s;box-shadow:0 5px 0 #1e7e34;}
-        .submit-btn:active{transform:translateY(5px);box-shadow:0 1px 0 #1e7e34;}
-        .submit-btn:hover{background:#218838;}
-        .submit-btn:disabled{opacity:0.6;cursor:not-allowed;transform:none;box-shadow:0 5px 0 #1e7e34;}
-        /* ===== FLOATING INPUT SYSTEM ===== */
-        .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);backdrop-filter:blur(3px);display:none;z-index:900;}
-        .floating-input{position:fixed;left:50%;top:35%;transform:translate(-50%,-50%) scale(0.7);width:550px;height:70px;font-size:26px;border:4px solid #ff9933;border-radius:25px;padding:0 25px;z-index:1001;box-shadow:0 20px 50px rgba(0,0,0,0.4);transition:all 0.25s ease;display:none;}
-        .floating-input.show{transform:translate(-50%,-50%) scale(1);}
-        .floating-input:focus{outline:none;}
-        /* ===== KEYBOARD ===== */
-        .keyboard{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:white;padding:15px;border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,0.3);display:none;z-index:1000;}
-        .keyboard-row{display:flex;justify-content:center;}
-        .keyboard button{min-width:60px;height:60px;margin:4px;font-size:18px;border-radius:10px;border:2px solid #1e5fbf;background:#f0f7ff;cursor:pointer;transition:all 0.2s;}
-        .keyboard button:hover{background:#1e5fbf;color:white;}
-        .keyboard .ok-btn{background:#28a745;color:white;border:none;}
-        .keyboard .ok-btn:hover{background:#218838;}
-        /* ===== LOADING OVERLAY ===== */
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(255,255,255,0.8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            display: none;
-        }
-        .loading-spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #1e5fbf;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        /* ===== UTILITY CLASSES ===== */
-        .hidden{display:none !important;}
-        /* ===== CSRF TOKEN (hidden) ===== */
-        @media (max-width:768px){.submit-btn{width:100%;}}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;user-select:none;}
+body{width:100vw;height:100vh;overflow:hidden;background:#f0f7ff;}
 
+/* HEADER */
+.header{
+height:70px;
+background:white;
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:0 30px;
+border-bottom:2px solid #1e5fbf;
+}
+.header-left{display:flex;align-items:center;gap:12px;}
+.header-left img{height:42px;}
+.header-left div{font-size:12px;font-weight:600;color:#1e5fbf;line-height:1.2;}
+.header-right img{height:36px;}
 
+/* FIXED BUTTONS */
+.voice-corner{position:fixed;top:85px;right:25px;display:flex;flex-direction:column;align-items:center;gap:4px;z-index:1000;}
+.voice-corner-btn{
+background:#ff9933;
+width:48px;
+height:48px;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:22px;
+border:2px solid white;
+cursor:pointer;
+}
+.voice-corner-text{
+background:white;
+padding:3px 8px;
+border-radius:12px;
+font-size:11px;
+color:#ff9933;
+border:1px solid #ff9933;
+}
+
+.back-btn{
+position:fixed;
+top:85px;
+left:25px;
+background:white;
+border:2px solid #1e5fbf;
+border-radius:25px;
+padding:6px 18px;
+font-size:18px;
+font-weight:700;
+color:#1e5fbf;
+text-decoration:none;
+z-index:1000;
+display:inline-block;
+}
+.back-btn:hover{
+background:#1e5fbf;
+color:white;
+}
+
+/* MAIN CONTAINER */
+.container{
+position:fixed;
+top:70px;
+left:0;
+right:0;
+bottom:0;
+display:flex;
+align-items:center;
+justify-content:center;
+padding:20px;
+overflow-y:auto;
+}
+
+/* FORM LAYOUT */
+.content-wrapper{
+width:100%;
+max-width:1100px;
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:20px 40px;
+padding:20px 0;
+}
+
+h1{
+grid-column:1/-1;
+text-align:center;
+font-size:38px;
+color:#1e5fbf;
+margin-bottom:10px;
+}
+
+/* Message styles */
+.messages{
+grid-column:1/-1;
+margin-bottom:15px;
+}
+.message{
+padding:12px;
+border-radius:10px;
+margin-bottom:8px;
+text-align:center;
+font-size:16px;
+}
+.message.success{
+background:#d4edda;
+color:#155724;
+border:1px solid #c3e6cb;
+}
+.message.error{
+background:#f8d7da;
+color:#721c24;
+border:1px solid #f5c6cb;
+}
+.message.info{
+background:#d1ecf1;
+color:#0c5460;
+border:1px solid #bee5eb;
+}
+
+.form-group{display:flex;flex-direction:column;}
+label{font-size:20px;color:#1e5fbf;margin-bottom:6px;}
+
+.large-input{
+height:55px;
+border:3px solid #1e5fbf;
+border-radius:18px;
+font-size:20px;
+padding:0 15px;
+background:white;
+cursor:pointer;
+width:100%;
+}
+.large-input:focus{
+outline:none;
+border-color:#ff9933;
+}
+.large-input[readonly]{
+background:#f9f9f9;
+cursor:pointer;
+}
+select.large-input{
+appearance:none;
+background-image:url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+background-repeat:no-repeat;
+background-position:right 15px center;
+background-size:20px;
+padding-right:45px;
+}
+
+.file-upload{
+grid-column:1/-1;
+background:#e3f2fd;
+border:3px dashed #1e5fbf;
+border-radius:25px;
+padding:20px;
+text-align:center;
+font-size:18px;
+cursor:pointer;
+transition:background 0.3s;
+}
+.file-upload:hover{
+background:#bbdefb;
+}
+
+.submit-btn{
+grid-column:1/-1;
+justify-self:center;
+width:350px;   /* FIXED WIDTH (not full wide) */
+background:#28a745;
+color:white;
+font-size:24px;
+padding:12px;
+border-radius:35px;
+border:none;
+margin-top:10px;
+cursor:pointer;
+transition:background 0.3s;
+}
+.submit-btn:hover{
+background:#218838;
+}
+
+/* OVERLAY */
+.overlay{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,0.4);
+backdrop-filter:blur(3px);
+display:none;
+z-index:900;
+}
+
+/* FLOATING INPUT */
+.floating-input{
+position:fixed;
+left:50%;
+top:35%;
+transform:translate(-50%,-50%) scale(0.7);
+width:550px;
+height:70px;
+font-size:26px;
+border:4px solid #ff9933;
+border-radius:25px;
+padding:0 25px;
+z-index:1001;
+box-shadow:0 20px 50px rgba(0,0,0,0.4);
+transition:all 0.25s ease;
+display:none;
+}
+.floating-input.show{
+transform:translate(-50%,-50%) scale(1);
+}
+.floating-input:focus{
+outline:none;
+}
+
+/* KEYBOARD */
+.keyboard{
+position:fixed;
+bottom:20px;
+left:50%;
+transform:translateX(-50%);
+background:white;
+padding:15px;
+border-radius:20px;
+box-shadow:0 10px 30px rgba(0,0,0,0.3);
+display:none;
+z-index:1000;
+}
+.keyboard-row{display:flex;justify-content:center;}
+.keyboard button{
+min-width:60px;
+height:60px;
+margin:4px;
+font-size:18px;
+border-radius:10px;
+border:2px solid #1e5fbf;
+background:#f0f7ff;
+cursor:pointer;
+transition:all 0.2s;
+}
+.keyboard button:hover{
+background:#1e5fbf;
+color:white;
+}
+.keyboard .ok-btn{
+background:#28a745;
+color:white;
+border:none;
+}
+.keyboard .ok-btn:hover{
+background:#218838;
+}
+
+/* Responsive adjustments */
+@media (max-width:768px){
+.content-wrapper{
+grid-template-columns:1fr;
+}
+.submit-btn{
+width:100%;
+}
+}
 </style>
-{% endblock %}
+</head>
+<body>
 
-{% block content %}
-    <div class="container">
-<form action="{% url 'building-plan' %}" class="content-wrapper" enctype="multipart/form-data" id="buildingForm" method="post" onsubmit="return validateAndSubmitForm()">
+<div class="header">
+<div class="header-left">
+<img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India">
+<div>{% trans "Ministry of Electronics &" %}<br>{% trans "Information Technology" %}<br>{% trans "Government of India" %}</div>
+</div>
+<div class="header-right">
+<img src="https://www.cdac.in/img/cdac-logo.png" alt="CDAC Logo">
+</div>
+</div>
+
+<div class="voice-corner">
+<div class="voice-corner-btn">🎤</div>
+<div class="voice-corner-text">{% trans "Click" %}</div>
+</div>
+
+<a href="{% url 'menu' %}" class="back-btn">← {% trans "Back" %}</a>
+
+<div class="container">
+<form class="content-wrapper" method="post" action="{% url 'building-plan' %}" enctype="multipart/form-data">
     {% csrf_token %}
-            <h1>🏗️ {% trans "Building Plan Approval" %}</h1>
-            <div class="form-group">
-<label for="owner_name">{% trans "Owner Name" %} *</label>
-<input autocomplete="off" class="large-input text-input" id="owner_name" maxlength="100" name="owner_name" readonly="" required="" type="text" value="{{ request.POST.owner_name }}"/>
-</div>
-<div class="form-group">
-<label for="property_address">{% trans "Property Address" %} *</label>
-<input autocomplete="off" class="large-input text-input" id="property_address" maxlength="200" name="property_address" readonly="" required="" type="text" value="{{ request.POST.property_address }}"/>
-</div>
-<div class="form-group">
-<label for="survey_number">{% trans "Survey/Khasra Number" %} *</label>
-<input autocomplete="off" class="large-input text-input" id="survey_number" maxlength="50" name="survey_number" readonly="" required="" type="text" value="{{ request.POST.survey_number }}"/>
-</div>
-<div class="form-group">
-<label for="plot_area">{% trans "Plot Area (sq m)" %} *</label>
-<input autocomplete="off" class="large-input text-input" id="plot_area" maxlength="10" name="plot_area" readonly="" required="" type="text" value="{{ request.POST.plot_area }}"/>
-</div>
-<div class="form-group">
-<label for="building_type">{% trans "Building Type" %} *</label>
-<select class="large-input" id="building_type" name="building_type" required="">
-<option value="Residential">Residential</option>
-<option value="Commercial">Commercial</option>
-<option value="Mixed Use">Mixed Use</option>
-<option value="Industrial">Industrial</option>
-</select>
-</div>
-<div class="form-group">
-<label for="num_floors">{% trans "Number of Floors" %} *</label>
-<input autocomplete="off" class="large-input text-input" id="num_floors" maxlength="2" name="num_floors" readonly="" required="" type="text" value="2"/>
-</div>
-<div class="file-upload" id="fileUploadArea" onclick="document.getElementById('building_plan').click()" onkeypress="if(event.key==='Enter') document.getElementById('building_plan').click()" role="button" tabindex="0">
-                📄 {% trans "Upload Building Plan (PDF/DWG - Max 25MB)" %}
-                <br/><span id="fileName"></span>
-<input accept=".pdf,.dwg" id="building_plan" name="building_plan" onchange="validateAndUpdateFile(this)" style="display:none;" type="file"/>
-</div>
-<button class="submit-btn" id="submitBtn" type="submit">{% trans "Submit for Approval" %}</button>
+    
+    <h1>🏗️ {% trans "Building Plan Approval" %}</h1>
+
+    <!-- Display Django messages -->
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="message {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="form-group">
+        <label for="owner_name">{% trans "Owner Name" %} *</label>
+        <input type="text" id="owner_name" name="owner_name" class="large-input text-input" 
+               value="{{ request.POST.owner_name }}" readonly required>
+    </div>
+
+    <div class="form-group">
+        <label for="property_address">{% trans "Property Address" %} *</label>
+        <input type="text" id="property_address" name="property_address" class="large-input text-input" 
+               value="{{ request.POST.property_address }}" readonly required>
+    </div>
+
+    <div class="form-group">
+        <label for="survey_number">{% trans "Survey/Khasra Number" %} *</label>
+        <input type="text" id="survey_number" name="survey_number" class="large-input text-input" 
+               value="{{ request.POST.survey_number }}" readonly required>
+    </div>
+
+    <div class="form-group">
+        <label for="plot_area">{% trans "Plot Area (sq m)" %} *</label>
+        <input type="text" id="plot_area" name="plot_area" class="large-input text-input" 
+               value="{{ request.POST.plot_area }}" readonly required>
+    </div>
+
+    <div class="form-group">
+        <label for="building_type">{% trans "Building Type" %} *</label>
+        <select id="building_type" name="building_type" class="large-input" required>
+            <option value="Residential" {% if request.POST.building_type == 'Residential' %}selected{% endif %}>{% trans "Residential" %}</option>
+            <option value="Commercial" {% if request.POST.building_type == 'Commercial' %}selected{% endif %}>{% trans "Commercial" %}</option>
+            <option value="Mixed Use" {% if request.POST.building_type == 'Mixed Use' %}selected{% endif %}>{% trans "Mixed Use" %}</option>
+            <option value="Industrial" {% if request.POST.building_type == 'Industrial' %}selected{% endif %}>{% trans "Industrial" %}</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="num_floors">{% trans "Number of Floors" %} *</label>
+        <input type="text" id="num_floors" name="num_floors" class="large-input text-input" 
+               value="{% if request.POST.num_floors %}{{ request.POST.num_floors }}{% else %}2{% endif %}" readonly required>
+    </div>
+
+    <div class="file-upload" onclick="document.getElementById('building_plan').click()">
+        📄 {% trans "Upload Building Plan (PDF/DWG - Max 25MB)" %}
+        <br>
+        <span id="fileName" style="color:#28a745;font-size:16px;">
+            {% if request.FILES.building_plan %}
+                ✅ {% trans "Selected:" %} {{ request.FILES.building_plan.name }}
+            {% endif %}
+        </span>
+        <input type="file" id="building_plan" name="building_plan" accept=".pdf,.dwg" style="display:none;" onchange="showFileName()">
+    </div>
+
+    <button type="submit" class="submit-btn">{% trans "Submit for Approval" %}</button>
+
 </form>
 </div>
- Floating Input System 
-<div class="overlay" id="overlay"></div>
-<input class="floating-input" here..."="" id="floatingInput" maxlength="200" placeholder="{% trans " type="" }}"=""/>
-<div class="keyboard" id="keyboard"></div>
- Security Note 
-<script src="{% static 'js/voice.js' %}"></script>
-{% endblock %}
 
-{% block extra_scripts %}
+<div id="overlay" class="overlay"></div>
+<input id="floatingInput" class="floating-input" placeholder="{% trans "Type here..." %}">
+<div id="keyboard" class="keyboard"></div>
+
 <script>
-        // ================= SECURITY ENHANCEMENTS =================
-        // Auto-hide cursor on touch devices
-        let cursorTimeout;
-        document.addEventListener('touchstart', function() {
-            document.body.style.cursor = 'default';
-            clearTimeout(cursorTimeout);
-            cursorTimeout = setTimeout(function() {
-                document.body.style.cursor = 'none';
-            }, 3000);
-        });
-        // Prevent page zoom on double tap
-        let lastTouchEnd = 0;
-        document.addEventListener('touchend', function(event) {
-            const now = (new Date()).getTime();
-            if (now - lastTouchEnd <= 300) {
-                event.preventDefault();
-            }
-            lastTouchEnd = now;
-        }, false);
-        // ================= FORM SUBMISSION PROTECTION =================
-        let isSubmitting = false;
-        function validateAndSubmitForm() {
-            if (isSubmitting) {
-                return false;
-            }
-            // Check required fields
-            const requiredFields = ['owner_name', 'property_address', 'survey_number', 'plot_area', 'num_floors'];
-            let missing = false;
-            for (let field of requiredFields) {
-                const input = document.getElementById(field);
-                if (!input || !input.value.trim()) {
-                    missing = true;
-                    break;
-                }
-            }
-            // Check file uploaded
-            const fileInput = document.getElementById('building_plan');
-            if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
-                missing = true;
-                const langCode = getCurrentLangCode();
-                if (langCode === 'hi') {
-                    speak("कृपया भवन नक्शा अपलोड करें");
-                } else if (langCode === 'or') {
-                    speak("ଦୟାକରି ଭବନ ନକ୍ସା ଅପଲୋଡ୍ କରନ୍ତୁ");
-                } else {
-                    speak("{% trans 'Please upload building plan' %}");
-                }
-                return false;
-            }
-            if (missing) {
-                const langCode = getCurrentLangCode();
-                if (langCode === 'hi') {
-                    speak("कृपया सभी आवश्यक फ़ील्ड भरें");
-                } else if (langCode === 'or') {
-                    speak("ଦୟାକରି ସମସ୍ତ ଆବଶ୍ୟକୀୟ କ୍ଷେତ୍ର ପୂରଣ କରନ୍ତୁ");
-                } else {
-                    speak("{% trans 'Please fill all required fields' %}");
-                }
-                return false;
-            }
-            // Validate plot area is number
-            const plotArea = document.getElementById('plot_area').value;
-            if (isNaN(plotArea) || parseFloat(plotArea) <= 0) {
-                const langCode = getCurrentLangCode();
-                if (langCode === 'hi') {
-                    speak("कृपया मान्य प्लॉट क्षेत्र दर्ज करें");
-                } else {
-                    speak("{% trans 'Please enter valid plot area' %}");
-                }
-                return false;
-            }
-            // Validate floors is number
-            const numFloors = document.getElementById('num_floors').value;
-            if (isNaN(numFloors) || parseInt(numFloors) < 1 || parseInt(numFloors) > 50) {
-                const langCode = getCurrentLangCode();
-                if (langCode === 'hi') {
-                    speak("कृपया मान्य मंजिलों की संख्या दर्ज करें (1-50)");
-                } else {
-                    speak("{% trans 'Please enter valid number of floors (1-50)' %}");
-                }
-                return false;
-            }
-            // Prevent double submission
-            isSubmitting = true;
-            document.getElementById('submitBtn').disabled = true;
-            document.getElementById('submitBtn').innerHTML = "{% trans 'Submitting...' %}";
-            document.getElementById('loadingOverlay').style.display = 'flex';
-            return true;
-        }
-        // ================= LANGUAGE MAP =================
-        const languageMap = {
-            "en": "en-IN",
-            "hi": "hi-IN",
-            "ta": "ta-IN",
-            "te": "te-IN",
-            "bn": "bn-IN",
-            "or": "or-IN"
-        };
-        function getCurrentLang() {
-            let p = window.location.pathname.split('/');
-            const langCode = p[1] || "en";
-            return languageMap[langCode] || "en-IN";
-        }
-        function getCurrentLangCode() {
-            let p = window.location.pathname.split('/');
-            return p[1] || "en";
-        }
-        // ================= TEXT TO SPEECH =================
-        function speak(text) {
-            if(!('speechSynthesis' in window)) return;
-            speechSynthesis.cancel();
-            let u = new SpeechSynthesisUtterance(text);
-            u.lang = getCurrentLang();
-            u.rate = 1;
-            speechSynthesis.speak(u);
-        }
-        // ================= SESSION TIMER =================
-        function resetSessionTimer() {
-            clearTimeout(sessionTimer);
-            clearTimeout(timeoutWarningTimer);
-            startSessionTimer();
-        }
-        // ================= FLOATING KEYBOARD =================
-        let activeInput = null;
-        const overlay = document.getElementById("overlay");
-        const floatingInput = document.getElementById("floatingInput");
-        const keyboard = document.getElementById("keyboard");
-        let isUpperCase = true;
-        const keys = ["1","2","3","4","5","6","7","8","9","0",
-            "Q","W","E","R","T","Y","U","I","O","P",
-            "A","S","D","F","G","H","J","K","L",
-            "Z","X","C","V","B","N","M",".","-"," "];
-        function createKeyboard() {
-            keyboard.innerHTML = "";
-            let row = document.createElement("div");
-            row.className = "keyboard-row";
-            keys.forEach((k, i) => {
-                if (i % 10 === 0 && i !== 0) {
-                    keyboard.appendChild(row);
-                    row = document.createElement("div");
-                    row.className = "keyboard-row";
-                }
-                let btn = document.createElement("button");
-                btn.innerText = k === " " ? "Space" : (isUpperCase ? k : k.toLowerCase());
-                btn.type = "button";
-                btn.onclick = () => {
-                    resetSessionTimer();
-                    floatingInput.value += (k === " " ? " " : (isUpperCase ? k : k.toLowerCase()));
-                };
-                row.appendChild(btn);
-            });
-            keyboard.appendChild(row);
-            let lastRow = document.createElement("div");
-            lastRow.className = "keyboard-row";
-            lastRow.innerHTML = `
-                <button type="button" onclick="toggleCase()">⇧ Shift</button>
-                <button type="button" onclick="floatingInput.value = floatingInput.value.slice(0,-1)">⌫ Back</button>
-                <button type="button" onclick="floatingInput.value=''">Clear</button>
-                <button type="button" class="ok-btn" onclick="finishInput()">✓ OK</button>
-            `;
-            keyboard.appendChild(lastRow);
-        }
-        function toggleCase() {
-            isUpperCase = !isUpperCase;
-            createKeyboard();
-        }
-        function openKeyboard(input) {
-            activeInput = input;
-            floatingInput.value = input.value;
-            floatingInput.maxLength = input.maxLength || 200;
-            overlay.style.display = "block";
-            floatingInput.style.display = "block";
-            keyboard.style.display = "block";
-            setTimeout(() => {
-                floatingInput.classList.add("show");
-            }, 10);
-        }
-        function finishInput() {
-            if (activeInput) {
-                // Validate numeric fields
-                if (activeInput.id === 'plot_area' || activeInput.id === 'num_floors') {
-                    const value = floatingInput.value.trim();
-                    if (activeInput.id === 'plot_area' && !/^\d*\.?\d*$/.test(value)) {
-                        speak("{% trans 'Please enter numbers only' %}");
-                        return;
-                    }
-                    if (activeInput.id === 'num_floors' && !/^\d+$/.test(value)) {
-                        speak("{% trans 'Please enter numbers only' %}");
-                        return;
-                    }
-                }
-                activeInput.value = floatingInput.value;
-            }
-            closeKeyboard();
-        }
-        function closeKeyboard() {
-            floatingInput.classList.remove("show");
-            setTimeout(() => {
-                overlay.style.display = "none";
-                floatingInput.style.display = "none";
-                keyboard.style.display = "none";
-            }, 200);
-        }
-        // Initialize keyboard
-        createKeyboard();
-        // Add click handlers to text inputs
-        document.querySelectorAll(".text-input").forEach(input => {
-            input.addEventListener("click", (e) => {
-                e.preventDefault();
-                resetSessionTimer();
-                openKeyboard(input);
-            });
-            // Prevent any default touch behavior
-            input.addEventListener("touchstart", (e) => {
-                e.preventDefault();
-                resetSessionTimer();
-                openKeyboard(input);
-            });
-        });
-        overlay.addEventListener("click", closeKeyboard);
-        // ================= FILE UPLOAD VALIDATION =================
-        function validateAndUpdateFile(input) {
-            resetSessionTimer();
-            const file = input.files[0];
-            if (!file) return;
-            // Validate file size (25MB max)
-            const maxSize = 25 * 1024 * 1024; // 25MB in bytes
-            if (file.size > maxSize) {
-                alert("{% trans 'File size exceeds 25MB limit' %}");
-                input.value = '';
-                document.getElementById('fileName').innerText = '';
-                document.getElementById('fileUploadArea').classList.remove('active');
-                return;
-            }
-            // Validate file extension
-            const fileName = file.name;
-            const fileExt = fileName.split('.').pop().toLowerCase();
-            if (fileExt !== 'pdf' && fileExt !== 'dwg') {
-                alert("{% trans 'Only PDF and DWG files are allowed' %}");
-                input.value = '';
-                document.getElementById('fileName').innerText = '';
-                document.getElementById('fileUploadArea').classList.remove('active');
-                return;
-            }
-            document.getElementById('fileName').innerText = fileName;
-            document.getElementById('fileUploadArea').classList.add('active');
-            speak("{% trans 'File selected' %} " + fileName);
-        }
-        // ================= VOICE INPUT =================
-        let recognition;
-        let isListening = false;
-        let voiceRestartTimeout = null;
-        function toggleVoiceInput() {
-            resetSessionTimer();
-            if(isListening) {
-                stopVoiceInput();
-                return;
-            }
-            const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if(!SR) {
-                alert("{% trans 'Speech not supported' %}");
-                return;
-            }
-            if (recognition) {
-                try {
-                    recognition.stop();
-                } catch(e) {}
-            }
-            recognition = new SR();
-            recognition.lang = getCurrentLang();
-            recognition.continuous = true;
-            recognition.interimResults = true;
-            recognition.maxAlternatives = 1;
-            recognition.onstart = function() {
-                isListening = true;
-                document.getElementById("voiceBtn").classList.add("listening");
-                document.getElementById("voiceStatus").innerText = "{% trans 'Listening...' %}";
-                const langCode = getCurrentLangCode();
-                if (langCode === 'hi') {
-                    speak("कृपया बोलें... मालिक का नाम, पता, सर्वे नंबर, प्लॉट क्षेत्र, या मंजिलों की संख्या");
-                } else if (langCode === 'or') {
-                    speak("ଦୟାକରି କୁହନ୍ତୁ... ମାଲିକଙ୍କ ନାମ, ଠିକଣା, ସର୍ଭେ ନମ୍ବର, ପ୍ଲଟ୍ କ୍ଷେତ୍ର, କିମ୍ବା ମହଲା ସଂଖ୍ୟା");
-                } else {
-                    speak("{% trans 'Please speak... owner name, address, survey number, plot area, or number of floors' %}");
-                }
-            };
-            recognition.onresult = function(e) {
-                resetSessionTimer();
-                let finalTranscript = '';
-                let interimTranscript = '';
-                for (let i = 0; i < e.results.length; i++) {
-                    const result = e.results[i];
-                    if (result.isFinal) {
-                        finalTranscript += result[0].transcript;
-                    } else {
-                        interimTranscript += result[0].transcript;
-                    }
-                }
-                const transcript = finalTranscript || interimTranscript;
-                const text = transcript.trim();
-                console.log("Voice input:", text);
-                // Check for building type selection
-                let lower = text.toLowerCase();
-                let select = document.getElementById("building_type");
-                if (lower.includes("residential")) {
-                    select.value = "Residential";
-                    speak("{% trans 'Selected Residential' %}");
-                    return;
-                }
-                else if (lower.includes("commercial")) {
-                    select.value = "Commercial";
-                    speak("{% trans 'Selected Commercial' %}");
-                    return;
-                }
-                else if (lower.includes("mixed use") || lower.includes("mixed")) {
-                    select.value = "Mixed Use";
-                    speak("{% trans 'Selected Mixed Use' %}");
-                    return;
-                }
-                else if (lower.includes("industrial")) {
-                    select.value = "Industrial";
-                    speak("{% trans 'Selected Industrial' %}");
-                    return;
-                }
-                // Check for file upload command
-                if (lower.includes("upload") || lower.includes("file") || lower.includes("document")) {
-                    document.getElementById('building_plan').click();
-                    speak("{% trans 'Please select file to upload' %}");
-                    return;
-                }
-                // If keyboard is open, fill floating input
-                if (floatingInput.style.display === "block") {
-                    floatingInput.value = text;
-                }
-                // Otherwise, try to determine which field to fill based on context
-                else if (activeInput) {
-                    // Capitalize first letter of each word for names/addresses
-                    let formattedText = text.split(' ').map(word => 
-                        word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-                    ).join(' ');
-                    // Limit length
-                    if (formattedText.length > activeInput.maxLength) {
-                        formattedText = formattedText.substring(0, activeInput.maxLength);
-                    }
-                    activeInput.value = formattedText;
-                    speak("{% trans 'Field updated' %}");
-                }
-            };
-            recognition.onerror = function(event) {
-                console.error("Recognition error:", event.error);
-                if (event.error === 'no-speech') return;
-                stopVoiceInput();
-            };
-            recognition.onend = function() {
-                if (isListening) {
-                    if (voiceRestartTimeout) clearTimeout(voiceRestartTimeout);
-                    voiceRestartTimeout = setTimeout(() => {
-                        try {
-                            recognition.start();
-                        } catch(e) {
-                            console.error("Failed to restart recognition:", e);
-                            stopVoiceInput();
-                        }
-                    }, 1000);
-                } else {
-                    document.getElementById("voiceBtn").classList.remove("listening");
-                    document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
-                }
-            };
-            try {
-                recognition.start();
-            } catch(e) {
-                console.error("Failed to start recognition:", e);
-                stopVoiceInput();
-            }
-        }
-        function stopVoiceInput() {
-            isListening = false;
-            if (recognition) {
-                try {
-                    recognition.stop();
-                } catch(e) {}
-            }
-            document.getElementById("voiceBtn").classList.remove("listening");
-            document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
-            if (voiceRestartTimeout) {
-                clearTimeout(voiceRestartTimeout);
-            }
-        }
-        // ================= OVERRIDE VOICE COMMANDS =================
-        const originalHandleCommand = window.handleCommand;
-        window.handleCommand = function(command) {
-            command = command.toLowerCase();
-            console.log("Building plan command:", command);
-            if (command.includes("submit") || command.includes("apply") || command.includes("जमा") || command.includes("ଦାଖଲ")) {
-                if (!isSubmitting) {
-                    document.getElementById('buildingForm').requestSubmit();
-                }
-                return;
-            }
-            else if (command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
-                window.location.href = "/" + getCurrentLangCode() + "/menu/";
-                return;
-            }
-            else if (command.includes("home") || command.includes("होम") || command.includes("ଘର")) {
-                window.location.href = "/" + getCurrentLangCode() + "/";
-                return;
-            }
-            else if (command.includes("upload") || command.includes("file") || command.includes("document")) {
-                document.getElementById('building_plan').click();
-                return;
-            }
-            else if (command.includes("stop listening") || command.includes("stop voice")) {
-                stopVoiceInput();
-                return;
-            }
-            else if (command.includes("start listening") || command.includes("start voice")) {
-                toggleVoiceInput();
-                return;
-            }
-            else if (command.includes("clear")) {
-                if (activeInput) {
-                    activeInput.value = '';
-                    speak("{% trans 'Field cleared' %}");
-                }
-                return;
-            }
-            if (originalHandleCommand) {
-                originalHandleCommand(command);
-            }
-        };
-        // ================= AUTO READ PAGE =================
-        const originalAutoRead = window.autoReadPage;
-        window.autoReadPage = function() {
-            if (originalAutoRead) originalAutoRead();
-            setTimeout(() => {
-                if (typeof speak === 'function') {
-                    const langCode = getCurrentLangCode();
-                    if (langCode === 'hi') {
-                        speak("भवन नक्शा अनुमोदन आवेदन। मालिक का नाम, संपत्ति का पता, सर्वे नंबर, प्लॉट क्षेत्र, भवन प्रकार और मंजिलों की संख्या भरें। अंत में भवन नक्शा अपलोड करें। मदद के लिए माइक बटन दबाएं।");
-                    } else if (langCode === 'or') {
-                        speak("ଭବନ ନକ୍ସା ଅନୁମୋଦନ ଆବେଦନ। ମାଲିକଙ୍କ ନାମ, ସମ୍ପତ୍ତି ଠିକଣା, ସର୍ଭେ ନମ୍ବର, ପ୍ଲଟ୍ କ୍ଷେତ୍ର, ଭବନ ପ୍ରକାର ଏବଂ ମହଲା ସଂଖ୍ୟା ପୂରଣ କରନ୍ତୁ। ଶେଷରେ ଭବନ ନକ୍ସା ଅପଲୋଡ୍ କରନ୍ତୁ। ସାହାଯ୍ୟ ପାଇଁ ମାଇକ୍ ବଟନ୍ ଦବାନ୍ତୁ।");
-                    } else {
-                        speak("{% trans 'Building plan approval application. Fill owner name, property address, survey number, plot area, building type, and number of floors. Finally upload building plan. Press mic button for voice help.' %}");
-                    }
-                }
-            }, 1000);
-        };
-        // ================= INIT =================
-        document.addEventListener('DOMContentLoaded', function() {
-            startSessionTimer();
-            // Add activity listeners
-            document.addEventListener('click', resetSessionTimer);
-            document.addEventListener('keypress', resetSessionTimer);
-            document.addEventListener('touchstart', resetSessionTimer);
-            document.addEventListener('mousemove', resetSessionTimer);
-            // Auto-read form instructions
-            setTimeout(autoReadPage, 1500);
-            // Add numeric validation for plot area and floors
-            document.getElementById('plot_area').addEventListener('input', function(e) {
-                this.value = this.value.replace(/[^0-9.]/g, '');
-                // Ensure only one decimal point
-                if ((this.value.match(/\./g) || []).length > 1) {
-                    this.value = this.value.replace(/\.+$/, '');
-                }
-            });
-            document.getElementById('num_floors').addEventListener('input', function(e) {
-                this.value = this.value.replace(/[^0-9]/g, '');
-            });
-        });
-        window.addEventListener('beforeunload', function() {
-            if (sessionTimer) {
-                clearTimeout(sessionTimer);
-            }
-            if (timeoutWarningTimer) {
-                clearTimeout(timeoutWarningTimer);
-            }
-            stopVoiceInput();
-        });
-        // Auto-hide messages after 3 seconds
-        setTimeout(function() {
-            const successMsg = document.querySelector('.success-message');
-            if (successMsg) {
-                successMsg.style.animation = 'slideOutLeft 0.3s ease';
-                setTimeout(function() {
-                    if (successMsg) successMsg.remove();
-                }, 300);
-            }
-        }, 3000);
+let activeInput=null;
+const overlay=document.getElementById("overlay");
+const floatingInput=document.getElementById("floatingInput");
+const keyboard=document.getElementById("keyboard");
 
+const keys=["1","2","3","4","5","6","7","8","9","0",
+"A","B","C","D","E","F","G","H","I","J",
+"K","L","M","N","O","P","Q","R","S",
+"T","U","V","W","X","Y","Z",".",",","-"];
+
+function createKeyboard(){
+keyboard.innerHTML = "";
+let row=document.createElement("div");
+row.className="keyboard-row";
+keys.forEach((k,i)=>{
+if(i===10||i===20||i===30||i===40){
+keyboard.appendChild(row);
+row=document.createElement("div");
+row.className="keyboard-row";
+}
+let btn=document.createElement("button");
+btn.innerText=k;
+btn.type="button";
+btn.onclick=()=>floatingInput.value+=k;
+row.appendChild(btn);
+});
+keyboard.appendChild(row);
+
+let last=document.createElement("div");
+last.className="keyboard-row";
+last.innerHTML=`<button type="button" onclick="floatingInput.value=''">{% trans "Clear" %}</button>
+<button type="button" onclick="floatingInput.value=floatingInput.value.slice(0,-1)">⌫</button>
+<button type="button" onclick="floatingInput.value+=' '">{% trans "Space" %}</button>
+<button type="button" class="ok-btn" onclick="finish()">{% trans "OK" %}</button>`;
+keyboard.appendChild(last);
+}
+
+function openKeyboard(input){
+activeInput=input;
+floatingInput.value=input.value;
+
+overlay.style.display="block";
+floatingInput.style.display="block";
+keyboard.style.display="block";
+
+/* Move box upward when keyboard appears */
+floatingInput.style.top="32%";
+
+setTimeout(()=>{
+floatingInput.classList.add("show");
+floatingInput.focus();
+},10);
+}
+
+function finish(){
+if(activeInput){
+activeInput.value=floatingInput.value;
+}
+closeKeyboard();
+}
+
+function closeKeyboard(){
+floatingInput.classList.remove("show");
+setTimeout(()=>{
+overlay.style.display="none";
+floatingInput.style.top="45%";
+floatingInput.style.display="none";
+keyboard.style.display="none";
+},200);
+}
+
+document.querySelectorAll(".text-input").forEach(i=>{
+i.addEventListener("click",e=>{
+e.stopPropagation();
+e.preventDefault();
+openKeyboard(i);
+});
+});
+
+function showFileName(){
+const file=document.getElementById("building_plan").files[0];
+if(file){
+document.getElementById("fileName").innerText="✅ {% trans "Selected:" %} "+file.name;
+}
+}
+
+// Handle Enter key on floating input
+floatingInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        finish();
+    }
+});
+
+overlay.addEventListener("click",closeKeyboard);
+
+// Prevent form submission on Enter key in readonly inputs
+document.querySelectorAll('input[readonly]').forEach(input => {
+    input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+        }
+    });
+});
+
+createKeyboard();
+
+// Auto-hide messages after 5 seconds
+setTimeout(function() {
+    document.querySelectorAll('.message').forEach(function(message) {
+        message.style.display = 'none';
+    });
+}, 5000);
 
 </script>
-{% endblock %}
+
+</body>
+</html>

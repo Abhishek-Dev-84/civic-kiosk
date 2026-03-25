@@ -1,69 +1,109 @@
-{% extends 'base.html' %}
-{% load i18n static %}
+{% load static %}
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% trans "Application Status - Civic Services Kiosk" %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <style>
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            font-family: 'Segoe UI', sans-serif; 
+            user-select: none; 
+        }
 
-{% block title %}{% trans "Application Status - Civic Services Kiosk" %}{% endblock %}
+        body {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background: #f0f7ff;
+            display: flex;
+            flex-direction: column;
+        }
 
-{% block extra_head %}
-<style>
+        .header {
+            height: 70px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            border-bottom: 2px solid #1e5fbf;
+            flex-shrink: 0;
+        }
+
+        .header-left { 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+        }
+        
         .header-left img { height: 40px; }
+        
         .header-left div { 
             font-size: 12px; 
             font-weight: 600; 
             color: #1e5fbf; 
             line-height: 1.2; 
         }
+        
         .header-right img { height: 35px; }
-        /* ===== VOICE BUTTON ===== */
-        .voice-corner-btn.listening {
-            background: #28a745;
-            animation: pulse 1s infinite;
+
+        .voice-corner {
+            position: absolute;
+            top: 80px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
         }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
+
+        .voice-corner-btn {
+            background: #ff9933;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 2px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
-        /* ===== BACK BUTTON ===== */
-        .back-btn:active {
-            transform: translateY(4px);
-            box-shadow: 0 1px 0 #0a3d7a;
+
+        .voice-corner-text {
+            background: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            color: #ff9933;
+            border: 1px solid #ff9933;
         }
-        /* ===== TIMEOUT WARNING ===== */
-        .timeout-warning p {
-            font-size: 28px;
-            color: #1e5fbf;
-            margin-bottom: 20px;
-            font-weight: 700;
-        }
-        .timeout-warning button {
-            background: #28a745;
-            color: white;
-            border: none;
-            border-radius: 40px;
-            padding: 15px 30px;
-            font-size: 28px;
+
+        .back-btn {
+            position: absolute;
+            top: 80px;
+            left: 20px;
+            background: white;
+            border: 2px solid #1e5fbf;
+            border-radius: 30px;
+            padding: 6px 18px;
+            font-size: 18px;
             font-weight: 700;
             cursor: pointer;
-            margin: 10px;
-            min-width: 200px;
-            box-shadow: 0 5px 0 #1e7e34;
+            color: #1e5fbf;
+            box-shadow: 0 3px 0 #0a3d7a;
+            display: none;
+            z-index: 1000;
+            text-decoration: none;
         }
-        .timeout-warning button:active {
-            transform: translateY(5px);
-            box-shadow: 0 1px 0 #1e7e34;
-        }
-        .timeout-warning .logout-btn {
-            background: #dc3545;
-            box-shadow: 0 5px 0 #a71d2a;
-        }
-        /* ===== SUCCESS MESSAGE ===== */
-        .success-message::before {
-            content: "✅";
-            font-size: 20px;
-        }
-            to { transform: translateX(0); opacity: 1; }
-        }
-            to { transform: translateX(-100%); opacity: 0; }
-        }
-        /* ===== MAIN CONTAINER ===== */
+
         .main {
             flex: 1;
             display: flex;
@@ -72,17 +112,20 @@
             padding: 20px;
             overflow-y: auto;
         }
+
         .menu-title {
             color: #1e5fbf;
             font-size: 40px;
             text-align: center;
             margin-bottom: 30px;
         }
+
         .menu-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 25px;
         }
+
         .menu-card {
             background: white;
             border: 3px solid #1e5fbf;
@@ -94,21 +137,14 @@
             font-size: 24px;
             font-weight: 700;
             color: #1e5fbf;
-            transition: all 0.1s;
         }
-        .menu-card:active {
-            transform: translateY(6px);
-            box-shadow: 0 2px 0 #0a3d7a;
-        }
-        .menu-card:focus-visible {
-            outline: 3px solid #ff9933;
-            outline-offset: 2px;
-        }
+
         .screen {
             display: none;
             width: 100%;
             max-width: 900px;
         }
+
         .section-card {
             background: white;
             padding: 25px;
@@ -119,6 +155,7 @@
             border: 2px solid #1e5fbf;
             box-shadow: 0 4px 0 #0a3d7a;
         }
+
         .section-title {
             color: #1e5fbf;
             font-size: 22px;
@@ -127,6 +164,7 @@
             border-bottom: 2px solid #e0e0e0;
             padding-bottom: 8px;
         }
+
         .progress-container {
             background: #ddd;
             height: 15px;
@@ -134,11 +172,13 @@
             margin: 15px 0;
             overflow: hidden;
         }
+
         .progress-bar {
             height: 100%;
             background: #1e5fbf;
             transition: width 0.3s ease;
         }
+
         .deadline {
             margin-top: 10px;
             font-weight: 700;
@@ -148,14 +188,17 @@
             border-radius: 10px;
             text-align: center;
         }
+
         .info-row {
             display: flex;
             justify-content: space-between;
             padding: 8px 0;
             border-bottom: 1px solid #eee;
         }
+
         .info-label { font-weight: 600; color: #1e5fbf; }
         .info-value { color: #333; }
+
         .stage-item {
             display: flex;
             align-items: center;
@@ -165,6 +208,7 @@
             background: #f8f9fa;
             border-radius: 8px;
         }
+
         .back-to-menu {
             display: inline-block;
             padding: 12px 30px;
@@ -177,450 +221,150 @@
             margin-top: 20px;
             border: 2px solid white;
             box-shadow: 0 4px 0 #0a3d7a;
-            transition: all 0.1s;
         }
-        .back-to-menu:active {
-            transform: translateY(4px);
-            box-shadow: 0 1px 0 #0a3d7a;
-        }
+
         .empty-state { text-align: center; padding: 40px; }
         .empty-icon { font-size: 64px; margin-bottom: 20px; opacity: 0.5; }
-        /* ===== UTILITY CLASSES ===== */
-        .hidden {
-            display: none !important;
-        }
-        /* ===== SECURITY NOTE ===== */
-        /* ===== CSRF TOKEN (hidden) ===== */
+    </style>
+</head>
+<body>
 
-
-</style>
-{% endblock %}
-
-{% block content %}
-<div id="mainMenu" role="main">
-<h1 class="menu-title">📄 {% trans "Status Portal" %}</h1>
-<div class="menu-grid">
-<div class="menu-card" id="appStatusCard" onclick="openApplication()" onkeypress="if(event.key==='Enter') openApplication()" role="button" tabindex="0">
-                    {% trans "Application Status" %}
-                </div>
-<div class="menu-card" id="paymentHistoryCard" onclick="window.location='{% url 'payment-history' %}'" onkeypress="if(event.key==='Enter') window.location='{% url 'payment-history' %}'" role="button" tabindex="0">
-                    {% trans "Payment History" %}
-                </div>
-</div>
-</div>
-<div aria-label="{% trans 'Application details' %}" class="screen" id="applicationScreen" role="region">
-<h1 style="text-align:center; color:#1e5fbf; margin-bottom:20px; font-size:32px;">
-                📑 {% trans "Application &amp; Complaint Status" %}
-            </h1>
-            {% if application %}
-            <div class="section-card">
-<div class="section-title">{% trans "Application Tracking" %}</div>
-<div class="info-row">
-<span class="info-label">{% trans "Application ID:" %}</span>
-<span class="info-value">{{ application.application_id }}</span>
-</div>
-<div class="info-row">
-<span class="info-label">{% trans "Department:" %}</span>
-<span class="info-value">{{ application.department }}</span>
-</div>
-<div class="info-row">
-<span class="info-label">{% trans "Submitted Date:" %}</span>
-<span class="info-value">{{ application.submitted_date|date:"d M Y" }}</span>
-</div>
-<div class="info-row">
-<span class="info-label">{% trans "Current Stage:" %}</span>
-<span class="info-value">{{ application.current_stage }}</span>
-</div>
-<div class="info-row">
-<span class="info-label">{% trans "Assigned Officer:" %}</span>
-<span class="info-value">{{ application.assigned_officer }}</span>
-</div>
-<div class="deadline">
-                    {% trans "Expected Completion:" %} {{ application.expected_completion|date:"d M Y" }}
-                </div>
-</div>
-            {% endif %}
-            {% if complaint %}
-            <div class="section-card">
-<div class="section-title">{% trans "Complaint Tracking" %}</div>
-<div class="info-row">
-<span class="info-label">{% trans "Complaint ID:" %}</span>
-<span class="info-value">{{ complaint.complaint_id }}</span>
-</div>
-<div class="info-row">
-<span class="info-label">{% trans "Status:" %}</span>
-<span class="info-value">{{ complaint.status }}</span>
-</div>
-<div class="info-row">
-<span class="info-label">{% trans "Work Completed:" %}</span>
-<span class="info-value">{{ complaint.work_completed }}%</span>
-</div>
-<div class="progress-container">
-<div class="progress-bar" style="width: {{ complaint.work_completed }}%;"></div>
-</div>
-<div class="info-row">
-<span class="info-label">{% trans "Officer Remark:" %}</span>
-<span class="info-value">{{ complaint.officer_remark }}</span>
-</div>
-<div class="deadline">
-                    {% trans "Deadline:" %} {{ complaint.deadline|date:"d M Y" }}
-                </div>
-</div>
-            {% endif %}
-            {% if not application and not complaint %}
-            <div class="section-card empty-state">
-<div class="empty-icon">📭</div>
-<div class="section-title">{% trans "No Active Applications" %}</div>
-<p style="padding: 20px; font-size: 18px; color: #666;">
-                    {% trans "You don't have any active applications or complaints." %}
-                </p>
-<a class="back-to-menu" href="{% url 'menu' %}" id="backToMenuBtn" role="button">
-                    ← {% trans "Back to Menu" %}
-                </a>
-</div>
-            {% endif %}
-            {% if application or complaint %}
-            <div style="text-align: center;">
-<a class="back-to-menu" href="{% url 'menu' %}" id="backToMenuBtn" role="button">
-                    ← {% trans "Back to Menu" %}
-                </a>
-</div>
-            {% endif %}
+<div class="header">
+    <div class="header-left">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India">
+        <div>
+            {% trans "Ministry of Electronics &" %}<br>
+            {% trans "Information Technology" %}<br>
+            {% trans "Government of India" %}
         </div>
-{% endblock %}
+    </div>
+    <div class="header-right">
+        <img src="https://www.cdac.in/img/cdac-logo.png" alt="CDAC Logo">
+    </div>
+</div>
 
-{% block extra_scripts %}
+<div class="voice-corner">
+    <div class="voice-corner-btn" onclick="alert('{% trans "Voice assistant activated" %}')">🎤</div>
+    <div class="voice-corner-text">{% trans "Click" %}</div>
+</div>
+
+<div class="back-btn" onclick="goHome()">← {% trans "Back" %}</div>
+
+<div class="main">
+
+    <div id="mainMenu">
+        <h1 class="menu-title">📄 {% trans "Status Portal" %}</h1>
+        <div class="menu-grid">
+            <div class="menu-card" onclick="openApplication()">
+                {% trans "Application Status" %}
+            </div>
+            <div class="menu-card" onclick="window.location='{% url 'payment-history' %}'">
+                {% trans "Payment History" %}
+            </div>
+        </div>
+    </div>
+
+    <div id="applicationScreen" class="screen">
+        <h1 style="text-align:center; color:#1e5fbf; margin-bottom:20px; font-size:32px;">
+            📑 {% trans "Application & Complaint Status" %}
+        </h1>
+
+        {% if application %}
+        <div class="section-card">
+            <div class="section-title">{% trans "Application Tracking" %}</div>
+
+            <div class="info-row">
+                <span class="info-label">{% trans "Application ID:" %}</span>
+                <span class="info-value">{{ application.application_id }}</span>
+            </div>
+
+            <div class="info-row">
+                <span class="info-label">{% trans "Department:" %}</span>
+                <span class="info-value">{{ application.department }}</span>
+            </div>
+
+            <div class="info-row">
+                <span class="info-label">{% trans "Submitted Date:" %}</span>
+                <span class="info-value">{{ application.submitted_date|date:"d M Y" }}</span>
+            </div>
+
+            <div class="info-row">
+                <span class="info-label">{% trans "Current Stage:" %}</span>
+                <span class="info-value">{{ application.current_stage }}</span>
+            </div>
+
+            <div class="info-row">
+                <span class="info-label">{% trans "Assigned Officer:" %}</span>
+                <span class="info-value">{{ application.assigned_officer }}</span>
+            </div>
+
+            <div class="deadline">
+                {% trans "Expected Completion:" %} {{ application.expected_completion|date:"d M Y" }}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if complaint %}
+        <div class="section-card">
+            <div class="section-title">{% trans "Complaint Tracking" %}</div>
+
+            <div class="info-row">
+                <span class="info-label">{% trans "Complaint ID:" %}</span>
+                <span class="info-value">{{ complaint.complaint_id }}</span>
+            </div>
+
+            <div class="info-row">
+                <span class="info-label">{% trans "Status:" %}</span>
+                <span class="info-value">{{ complaint.status }}</span>
+            </div>
+
+            <div class="info-row">
+                <span class="info-label">{% trans "Work Completed:" %}</span>
+                <span class="info-value">{{ complaint.work_completed }}%</span>
+            </div>
+
+            <div class="info-row">
+                <span class="info-label">{% trans "Officer Remark:" %}</span>
+                <span class="info-value">{{ complaint.officer_remark }}</span>
+            </div>
+
+            <div class="deadline">
+                {% trans "Deadline:" %} {{ complaint.deadline|date:"d M Y" }}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if not application and not complaint %}
+        <div class="section-card empty-state">
+            <div class="empty-icon">📭</div>
+            <div class="section-title">{% trans "No Active Applications" %}</div>
+            <p style="padding: 20px; font-size: 18px; color: #666;">
+                {% trans "You don't have any active applications or complaints." %}
+            </p>
+            <a href="{% url 'menu' %}" class="back-to-menu">
+                ← {% trans "Back to Menu" %}
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+
 <script>
-        const languageMap = {
-            "en": "en-IN",
-            "hi": "hi-IN",
-            "ta": "ta-IN",
-            "te": "te-IN",
-            "bn": "bn-IN",
-            "or": "or-IN"
-        };
-        function getCurrentLang() {
-            const path = window.location.pathname.split('/');
-            const langCode = path[1] || "en";
-            return languageMap[langCode] || "en-IN";
-        }
-        function getCurrentLangCode() {
-            const path = window.location.pathname.split('/');
-            return path[1] || "en";
-        }
-        function speak(text) {
-            if (!('speechSynthesis' in window)) return;
-            // Cancel any ongoing speech
-            speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = getCurrentLang();
-            utterance.rate = 1;
-            utterance.pitch = 1;
-            utterance.volume = 1;
-            speechSynthesis.speak(utterance);
-        }
-        // ===== PAGE FUNCTIONS =====
-        function openApplication() {
-            document.getElementById("mainMenu").style.display = "none";
-            document.getElementById("applicationScreen").style.display = "block";
-            document.getElementById("backBtn").style.display = "block";
-            sessionStorage.setItem('appScreenOpen', 'true');
-            // Auto-read application details if available
-            setTimeout(() => {
-                const langCode = getCurrentLangCode();
-                if (document.querySelector('.section-card')) {
-                    if (langCode === 'hi') {
-                        speak("आवेदन विवरण पृष्ठ। वापस जाने के लिए बैक कहें।");
-                    } else if (langCode === 'or') {
-                        speak("ଆବେଦନ ବିବରଣୀ ପୃଷ୍ଠା। ପଛକୁ ଯିବା ପାଇଁ ବ୍ୟାକ୍ କୁହନ୍ତୁ।");
-                    } else {
-                        speak("{% trans 'Application details page. Say back to return.' %}");
-                    }
-                }
-            }, 1000);
-        }
-        function goBack() {
-            document.getElementById("mainMenu").style.display = "block";
-            document.getElementById("applicationScreen").style.display = "none";
-            document.getElementById("backBtn").style.display = "none";
-            sessionStorage.setItem('appScreenOpen', 'false');
-            const langCode = getCurrentLangCode();
-            if (langCode === 'hi') {
-                speak("मुख्य मेनू पर वापस");
-            } else if (langCode === 'or') {
-                speak("ମୁଖ୍ୟ ମେନୁକୁ ଫେରନ୍ତୁ");
-            } else {
-                speak("{% trans 'Back to main menu' %}");
-            }
-        }
-        // ===== VOICE INPUT =====
-        let recognition = null;
-        let isListening = false;
-        let voiceRestartTimeout = null;
-        function toggleVoiceInput() {
-            resetSessionTimer();
-            if(isListening) {
-                stopVoiceInput();
-                return;
-            }
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if(!SpeechRecognition) {
-                alert("{% trans 'Speech not supported' %}");
-                return;
-            }
-            if (recognition) {
-                try {
-                    recognition.stop();
-                } catch(e) {}
-            }
-            recognition = new SpeechRecognition();
-            recognition.lang = getCurrentLang();
-            recognition.continuous = true;
-            recognition.interimResults = true;
-            recognition.maxAlternatives = 1;
-            recognition.onstart = function() {
-                isListening = true;
-                document.getElementById("voiceBtn").classList.add("listening");
-                document.getElementById("voiceStatus").innerText = "{% trans 'Listening...' %}";
-                const langCode = getCurrentLangCode();
-                if (langCode === 'hi') {
-                    speak("कृपया आदेश बोलें... आवेदन स्थिति, भुगतान इतिहास, या वापस");
-                } else if (langCode === 'or') {
-                    speak("ଦୟାକରି ନିର୍ଦ୍ଦେଶ କୁହନ୍ତୁ... ଆବେଦନ ସ୍ଥିତି, ଦେୟ ଇତିହାସ, କିମ୍ବା ପଛକୁ");
-                } else {
-                    speak("{% trans 'Please say a command... Application Status, Payment History, or Back' %}");
-                }
-            };
-            recognition.onresult = function(event) {
-                resetSessionTimer();
-                let finalTranscript = '';
-                let interimTranscript = '';
-                for (let i = 0; i < event.results.length; i++) {
-                    const result = event.results[i];
-                    if (result.isFinal) {
-                        finalTranscript += result[0].transcript;
-                    } else {
-                        interimTranscript += result[0].transcript;
-                    }
-                }
-                const transcript = finalTranscript || interimTranscript;
-                const command = transcript.toLowerCase();
-                console.log("Voice command:", command);
-                // Check which screen is active
-                const isAppScreen = document.getElementById("applicationScreen").style.display === "block";
-                if (isAppScreen) {
-                    // Commands for application details screen
-                    if (command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
-                        goBack();
-                    }
-                    else if (command.includes("home") || command.includes("होम") || command.includes("ଘର")) {
-                        window.location.href = "/" + getCurrentLangCode() + "/menu/";
-                    }
-                    else if (command.includes("read") || command.includes("पढ़ें") || command.includes("ପଢ଼ନ୍ତୁ")) {
-                        // Read application details
-                        const details = document.querySelector('.section-card');
-                        if (details) {
-                            const text = details.innerText;
-                            speak(text);
-                        }
-                    }
-                    else if (command.includes("menu") || command.includes("मेनू") || command.includes("ମେନୁ")) {
-                        goBack();
-                    }
-                } else {
-                    // Commands for main menu
-                    if (command.includes("application") || command.includes("status") || command.includes("आवेदन") || command.includes("स्थिति")) {
-                        speak("{% trans 'Opening Application Status' %}");
-                        setTimeout(() => {
-                            openApplication();
-                        }, 500);
-                    }
-                    else if (command.includes("payment") || command.includes("history") || command.includes("भुगतान") || command.includes("इतिहास")) {
-                        speak("{% trans 'Opening Payment History' %}");
-                        setTimeout(() => {
-                            window.location.href = "{% url 'payment-history' %}";
-                        }, 500);
-                    }
-                    else if (command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
-                        speak("{% trans 'Going back to main menu' %}");
-                        setTimeout(() => {
-                            window.location.href = "/" + getCurrentLangCode() + "/menu/";
-                        }, 500);
-                    }
-                    else if (command.includes("home") || command.includes("होम") || command.includes("ଘର")) {
-                        speak("{% trans 'Going to home' %}");
-                        setTimeout(() => {
-                            window.location.href = "/" + getCurrentLangCode() + "/";
-                        }, 500);
-                    }
-                    else if (command.includes("stop listening") || command.includes("stop voice")) {
-                        stopVoiceInput();
-                    }
-                }
-            };
-            recognition.onerror = function(event) {
-                console.error("Recognition error:", event.error);
-                if (event.error === 'no-speech') {
-                    // Ignore no-speech errors
-                    return;
-                }
-                stopVoiceInput();
-            };
-            recognition.onend = function() {
-                if (isListening) {
-                    // Try to restart with exponential backoff
-                    if (voiceRestartTimeout) clearTimeout(voiceRestartTimeout);
-                    voiceRestartTimeout = setTimeout(() => {
-                        try {
-                            recognition.start();
-                        } catch(e) {
-                            console.error("Failed to restart recognition:", e);
-                            stopVoiceInput();
-                        }
-                    }, 1000);
-                } else {
-                    document.getElementById("voiceBtn").classList.remove("listening");
-                    document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
-                }
-            };
-            try {
-                recognition.start();
-            } catch(e) {
-                console.error("Failed to start recognition:", e);
-                stopVoiceInput();
-            }
-        }
-        function stopVoiceInput() {
-            isListening = false;
-            if (recognition) {
-                try {
-                    recognition.stop();
-                } catch(e) {}
-            }
-            document.getElementById("voiceBtn").classList.remove("listening");
-            document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
-            if (voiceRestartTimeout) {
-                clearTimeout(voiceRestartTimeout);
-            }
-        }
-        // ===== INIT =====
-        document.addEventListener('DOMContentLoaded', function() {
-            // Check session storage for screen state
-            const appScreenOpen = sessionStorage.getItem('appScreenOpen') === 'true';
-            if (appScreenOpen) {
-                document.getElementById("mainMenu").style.display = "none";
-                document.getElementById("applicationScreen").style.display = "block";
-                document.getElementById("backBtn").style.display = "block";
-            } else {
-                document.getElementById("mainMenu").style.display = "block";
-                document.getElementById("applicationScreen").style.display = "none";
-                document.getElementById("backBtn").style.display = "none";
-            }
-            startSessionTimer();
-            // Add activity listeners
-            document.addEventListener('click', resetSessionTimer);
-            document.addEventListener('keypress', resetSessionTimer);
-            document.addEventListener('touchstart', resetSessionTimer);
-            document.addEventListener('mousemove', resetSessionTimer);
-            // Auto-read menu options
-            setTimeout(() => {
-                const langCode = getCurrentLangCode();
-                const isAppScreen = document.getElementById("applicationScreen").style.display === "block";
-                if (isAppScreen) {
-                    if (langCode === 'hi') {
-                        speak("आवेदन विवरण पृष्ठ। वापस जाने के लिए बैक कहें।");
-                    } else if (langCode === 'or') {
-                        speak("ଆବେଦନ ବିବରଣୀ ପୃଷ୍ଠା। ପଛକୁ ଯିବା ପାଇଁ ବ୍ୟାକ୍ କୁହନ୍ତୁ।");
-                    } else {
-                        speak("{% trans 'Application details page. Say back to return.' %}");
-                    }
-                } else {
-                    if (langCode === 'hi') {
-                        speak("स्थिति पोर्टल। आवेदन स्थिति या भुगतान इतिहास चुनें। मदद के लिए माइक बटन दबाएं।");
-                    } else if (langCode === 'or') {
-                        speak("ସ୍ଥିତି ପୋର୍ଟାଲ। ଆବେଦନ ସ୍ଥିତି କିମ୍ବା ଦେୟ ଇତିହାସ ଚୟନ କରନ୍ତୁ। ସାହାଯ୍ୟ ପାଇଁ ମାଇକ୍ ବଟନ୍ ଦବାନ୍ତୁ।");
-                    } else {
-                        speak("{% trans 'Status Portal. Choose Application Status or Payment History. Press mic button for voice help.' %}");
-                    }
-                }
-            }, 1000);
-        });
-        window.addEventListener('beforeunload', function() {
-            if (sessionTimer) {
-                clearTimeout(sessionTimer);
-            }
-            if (timeoutWarningTimer) {
-                clearTimeout(timeoutWarningTimer);
-            }
-            stopVoiceInput();
-        });
-        // Auto-hide success messages after 3 seconds
-        setTimeout(function() {
-            const successMsg = document.querySelector('.success-message');
-            if (successMsg) {
-                successMsg.style.animation = 'slideOutLeft 0.3s ease';
-                setTimeout(function() {
-                    if (successMsg) successMsg.remove();
-                }, 300);
-            }
-        }, 3000);
-        // Extend voice.js handleCommand
-        const originalHandleCommand = window.handleCommand;
-        window.handleCommand = function(command) {
-            command = command.toLowerCase();
-            console.log("Status page command:", command);
-            const isAppScreen = document.getElementById("applicationScreen").style.display === "block";
-            if (isAppScreen) {
-                if (command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
-                    goBack();
-                    return;
-                }
-                else if (command.includes("home") || command.includes("होम") || command.includes("ଘର")) {
-                    window.location.href = "/" + getCurrentLangCode() + "/";
-                    return;
-                }
-                else if (command.includes("menu") || command.includes("मेनू") || command.includes("ମେନୁ")) {
-                    goBack();
-                    return;
-                }
-            } else {
-                if (command.includes("application") || command.includes("status") || command.includes("आवेदन")) {
-                    openApplication();
-                    return;
-                }
-                else if (command.includes("payment") || command.includes("history") || command.includes("भुगतान")) {
-                    window.location.href = "{% url 'payment-history' %}";
-                    return;
-                }
-                else if (command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
-                    window.location.href = "/" + getCurrentLangCode() + "/menu/";
-                    return;
-                }
-                else if (command.includes("home") || command.includes("होम") || command.includes("ଘର")) {
-                    window.location.href = "/" + getCurrentLangCode() + "/";
-                    return;
-                }
-            }
-            if (originalHandleCommand) {
-                originalHandleCommand(command);
-            }
-        };
-        // Override autoReadPage
-        const originalAutoRead = window.autoReadPage;
-        window.autoReadPage = function() {
-            if (originalAutoRead) originalAutoRead();
-            setTimeout(() => {
-                if (typeof speak === 'function') {
-                    const isAppScreen = document.getElementById("applicationScreen").style.display === "block";
-                    if (isAppScreen) {
-                        speak("{% trans 'Application details page. Say back to return.' %}");
-                    } else {
-                        speak("{% trans 'Status Portal. Choose Application Status or Payment History.' %}");
-                    }
-                }
-            }, 2000);
-        };
+function openApplication() {
+    document.getElementById("mainMenu").style.display = "none";
+    document.getElementById("applicationScreen").style.display = "block";
+    document.querySelector(".back-btn").style.display = "block";
+    sessionStorage.setItem('appScreenOpen', 'true');
+}
 
-
+function goHome() {
+    document.getElementById("mainMenu").style.display = "block";
+    document.getElementById("applicationScreen").style.display = "none";
+    document.querySelector(".back-btn").style.display = "none";
+    sessionStorage.setItem('appScreenOpen', 'false');
+}
 </script>
-{% endblock %}
+
+</body>
+</html>

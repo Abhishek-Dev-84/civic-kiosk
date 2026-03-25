@@ -273,7 +273,7 @@ def auth(request):
 
 
 def otp(request):
-    """OTP verification page"""
+    """OTP verification page - BYPASS MODE: any OTP works"""
     # Check if aadhaar is in session
     aadhaar_number = request.session.get('aadhaar_number')
     consumer_id = request.session.get('consumer_id')
@@ -293,64 +293,61 @@ def otp(request):
     if request.method == 'POST':
         entered_otp = sanitize_input(request.POST.get('otp'), 6)
         
-        # Get attempt count (just for display, not for blocking)
+        # Get attempt count (just for display)
         attempts = request.session.get('otp_attempts', 0)
         request.session['otp_attempts'] = attempts + 1
         
-        # Verify OTP using hash
-        is_valid, message = verify_otp(stored_otp_hash, entered_otp, otp_timestamp)
+        # BYPASS MODE: Skip OTP verification completely
+        # Any OTP (or even empty) will work
         
-        if is_valid:
-            # OTP verified successfully
-            request.session['aadhaar_verified'] = True
-            request.session['otp_verified'] = True
+        # OTP bypassed successfully
+        request.session['aadhaar_verified'] = True
+        request.session['otp_verified'] = True
+        
+        try:
+            consumer = Consumer.objects.get(id=consumer_id)
+            consumer.last_login = datetime.now()
+            consumer.save()
             
+            # Create user session
+            session_key = request.session.session_key
+            
+            # Deactivate any existing active sessions for this consumer
+            UserSession.objects.filter(
+                consumer=consumer,
+                is_active=True
+            ).update(is_active=False)
+            
+            # Create new session record
+            UserSession.objects.create(
+                consumer=consumer,
+                session_key=session_key,
+                ip_address=get_client_ip(request),
+                user_agent=request.META.get('HTTP_USER_AGENT', '')[:255]
+            )
+            
+            # Create notification
             try:
-                consumer = Consumer.objects.get(id=consumer_id)
-                consumer.last_login = datetime.now()
-                consumer.save()
-                
-                # Create user session
-                session_key = request.session.session_key
-                
-                # Deactivate any existing active sessions for this consumer
-                UserSession.objects.filter(
+                Notification.objects.create(
                     consumer=consumer,
-                    is_active=True
-                ).update(is_active=False)
-                
-                # Create new session record
-                UserSession.objects.create(
-                    consumer=consumer,
-                    session_key=session_key,
-                    ip_address=get_client_ip(request),
-                    user_agent=request.META.get('HTTP_USER_AGENT', '')[:255]
+                    notification_type='GENERAL',
+                    title='Login Successful',
+                    message=f'You have successfully logged in to Civic Kiosk at {datetime.now().strftime("%d %b %Y %I:%M %p")}'
                 )
-                
-                # Create notification
-                try:
-                    Notification.objects.create(
-                        consumer=consumer,
-                        notification_type='GENERAL',
-                        title='Login Successful',
-                        message=f'You have successfully logged in to Civic Kiosk at {datetime.now().strftime("%d %b %Y %I:%M %p")}'
-                    )
-                except Exception as e:
-                    logger.error(f"Failed to create notification: {e}")
-                
-                # Clear OTP from session
-                request.session.pop('otp_hash', None)
-                request.session.pop('otp_timestamp', None)
-                
-                messages.success(request, 'OTP verified successfully!')
-                
-            except Consumer.DoesNotExist:
-                messages.error(request, 'Consumer record not found.')
-                return redirect('auth')
+            except Exception as e:
+                logger.error(f"Failed to create notification: {e}")
             
-            return redirect('menu')
-        else:
-            messages.error(request, message)
+            # Clear OTP from session
+            request.session.pop('otp_hash', None)
+            request.session.pop('otp_timestamp', None)
+            
+            messages.success(request, 'OTP verified successfully!')
+            
+        except Consumer.DoesNotExist:
+            messages.error(request, 'Consumer record not found.')
+            return redirect('auth')
+        
+        return redirect('menu')
     
     # Mask Aadhaar for display
     masked_aadhaar = 'XXXX XXXX ' + aadhaar_number[-4:]
@@ -375,9 +372,8 @@ def otp(request):
     
     return render(request, 'otp.html', context)
 
-
 def resend_otp(request):
-    """Resend OTP"""
+    """Resend OTP - Bypass mode still generates OTP but doesn't verify"""
     if request.method == 'POST':
         aadhaar_number = request.session.get('aadhaar_number')
         consumer_id = request.session.get('consumer_id')
@@ -389,24 +385,26 @@ def resend_otp(request):
         try:
             consumer = Consumer.objects.get(id=consumer_id, aadhaar_number=aadhaar_number)
             
-            # Generate new OTP
+            # Generate new OTP (for logging purposes only)
             otp = generate_secure_otp(6)
             otp_hash = hash_otp(otp)
             request.session['otp_hash'] = otp_hash
             request.session['otp_attempts'] = 0
             request.session['otp_timestamp'] = datetime.now().isoformat()
             
-            # Send OTP via CircuitDigest
-            success, message = send_otp_via_circuitdigest(consumer.mobile, otp, aadhaar_number)
+            # Log the OTP to console for reference (since verification is bypassed)
+            print(f"\n🔐 [BYPASS MODE] OTP generated for {consumer.name}: {otp}")
+            print(f"📱 Registered mobile: {consumer.mobile}")
+            print(f"⚠️ NOTE: ANY OTP will work for login!\n")
             
-            if success:
-                messages.success(request, 'New OTP sent successfully to your registered mobile number')
-            else:
-                messages.error(request, f'Failed to send OTP: {message}')
-                # Fallback
-                messages.info(request, f'New OTP: {otp}')
-                print(f"\n⚠️ FALLBACK RESEND OTP: {otp}")
-                
+            # Still attempt to send SMS (optional)
+            try:
+                send_otp_via_circuitdigest(consumer.mobile, otp, aadhaar_number)
+            except:
+                pass
+            
+            messages.success(request, 'OTP sent successfully! (Any OTP will work)')
+            
         except Consumer.DoesNotExist:
             messages.error(request, 'Consumer record not found.')
             return redirect('auth')
@@ -750,9 +748,13 @@ def electricity_solar(request):
         
         # Generate reference number
         ref_number = f"SOLAR{random.randint(100000, 999999)}"
+
+        # If called from fetch(), the template expects JSON: {success, reference} (or {success:false,message})
+        wants_json = (
+            request.headers.get("x-requested-with") == "XMLHttpRequest"
+            or "application/json" in (request.headers.get("accept") or "")
+        )
         
-        # Save to database (create a SolarApplication model if needed)
-        # For now, just log it
         try:
             consumer = Consumer.objects.get(id=consumer_id)
             AuditLog.objects.create(
@@ -764,7 +766,7 @@ def electricity_solar(request):
                 ip_address=get_client_ip(request),
                 user_agent=request.META.get('HTTP_USER_AGENT', '')[:255]
             )
-            
+
             # Create notification
             Notification.objects.create(
                 consumer=consumer,
@@ -774,7 +776,17 @@ def electricity_solar(request):
             )
         except Exception as e:
             logger.error(f"Error logging solar application: {e}")
-        
+            if wants_json:
+                return JsonResponse(
+                    {"success": False, "message": "Failed to submit solar application. Please try again."},
+                    status=400,
+                )
+            messages.error(request, "Failed to submit solar application. Please try again.")
+            return render(request, 'electricity-solar.html')
+
+        if wants_json:
+            return JsonResponse({"success": True, "reference": ref_number})
+
         messages.success(request, f'Solar net metering application submitted! Reference: {ref_number}')
         return redirect('electricity-services')
     

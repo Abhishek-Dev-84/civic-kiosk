@@ -58,6 +58,7 @@ MIDDLEWARE = [
     # Add our custom middleware here (order matters)
     "display.middleware.KioskSessionMiddleware",
     "display.middleware.KioskSecurityMiddleware",
+    "display.middleware.KioskLoaderMiddleware",
     "display.middleware.AuditLogMiddleware",
 ]
 

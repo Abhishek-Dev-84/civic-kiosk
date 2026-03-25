@@ -154,3 +154,176 @@ class KioskSecurityMiddleware:
             response['Expires'] = '0'
 
         return response
+
+
+class KioskLoaderMiddleware:
+    """
+    Inject a small, UI-neutral loader script into HTML responses.
+
+    This avoids editing dozens of templates while still enabling:
+    - loader overlay on click/submit/navigation
+    - basic double-click prevention
+    - lightweight skeleton placeholder insertion (no layout changes)
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        response = self.get_response(request)
+        try:
+            content_type = (response.get("Content-Type") or "").lower()
+            if "text/html" not in content_type:
+                return response
+            if not hasattr(response, "content"):
+                return response
+
+            body = response.content or b""
+            marker = b"</body>"
+            if marker not in body:
+                return response
+
+            # Avoid injecting twice (e.g. internal redirects).
+            if b"id=\"kiosk-global-loader\"" in body:
+                return response
+
+            injection = b"""
+<script>
+(function(){
+  try {
+    const LOADER_ID = 'kiosk-global-loader';
+    const SKELETON_CLASS = 'kiosk-skeleton-row';
+
+    function ensureStyles(){
+      if (document.getElementById('kiosk-global-loader-styles')) return;
+      const style = document.createElement('style');
+      style.id = 'kiosk-global-loader-styles';
+      style.textContent = `
+        #${LOADER_ID}{
+          position:fixed; inset:0; z-index:999999;
+          display:none; align-items:center; justify-content:center;
+          background: rgba(255,255,255,0.70);
+          backdrop-filter: blur(2px);
+          cursor: progress;
+        }
+        #${LOADER_ID} .kiosk-spinner{
+          width:54px; height:54px; border-radius:50%;
+          border:6px solid #1e5fbf; border-top-color: #ff9933;
+          animation: kiosk-spin 0.9s linear infinite;
+          box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+        }
+        @keyframes kiosk-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        #${LOADER_ID} .kiosk-loader-text{
+          margin-top:12px; font: 700 18px/1.2 'Segoe UI', system-ui, sans-serif; color:#1e5fbf;
+          text-align:center; padding: 0 12px;
+        }
+        .${SKELETON_CLASS}{
+          height: 14px; border-radius: 10px; background: #e9f2ff; margin: 8px 0;
+          position: relative; overflow: hidden;
+        }
+        .${SKELETON_CLASS}::after{
+          content:'';
+          position:absolute; top:0; left:-40%;
+          width:40%; height:100%;
+          background: linear-gradient(90deg, transparent, rgba(30,95,191,0.18), transparent);
+          animation: kiosk-skeleton-shimmer 1.0s ease-in-out infinite;
+        }
+        @keyframes kiosk-skeleton-shimmer {
+          from { transform: translateX(0); }
+          to { transform: translateX(250%); }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    function ensureOverlay(){
+      ensureStyles();
+      let el = document.getElementById(LOADER_ID);
+      if (!el){
+        el = document.createElement('div');
+        el.id = LOADER_ID;
+        el.innerHTML = '<div>' +
+          '<div class=\"kiosk-spinner\"></div>' +
+          '<div class=\"kiosk-loader-text\">Loading...</div>' +
+          '<div class=\"kiosk-skeleton-box\" style=\"width:80%; max-width:420px;\"></div>' +
+        '</div>';
+        document.body.appendChild(el);
+      }
+      return el;
+    }
+
+    let disabledButtons = [];
+
+    function showLoader(){
+      const overlay = ensureOverlay();
+      overlay.style.display = 'flex';
+      // Disable multiple clicks / pointer events.
+      document.documentElement.style.pointerEvents = 'none';
+      overlay.style.pointerEvents = 'auto';
+
+      // Skeleton rows rendered INSIDE the loader (no DOM replacement => no event handler loss).
+      const skBox = overlay.querySelector('.kiosk-skeleton-box');
+      if (skBox){
+        skBox.innerHTML = '';
+        for (let i=0;i<6;i++){
+          const row = document.createElement('div');
+          row.className = '${SKELETON_CLASS}';
+          row.style.width = (70 + Math.floor(Math.random()*25)) + '%';
+          skBox.appendChild(row);
+        }
+      }
+    }
+
+    function hideLoader(){
+      const overlay = document.getElementById(LOADER_ID);
+      if (overlay) overlay.style.display = 'none';
+      document.documentElement.style.pointerEvents = '';
+
+      // Restore disabled buttons for pages that don't fully navigate.
+      for (const btn of disabledButtons){
+        try {
+          if (btn && typeof btn.disabled !== 'undefined') btn.disabled = false;
+        } catch (_) {}
+      }
+      disabledButtons = [];
+    }
+
+    window.KioskLoader = { show: showLoader, hide: hideLoader };
+
+    // Click-based navigation (covers most kiosk cards/buttons).
+    document.addEventListener('click', function(e){
+      const a = e.target && e.target.closest ? e.target.closest('a') : null;
+      const btn = e.target && e.target.closest ? e.target.closest('button,[role=\"button\"],.dept-card,.menu-card,.back-btn') : null;
+      if (!a && !btn) return;
+      if (e.defaultPrevented) return;
+      if (btn && (btn.disabled || btn.getAttribute('aria-disabled') === 'true')) return;
+      if (btn && btn.type === 'button') {
+        // Many buttons use onclick/window.location; show loader anyway.
+      }
+      showLoader();
+      // Prevent double-click: best-effort disable/lock for short time.
+      if (btn && typeof btn.disabled !== 'undefined' && !btn.disabled){
+        disabledButtons.push(btn);
+        btn.disabled = true;
+      }
+    }, true);
+
+    // Form submissions
+    document.addEventListener('submit', function(e){
+      try { showLoader(); } catch(_) {}
+    }, true);
+
+  } catch(err){
+    // Never break page if loader injection fails.
+    console.warn('KioskLoader init failed', err);
+  }
+})();
+</script>
+            """
+
+            response.content = body.replace(marker, injection + marker)
+        except Exception:
+            # Emergency rule: never fail template rendering because of loader injection.
+            return response
+
+        return response

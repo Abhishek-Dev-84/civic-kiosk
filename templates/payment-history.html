@@ -1,230 +1,96 @@
-{% extends 'base.html' %}
-{% load i18n static %}
-
-{% block title %}{% trans "Payment History - Civic Kiosk" %}{% endblock %}
-
-{% block extra_head %}
-<style>
-        /* HEADER */
+<!DOCTYPE html>
+{% load i18n %}
+{% load static %}
+<html>
+<head>
+    <title>{% trans "Payment History - Civic Kiosk" %}</title>
+    
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif; user-select:none; }
+        body { width:100vw; height:100vh; overflow:hidden; background:#f0f7ff; }
+        .header { height:70px; background:white; display:flex; align-items:center; justify-content:space-between; padding:0 20px; border-bottom:2px solid #1e5fbf; }
+        .header-left { display:flex; align-items:center; gap:10px; }
         .header-left img { height:40px; }
         .header-left div { font-size:11px; font-weight:600; color:#1e5fbf; line-height:1.2; }
         .header-right img { height:35px; }
-        /* VOICE BUTTON */
-        .voice-corner-btn:hover { background:#ffaa44; }
-        .voice-corner-btn.listening {
-            background:#28a745;
-            animation:pulse 1s infinite;
-            transform:scale(1.1);
-        }
-            50% { transform:scale(1.1); }
-            100% { transform:scale(1); }
-        }
-        /* BACK BUTTON */
-        .back-btn:hover { background:#1e5fbf; color:white; }
-        .back-btn:active { transform:translateY(4px); box-shadow:0 1px 0 #0a3d7a; }
-        /* TIMEOUT WARNING */
-        .timeout-warning p {
-            font-size:28px;
-            color:#1e5fbf;
-            margin-bottom:20px;
-            font-weight:700;
-        }
-        .timeout-warning button {
-            background:#28a745;
-            color:white;
-            border:none;
-            border-radius:40px;
-            padding:15px 30px;
-            font-size:28px;
-            font-weight:700;
-            cursor:pointer;
-            margin:10px;
-            min-width:200px;
-            box-shadow:0 5px 0 #1e7e34;
-        }
-        .timeout-warning button:active { transform:translateY(5px); box-shadow:0 1px 0 #1e7e34; }
-        .timeout-warning .logout-btn { background:#dc3545; box-shadow:0 5px 0 #a71d2a; }
-        /* SUCCESS MESSAGE */
-        .success-message::before { content:"✅"; font-size:18px; }
-            to { transform:translateX(0); opacity:1; }
-        }
-            to { transform:translateX(-100%); opacity:0; }
-        }
-        /* MAIN CONTAINER */
-        .container {
-            position:fixed;
-            top:70px;
-            left:0;
-            right:0;
-            bottom:0;
-            display:flex;
-            flex-direction:column;
-            align-items:center;
-            justify-content:flex-start;
-            padding:20px 10px 10px 10px;
-            overflow-y:auto;
-            z-index:1;
-        }
-        h1 {
-            color:#1e5fbf;
-            font-size:32px;
-            font-weight:800;
-            text-align:center;
-            margin:0 0 10px 0;
-        }
-        /* Message styles */
-        .messages {
-            position:fixed;
-            top:75px;
-            left:50%;
-            transform:translateX(-50%);
-            z-index:1002;
-            width:90%;
-            max-width:600px;
-        }
-        .message {
-            padding:8px 12px;
-            border-radius:5px;
-            margin-bottom:5px;
-            text-align:center;
-            font-size:14px;
-        }
-        .message.success { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
-        .message.error { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
-        .message.info { background:#d1ecf1; color:#0c5460; border:1px solid #bee5eb; }
-        /* Filter bar */
-        .filter-bar {
-            display:flex;
-            gap:10px;
-            margin:10px 0;
-        }
-        .filter-select {
-            flex:1;
-            height:50px;
-            border:2px solid #1e5fbf;
-            border-radius:25px;
-            font-size:18px;
-            padding:0 12px;
-            background:white;
-            cursor:pointer;
-        }
-        /* History list */
-        .history-list {
-            display:flex;
-            flex-direction:column;
-            gap:10px;
-            max-height: calc(100vh - 250px);
-            overflow-y:auto;
-            padding-right:5px;
-        }
-        .payment-card {
-            background:white;
-            border:2px solid #1e5fbf;
-            border-radius:20px;
-            padding:15px;
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-            cursor:pointer;
-            transition:all 0.1s;
-        }
-        .payment-card:hover { background:#e3f2fd; }
-        .payment-card:active { transform:translateY(2px); }
-        .payment-left { display:flex; flex-direction:column; gap:3px; flex:1; }
+        .voice-corner { position:fixed; top:80px; right:15px; z-index:1000; display:flex; flex-direction:column; align-items:center; gap:3px; }
+        .voice-corner-btn { background:#ff9933; width:40px; height:40px; border-radius:50%; border:2px solid white; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:20px; box-shadow:0 2px 5px rgba(0,0,0,0.2); }
+        .voice-corner-text { background:white; padding:2px 6px; border-radius:12px; font-size:9px; color:#ff9933; border:1px solid #ff9933; }
+        .back-btn { position:fixed; top:80px; left:15px; background:white; border:2px solid #1e5fbf; border-radius:30px; padding:4px 12px; font-size:16px; font-weight:700; cursor:pointer; color:#1e5fbf; box-shadow:0 3px 0 #0a3d7a; z-index:1000; }
+        .back-btn:active { transform:translateY(3px); box-shadow:0 1px 0 #0a3d7a; }
+        .container { position:fixed; top:70px; left:0; right:0; bottom:0; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:10px; }
+        .content-wrapper { width:100%; max-width:600px; padding:10px 0; }
+        h1 { color:#1e5fbf; font-size:32px; font-weight:800; text-align:center; margin-bottom:15px; }
+        .filter-bar { display:flex; gap:10px; margin:15px 0; }
+        .filter-select { flex:1; height:50px; border:2px solid #1e5fbf; border-radius:25px; font-size:18px; padding:0 12px; background:white; }
+        .history-list { display:flex; flex-direction:column; gap:10px; }
+        .payment-card { background:white; border:2px solid #1e5fbf; border-radius:20px; padding:15px; display:flex; justify-content:space-between; align-items:center; cursor:pointer; }
+        .payment-card:active { background:#e3f2fd; }
+        .payment-left { display:flex; flex-direction:column; gap:3px; }
         .service-name { font-size:18px; font-weight:700; color:#1e5fbf; }
         .payment-date { font-size:14px; color:#666; }
         .payment-ref { font-size:12px; color:#999; }
-        .payment-right { text-align:right; min-width:100px; }
-        .amount { font-size:20px; font-weight:700; color:#28a745; display:block; }
-        .status {
-            font-size:12px;
-            padding:3px 10px;
-            border-radius:15px;
-            display:inline-block;
-            margin-top:5px;
-        }
+        .payment-right { text-align:right; }
+        .amount { font-size:20px; font-weight:700; color:#28a745; }
+        .status { font-size:12px; padding:3px 10px; border-radius:15px; display:inline-block; margin-top:3px; }
         .status.success { background:#d4edda; color:#155724; }
         .status.pending { background:#fff3cd; color:#856404; }
-        .no-payments {
-            text-align:center;
-            padding:40px;
-            color:#666;
-            font-size:18px;
-            background:white;
-            border-radius:20px;
-            border:2px solid #1e5fbf;
-        }
-        /* Scrollbar styling */
-        .history-list::-webkit-scrollbar { width:8px; }
-        .history-list::-webkit-scrollbar-track { background:#f1f1f1; border-radius:10px; }
-        .history-list::-webkit-scrollbar-thumb { background:#1e5fbf; border-radius:10px; }
-        .history-list::-webkit-scrollbar-thumb:hover { background:#0a3d7a; }
-        /* LOADING INDICATOR */
-        .loading {
-            display:none;
-            position:fixed;
-            top:0;
-            left:0;
-            right:0;
-            bottom:0;
-            background:rgba(0,0,0,0.5);
-            z-index:2000;
-            justify-content:center;
-            align-items:center;
-            color:white;
-            font-size:24px;
-        }
-        .loading.show { display:flex; }
-        .spinner {
-            border:4px solid rgba(255,255,255,0.3);
-            border-radius:50%;
-            border-top:4px solid white;
-            width:50px;
-            height:50px;
-            animation:spin 1s linear infinite;
-            margin-right:10px;
-        }
-        @keyframes spin { 0%{transform:rotate(0deg);} 100%{transform:rotate(360deg);} }
-        /* MOBILE RESPONSIVE */
-        @media (max-width: 480px) {
-            h1 { font-size:28px; }
-            .service-name { font-size:16px; }
-            .payment-date { font-size:12px; }
-            .amount { font-size:18px; }
-            .filter-select { height:45px; font-size:16px; }
-            .payment-card { padding:12px; }
-        }
-
-
-</style>
-{% endblock %}
-
-{% block content %}
-     Loading Indicator 
-<div class="loading" id="loadingIndicator">
-<div class="spinner"></div>
-<div>{% trans "Loading..." %}</div>
-</div>
-<div class="container">
-<div class="content-wrapper">
-<h1>💰 {% trans "Payment History" %}</h1>
-<form action="{% url 'payment-history' %}" id="filterForm" method="GET">
-<div class="filter-bar">
-<select class="filter-select" id="filter" name="filter" onchange="this.form.submit()">
-<option value="all" {% if filter == 'all' %}selected{% endif %}>{% trans "All Services" %}</option>
-<option value="gas" {% if filter == 'gas' %}selected{% endif %}>{% trans "Gas" %}</option>
-<option value="electricity" {% if filter == 'electricity' %}selected{% endif %}>{% trans "Electricity" %}</option>
-<option value="water" {% if filter == 'water' %}selected{% endif %}>{% trans "Water" %}</option>
-<option value="municipal" {% if filter == 'municipal' %}selected{% endif %}>{% trans "Municipal" %}</option>
-</select>
-</div>
-</form>
-<div class="history-list" id="paymentList">
+        .messages { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); z-index: 2000; width: 90%; max-width: 600px; }
+        .message { padding: 10px; border-radius: 5px; margin-bottom: 5px; }
+        .message.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .message.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .message.info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .no-payments { text-align: center; padding: 40px; color: #666; font-size: 18px; background: white; border-radius: 20px; border: 2px solid #1e5fbf; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India">
+            <div>{% trans "Ministry of Electronics &" %}<br>{% trans "Information Technology" %}<br>{% trans "Government of India" %}</div>
+        </div>
+        <div class="header-right">
+            <img src="https://www.cdac.in/img/cdac-logo.png" alt="CDAC Logo">
+        </div>
+    </div>
+    
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <div class="voice-corner">
+        <div class="voice-corner-btn" onclick="alert('{% trans "Voice assistant activated" %}')">🎤</div>
+        <div class="voice-corner-text">{% trans "Click" %}</div>
+    </div>
+    <div class="back-btn" onclick="window.location='{% url 'menu' %}'">← {% trans "Back" %}</div>
+    <div class="container">
+        <div class="content-wrapper">
+            <h1>💰 {% trans "Payment History" %}</h1>
+            
+            <form method="GET" action="{% url 'payment-history' %}">
+                <div class="filter-bar">
+                    <select class="filter-select" name="filter" id="filter" onchange="this.form.submit()">
+                        <option value="all" {% if filter == 'all' %}selected{% endif %}>{% trans "All Services" %}</option>
+                        <option value="gas" {% if filter == 'gas' %}selected{% endif %}>{% trans "Gas" %}</option>
+                        <option value="electricity" {% if filter == 'electricity' %}selected{% endif %}>{% trans "Electricity" %}</option>
+                        <option value="water" {% if filter == 'water' %}selected{% endif %}>{% trans "Water" %}</option>
+                        <option value="municipal" {% if filter == 'municipal' %}selected{% endif %}>{% trans "Municipal" %}</option>
+                    </select>
+                </div>
+            </form>
+            
+            <div class="history-list" id="paymentList">
                 {% if payments %}
                     {% for payment in payments %}
-                    <div class="payment-card" data-ref="{{ payment.reference_no }}" data-service="{{ payment.service }}" onclick="viewReceipt('{{ payment.reference_no }}')">
-<div class="payment-left">
-<span class="service-name">
+                    <div class="payment-card" onclick="viewReceipt('{{ payment.reference_no }}')">
+                        <div class="payment-left">
+                            <span class="service-name">
                                 {% if payment.service == 'electricity' %}⚡ {% trans "Electricity Bill" %}
                                 {% elif payment.service == 'gas' %}🔥 {% trans "Gas Bill" %}
                                 {% elif payment.service == 'water' %}💧 {% trans "Water Bill" %}
@@ -236,60 +102,25 @@
                                 {% elif payment.service == 'marriage_registration' %}💑 {% trans "Marriage Registration" %}
                                 {% else %}{{ payment.service_name|default:payment.service }}{% endif %}
                             </span>
-<span class="payment-date">{{ payment.date|date:'d M Y, h:i A' }}</span>
-<span class="payment-ref">{% trans "Ref:" %} {{ payment.reference_no }}</span>
-</div>
-<div class="payment-right">
-<span class="amount">₹{{ payment.amount|floatformat:2 }}</span>
-<span class="status {% if payment.status == 'success' %}success{% else %}pending{% endif %}">{{ payment.status|title }}</span>
-</div>
-</div>
+                            <span class="payment-date">{{ payment.date|date:'d M Y, h:i A' }}</span>
+                            <span class="payment-ref">{% trans "Ref:" %} {{ payment.reference_no }}</span>
+                        </div>
+                        <div class="payment-right">
+                            <span class="amount">₹{{ payment.amount|floatformat:2 }}</span>
+                            <span class="status {% if payment.status == 'success' %}success{% else %}pending{% endif %}">{{ payment.status|title }}</span>
+                        </div>
+                    </div>
                     {% endfor %}
                 {% else %}
-                    <div class="no-payments" id="noPayments">
+                    <div class="no-payments">
                         {% trans "No payment history found" %}
                     </div>
                 {% endif %}
             </div>
-</div>
-</div>
-<script src="{% static 'js/voice.js' %}"></script>
-{% endblock %}
-
-{% block extra_scripts %}
-<script>
-        /* ================= LANGUAGE MAP ================= */
-        const languageMap = {
-            "en": "en-IN",
-            "hi": "hi-IN",
-            "ta": "ta-IN",
-            "te": "te-IN",
-            "bn": "bn-IN",
-            "or": "or-IN"
-        };
-        function getCurrentLang() {
-            let path = window.location.pathname.split('/');
-            const langCode = path[1] || "en";
-            return languageMap[langCode] || "en-IN";
-        }
-        function getCurrentLangCode() {
-            let path = window.location.pathname.split('/');
-            return path[1] || "en";
-        }
-        function speak(text) {
-            if(!('speechSynthesis' in window)) return;
-            speechSynthesis.cancel();
-            let u = new SpeechSynthesisUtterance(text);
-            u.lang = getCurrentLang();
-            u.rate = 1;
-            speechSynthesis.speak(u);
-        }
-        /* ================= SESSION TIMER ================= */
-        function resetSessionTimer() {
-            clearTimeout(sessionTimer);
-            clearTimeout(timeoutWarningTimer);
-            startSessionTimer();
-        }
+        </div>
+    </div>
+    
+    <script>
         // Auto-hide messages after 5 seconds
         setTimeout(function() {
             const messages = document.querySelectorAll('.message');
@@ -297,411 +128,48 @@
                 message.style.display = 'none';
             });
         }, 5000);
-        // Auto-hide success messages after 3 seconds
-        setTimeout(function() {
-            const successMsg = document.querySelector('.success-message');
-            if (successMsg) {
-                successMsg.style.animation = 'slideOutLeft 0.3s ease';
-                setTimeout(function() {
-                    if (successMsg) successMsg.remove();
-                }, 300);
-            }
-        }, 3000);
+        
+        // Keep original function for compatibility but enhance it
+        function filterPayments() {
+            // This is now handled by form submission
+            const filter = document.getElementById('filter').value;
+            console.log('Filtering by: ' + filter);
+            return true;
+        }
+        
         function viewReceipt(ref) {
-            resetSessionTimer();
-            const langCode = getCurrentLangCode();
-            if (langCode === 'hi') {
-                speak("रसीद " + ref + " देखी जा रही है");
-            } else if (langCode === 'or') {
-                speak("ରସିଦ " + ref + " ଦେଖାଯାଉଛି");
-            } else {
-                if (typeof speak === 'function') speak("{% trans 'Viewing receipt' %} " + ref);
-            }
-            // Store receipt reference in session storage
+            // Store receipt reference in session storage for compatibility
             sessionStorage.setItem('receiptRef', ref);
+            
             // Create a form to POST the receipt reference
             const form = document.createElement('form');
             form.method = 'POST';
             form.action = '{% url 'receipt-print' %}';
+            
             const csrfInput = document.createElement('input');
             csrfInput.type = 'hidden';
             csrfInput.name = 'csrfmiddlewaretoken';
             csrfInput.value = '{{ csrf_token }}';
             form.appendChild(csrfInput);
+            
             const refInput = document.createElement('input');
             refInput.type = 'hidden';
             refInput.name = 'receipt_ref';
             refInput.value = ref;
             form.appendChild(refInput);
+            
             document.body.appendChild(form);
             form.submit();
         }
-        /* ================= VOICE INPUT ================= */
-        let recognition;
-        let isListening = false;
-        function toggleVoiceInput() {
-            resetSessionTimer();
-            if(isListening) {
-                stopVoiceInput();
-                return;
+        
+        // Optional: Add infinite scroll or pagination
+        let page = 1;
+        window.addEventListener('scroll', function() {
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100) {
+                // Load more payments
+                console.log('Load more payments for page: ' + (page + 1));
             }
-            const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if(!SR) {
-                alert("{% trans 'Speech not supported' %}");
-                return;
-            }
-            if (recognition) {
-                try {
-                    recognition.stop();
-                } catch(e) {}
-            }
-            recognition = new SR();
-            recognition.lang = getCurrentLang();
-            recognition.continuous = true;
-            recognition.interimResults = true;
-            recognition.maxAlternatives = 1;
-            recognition.onstart = function() {
-                isListening = true;
-                document.getElementById("voiceBtn").classList.add("listening");
-                document.getElementById("voiceStatus").innerText = "{% trans 'Listening...' %}";
-                const langCode = getCurrentLangCode();
-                if (langCode === 'hi') {
-                    speak("कृपया आदेश बोलें... सभी दिखाएं, गैस, बिजली, पानी, नगर, पहला, आखिरी, या गिनती");
-                } else if (langCode === 'or') {
-                    speak("ଦୟାକରି ନିର୍ଦ୍ଦେଶ କୁହନ୍ତୁ... ସବୁ ଦେଖାନ୍ତୁ, ଗ୍ୟାସ୍, ବିଜୁଳି, ପାଣି, ନଗର, ପ୍ରଥମ, ଶେଷ, କିମ୍ବା ଗଣନା");
-                } else {
-                    speak("{% trans 'Please say a command... show all, gas, electricity, water, municipal, first, last, or count' %}");
-                }
-            };
-            recognition.onresult = function(e) {
-                resetSessionTimer();
-                let finalTranscript = '';
-                let interimTranscript = '';
-                for (let i = 0; i < e.results.length; i++) {
-                    const result = e.results[i];
-                    if (result.isFinal) {
-                        finalTranscript += result[0].transcript;
-                    } else {
-                        interimTranscript += result[0].transcript;
-                    }
-                }
-                const transcript = finalTranscript || interimTranscript;
-                const command = transcript.toLowerCase();
-                console.log("Payment history command:", command);
-                // Filter commands
-                if (command.includes("show all") || command.includes("all services") || command.includes("सभी दिखाएं") || command.includes("ସବୁ ଦେଖାନ୍ତୁ")) {
-                    document.getElementById('filter').value = 'all';
-                    document.getElementById('filterForm').submit();
-                    const langCode = getCurrentLangCode();
-                    if (langCode === 'hi') {
-                        speak("सभी सेवाएं दिखा रहे हैं");
-                    } else if (langCode === 'or') {
-                        speak("ସବୁ ସେବା ଦେଖାଉଛି");
-                    } else {
-                        if (typeof speak === 'function') speak("{% trans 'Showing all services' %}");
-                    }
-                    return;
-                }
-                else if (command.includes("gas") || command.includes("गैस") || command.includes("ଗ୍ୟାସ୍")) {
-                    document.getElementById('filter').value = 'gas';
-                    document.getElementById('filterForm').submit();
-                    const langCode = getCurrentLangCode();
-                    if (langCode === 'hi') {
-                        speak("गैस भुगतान दिखा रहे हैं");
-                    } else if (langCode === 'or') {
-                        speak("ଗ୍ୟାସ୍ ଦେୟ ଦେଖାଉଛି");
-                    } else {
-                        if (typeof speak === 'function') speak("{% trans 'Showing gas payments only' %}");
-                    }
-                    return;
-                }
-                else if (command.includes("electricity") || command.includes("बिजली") || command.includes("ବିଜୁଳି")) {
-                    document.getElementById('filter').value = 'electricity';
-                    document.getElementById('filterForm').submit();
-                    const langCode = getCurrentLangCode();
-                    if (langCode === 'hi') {
-                        speak("बिजली भुगतान दिखा रहे हैं");
-                    } else if (langCode === 'or') {
-                        speak("ବିଜୁଳି ଦେୟ ଦେଖାଉଛି");
-                    } else {
-                        if (typeof speak === 'function') speak("{% trans 'Showing electricity payments only' %}");
-                    }
-                    return;
-                }
-                else if (command.includes("water") || command.includes("पानी") || command.includes("ପାଣି")) {
-                    document.getElementById('filter').value = 'water';
-                    document.getElementById('filterForm').submit();
-                    const langCode = getCurrentLangCode();
-                    if (langCode === 'hi') {
-                        speak("पानी भुगतान दिखा रहे हैं");
-                    } else if (langCode === 'or') {
-                        speak("ପାଣି ଦେୟ ଦେଖାଉଛି");
-                    } else {
-                        if (typeof speak === 'function') speak("{% trans 'Showing water payments only' %}");
-                    }
-                    return;
-                }
-                else if (command.includes("municipal") || command.includes("नगर") || command.includes("ନଗର")) {
-                    document.getElementById('filter').value = 'municipal';
-                    document.getElementById('filterForm').submit();
-                    const langCode = getCurrentLangCode();
-                    if (langCode === 'hi') {
-                        speak("नगर भुगतान दिखा रहे हैं");
-                    } else if (langCode === 'or') {
-                        speak("ନଗର ଦେୟ ଦେଖାଉଛି");
-                    } else {
-                        if (typeof speak === 'function') speak("{% trans 'Showing municipal payments only' %}");
-                    }
-                    return;
-                }
-                // Receipt navigation by reference number
-                const refMatch = command.match(/ref[-\s]?(\w+)/i) || command.match(/reference[-\s]?(\w+)/i) ||
-                                 command.match(/रसीद[-\s]?(\w+)/i) || command.match(/ରସିଦ[-\s]?(\w+)/i);
-                if (refMatch) {
-                    const ref = refMatch[1].toUpperCase();
-                    const cards = document.querySelectorAll('.payment-card');
-                    let found = false;
-                    for (let card of cards) {
-                        if (card.dataset.ref && card.dataset.ref.toUpperCase().includes(ref)) {
-                            card.click();
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found) {
-                        const langCode = getCurrentLangCode();
-                        if (langCode === 'hi') {
-                            speak("रसीद नहीं मिली");
-                        } else if (langCode === 'or') {
-                            speak("ରସିଦ ମିଳିଲା ନାହିଁ");
-                        } else {
-                            if (typeof speak === 'function') speak("{% trans 'Receipt not found' %}");
-                        }
-                    }
-                    return;
-                }
-                // Navigate to specific receipt by position
-                if (command.includes("first") || command.includes("पहला") || command.includes("ପ୍ରଥମ")) {
-                    const firstCard = document.querySelector('.payment-card');
-                    if (firstCard) {
-                        firstCard.click();
-                    }
-                    return;
-                }
-                else if (command.includes("last") || command.includes("आखिरी") || command.includes("ଶେଷ")) {
-                    const cards = document.querySelectorAll('.payment-card');
-                    if (cards.length > 0) {
-                        cards[cards.length - 1].click();
-                    }
-                    return;
-                }
-                // Count payments
-                if (command.includes("how many") || command.includes("count") || command.includes("कितने") || command.includes("ଗଣନା")) {
-                    const count = document.querySelectorAll('.payment-card').length;
-                    const langCode = getCurrentLangCode();
-                    if (count > 0) {
-                        if (langCode === 'hi') {
-                            speak(count + " भुगतान मिले");
-                        } else if (langCode === 'or') {
-                            speak(count + " ଦେୟ ମିଳିଲା");
-                        } else {
-                            if (typeof speak === 'function') speak(count + " {% trans 'payments found' %}");
-                        }
-                    } else {
-                        if (langCode === 'hi') {
-                            speak("कोई भुगतान नहीं मिला");
-                        } else if (langCode === 'or') {
-                            speak("କୌଣସି ଦେୟ ମିଳିଲା ନାହିଁ");
-                        } else {
-                            if (typeof speak === 'function') speak("{% trans 'No payments found' %}");
-                        }
-                    }
-                    return;
-                }
-                // Back and home commands
-                if (command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
-                    window.location.href = "/" + getCurrentLangCode() + "/menu/";
-                    return;
-                }
-                else if (command.includes("home") || command.includes("होम") || command.includes("ଘର")) {
-                    window.location.href = "/" + getCurrentLangCode() + "/";
-                    return;
-                }
-                else if (command.includes("stop listening") || command.includes("stop voice")) {
-                    stopVoiceInput();
-                    return;
-                }
-            };
-            recognition.onerror = function(event) {
-                console.error("Recognition error:", event.error);
-                if (event.error === 'no-speech') return;
-                stopVoiceInput();
-            };
-            recognition.onend = function() {
-                if (isListening) {
-                    try {
-                        recognition.start();
-                    } catch(e) {
-                        console.error("Failed to restart recognition:", e);
-                        stopVoiceInput();
-                    }
-                } else {
-                    document.getElementById("voiceBtn").classList.remove("listening");
-                    document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
-                }
-            };
-            try {
-                recognition.start();
-            } catch(e) {
-                console.error("Failed to start recognition:", e);
-                stopVoiceInput();
-            }
-        }
-        function stopVoiceInput() {
-            isListening = false;
-            if (recognition) {
-                try {
-                    recognition.stop();
-                } catch(e) {}
-            }
-            document.getElementById("voiceBtn").classList.remove("listening");
-            document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
-        }
-        /* ================= OVERRIDE VOICE COMMANDS ================= */
-        const originalHandleCommand = window.handleCommand;
-        window.handleCommand = function(command) {
-            command = command.toLowerCase();
-            console.log("Payment history command:", command);
-            // Filter commands
-            if (command.includes("show all") || command.includes("all services") || command.includes("सभी दिखाएं") || command.includes("ସବୁ ଦେଖାନ୍ତୁ")) {
-                document.getElementById('filter').value = 'all';
-                document.getElementById('filterForm').submit();
-                if (typeof speak === 'function') speak("{% trans 'Showing all services' %}");
-                return;
-            }
-            else if (command.includes("gas") || command.includes("गैस") || command.includes("ଗ୍ୟାସ୍")) {
-                document.getElementById('filter').value = 'gas';
-                document.getElementById('filterForm').submit();
-                if (typeof speak === 'function') speak("{% trans 'Showing gas payments only' %}");
-                return;
-            }
-            else if (command.includes("electricity") || command.includes("बिजली") || command.includes("ବିଜୁଳି")) {
-                document.getElementById('filter').value = 'electricity';
-                document.getElementById('filterForm').submit();
-                if (typeof speak === 'function') speak("{% trans 'Showing electricity payments only' %}");
-                return;
-            }
-            else if (command.includes("water") || command.includes("पानी") || command.includes("ପାଣି")) {
-                document.getElementById('filter').value = 'water';
-                document.getElementById('filterForm').submit();
-                if (typeof speak === 'function') speak("{% trans 'Showing water payments only' %}");
-                return;
-            }
-            else if (command.includes("municipal") || command.includes("नगर") || command.includes("ନଗର")) {
-                document.getElementById('filter').value = 'municipal';
-                document.getElementById('filterForm').submit();
-                if (typeof speak === 'function') speak("{% trans 'Showing municipal payments only' %}");
-                return;
-            }
-            // Receipt navigation by reference number
-            const refMatch = command.match(/ref[-\s]?(\w+)/i) || command.match(/reference[-\s]?(\w+)/i);
-            if (refMatch) {
-                const ref = refMatch[1].toUpperCase();
-                const cards = document.querySelectorAll('.payment-card');
-                for (let card of cards) {
-                    if (card.dataset.ref && card.dataset.ref.toUpperCase().includes(ref)) {
-                        card.click();
-                        return;
-                    }
-                }
-                if (typeof speak === 'function') speak("{% trans 'Receipt not found' %}");
-                return;
-            }
-            // Navigate to specific receipt by position
-            if (command.includes("first") || command.includes("top") || command.includes("पहला") || command.includes("ପ୍ରଥମ")) {
-                const firstCard = document.querySelector('.payment-card');
-                if (firstCard) {
-                    firstCard.click();
-                }
-                return;
-            }
-            else if (command.includes("last") || command.includes("आखिरी") || command.includes("ଶେଷ")) {
-                const cards = document.querySelectorAll('.payment-card');
-                if (cards.length > 0) {
-                    cards[cards.length - 1].click();
-                }
-                return;
-            }
-            // Count payments
-            if (command.includes("how many") || command.includes("count") || command.includes("कितने") || command.includes("ଗଣନା")) {
-                const count = document.querySelectorAll('.payment-card').length;
-                if (count > 0) {
-                    if (typeof speak === 'function') speak(count + " {% trans 'payments found' %}");
-                } else {
-                    if (typeof speak === 'function') speak("{% trans 'No payments found' %}");
-                }
-                return;
-            }
-            // Back and home commands
-            if (command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
-                window.location.href = "/" + getCurrentLangCode() + "/menu/";
-                return;
-            }
-            else if (command.includes("home") || command.includes("होम") || command.includes("ଘର")) {
-                window.location.href = "/" + getCurrentLangCode() + "/";
-                return;
-            }
-            else if (command.includes("stop listening") || command.includes("stop voice")) {
-                stopVoiceInput();
-                return;
-            }
-            if (originalHandleCommand) {
-                originalHandleCommand(command);
-            }
-        };
-        // Override autoReadPage to read payment history summary
-        const originalAutoRead = window.autoReadPage;
-        window.autoReadPage = function() {
-            if (originalAutoRead) originalAutoRead();
-            setTimeout(() => {
-                if (typeof speak === 'function') {
-                    const count = document.querySelectorAll('.payment-card').length;
-                    const langCode = getCurrentLangCode();
-                    if (count > 0) {
-                        if (langCode === 'hi') {
-                            speak("भुगतान इतिहास। " + count + " भुगतान मिले। गैस, बिजली, पानी, या नगर से फ़िल्टर करें। पहला या आखिरी रसीद देखें।");
-                        } else if (langCode === 'or') {
-                            speak("ଦେୟ ଇତିହାସ। " + count + " ଦେୟ ମିଳିଲା। ଗ୍ୟାସ୍, ବିଜୁଳି, ପାଣି, କିମ୍ବା ନଗର ରୁ ଫିଲ୍ଟର୍ କରନ୍ତୁ। ପ୍ରଥମ କିମ୍ବା ଶେଷ ରସିଦ ଦେଖନ୍ତୁ।");
-                        } else {
-                            speak("{% trans 'Payment history. ' %}" + count + " {% trans 'payments found. Say filter by gas, electricity, water, or municipal, or say view first or last receipt.' %}");
-                        }
-                    } else {
-                        if (langCode === 'hi') {
-                            speak("कोई भुगतान इतिहास नहीं मिला।");
-                        } else if (langCode === 'or') {
-                            speak("କୌଣସି ଦେୟ ଇତିହାସ ମିଳିଲା ନାହିଁ।");
-                        } else {
-                            speak("{% trans 'No payment history found.' %}");
-                        }
-                    }
-                }
-            }, 2000);
-        };
-        /* ================= INIT ================= */
-        document.addEventListener('DOMContentLoaded', function() {
-            startSessionTimer();
-            document.addEventListener('click', resetSessionTimer);
-            document.addEventListener('keypress', resetSessionTimer);
-            document.addEventListener('touchstart', resetSessionTimer);
-            setTimeout(autoReadPage, 2000);
         });
-        window.addEventListener('beforeunload', function() {
-            if (sessionTimer) {
-                clearTimeout(sessionTimer);
-            }
-            stopVoiceInput();
-        });
-
-
-</script>
-{% endblock %}
+    </script>
+</body>
+</html>

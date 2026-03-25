@@ -1,560 +1,270 @@
-{% extends 'base.html' %}
-{% load i18n static %}
-
-{% block title %}{% trans "QR Upload - Civic Kiosk" %}{% endblock %}
-
-{% block extra_head %}
-<style>
+{% load i18n %}
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% trans "QR Upload - Civic Kiosk" %}</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif; user-select:none; }
+        body { width:100vw; height:100vh; overflow:hidden; background:#f0f7ff; }
+        .header { height:70px; background:white; display:flex; align-items:center; justify-content:space-between; padding:0 20px; border-bottom:2px solid #1e5fbf; }
+        .header-left { display:flex; align-items:center; gap:10px; }
         .header-left img { height:40px; }
         .header-left div { font-size:12px; font-weight:600; color:#1e5fbf; line-height:1.2; }
         .header-right img { height:35px; }
-        /* Voice Button */
-        .voice-corner-btn.listening {
-            background:#28a745;
-            animation:pulse 1s infinite;
-        }
-            50% { transform:scale(1.1); }
-            100% { transform:scale(1); }
-        }
-        .back-btn:active {
-            transform:translateY(4px);
-            box-shadow:0 1px 0 #0a3d7a;
-        }
-        .back-btn:hover {
-            background:#1e5fbf;
-            color:white;
-        }
-        /* Timeout Warning */
-        .timeout-warning p {
-            font-size:28px;
-            color:#1e5fbf;
-            margin-bottom:20px;
-            font-weight:700;
-        }
-        .timeout-warning button {
-            background:#28a745;
-            color:white;
-            border:none;
-            border-radius:40px;
-            padding:15px 30px;
-            font-size:28px;
-            font-weight:700;
-            cursor:pointer;
-            margin:10px;
-            min-width:200px;
-            box-shadow:0 5px 0 #1e7e34;
-        }
-        .timeout-warning button:active {
-            transform:translateY(5px);
-            box-shadow:0 1px 0 #1e7e34;
-        }
-        .timeout-warning .logout-btn {
-            background:#dc3545;
-            box-shadow:0 5px 0 #a71d2a;
-        }
-        /* Success Message */
-        .success-message::before {
-            content:"✅";
-            font-size:20px;
-        }
-            to { transform:translateX(0); opacity:1; }
-        }
-            to { transform:translateX(-100%); opacity:0; }
-        }
-        /* Security Note */
+        .voice-corner { position:fixed; top:80px; right:15px; z-index:1000; display:flex; flex-direction:column; align-items:center; gap:3px; }
+        .voice-corner-btn { background:#ff9933; width:45px; height:45px; border-radius:50%; border:2px solid white; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:24px; box-shadow:0 2px 5px rgba(0,0,0,0.2); }
+        .voice-corner-btn:hover { background:#ffaa44; }
+        .voice-corner-text { background:white; padding:2px 8px; border-radius:12px; font-size:10px; color:#ff9933; border:1px solid #ff9933; }
+        .back-btn { position:fixed; top:80px; left:15px; background:white; border:2px solid #1e5fbf; border-radius:30px; padding:5px 15px; font-size:18px; font-weight:700; cursor:pointer; color:#1e5fbf; text-decoration:none; box-shadow:0 3px 0 #0a3d7a; z-index:1000; display:inline-block; }
+        .back-btn:active { transform:translateY(3px); box-shadow:0 1px 0 #0a3d7a; }
+        .back-btn:hover { background:#1e5fbf; color:white; }
         .container { position:fixed; top:70px; left:0; right:0; bottom:0; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:10px; overflow:hidden; }
-        h1 { color:#1e5fbf; font-size:36px; font-weight:800; margin-bottom:20px; }
+        .content-wrapper { width:100%; max-width:600px; text-align:center; }
+        
+        /* Message styles */
+        .messages { margin-bottom:15px; }
+        .message { padding:10px; border-radius:10px; margin-bottom:5px; text-align:center; }
+        .message.success { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
+        .message.error { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+        .message.info { background:#d1ecf1; color:#0c5460; border:1px solid #bee5eb; }
+        
+        h1 { color:#1e5fbf; font-size:36px; font-weight:800; text-align:center; margin-bottom:20px; }
         .qr-container { background:white; border:4px solid #1e5fbf; border-radius:40px; padding:30px; display:inline-block; margin:20px 0; box-shadow:0 8px 0 #0a3d7a; }
         .qr-code { width:250px; height:250px; background:#f0f0f0; display:flex; align-items:center; justify-content:center; font-size:40px; border:2px dashed #1e5fbf; }
-        .refresh-qr { background:#ff9933; color:white; font-size:16px; padding:8px 15px; border-radius:20px; border:none; cursor:pointer; margin-top:10px; box-shadow:0 3px 0 #b35900; transition:all 0.1s; }
-        .refresh-qr:active { transform:translateY(3px); box-shadow:0 1px 0 #b35900; }
-        .refresh-qr:disabled { opacity:0.6; cursor:not-allowed; transform:none; box-shadow:0 3px 0 #b35900; }
-        .continue-btn { background:#28a745; color:white; font-size:24px; padding:12px; border-radius:30px; width:100%; border:none; margin-top:15px; display:none; box-shadow:0 5px 0 #1e7e34; transition:all 0.1s; }
-        .continue-btn:active { transform:translateY(5px); box-shadow:0 1px 0 #1e7e34; }
-        .continue-btn:disabled { opacity:0.6; cursor:not-allowed; transform:none; box-shadow:0 5px 0 #1e7e34; }
-        .document-list { background:white; border:2px solid #1e5fbf; border-radius:20px; padding:15px; margin:20px 0; max-height:200px; overflow-y:auto; display:none; text-align:left; }
-        .document-item { padding:8px; border-bottom:1px solid #eee; font-size:16px; }
+        .instruction { font-size:22px; color:#1e5fbf; margin:15px 0; }
+        .steps { text-align:left; background:#e3f2fd; border-radius:30px; padding:20px; font-size:18px; margin:20px 0; }
+        .step-item { margin:10px 0; display:flex; align-items:center; gap:10px; }
+        .step-number { background:#1e5fbf; color:white; width:30px; height:30px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; }
+        
+        /* Document list styles */
+        .document-list { background:white; border:2px solid #1e5fbf; border-radius:20px; padding:15px; margin:20px 0; max-height:200px; overflow-y:auto; display:none; }
+        .document-item { padding:10px; border-bottom:1px solid #dee2e6; display:flex; align-items:center; gap:10px; }
         .document-item:last-child { border-bottom:none; }
-        .document-item::before { content:"📄 "; }
-        .loading {
-            display:none;
-            position:fixed;
-            top:0;
-            left:0;
-            right:0;
-            bottom:0;
-            background:rgba(0,0,0,0.5);
-            z-index:2000;
-            justify-content:center;
-            align-items:center;
-            color:white;
-            font-size:24px;
-            flex-direction:column;
-            gap:15px;
-        }
+        .document-icon { font-size:24px; }
+        .document-name { flex:1; font-size:16px; text-align:left; }
+        .document-size { color:#6c757d; font-size:14px; }
+        .document-status { color:#28a745; font-size:14px; }
+        
+        /* Continue button */
+        .continue-btn { background:#28a745; color:white; font-size:24px; padding:12px; border-radius:30px; width:100%; border:none; box-shadow:0 4px 0 #1e7e34; cursor:pointer; margin-top:15px; display:none; }
+        .continue-btn:active { transform:translateY(4px); box-shadow:0 1px 0 #1e7e34; }
+        .continue-btn:hover { background:#2fcB4f; }
+        
+        /* Loading indicator */
+        .loading { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center; color:white; font-size:24px; }
         .loading.show { display:flex; }
-        .loading-spinner {
-            border:4px solid #f3f3f3;
-            border-top:4px solid #1e5fbf;
-            border-radius:50%;
-            width:50px;
-            height:50px;
-            animation:spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform:rotate(0deg); }
-            100% { transform:rotate(360deg); }
-        }
-        /* CSRF Token (hidden) */
-        /* Utility Classes */
-        .hidden { display:none !important; }
-
-
-</style>
-{% endblock %}
-
-{% block content %}
+        .spinner { border:4px solid rgba(255,255,255,0.3); border-radius:50%; border-top:4px solid white; width:50px; height:50px; animation:spin 1s linear infinite; margin-right:10px; }
+        @keyframes spin { 0% { transform:rotate(0deg); } 100% { transform:rotate(360deg); } }
+        
+        /* QR Code refresh button */
+        .refresh-qr { background:#ff9933; color:white; font-size:16px; padding:8px 15px; border-radius:20px; border:none; cursor:pointer; margin-top:10px; }
+        .refresh-qr:hover { background:#ffaa44; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India">
+            <div>{% trans "Ministry of Electronics &" %}<br>{% trans "Information Technology" %}<br>{% trans "Government of India" %}</div>
+        </div>
+        <div class="header-right">
+            <img src="https://www.cdac.in/img/cdac-logo.png" alt="CDAC Logo">
+        </div>
+    </div>
+    
+    <div class="voice-corner">
+        <div class="voice-corner-btn" onclick="alert('{% trans "Voice assistant activated" %}')">🎤</div>
+        <div class="voice-corner-text">{% trans "Click" %}</div>
+    </div>
+    
+    <a href="{% url 'menu' %}" class="back-btn">← {% trans "Back" %}</a>
+    
     <div class="container">
-<div class="content-wrapper">
-<h1>📱 {% trans "QR Code Upload" %}</h1>
-<form action="{% url 'document-upload-qr' %}" id="qrForm" method="post">
-    {% csrf_token %}
-                <input id="sessionId" name="session_id" type="hidden"/>
-<input id="documentCount" name="document_count" type="hidden" value="0"/>
-</form>
-<div class="qr-container">
-<div aria-label="{% trans 'QR Code' %}" class="qr-code" id="qrCode">{% trans "QR" %}</div>
-</div>
-<button aria-label="{% trans 'Refresh QR code' %}" class="refresh-qr" id="refreshBtn" onclick="refreshQRCode()">🔄 {% trans "Refresh QR Code" %}</button>
-<div id="waitingMessage" style="margin-top:15px; font-size:18px; color:#1e5fbf;">⏳ {% trans "Waiting for upload..." %}</div>
-<div class="document-list" id="documentList">
-<div id="documentsContainer"></div>
-</div>
-<button aria-label="{% trans 'Continue to menu' %}" class="continue-btn" id="continueBtn" onclick="continueToMenu()">{% trans "Continue to Menu" %}</button>
-</div>
-</div>
-<div class="loading" id="loadingIndicator">
-<div class="loading-spinner"></div>
-<div>{% trans "Processing..." %}</div>
-</div>
- Security Note 
-<script src="{% static 'js/voice.js' %}"></script>
-{% endblock %}
-
-{% block extra_scripts %}
-<script>
-        // ================= SECURITY ENHANCEMENTS =================
-        // Auto-hide cursor on touch devices
-        let cursorTimeout;
-        document.addEventListener('touchstart', function() {
-            document.body.style.cursor = 'default';
-            clearTimeout(cursorTimeout);
-            cursorTimeout = setTimeout(function() {
-                document.body.style.cursor = 'none';
-            }, 3000);
-        });
-        // Prevent page zoom on double tap
-        let lastTouchEnd = 0;
-        document.addEventListener('touchend', function(event) {
-            const now = (new Date()).getTime();
-            if (now - lastTouchEnd <= 300) {
-                event.preventDefault();
-            }
-            lastTouchEnd = now;
-        }, false);
-        // ================= LANGUAGE MAP =================
-        const languageMap = {
-            "en": "en-IN",
-            "hi": "hi-IN",
-            "ta": "ta-IN",
-            "te": "te-IN",
-            "bn": "bn-IN",
-            "or": "or-IN"
-        };
-        function getCurrentLang() {
-            let path = window.location.pathname.split('/');
-            const langCode = path[1] || "en";
-            return languageMap[langCode] || "en-IN";
+        <div class="content-wrapper">
+            
+            <!-- Display Django messages -->
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <div class="message {{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <h1>📱 {% trans "QR Code Upload" %}</h1>
+            
+            <!-- Django form for QR upload confirmation -->
+            <form id="qrForm" method="post" action="{% url 'document-upload-qr' %}">
+                {% csrf_token %}
+                <input type="hidden" name="session_id" id="sessionId" value="{{ session_id }}">
+                <input type="hidden" name="document_count" id="documentCount" value="0">
+            </form>
+            
+            <div class="qr-container">
+                <div class="qr-code" id="qrCode">
+                    🔲🔳🔲<br>🔳🔲🔳<br>🔲🔳🔲
+                </div>
+            </div>
+            
+            <button class="refresh-qr" onclick="refreshQRCode()">🔄 {% trans "Refresh QR Code" %}</button>
+            
+            <div class="instruction">{% trans "Scan QR code with your phone" %}</div>
+            
+            <div class="steps">
+                <div class="step-item"><span class="step-number">1</span> {% trans "Open DigiLocker or any scanner app" %}</div>
+                <div class="step-item"><span class="step-number">2</span> {% trans "Scan this QR code" %}</div>
+                <div class="step-item"><span class="step-number">3</span> {% trans "Upload documents from your phone" %}</div>
+                <div class="step-item"><span class="step-number">4</span> {% trans "Documents will appear here automatically" %}</div>
+            </div>
+            
+            <div id="waitingMessage" style="font-size:20px; color:#28a745; margin-top:15px;">⏳ {% trans "Waiting for upload..." %}</div>
+            
+            <!-- Document list that appears after QR scan -->
+            <div id="documentList" class="document-list">
+                <div style="font-weight:bold; margin-bottom:10px;">📄 {% trans "Received Documents:" %}</div>
+                <div id="documentsContainer"></div>
+            </div>
+            
+            <button class="continue-btn" id="continueBtn" onclick="continueToMenu()">✅ {% trans "Continue to Menu" %}</button>
+        </div>
+    </div>
+    
+    <!-- Loading indicator -->
+    <div id="loadingIndicator" class="loading">
+        <div class="spinner"></div>
+        <div>{% trans "Processing..." %}</div>
+    </div>
+    
+    <script>
+        // Generate a unique session ID for this QR session
+        let sessionId = '{{ session_id|default:"" }}';
+        if (!sessionId) {
+            sessionId = 'QR_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+            document.getElementById('sessionId').value = sessionId;
         }
-        function getCurrentLangCode() {
-            let path = window.location.pathname.split('/');
-            return path[1] || "en";
-        }
-        // ================= TEXT TO SPEECH =================
-        function speak(text) {
-            if(!('speechSynthesis' in window)) return;
-            speechSynthesis.cancel();
-            let u = new SpeechSynthesisUtterance(text);
-            u.lang = getCurrentLang();
-            u.rate = 1;
-            speechSynthesis.speak(u);
-        }
-        // ================= SESSION TIMER =================
-        function resetSessionTimer() {
-            clearTimeout(sessionTimer);
-            clearTimeout(timeoutWarningTimer);
-            startSessionTimer();
-        }
-        // ================= QR SIMULATION WITH SECURITY =================
-        let scanTimeout = null;
-        let isRefreshing = false;
-        let isProcessing = false;
-        // Generate a random session ID
-        function generateSessionId() {
-            return 'qr_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-        }
-        // Initialize session ID
-        document.getElementById('sessionId').value = generateSessionId();
+        
+        let documentsReceived = [];
+        let scanTimeout;
+        
+        // Simulate QR code scanning completion after 30 seconds (for demo)
+        // In production, this would be triggered by an actual backend event
+        scanTimeout = setTimeout(() => {
+            simulateDocumentsReceived();
+        }, 30000);
+        
         function simulateDocumentsReceived() {
-            if (isProcessing) return;
-            resetSessionTimer();
-            document.getElementById('waitingMessage').style.display = 'none';
-            document.getElementById('documentList').style.display = 'block';
-            document.getElementById('continueBtn').style.display = 'block';
-            // Simulate received documents
-            const docCount = Math.floor(Math.random() * 5) + 2; // 2-6 documents
-            document.getElementById('documentCount').value = docCount;
-            const documentsContainer = document.getElementById('documentsContainer');
-            documentsContainer.innerHTML = '';
-            const documentTypes = [
-                '{% trans "Document" %}', 
-                '{% trans "Photo" %}', 
-                '{% trans "Form" %}', 
-                '{% trans "Certificate" %}',
-                '{% trans "ID Proof" %}',
-                '{% trans "Address Proof" %}'
+            // Sample documents that would come from QR scan
+            const sampleDocs = [
+                { name: 'Aadhaar_Card.pdf', size: '245 KB', icon: '📄' },
+                { name: 'Voter_ID.pdf', size: '180 KB', icon: '📄' },
+                { name: 'Photo.jpg', size: '1.2 MB', icon: '🖼️' },
+                { name: 'Signature.png', size: '45 KB', icon: '✍️' }
             ];
-            for (let i = 0; i < docCount; i++) {
-                const type = documentTypes[Math.floor(Math.random() * documentTypes.length)];
-                const num = Math.floor(Math.random() * 100) + 1;
-                const div = document.createElement('div');
-                div.className = 'document-item';
-                div.textContent = `${type} ${num}`;
-                documentsContainer.appendChild(div);
-            }
-            const langCode = getCurrentLangCode();
-            if (langCode === 'hi') {
-                speak(docCount + " दस्तावेज़ प्राप्त हो गए। जारी रखने के लिए कंटिन्यू कहें।");
-            } else if (langCode === 'or') {
-                speak(docCount + " ଦଲିଲଗୁଡିକ ପ୍ରାପ୍ତ ହେଲା। ଜାରି ରଖିବା ପାଇଁ କଣ୍ଟିନ୍ୟୁ କୁହନ୍ତୁ।");
-            } else {
-                speak(docCount + " documents received. Say continue to proceed.");
-            }
+            
+            documentsReceived = sampleDocs;
+            displayDocuments(sampleDocs);
+            
+            // Hide waiting message
+            document.getElementById('waitingMessage').style.display = 'none';
+            
+            // Show document list
+            const docList = document.getElementById('documentList');
+            docList.style.display = 'block';
+            
+            // Show continue button
+            document.getElementById('continueBtn').style.display = 'block';
+            
+            // Update form with document count
+            document.getElementById('documentCount').value = sampleDocs.length;
+            
+            // Show success message
+            alert('✅ 4 {% trans "documents received successfully via QR scan!" %}');
         }
+        
+        function displayDocuments(docs) {
+            const container = document.getElementById('documentsContainer');
+            container.innerHTML = '';
+            
+            docs.forEach(doc => {
+                const docItem = document.createElement('div');
+                docItem.className = 'document-item';
+                docItem.innerHTML = `
+                    <span class="document-icon">${doc.icon}</span>
+                    <span class="document-name">${doc.name}</span>
+                    <span class="document-size">${doc.size}</span>
+                    <span class="document-status">✓</span>
+                `;
+                container.appendChild(docItem);
+            });
+        }
+        
         function refreshQRCode() {
-            if (isRefreshing || isProcessing) return;
-            resetSessionTimer();
-            isRefreshing = true;
-            document.getElementById('refreshBtn').disabled = true;
-            clearTimeout(scanTimeout);
-            document.getElementById('waitingMessage').style.display = 'block';
-            document.getElementById('documentList').style.display = 'none';
-            document.getElementById('continueBtn').style.display = 'none';
-            document.getElementById('documentCount').value = '0';
-            // Generate new session ID
-            document.getElementById('sessionId').value = generateSessionId();
-            // Animate QR code refresh
-            const qrElement = document.getElementById('qrCode');
-            qrElement.style.opacity = '0.5';
-            qrElement.innerHTML = '⟳';
-            setTimeout(() => {
-                qrElement.style.opacity = '1';
-                qrElement.innerHTML = '{% trans "QR" %}';
-                document.getElementById('refreshBtn').disabled = false;
-                isRefreshing = false;
-                const langCode = getCurrentLangCode();
-                if (langCode === 'hi') {
-                    speak("क्यूआर कोड रीफ्रेश किया गया");
-                } else if (langCode === 'or') {
-                    speak("QR କୋଡ୍ ରିଫ୍ରେସ୍ ହେଲା");
-                } else {
-                    speak("QR code refreshed");
-                }
-            }, 500);
-            // Set new timeout for document simulation
-            scanTimeout = setTimeout(simulateDocumentsReceived, 30000);
-        }
-        function continueToMenu() {
-            if (isProcessing) return;
-            resetSessionTimer();
-            const docCount = parseInt(document.getElementById('documentCount').value);
-            if (docCount === 0) {
-                const langCode = getCurrentLangCode();
-                if (langCode === 'hi') {
-                    speak("कोई दस्तावेज़ नहीं मिला");
-                } else if (langCode === 'or') {
-                    speak("କୌଣସି ଦଲିଲ ମିଳିଲା ନାହିଁ");
-                } else {
-                    speak("No documents received");
-                }
-                return;
-            }
-            isProcessing = true;
-            document.getElementById('continueBtn').disabled = true;
-            document.getElementById('refreshBtn').disabled = true;
-            document.getElementById('loadingIndicator').classList.add('show');
-            const langCode = getCurrentLangCode();
-            if (langCode === 'hi') {
-                speak("प्रसंस्करण हो रहा है");
-            } else if (langCode === 'or') {
-                speak("ପ୍ରକ୍ରିୟାକରଣ ହେଉଛି");
-            } else {
-                speak("Processing");
-            }
-            // Submit form
-            document.getElementById('qrForm').submit();
-        }
-        // ================= VOICE INPUT =================
-        let recognition;
-        let isListening = false;
-        let voiceRestartTimeout = null;
-        function toggleVoiceInput() {
-            resetSessionTimer();
-            if(isListening) {
-                stopVoiceInput();
-                return;
-            }
-            const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if(!SR) {
-                alert("{% trans 'Speech not supported' %}");
-                return;
-            }
-            if (recognition) {
-                try {
-                    recognition.stop();
-                } catch(e) {}
-            }
-            recognition = new SR();
-            recognition.lang = getCurrentLang();
-            recognition.continuous = true;
-            recognition.interimResults = true;
-            recognition.maxAlternatives = 1;
-            recognition.onstart = function() {
-                isListening = true;
-                document.getElementById("voiceBtn").classList.add("listening");
-                document.getElementById("voiceStatus").innerText = "{% trans 'Listening...' %}";
-                const langCode = getCurrentLangCode();
-                if (langCode === 'hi') {
-                    speak("कृपया आदेश बोलें... रीफ्रेश, कंटिन्यू, स्टेटस, या वापस");
-                } else if (langCode === 'or') {
-                    speak("ଦୟାକରି ନିର୍ଦ୍ଦେଶ କୁହନ୍ତୁ... ରିଫ୍ରେସ୍, କଣ୍ଟିନ୍ୟୁ, ସ୍ଥିତି, କିମ୍ବା ପଛକୁ");
-                } else {
-                    speak("Please say a command... refresh, continue, status, or back");
-                }
-            };
-            recognition.onresult = function(e) {
-                resetSessionTimer();
-                let finalTranscript = '';
-                let interimTranscript = '';
-                for (let i = 0; i < e.results.length; i++) {
-                    const result = e.results[i];
-                    if (result.isFinal) {
-                        finalTranscript += result[0].transcript;
-                    } else {
-                        interimTranscript += result[0].transcript;
-                    }
-                }
-                const transcript = finalTranscript || interimTranscript;
-                const command = transcript.toLowerCase();
-                console.log("QR command:", command);
-                // QR-specific commands
-                if (command.includes("refresh") || command.includes("new qr") || command.includes("reset") || 
-                    command.includes("रीफ्रेश") || command.includes("ରିଫ୍ରେସ୍")) {
-                    refreshQRCode();
-                    return;
-                }
-                else if (command.includes("continue") || command.includes("next") || command.includes("proceed") || 
-                         command.includes("कंटिन्यू") || command.includes("କଣ୍ଟିନ୍ୟୁ")) {
-                    if (document.getElementById('continueBtn').style.display === 'block') {
-                        continueToMenu();
-                    } else {
-                        const langCode = getCurrentLangCode();
-                        if (langCode === 'hi') {
-                            speak("कृपया दस्तावेज़ों के लिए प्रतीक्षा करें");
-                        } else if (langCode === 'or') {
-                            speak("ଦୟାକରି ଦଲିଲ ପାଇଁ ଅପେକ୍ଷା କରନ୍ତୁ");
-                        } else {
-                            speak("Please wait for documents");
-                        }
-                    }
-                    return;
-                }
-                else if (command.includes("status") || command.includes("check") || command.includes("स्थिति") || command.includes("ସ୍ଥିତି")) {
-                    if (document.getElementById('continueBtn').style.display === 'block') {
-                        const docCount = document.getElementById('documentCount').value;
-                        const langCode = getCurrentLangCode();
-                        if (langCode === 'hi') {
-                            speak(docCount + " दस्तावेज़ प्राप्त हो गए");
-                        } else if (langCode === 'or') {
-                            speak(docCount + " ଦଲିଲଗୁଡିକ ପ୍ରାପ୍ତ ହେଲା");
-                        } else {
-                            speak(docCount + " documents received");
-                        }
-                    } else {
-                        const langCode = getCurrentLangCode();
-                        if (langCode === 'hi') {
-                            speak("अपलोड की प्रतीक्षा है");
-                        } else if (langCode === 'or') {
-                            speak("ଅପଲୋଡ୍ ପାଇଁ ଅପେକ୍ଷା");
-                        } else {
-                            speak("Waiting for upload");
-                        }
-                    }
-                    return;
-                }
-                else if (command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
-                    window.location.href = "/" + getCurrentLangCode() + "/menu/";
-                    return;
-                }
-                else if (command.includes("home") || command.includes("होम") || command.includes("ଘର")) {
-                    window.location.href = "/" + getCurrentLangCode() + "/";
-                    return;
-                }
-                else if (command.includes("stop listening") || command.includes("stop voice")) {
-                    stopVoiceInput();
-                    return;
-                }
-            };
-            recognition.onerror = function(event) {
-                console.error("Recognition error:", event.error);
-                if (event.error === 'no-speech') return;
-                stopVoiceInput();
-            };
-            recognition.onend = function() {
-                if (isListening) {
-                    if (voiceRestartTimeout) clearTimeout(voiceRestartTimeout);
-                    voiceRestartTimeout = setTimeout(() => {
-                        try {
-                            recognition.start();
-                        } catch(e) {
-                            console.error("Failed to restart recognition:", e);
-                            stopVoiceInput();
-                        }
-                    }, 1000);
-                } else {
-                    document.getElementById("voiceBtn").classList.remove("listening");
-                    document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
-                }
-            };
-            try {
-                recognition.start();
-            } catch(e) {
-                console.error("Failed to start recognition:", e);
-                stopVoiceInput();
-            }
-        }
-        function stopVoiceInput() {
-            isListening = false;
-            if (recognition) {
-                try {
-                    recognition.stop();
-                } catch(e) {}
-            }
-            document.getElementById("voiceBtn").classList.remove("listening");
-            document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
-            if (voiceRestartTimeout) {
-                clearTimeout(voiceRestartTimeout);
-            }
-        }
-        // ================= OVERRIDE VOICE COMMANDS =================
-        const originalHandleCommand = window.handleCommand;
-        window.handleCommand = function(command) {
-            command = command.toLowerCase();
-            console.log("QR command:", command);
-            // QR-specific commands
-            if(command.includes("refresh") || command.includes("new qr") || command.includes("reset") || 
-               command.includes("रीफ्रेश") || command.includes("ରିଫ୍ରେସ୍")) {
-                refreshQRCode();
-                return;
-            }
-            else if(command.includes("continue") || command.includes("next") || command.includes("proceed") || 
-                    command.includes("कंटिन्यू") || command.includes("କଣ୍ଟିନ୍ୟୁ")) {
-                if(document.getElementById('continueBtn').style.display === 'block') {
-                    continueToMenu();
-                } else {
-                    if(typeof speak === 'function') speak("Please wait for documents");
-                }
-                return;
-            }
-            else if(command.includes("status") || command.includes("check") || command.includes("स्थिति") || command.includes("ସ୍ଥିତି")) {
-                if(document.getElementById('continueBtn').style.display === 'block') {
-                    const docCount = document.getElementById('documentCount').value;
-                    if(typeof speak === 'function') speak(docCount + " documents received");
-                } else {
-                    if(typeof speak === 'function') speak("Waiting for upload");
-                }
-                return;
-            }
-            else if(command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
-                window.location.href = "/" + getCurrentLangCode() + "/menu/";
-                return;
-            }
-            else if(command.includes("home") || command.includes("होम") || command.includes("ଘର")) {
-                window.location.href = "/" + getCurrentLangCode() + "/";
-                return;
-            }
-            else if(command.includes("stop listening") || command.includes("stop voice")) {
-                stopVoiceInput();
-                return;
-            }
-            // If not QR-specific, pass to original handler
-            if(originalHandleCommand) {
-                originalHandleCommand(command);
-            }
-        };
-        // ================= AUTO READ PAGE =================
-        const originalAutoRead = window.autoReadPage;
-        window.autoReadPage = function() {
-            if(originalAutoRead) originalAutoRead();
-            setTimeout(() => {
-                if(typeof speak === 'function') {
-                    const langCode = getCurrentLangCode();
-                    if (langCode === 'hi') {
-                        speak("क्यूआर कोड अपलोड पृष्ठ। अपने फोन से क्यूआर कोड स्कैन करें। नया कोड के लिए रीफ्रेश कहें, तैयार होने पर कंटिन्यू कहें।");
-                    } else if (langCode === 'or') {
-                        speak("QR କୋଡ୍ ଅପଲୋଡ୍ ପୃଷ୍ଠା। ଆପଣଙ୍କ ଫୋନ୍ ରେ QR କୋଡ୍ ସ୍କାନ୍ କରନ୍ତୁ। ନୂଆ କୋଡ୍ ପାଇଁ ରିଫ୍ରେସ୍ କୁହନ୍ତୁ, ପ୍ରସ୍ତୁତ ହେଲେ କଣ୍ଟିନ୍ୟୁ କୁହନ୍ତୁ।");
-                    } else {
-                        speak("QR code upload page. Scan QR code with your phone. Say refresh for new code, continue when done.");
-                    }
-                }
-            }, 2000);
-        };
-        // ================= INIT =================
-        document.addEventListener('DOMContentLoaded', function() {
-            startSessionTimer();
-            // Add activity listeners
-            document.addEventListener('click', resetSessionTimer);
-            document.addEventListener('keypress', resetSessionTimer);
-            document.addEventListener('touchstart', resetSessionTimer);
-            document.addEventListener('mousemove', resetSessionTimer);
-            // Auto-read instructions
-            setTimeout(autoReadPage, 2000);
-            // Start QR timeout
-            scanTimeout = setTimeout(simulateDocumentsReceived, 30000);
-        });
-        window.addEventListener('beforeunload', function() {
-            if (sessionTimer) {
-                clearTimeout(sessionTimer);
-            }
-            if (timeoutWarningTimer) {
-                clearTimeout(timeoutWarningTimer);
-            }
+            // Clear previous timeout
             if (scanTimeout) {
                 clearTimeout(scanTimeout);
             }
-            stopVoiceInput();
-        });
-        // Auto-hide success messages after 3 seconds
-        setTimeout(function() {
-            const successMsg = document.querySelector('.success-message');
-            if (successMsg) {
-                successMsg.style.animation = 'slideOutLeft 0.3s ease';
-                setTimeout(function() {
-                    if (successMsg) successMsg.remove();
-                }, 300);
+            
+            // Generate new session ID
+            sessionId = 'QR_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+            document.getElementById('sessionId').value = sessionId;
+            
+            // Reset UI
+            documentsReceived = [];
+            document.getElementById('documentList').style.display = 'none';
+            document.getElementById('continueBtn').style.display = 'none';
+            document.getElementById('waitingMessage').style.display = 'block';
+            document.getElementById('waitingMessage').innerHTML = '⏳ {% trans "Waiting for upload..." %}';
+            
+            // Flash QR code to indicate refresh
+            const qrCode = document.getElementById('qrCode');
+            qrCode.style.animation = 'flash 0.5s';
+            setTimeout(() => qrCode.style.animation = '', 500);
+            
+            // Set new timeout for demo
+            scanTimeout = setTimeout(() => {
+                simulateDocumentsReceived();
+            }, 30000);
+            
+            // In production, you would make an AJAX call to get a new QR code
+            // fetch(`/api/new-qr-session/${sessionId}`)
+        }
+        
+        function continueToMenu() {
+            // Show loading
+            document.getElementById('loadingIndicator').classList.add('show');
+            
+            // Submit form to confirm receipt
+            setTimeout(() => {
+                document.getElementById('qrForm').submit();
+            }, 500);
+        }
+        
+        // Add flash animation
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes flash {
+                0% { opacity: 1; }
+                50% { opacity: 0.5; }
+                100% { opacity: 1; }
             }
-        }, 3000);
-
-
-</script>
-{% endblock %}
+        `;
+        document.head.appendChild(style);
+        
+        // Auto-hide messages after 5 seconds
+        setTimeout(function() {
+            document.querySelectorAll('.message').forEach(function(message) {
+                message.style.display = 'none';
+            });
+        }, 5000);
+        
+        // Clean up timeout on page unload
+        window.addEventListener('beforeunload', function() {
+            if (scanTimeout) {
+                clearTimeout(scanTimeout);
+            }
+        });
+    
+    </script>
+</body>
+</html>
