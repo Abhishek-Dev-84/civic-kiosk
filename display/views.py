@@ -268,8 +268,8 @@ def auth(request):
                 except Exception as e:
                     logger.error(f"Failed to create audit log: {e}")
                 
-                messages.success(request, f'Welcome {consumer.name}! Login successful.')
-                return redirect('menu')
+                
+                return redirect('otp')
                 
             except Exception as e:
                 logger.error(f"Error creating session: {e}")
@@ -442,6 +442,7 @@ def logout(request):
 def menu(request):
     """Main menu after authentication"""
     # Get consumer info for display
+    messages.success(request, f'Welcome {consumer.name}! Login successful.')
     consumer_id = request.session.get('consumer_id')
     try:
         consumer = Consumer.objects.get(id=consumer_id)
