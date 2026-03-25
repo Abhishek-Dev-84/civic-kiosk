@@ -222,8 +222,8 @@ class KioskLoaderMiddleware:
 (function(){
   try {
     const LOADER_ID = 'kiosk-global-loader';
-    const SKELETON_CLASS = 'kiosk-skeleton-row';
-    let skeletonTimer = null;
+    let loaderStartTime = 0;
+    const MIN_LOADER_MS = 500;
     let safetyTimer = null;
 
     function ensureStyles(){
@@ -257,21 +257,6 @@ class KioskLoaderMiddleware:
           margin-top:12px; font: 700 18px/1.2 'Segoe UI', system-ui, sans-serif; color:#1e5fbf;
           text-align:center; padding: 0 12px;
         }
-        .${SKELETON_CLASS}{
-          height: 14px; border-radius: 10px; background: #e9f2ff; margin: 8px 0;
-          position: relative; overflow: hidden;
-        }
-        .${SKELETON_CLASS}::after{
-          content:'';
-          position:absolute; top:0; left:-40%;
-          width:40%; height:100%;
-          background: linear-gradient(90deg, transparent, rgba(30,95,191,0.18), transparent);
-          animation: kiosk-skeleton-shimmer 1.0s ease-in-out infinite;
-        }
-        @keyframes kiosk-skeleton-shimmer {
-          from { transform: translateX(0); }
-          to { transform: translateX(250%); }
-        }
       `;
       document.head.appendChild(style);
     }
@@ -285,35 +270,19 @@ class KioskLoaderMiddleware:
         el.innerHTML = '<div>' +
           '<div class=\"kiosk-spinner\"></div>' +
           '<div class=\"kiosk-loader-text\">Loading...</div>' +
-          '<div class=\"kiosk-skeleton-box\" style=\"width:80%; max-width:420px;\"></div>' +
         '</div>';
         document.body.appendChild(el);
       }
       return el;
     }
 
-    let disabledButtons = [];
-
     function showLoader(){
+      loaderStartTime = Date.now();
       const overlay = ensureOverlay();
       overlay.style.display = 'flex';
       // Disable multiple clicks / pointer events.
       document.documentElement.style.pointerEvents = 'none';
       overlay.style.pointerEvents = 'auto';
-
-      // Skeleton is created slightly later to avoid flicker on fast navigations.
-      if (skeletonTimer) clearTimeout(skeletonTimer);
-      skeletonTimer = setTimeout(() => {
-        const skBox = overlay.querySelector('.kiosk-skeleton-box');
-        if (!skBox) return;
-        skBox.innerHTML = '';
-        for (let i=0;i<6;i++){
-          const row = document.createElement('div');
-          row.className = '${SKELETON_CLASS}';
-          row.style.width = (70 + Math.floor(Math.random()*25)) + '%';
-          skBox.appendChild(row);
-        }
-      }, 140);
 
       // Safety: never keep the loader stuck forever.
       if (safetyTimer) clearTimeout(safetyTimer);
@@ -324,21 +293,16 @@ class KioskLoaderMiddleware:
 
     function hideLoader(){
       const overlay = document.getElementById(LOADER_ID);
-      if (overlay) overlay.style.display = 'none';
-      document.documentElement.style.pointerEvents = '';
+      const elapsed = loaderStartTime ? (Date.now() - loaderStartTime) : MIN_LOADER_MS;
+      const delay = loaderStartTime ? Math.max(0, MIN_LOADER_MS - elapsed) : 0;
 
-      if (skeletonTimer) clearTimeout(skeletonTimer);
-      skeletonTimer = null;
+      setTimeout(() => {
+        if (overlay) overlay.style.display = 'none';
+        document.documentElement.style.pointerEvents = '';
+      }, delay);
+
       if (safetyTimer) clearTimeout(safetyTimer);
       safetyTimer = null;
-
-      // Restore disabled buttons for pages that don't fully navigate.
-      for (const btn of disabledButtons){
-        try {
-          if (btn && typeof btn.disabled !== 'undefined') btn.disabled = false;
-        } catch (_) {}
-      }
-      disabledButtons = [];
     }
 
     window.KioskLoader = { show: showLoader, hide: hideLoader };
@@ -379,7 +343,7 @@ class KioskLoaderMiddleware:
         });
 
         // Navigation: show loader when these elements are clicked.
-        const navSelector = '.dept-card,.menu-card,.back-btn,.home-btn,a[href]';
+        const navSelector = '.dept-card,.menu-card,.back-btn,.home-btn,.lang-btn,a[href]';
         document.querySelectorAll(navSelector).forEach(function(el){
           if (!el || el.dataset.kioskNavBound === '1') return;
           el.dataset.kioskNavBound = '1';
@@ -387,7 +351,7 @@ class KioskLoaderMiddleware:
             try {
               // Ignore clicks inside form inputs/labels.
               const target = ev && ev.target;
-              if (target && target.closest && target.closest('input,textarea,select,label')) return;
+              if (target && target.closest && target.closest('input,textarea,select,label,[contenteditable=\"true\"]')) return;
               showLoader();
 
               // Best-effort disable (only if the element supports it).
