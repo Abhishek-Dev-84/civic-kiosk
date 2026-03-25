@@ -46,6 +46,7 @@ INSTALLED_APPS = [
 # MIDDLEWARE - ADD OUR CUSTOM MIDDLEWARE
 # -------------------------------------------------
 MIDDLEWARE = [
+    "display.middleware.KioskExceptionMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",

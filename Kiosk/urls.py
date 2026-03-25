@@ -14,7 +14,8 @@ urlpatterns = [
 ]
 
 handler404 = 'display.views.custom_404'
-# We don't have custom_500 yet, we will just use Django's default for 500 which automatically renders 500.html
+# Use a custom handler to ensure the kiosk never shows raw Django errors.
+handler500 = 'display.views.custom_500'
 
 urlpatterns += i18n_patterns(
     path('admin/', admin.site.urls),

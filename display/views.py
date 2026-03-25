@@ -268,8 +268,8 @@ def auth(request):
                 except Exception as e:
                     logger.error(f"Failed to create audit log: {e}")
                 
-                
-                return redirect('otp')
+                messages.success(request, f'Welcome {consumer.name}! Login successful.')
+                return redirect('menu')
                 
             except Exception as e:
                 logger.error(f"Error creating session: {e}")
@@ -380,7 +380,7 @@ def otp(request):
 
 
 def resend_otp(request):
-    """Resend OTP - Still generates OTP but doesn't send SMS"""
+    """Resend OTP - Bypass mode still generates OTP but doesn't verify"""
     if request.method == 'POST':
         aadhaar_number = request.session.get('aadhaar_number')
         consumer_id = request.session.get('consumer_id')
@@ -392,18 +392,24 @@ def resend_otp(request):
         try:
             consumer = Consumer.objects.get(id=consumer_id, aadhaar_number=aadhaar_number)
             
-            # Generate new OTP (but won't be verified)
+            # Generate new OTP (for logging purposes only)
             otp = generate_secure_otp(6)
             otp_hash = hash_otp(otp)
             request.session['otp_hash'] = otp_hash
             request.session['otp_attempts'] = 0
             request.session['otp_timestamp'] = datetime.now().isoformat()
             
-            # Log OTP to console for reference (optional)
+            # Log the OTP to console for reference (since verification is bypassed)
             print(f"\n🔐 [BYPASS MODE] OTP generated for {consumer.name}: {otp}")
+            print(f"📱 Registered mobile: {consumer.mobile}")
             print(f"⚠️ NOTE: ANY OTP will work for login!\n")
             
-            # DO NOT send SMS - just show success message
+            # Still attempt to send SMS (optional)
+            try:
+                send_otp_via_circuitdigest(consumer.mobile, otp, aadhaar_number)
+            except:
+                pass
+            
             messages.success(request, 'OTP sent successfully! (Any OTP will work)')
             
         except Consumer.DoesNotExist:
@@ -442,7 +448,6 @@ def logout(request):
 def menu(request):
     """Main menu after authentication"""
     # Get consumer info for display
-    messages.success(request, f'Welcome {consumer.name}! Login successful.')
     consumer_id = request.session.get('consumer_id')
     try:
         consumer = Consumer.objects.get(id=consumer_id)
@@ -3307,6 +3312,11 @@ def api_calculate_meter_cost(request):
 def custom_404(request, exception):
     """Custom 404 error handler"""
     return render(request, '404.html', status=404)
+
+
+def custom_500(request):
+    """Custom 500 error handler (standalone template, no backend variables)."""
+    return render(request, '500.html', status=500)
 
 
 def test_404(request):

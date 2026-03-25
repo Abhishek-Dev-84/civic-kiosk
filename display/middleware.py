@@ -156,6 +156,36 @@ class KioskSecurityMiddleware:
         return response
 
 
+class KioskExceptionMiddleware:
+    """
+    Catch-all exception handler to prevent raw Django error pages in kiosk mode.
+    Any exception should render the existing standalone `500.html`.
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        try:
+            return self.get_response(request)
+        except Exception:
+            # Never leak exception details to the kiosk UI.
+            try:
+                from django.http import JsonResponse
+                from django.shortcuts import render
+
+                accept = (request.headers.get("accept") or "").lower()
+                if "application/json" in accept:
+                    return JsonResponse({"error": "Internal Server Error"}, status=500)
+
+                return render(request, "500.html", status=500)
+            except Exception:
+                # Last-resort fallback.
+                from django.http import HttpResponse
+
+                return HttpResponse(status=500)
+
+
 class KioskLoaderMiddleware:
     """
     Inject a small, UI-neutral loader script into HTML responses.
@@ -193,6 +223,8 @@ class KioskLoaderMiddleware:
   try {
     const LOADER_ID = 'kiosk-global-loader';
     const SKELETON_CLASS = 'kiosk-skeleton-row';
+    let skeletonTimer = null;
+    let safetyTimer = null;
 
     function ensureStyles(){
       if (document.getElementById('kiosk-global-loader-styles')) return;
@@ -206,11 +238,19 @@ class KioskLoaderMiddleware:
           backdrop-filter: blur(2px);
           cursor: progress;
         }
+        #${LOADER_ID} > div{
+          width:100%; display:flex; flex-direction:column;
+          align-items:center; justify-content:center;
+          text-align:center;
+        }
         #${LOADER_ID} .kiosk-spinner{
           width:54px; height:54px; border-radius:50%;
           border:6px solid #1e5fbf; border-top-color: #ff9933;
           animation: kiosk-spin 0.9s linear infinite;
           box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+          display:block;
+          margin:0 auto;
+          transform: translateZ(0);
         }
         @keyframes kiosk-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         #${LOADER_ID} .kiosk-loader-text{
@@ -261,9 +301,11 @@ class KioskLoaderMiddleware:
       document.documentElement.style.pointerEvents = 'none';
       overlay.style.pointerEvents = 'auto';
 
-      // Skeleton rows rendered INSIDE the loader (no DOM replacement => no event handler loss).
-      const skBox = overlay.querySelector('.kiosk-skeleton-box');
-      if (skBox){
+      // Skeleton is created slightly later to avoid flicker on fast navigations.
+      if (skeletonTimer) clearTimeout(skeletonTimer);
+      skeletonTimer = setTimeout(() => {
+        const skBox = overlay.querySelector('.kiosk-skeleton-box');
+        if (!skBox) return;
         skBox.innerHTML = '';
         for (let i=0;i<6;i++){
           const row = document.createElement('div');
@@ -271,13 +313,24 @@ class KioskLoaderMiddleware:
           row.style.width = (70 + Math.floor(Math.random()*25)) + '%';
           skBox.appendChild(row);
         }
-      }
+      }, 140);
+
+      // Safety: never keep the loader stuck forever.
+      if (safetyTimer) clearTimeout(safetyTimer);
+      safetyTimer = setTimeout(() => {
+        try { hideLoader(); } catch(_) {}
+      }, 45000);
     }
 
     function hideLoader(){
       const overlay = document.getElementById(LOADER_ID);
       if (overlay) overlay.style.display = 'none';
       document.documentElement.style.pointerEvents = '';
+
+      if (skeletonTimer) clearTimeout(skeletonTimer);
+      skeletonTimer = null;
+      if (safetyTimer) clearTimeout(safetyTimer);
+      safetyTimer = null;
 
       // Restore disabled buttons for pages that don't fully navigate.
       for (const btn of disabledButtons){
@@ -289,6 +342,14 @@ class KioskLoaderMiddleware:
     }
 
     window.KioskLoader = { show: showLoader, hide: hideLoader };
+
+    // Ensure loader doesn't remain visible on refresh/back-forward.
+    document.addEventListener('DOMContentLoaded', () => {
+      try { hideLoader(); } catch(_) {}
+    });
+    window.addEventListener('pageshow', () => {
+      try { hideLoader(); } catch(_) {}
+    });
 
     // Click-based navigation (covers most kiosk cards/buttons).
     document.addEventListener('click', function(e){
