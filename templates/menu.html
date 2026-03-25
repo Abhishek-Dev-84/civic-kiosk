@@ -812,16 +812,71 @@
             }
         }
 
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let recognition = null;
+        let isListening = false;
+
         function toggleVoiceInput() {
             const btn = document.getElementById('voiceBtn');
-            btn.classList.toggle('listening');
-            if (btn.classList.contains('listening')) {
-                document.getElementById('voiceStatus').textContent = '{% trans "Listening..." %}';
-                // Simulate voice recognition
-                setTimeout(() => {
-                    btn.classList.remove('listening');
-                    document.getElementById('voiceStatus').textContent = '{% trans "Click" %}';
-                }, 3000);
+            const statusEl = document.getElementById('voiceStatus');
+
+            if (!SpeechRecognition) {
+                alert("{% trans 'Voice not supported in this browser' %}");
+                return;
+            }
+
+            try {
+                if (isListening && recognition) {
+                    recognition.stop();
+                    return;
+                }
+
+                if (!recognition) {
+                    recognition = new SpeechRecognition();
+                    recognition.continuous = false;
+                    recognition.interimResults = false;
+                    recognition.lang = 'en-IN';
+
+                    recognition.onstart = function() {
+                        isListening = true;
+                        if (btn) btn.classList.add('listening');
+                        if (statusEl) statusEl.textContent = '{% trans "Listening..." %}';
+                    };
+
+                    recognition.onresult = function(event) {
+                        try {
+                            const text = (event.results[0][0].transcript || '').toLowerCase();
+                            console.log(text);
+                            if (statusEl) statusEl.textContent = text;
+
+                            // Simple navigation keywords
+                            if (text.includes('gas')) window.location.href = '{% url "gas-services" %}';
+                            else if (text.includes('electric') || text.includes('power')) window.location.href = '{% url "electricity-services" %}';
+                            else if (text.includes('municipal') || text.includes('tax') || text.includes('service')) window.location.href = '{% url "municipal-services" %}';
+                            else if (text.includes('transport')) window.location.href = '{% url "transport-services" %}';
+                            else if (text.includes('revenue')) window.location.href = '{% url "revenue-services" %}';
+                            else if (text.includes('status') || text.includes('application')) window.location.href = '{% url "application-status" %}';
+                            else if (text.includes('home') || text.includes('back')) window.location.href = '{% url "menu" %}';
+                        } catch (err) {
+                            console.error('Voice menu navigation error:', err);
+                        }
+                    };
+
+                    recognition.onerror = function(event) {
+                        console.log('Voice error', event);
+                        if (statusEl) statusEl.textContent = '{% trans "Click" %}';
+                    };
+
+                    recognition.onend = function() {
+                        isListening = false;
+                        if (btn) btn.classList.remove('listening');
+                    };
+                }
+
+                recognition.start();
+            } catch (err) {
+                console.error('Failed to start voice recognition:', err);
+                if (statusEl) statusEl.textContent = '{% trans "Click" %}';
             }
         }
     </script>

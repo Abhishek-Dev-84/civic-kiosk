@@ -350,29 +350,53 @@ class KioskLoaderMiddleware:
     window.addEventListener('pageshow', () => {
       try { hideLoader(); } catch(_) {}
     });
+    window.addEventListener('load', () => {
+      try { hideLoader(); } catch(_) {}
+    });
 
-    // Click-based navigation (covers most kiosk cards/buttons).
-    document.addEventListener('click', function(e){
-      const a = e.target && e.target.closest ? e.target.closest('a') : null;
-      const btn = e.target && e.target.closest ? e.target.closest('button,[role=\"button\"],.dept-card,.menu-card,.back-btn') : null;
-      if (!a && !btn) return;
-      if (e.defaultPrevented) return;
-      if (btn && (btn.disabled || btn.getAttribute('aria-disabled') === 'true')) return;
-      if (btn && btn.type === 'button') {
-        // Many buttons use onclick/window.location; show loader anyway.
-      }
-      showLoader();
-      // Prevent double-click: best-effort disable/lock for short time.
-      if (btn && typeof btn.disabled !== 'undefined' && !btn.disabled){
-        disabledButtons.push(btn);
-        btn.disabled = true;
-      }
-    }, true);
+    // Attach loader only to the actions that should trigger navigation/loading.
+    // - Form submits
+    // - Page navigation elements (cards/anchors/back buttons)
+    document.addEventListener('DOMContentLoaded', function(){
+      try {
+        // Forms: loader on submit only (no loader on input clicks/typing).
+        document.querySelectorAll('form').forEach(function(form){
+          if (!form || form.dataset.kioskLoaderBound === '1') return;
+          form.dataset.kioskLoaderBound = '1';
+          form.addEventListener('submit', function(){
+            try {
+              if (form.dataset.kioskSubmitting === '1') return;
+              form.dataset.kioskSubmitting = '1';
+              showLoader();
 
-    // Form submissions
-    document.addEventListener('submit', function(e){
-      try { showLoader(); } catch(_) {}
-    }, true);
+              // Disable submit controls to prevent multiple submissions.
+              const submits = form.querySelectorAll('button[type=\"submit\"], input[type=\"submit\"]');
+              submits.forEach(function(el){
+                if (el && typeof el.disabled !== 'undefined') el.disabled = true;
+              });
+            } catch(_) {}
+          }, true);
+        });
+
+        // Navigation: show loader when these elements are clicked.
+        const navSelector = '.dept-card,.menu-card,.back-btn,.home-btn,a[href]';
+        document.querySelectorAll(navSelector).forEach(function(el){
+          if (!el || el.dataset.kioskNavBound === '1') return;
+          el.dataset.kioskNavBound = '1';
+          el.addEventListener('click', function(ev){
+            try {
+              // Ignore clicks inside form inputs/labels.
+              const target = ev && ev.target;
+              if (target && target.closest && target.closest('input,textarea,select,label')) return;
+              showLoader();
+
+              // Best-effort disable (only if the element supports it).
+              if (typeof el.disabled !== 'undefined' && !el.disabled) el.disabled = true;
+            } catch(_) {}
+          }, true);
+        });
+      } catch(_) {}
+    });
 
   } catch(err){
     // Never break page if loader injection fails.

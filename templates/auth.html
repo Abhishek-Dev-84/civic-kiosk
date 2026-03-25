@@ -648,12 +648,18 @@
         }
 
         function startVoiceInput() {
-            if ('webkitSpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                alert("{% trans 'Voice not supported in this browser' %}");
+                return;
+            }
+
+            if (SpeechRecognition) {
                 if (!recognition) {
-                    recognition = new webkitSpeechRecognition();
+                    recognition = new SpeechRecognition();
                     recognition.continuous = false;
                     recognition.interimResults = false;
-                    recognition.lang = 'hi-IN';
+                    recognition.lang = 'en-IN';
                     
                     recognition.onstart = function() {
                         isListening = true;

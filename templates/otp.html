@@ -523,6 +523,26 @@
             const loader = document.getElementById('loader');
             const loaderText = document.getElementById('loaderText');
             const otpFormContainer = document.getElementById('otpFormContainer');
+            const otpForm = document.getElementById('otpForm');
+            const resendForm = document.getElementById('resendForm');
+            const resendBtn = document.getElementById('resendBtn');
+
+            let otpSubmitting = false;
+            let resendSubmitting = false;
+
+            function showOtpLoaderNow() {
+                if (loader) loader.style.display = 'block';
+                if (loaderText) loaderText.style.display = 'block';
+            }
+
+            function disableOtpUiDuringSubmit() {
+                // Disable keypad to prevent multiple submissions while server is processing.
+                document.querySelectorAll('.key').forEach(key => {
+                    key.style.opacity = '0.5';
+                    key.style.pointerEvents = 'none';
+                });
+                if (resendBtn) resendBtn.disabled = true;
+            }
             
             console.log('Loader found:', loader);
             console.log('OTP Container found:', otpFormContainer);
@@ -556,6 +576,26 @@
                 startTimer();
                 
             }, 2000); // Show loader for 2 seconds, then show OTP form
+
+            // ================= SUBMIT LOADER (OTP + RESEND) =================
+            // OTP is auto-submitted once 6 digits are entered.
+            if (otpForm) {
+                otpForm.addEventListener('submit', function () {
+                    if (otpSubmitting) return;
+                    otpSubmitting = true;
+                    showOtpLoaderNow();
+                    disableOtpUiDuringSubmit();
+                });
+            }
+
+            if (resendForm) {
+                resendForm.addEventListener('submit', function () {
+                    if (resendSubmitting) return;
+                    resendSubmitting = true;
+                    showOtpLoaderNow();
+                    disableOtpUiDuringSubmit();
+                });
+            }
         });
 
         function highlightCurrentBox() {
@@ -676,8 +716,79 @@
         }
 
         // Voice input function (if needed)
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let recognition = null;
+        let isListening = false;
+
         function toggleVoiceInput() {
-            console.log('Voice toggled');
+            const voiceBtn = document.getElementById('voiceBtn');
+
+            if (!SpeechRecognition) {
+                alert("{% trans 'Voice not supported in this browser' %}");
+                return;
+            }
+
+            try {
+                if (isListening && recognition) {
+                    recognition.stop();
+                    return;
+                }
+
+                if (!recognition) {
+                    recognition = new SpeechRecognition();
+                    recognition.continuous = false;
+                    recognition.interimResults = false;
+                    recognition.lang = "en-IN";
+
+                    recognition.onstart = function() {
+                        isListening = true;
+                        if (voiceBtn) voiceBtn.classList.add('listening');
+                    };
+
+                    recognition.onresult = function(event) {
+                        try {
+                            const text = event.results[0][0].transcript;
+                            console.log(text);
+
+                            const digits = (text || '').replace(/\D/g, '').slice(0, 6);
+                            if (!digits) return;
+
+                            // Fill OTP boxes starting from current position.
+                            for (let i = 0; i < digits.length && otpPos < 6; i++) {
+                                const idx = otpPos;
+                                if (otpBoxes[idx]) {
+                                    otpBoxes[idx].textContent = digits[i];
+                                    otpBoxes[idx].classList.add('filled');
+                                }
+                                otpPos++;
+                            }
+
+                            highlightCurrentBox();
+
+                            if (otpPos === 6) {
+                                setTimeout(function() {
+                                    verifyOTP();
+                                }, 120);
+                            }
+                        } catch (err) {
+                            console.error('Voice OTP error:', err);
+                        }
+                    };
+
+                    recognition.onerror = function(event) {
+                        console.log('Voice error', event);
+                    };
+
+                    recognition.onend = function() {
+                        isListening = false;
+                        if (voiceBtn) voiceBtn.classList.remove('listening');
+                    };
+                }
+
+                recognition.start();
+            } catch (err) {
+                console.error('Failed to start voice recognition:', err);
+            }
         }
     </script>
 
