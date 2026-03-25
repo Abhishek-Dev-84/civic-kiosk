@@ -1,91 +1,42 @@
-{% load i18n %}
-{% load static %}
-<!DOCTYPE html>
-<html>
-<head>
-    <!-- Security Meta Tags -->
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://upload.wikimedia.org https://www.cdac.in; font-src 'self';">
-    <meta name="referrer" content="same-origin">
-    <meta name="robots" content="noindex, nofollow">
-    
-    <!-- Cache Control -->
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
+{% extends 'base.html' %}
+{% load i18n static %}
 
-    <title>{% trans "Meter Replacement - Civic Kiosk" %}</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% block title %}{% trans "Meter Replacement - Civic Kiosk" %}{% endblock %}
 
-    <style>
-        * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif; user-select:none; -webkit-tap-highlight-color:transparent; }
-        body { width:100vw; height:100vh; overflow:hidden; background:#f0f7ff; }
-        .header { height:70px; background:white; display:flex; align-items:center; justify-content:space-between; padding:0 20px; border-bottom:2px solid #1e5fbf; }
-        .header-left { display:flex; align-items:center; gap:10px; }
+{% block extra_head %}
+<style>
         .header-left img { height:40px; }
         .header-left div { font-size:12px; font-weight:600; color:#1e5fbf; line-height:1.2; }
         .header-right img { height:35px; }
-
         /* VOICE BUTTON */
-        .voice-corner { position:fixed; top:80px; right:15px; z-index:1000; display:flex; flex-direction:column; align-items:center; gap:4px; }
-        .voice-corner-btn { background:#ff9933; width:50px; height:50px; border-radius:50%; border:3px solid white; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:26px; box-shadow:0 3px 8px rgba(0,0,0,0.2); transition:all 0.2s; }
         .voice-corner-btn:hover { background:#ffaa44; }
         .voice-corner-btn.listening { background:#28a745; animation:pulse 1s infinite; transform:scale(1.1); }
-        @keyframes pulse { 0% { transform:scale(1); } 50% { transform:scale(1.1); } 100% { transform:scale(1); } }
-        .voice-corner-text { background:white; padding:4px 10px; border-radius:20px; font-size:11px; font-weight:600; color:#ff9933; border:1px solid #ff9933; }
-
+         50% { transform:scale(1.1); } 100% { transform:scale(1); } }
         /* BACK BUTTON */
-        .back-btn { position:fixed; top:80px; left:15px; background:white; border:2px solid #1e5fbf; border-radius:40px; padding:6px 20px; font-size:20px; font-weight:700; cursor:pointer; color:#1e5fbf; text-decoration:none; box-shadow:0 4px 0 #0a3d7a; z-index:1000; display:inline-block; transition:all 0.1s; }
         .back-btn:hover { background:#1e5fbf; color:white; }
         .back-btn:active { transform:translateY(4px); box-shadow:0 1px 0 #0a3d7a; }
-
         /* TIMEOUT WARNING */
-        .timeout-warning {
-            position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:white; border:4px solid #ff9933; border-radius:40px; padding:30px; text-align:center; z-index:2000; box-shadow:0 10px 30px rgba(0,0,0,0.3); max-width:500px; display:none;
-        }
         .timeout-warning p { font-size:28px; color:#1e5fbf; margin-bottom:20px; font-weight:700; }
         .timeout-warning button { background:#28a745; color:white; border:none; border-radius:40px; padding:15px 30px; font-size:28px; font-weight:700; cursor:pointer; margin:10px; min-width:200px; box-shadow:0 5px 0 #1e7e34; }
         .timeout-warning button:active { transform:translateY(5px); box-shadow:0 1px 0 #1e7e34; }
         .timeout-warning .logout-btn { background:#dc3545; box-shadow:0 5px 0 #a71d2a; }
-
         /* SUCCESS MESSAGE */
-        .success-message {
-            position:fixed; top:80px; left:15px; background:#4CAF50; color:white; padding:12px 25px; border-radius:50px; font-size:18px; font-weight:600; z-index:2000; border:3px solid white; box-shadow:0 4px 15px rgba(76,175,80,0.3); animation:slideInLeft 0.3s ease; display:flex; align-items:center; gap:8px; max-width:calc(100% - 130px);
-        }
         .success-message::before { content:"✅"; font-size:20px; }
-        @keyframes slideInLeft { from { transform:translateX(-100%); opacity:0; } to { transform:translateX(0); opacity:1; } }
-        @keyframes slideOutLeft { from { transform:translateX(0); opacity:1; } to { transform:translateX(-100%); opacity:0; } }
-
+         to { transform:translateX(0); opacity:1; } }
+         to { transform:translateX(-100%); opacity:0; } }
         /* SECURITY NOTE */
-        .security-note {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            font-size: 10px;
-            color: #666;
-            background: rgba(255,255,255,0.8);
-            padding: 3px 8px;
-            border-radius: 12px;
-            z-index: 999;
-        }
-
         .container { position:fixed; top:70px; left:0; right:0; bottom:0; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; padding:10px; overflow-y:auto; }
-        .content-wrapper { width:100%; max-width:600px; display:flex; flex-direction:column; gap:15px; padding:20px 0; }
-        
         .messages { width:100%; margin-bottom:15px; }
         .message { padding:10px; border-radius:10px; margin-bottom:5px; text-align:center; }
         .message.success { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
         .message.error { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
         .message.info { background:#d1ecf1; color:#0c5460; border:1px solid #bee5eb; }
-        
         h1 { color:#1e5fbf; font-size:36px; font-weight:800; text-align:center; margin:0; }
         .form-group { margin:15px 0; }
         label { display:block; font-size:22px; color:#1e5fbf; margin-bottom:5px; }
         .large-input { width:100%; height:60px; border:3px solid #1e5fbf; border-radius:20px; font-size:26px; padding:0 15px; background:white; cursor:pointer; }
         .large-input:focus { outline:none; border-color:#ff9933; }
         .large-input[readonly] { background:#f9f9f9; }
-        
         select.large-input {
             appearance:none;
             background-image:url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
@@ -94,7 +45,6 @@
             background-size:20px;
             padding-right:45px;
         }
-        
         /* METER TYPE CARDS */
         .meter-type { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin:10px 0; }
         .meter-option { background:white; border:2px solid #1e5fbf; border-radius:30px; padding:20px; text-align:center; cursor:pointer; transition:all 0.2s; }
@@ -102,7 +52,6 @@
         .meter-option.selected { background:#1e5fbf; color:white; }
         .meter-option .price { font-size:18px; color:#28a745; font-weight:600; margin-top:5px; }
         .meter-option.selected .price { color:white; }
-
         /* METER FEATURES (NEW) */
         .meter-features {
             display:flex;
@@ -121,7 +70,6 @@
             background:rgba(255,255,255,0.2);
             color:white;
         }
-
         /* INSTALLATION TIME SLOT (NEW) */
         .time-slots {
             display:grid;
@@ -141,7 +89,6 @@
         .time-slot:hover { background:#e3f2fd; }
         .time-slot.selected { background:#1e5fbf; color:white; }
         .time-slot.disabled { opacity:0.5; cursor:not-allowed; background:#f0f0f0; }
-
         /* ADDITIONAL SERVICES (NEW) */
         .additional-services {
             margin:15px 0;
@@ -164,7 +111,6 @@
             height:20px;
             cursor:pointer;
         }
-
         /* FEE BREAKDOWN (NEW) */
         .fee-breakdown {
             margin:15px 0;
@@ -187,12 +133,10 @@
             font-weight:700;
             color:#28a745;
         }
-
         .submit-btn { background:#28a745; color:white; font-size:32px; padding:12px; border-radius:40px; width:100%; border:none; box-shadow:0 5px 0 #1e7e34; cursor:pointer; margin-top:10px; transition:all 0.1s; }
         .submit-btn:active { transform:translateY(5px); box-shadow:0 1px 0 #1e7e34; }
         .submit-btn:hover { background:#2fcB4f; }
         .submit-btn:disabled { background:#6c757d; box-shadow:0 5px 0 #545b62; cursor:not-allowed; opacity:0.7; }
-
         .loading {
             display:none;
             position:fixed;
@@ -219,9 +163,7 @@
             animation:spin 1s linear infinite;
         }
         @keyframes spin { 0% { transform:rotate(0deg); } 100% { transform:rotate(360deg); } }
-
         input[type="date"].large-input { font-family:'Segoe UI',sans-serif; padding-right:10px; }
-
         /* FLOATING INPUT */
         .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);backdrop-filter:blur(3px);display:none;z-index:900;}
         .floating-input{
@@ -231,7 +173,6 @@
         }
         .floating-input.show{transform:translate(-50%,-50%) scale(1);}
         .floating-input:focus{outline:none;}
-
         /* KEYBOARD */
         .keyboard{
             position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:white;padding:12px;border-radius:18px;
@@ -244,255 +185,160 @@
         }
         .keyboard button:hover{background:#1e5fbf;color:white;}
         .keyboard .ok-btn{background:#28a745;color:white;border:none;}
-
         /* CSRF Token (hidden) */
-        #csrf_token { display:none; }
-
         /* UTILITY CLASSES */
         .hidden { display:none !important; }
-
         @media (max-width:768px) {
             .meter-type { grid-template-columns:1fr; }
             .time-slots { grid-template-columns:1fr; }
         }
         @media (max-width:480px) {
-            .voice-corner { top:75px; right:10px; }
-            .back-btn { top:75px; left:10px; padding:4px 12px; font-size:16px; }
-            .success-message { top:75px; left:10px; right:70px; padding:8px 15px; font-size:14px; }
             h1 { font-size:28px; }
         }
-    </style>
-</head>
-<body>
-    <!-- CSRF Token for JavaScript -->
-    {% csrf_token %}
-    <input type="hidden" id="csrf_token" value="{{ csrf_token }}">
 
-    <div class="header">
-        <div class="header-left">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India">
-            <div>{% trans "Ministry of Electronics &" %}<br>{% trans "Information Technology" %}<br>{% trans "Government of India" %}</div>
-        </div>
-        <div class="header-right">
-            <img src="https://www.cdac.in/img/cdac-logo.png" alt="CDAC Logo">
-        </div>
-    </div>
 
-    <!-- Voice Button -->
-    <div class="voice-corner">
-        <div class="voice-corner-btn" id="voiceBtn" onclick="toggleVoiceInput()" aria-label="{% trans 'Voice input' %}">🎤</div>
-        <div class="voice-corner-text" id="voiceStatus">{% trans "Click" %}</div>
-    </div>
+</style>
+{% endblock %}
 
-    <!-- Back Button -->
-    <a href="{% url 'electricity-services' %}" class="back-btn" id="backBtn" aria-label="{% trans 'Go back' %}">← {% trans "Back" %}</a>
-
-    <!-- Timeout Warning -->
-    <div id="timeoutWarning" class="timeout-warning" role="alert">
-        <p>⏰ {% trans "Session about to expire!" %}</p>
-        <button onclick="extendSession()" aria-label="{% trans 'Continue session' %}">{% trans "Continue" %}</button>
-        <button class="logout-btn" onclick="window.location='{% url 'index' %}'" aria-label="{% trans 'Logout' %}">{% trans "Logout" %}</button>
-    </div>
-
-    <!-- Success Messages -->
-    {% if messages %}
-        {% for message in messages %}
-            {% if message.tags == 'success' %}
-                <div class="success-message" role="alert">
-                    {{ message }}
-                </div>
-            {% endif %}
-        {% endfor %}
-    {% endif %}
-
-    <!-- Security Note -->
-    <div class="security-note">
-        🔒 {% trans "Secured by Government of India" %}
-    </div>
-
-    <div class="container">
-        <div class="content-wrapper">
-
-            {% if messages %}
-            <div class="messages">
-                {% for message in messages %}
-                    <div class="message {{ message.tags }}">{{ message }}</div>
-                {% endfor %}
-            </div>
-            {% endif %}
-
+{% block content %}
+     Security Note 
+<div class="container">
+<div class="content-wrapper">
             <h1>🔋 {% trans "Meter Replacement" %}</h1>
+<form action="{% url 'electricity-meter-replacement' %}" id="replacementForm" method="post" onsubmit="return validateAndSubmit()">
+    {% csrf_token %}
+                <input id="consumerNumber" name="consumer_number" type="hidden" value="{{ request.POST.consumer_number|default:'123456789012' }}"/>
+<input id="meterType" name="meter_type" type="hidden" value="Single Phase"/>
+<input id="meterPrice" name="meter_price" type="hidden" value="1200"/>
+<input id="reasonValue" name="reason" type="hidden" value="Meter faulty/not working"/>
+<input id="prefDateValue" name="preferred_date" type="hidden"/>
+<input id="prefTimeValue" name="preferred_time" type="hidden"/>
+<input id="additionalServices" name="additional_services" type="hidden"/>
+</form>
+<div class="form-group">
+<label for="consumerNo">{% trans "Consumer Number" %}</label>
+<input aria-label="{% trans 'Consumer number' %}" autocomplete="off" class="large-input text-input" id="consumerNo" maxlength="14" readonly="" value="1234 5678 9012"/>
+</div>
+<div class="form-group">
+<label for="reason">{% trans "Reason for Replacement" %}</label>
+<select aria-label="{% trans 'Reason for replacement' %}" class="large-input" id="reason" onchange="updateReason()">
+<option value="Meter faulty/not working">{% trans "Meter faulty/not working" %}</option>
+<option value="Meter damaged">{% trans "Meter damaged" %}</option>
+<option value="Upgrade to smart meter">{% trans "Upgrade to smart meter" %}</option>
+<option value="Meter showing error">{% trans "Meter showing error" %}</option>
+<option value="Meter stolen">{% trans "Meter stolen" %}</option>
+<option value="Other">{% trans "Other" %}</option>
+</select>
+</div>
+<div class="form-group">
+<label>{% trans "Select Meter Type" %}</label>
+<div class="meter-type">
+<div aria-label="{% trans 'Single Phase meter, ₹1,200' %}" class="meter-option selected" onclick="selectMeter(this,'Single Phase',1200)" onkeypress="if(event.key==='Enter') selectMeter(this,'Single Phase',1200)" role="button" tabindex="0">
+<div>{% trans "Single Phase" %}</div>
+<div class="price">₹1,200</div>
+<div class="meter-features">
+<span class="meter-feature">{% trans "Residential" %}</span>
+<span class="meter-feature">{% trans "Basic" %}</span>
+</div>
+</div>
+<div aria-label="{% trans 'Three Phase meter, ₹2,500' %}" class="meter-option" onclick="selectMeter(this,'Three Phase',2500)" onkeypress="if(event.key==='Enter') selectMeter(this,'Three Phase',2500)" role="button" tabindex="0">
+<div>{% trans "Three Phase" %}</div>
+<div class="price">₹2,500</div>
+<div class="meter-features">
+<span class="meter-feature">{% trans "Commercial" %}</span>
+<span class="meter-feature">{% trans "Industrial" %}</span>
+</div>
+</div>
+<div aria-label="{% trans 'Smart meter, ₹3,000' %}" class="meter-option" onclick="selectMeter(this,'Smart Meter',3000)" onkeypress="if(event.key==='Enter') selectMeter(this,'Smart Meter',3000)" role="button" tabindex="0">
+<div>{% trans "Smart Meter" %}</div>
+<div class="price">₹3,000</div>
+<div class="meter-features">
+<span class="meter-feature">{% trans "WiFi" %}</span>
+<span class="meter-feature">{% trans "App" %}</span>
+<span class="meter-feature">{% trans "Real-time" %}</span>
+</div>
+</div>
+<div aria-label="{% trans 'CT meter, ₹4,500' %}" class="meter-option" onclick="selectMeter(this,'CT Meter',4500)" onkeypress="if(event.key==='Enter') selectMeter(this,'CT Meter',4500)" role="button" tabindex="0">
+<div>{% trans "CT Meter" %}</div>
+<div class="price">₹4,500</div>
+<div class="meter-features">
+<span class="meter-feature">{% trans "High Load" %}</span>
+<span class="meter-feature">{% trans "Industrial" %}</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Installation Time Slot (New) -->
+<div class="form-group">
+<label for="prefDate">{% trans "Preferred Date &amp; Time" %}</label>
+<input aria-label="{% trans 'Preferred date' %}" class="large-input date-input" id="prefDate" min="{{ today|date:'Y-m-d' }}" onchange="updateDateTime()" type="date" value=""/>
+</div>
+<div class="time-slots" id="timeSlots">
+<div aria-label="{% trans '9 AM to 12 PM slot' %}" class="time-slot selected" onclick="selectTimeSlot('09:00-12:00')" onkeypress="if(event.key==='Enter') selectTimeSlot('09:00-12:00')" role="button" tabindex="0">09:00 - 12:00</div>
+<div aria-label="{% trans '12 PM to 3 PM slot' %}" class="time-slot" onclick="selectTimeSlot('12:00-15:00')" onkeypress="if(event.key==='Enter') selectTimeSlot('12:00-15:00')" role="button" tabindex="0">12:00 - 15:00</div>
+<div aria-label="{% trans '3 PM to 6 PM slot' %}" class="time-slot" onclick="selectTimeSlot('15:00-18:00')" onkeypress="if(event.key==='Enter') selectTimeSlot('15:00-18:00')" role="button" tabindex="0">15:00 - 18:00</div>
+</div>
+<!-- Additional Services (New) -->
+<div class="additional-services">
+<label style="font-size:18px; margin-bottom:10px;">{% trans "Additional Services" %}</label>
+<div class="service-checkbox">
+<input aria-label="{% trans 'Meter calibration service' %}" id="serviceCalibration" onchange="updateAdditionalServices()" type="checkbox"/>
+<label for="serviceCalibration" style="font-size:16px; color:#333;">{% trans "Meter Calibration" %} (+₹300)</label>
+</div>
+<div class="service-checkbox">
+<input aria-label="{% trans 'Wiring check service' %}" id="serviceWiring" onchange="updateAdditionalServices()" type="checkbox"/>
+<label for="serviceWiring" style="font-size:16px; color:#333;">{% trans "Wiring Check" %} (+₹500)</label>
+</div>
+<div class="service-checkbox">
+<input aria-label="{% trans 'New meter seal service' %}" id="serviceSeal" onchange="updateAdditionalServices()" type="checkbox"/>
+<label for="serviceSeal" style="font-size:16px; color:#333;">{% trans "New Meter Seal" %} (+₹100)</label>
+</div>
+</div>
+<!-- Fee Breakdown (New) -->
+<div class="fee-breakdown">
+<div class="fee-row">
+<span>{% trans "Meter Cost:" %}</span>
+<span id="meterCost">₹1,200</span>
+</div>
+<div class="fee-row" id="additionalServicesRow" style="display:none;">
+<span>{% trans "Additional Services:" %}</span>
+<span id="additionalServicesCost">₹0</span>
+</div>
+<div class="fee-row">
+<span>{% trans "Installation Fee:" %}</span>
+<span>₹500</span>
+</div>
+<div class="fee-row">
+<span>{% trans "GST (18%):" %}</span>
+<span id="gstAmount">₹306</span>
+</div>
+<div class="fee-total">
+<span>{% trans "Total:" %}</span>
+<span id="totalAmount">₹2,006</span>
+</div>
+</div>
+<div class="form-group">
+<label>{% trans "Estimated Total" %}</label>
+<div id="totalDisplay" style="font-size:28px;color:#28a745;font-weight:700;text-align:center;">₹ 2,006</div>
+</div>
+<button aria-label="{% trans 'Submit meter replacement request' %}" class="submit-btn" id="submitBtn" onclick="submitRequest()">{% trans "Request Replacement" %}</button>
+</div>
+</div>
+ Loading indicator 
+<div class="loading" id="loadingIndicator">
+<div class="spinner"></div>
+<div>{% trans "Processing..." %}</div>
+</div>
+ Floating Input System 
+<div class="overlay" id="overlay"></div>
+<input %}"="" class="floating-input" consumer="" enter="" id="floatingInput" maxlength="12" number"="" placeholder="{% trans "/>
+<div class="keyboard" id="keyboard"></div>
+<script src="{% static 'js/voice.js' %}"></script>
+{% endblock %}
 
-            <form id="replacementForm" method="post" action="{% url 'electricity-meter-replacement' %}" onsubmit="return validateAndSubmit()">
-                {% csrf_token %}
-                <input type="hidden" name="consumer_number" id="consumerNumber" value="{{ request.POST.consumer_number|default:'123456789012' }}">
-                <input type="hidden" name="meter_type" id="meterType" value="Single Phase">
-                <input type="hidden" name="meter_price" id="meterPrice" value="1200">
-                <input type="hidden" name="reason" id="reasonValue" value="Meter faulty/not working">
-                <input type="hidden" name="preferred_date" id="prefDateValue">
-                <input type="hidden" name="preferred_time" id="prefTimeValue">
-                <input type="hidden" name="additional_services" id="additionalServices">
-            </form>
-
-            <div class="form-group">
-                <label for="consumerNo">{% trans "Consumer Number" %}</label>
-                <input class="large-input text-input" id="consumerNo" value="1234 5678 9012" readonly maxlength="14" autocomplete="off" aria-label="{% trans 'Consumer number' %}">
-            </div>
-
-            <div class="form-group">
-                <label for="reason">{% trans "Reason for Replacement" %}</label>
-                <select class="large-input" id="reason" onchange="updateReason()" aria-label="{% trans 'Reason for replacement' %}">
-                    <option value="Meter faulty/not working">{% trans "Meter faulty/not working" %}</option>
-                    <option value="Meter damaged">{% trans "Meter damaged" %}</option>
-                    <option value="Upgrade to smart meter">{% trans "Upgrade to smart meter" %}</option>
-                    <option value="Meter showing error">{% trans "Meter showing error" %}</option>
-                    <option value="Meter stolen">{% trans "Meter stolen" %}</option>
-                    <option value="Other">{% trans "Other" %}</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>{% trans "Select Meter Type" %}</label>
-
-                <div class="meter-type">
-                    <div class="meter-option selected" onclick="selectMeter(this,'Single Phase',1200)" role="button" tabindex="0" onkeypress="if(event.key==='Enter') selectMeter(this,'Single Phase',1200)" aria-label="{% trans 'Single Phase meter, ₹1,200' %}">
-                        <div>{% trans "Single Phase" %}</div>
-                        <div class="price">₹1,200</div>
-                        <div class="meter-features">
-                            <span class="meter-feature">{% trans "Residential" %}</span>
-                            <span class="meter-feature">{% trans "Basic" %}</span>
-                        </div>
-                    </div>
-
-                    <div class="meter-option" onclick="selectMeter(this,'Three Phase',2500)" role="button" tabindex="0" onkeypress="if(event.key==='Enter') selectMeter(this,'Three Phase',2500)" aria-label="{% trans 'Three Phase meter, ₹2,500' %}">
-                        <div>{% trans "Three Phase" %}</div>
-                        <div class="price">₹2,500</div>
-                        <div class="meter-features">
-                            <span class="meter-feature">{% trans "Commercial" %}</span>
-                            <span class="meter-feature">{% trans "Industrial" %}</span>
-                        </div>
-                    </div>
-
-                    <div class="meter-option" onclick="selectMeter(this,'Smart Meter',3000)" role="button" tabindex="0" onkeypress="if(event.key==='Enter') selectMeter(this,'Smart Meter',3000)" aria-label="{% trans 'Smart meter, ₹3,000' %}">
-                        <div>{% trans "Smart Meter" %}</div>
-                        <div class="price">₹3,000</div>
-                        <div class="meter-features">
-                            <span class="meter-feature">{% trans "WiFi" %}</span>
-                            <span class="meter-feature">{% trans "App" %}</span>
-                            <span class="meter-feature">{% trans "Real-time" %}</span>
-                        </div>
-                    </div>
-
-                    <div class="meter-option" onclick="selectMeter(this,'CT Meter',4500)" role="button" tabindex="0" onkeypress="if(event.key==='Enter') selectMeter(this,'CT Meter',4500)" aria-label="{% trans 'CT meter, ₹4,500' %}">
-                        <div>{% trans "CT Meter" %}</div>
-                        <div class="price">₹4,500</div>
-                        <div class="meter-features">
-                            <span class="meter-feature">{% trans "High Load" %}</span>
-                            <span class="meter-feature">{% trans "Industrial" %}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Installation Time Slot (New) -->
-            <div class="form-group">
-                <label for="prefDate">{% trans "Preferred Date & Time" %}</label>
-                <input class="large-input date-input" type="date" id="prefDate" onchange="updateDateTime()" value="" min="{{ today|date:'Y-m-d' }}" aria-label="{% trans 'Preferred date' %}">
-            </div>
-
-            <div class="time-slots" id="timeSlots">
-                <div class="time-slot selected" onclick="selectTimeSlot('09:00-12:00')" role="button" tabindex="0" onkeypress="if(event.key==='Enter') selectTimeSlot('09:00-12:00')" aria-label="{% trans '9 AM to 12 PM slot' %}">09:00 - 12:00</div>
-                <div class="time-slot" onclick="selectTimeSlot('12:00-15:00')" role="button" tabindex="0" onkeypress="if(event.key==='Enter') selectTimeSlot('12:00-15:00')" aria-label="{% trans '12 PM to 3 PM slot' %}">12:00 - 15:00</div>
-                <div class="time-slot" onclick="selectTimeSlot('15:00-18:00')" role="button" tabindex="0" onkeypress="if(event.key==='Enter') selectTimeSlot('15:00-18:00')" aria-label="{% trans '3 PM to 6 PM slot' %}">15:00 - 18:00</div>
-            </div>
-
-            <!-- Additional Services (New) -->
-            <div class="additional-services">
-                <label style="font-size:18px; margin-bottom:10px;">{% trans "Additional Services" %}</label>
-                <div class="service-checkbox">
-                    <input type="checkbox" id="serviceCalibration" onchange="updateAdditionalServices()" aria-label="{% trans 'Meter calibration service' %}">
-                    <label for="serviceCalibration" style="font-size:16px; color:#333;">{% trans "Meter Calibration" %} (+₹300)</label>
-                </div>
-                <div class="service-checkbox">
-                    <input type="checkbox" id="serviceWiring" onchange="updateAdditionalServices()" aria-label="{% trans 'Wiring check service' %}">
-                    <label for="serviceWiring" style="font-size:16px; color:#333;">{% trans "Wiring Check" %} (+₹500)</label>
-                </div>
-                <div class="service-checkbox">
-                    <input type="checkbox" id="serviceSeal" onchange="updateAdditionalServices()" aria-label="{% trans 'New meter seal service' %}">
-                    <label for="serviceSeal" style="font-size:16px; color:#333;">{% trans "New Meter Seal" %} (+₹100)</label>
-                </div>
-            </div>
-
-            <!-- Fee Breakdown (New) -->
-            <div class="fee-breakdown">
-                <div class="fee-row">
-                    <span>{% trans "Meter Cost:" %}</span>
-                    <span id="meterCost">₹1,200</span>
-                </div>
-                <div class="fee-row" id="additionalServicesRow" style="display:none;">
-                    <span>{% trans "Additional Services:" %}</span>
-                    <span id="additionalServicesCost">₹0</span>
-                </div>
-                <div class="fee-row">
-                    <span>{% trans "Installation Fee:" %}</span>
-                    <span>₹500</span>
-                </div>
-                <div class="fee-row">
-                    <span>{% trans "GST (18%):" %}</span>
-                    <span id="gstAmount">₹306</span>
-                </div>
-                <div class="fee-total">
-                    <span>{% trans "Total:" %}</span>
-                    <span id="totalAmount">₹2,006</span>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>{% trans "Estimated Total" %}</label>
-                <div style="font-size:28px;color:#28a745;font-weight:700;text-align:center;" id="totalDisplay">₹ 2,006</div>
-            </div>
-
-            <button class="submit-btn" onclick="submitRequest()" id="submitBtn" aria-label="{% trans 'Submit meter replacement request' %}">{% trans "Request Replacement" %}</button>
-
-        </div>
-    </div>
-
-    <!-- Loading indicator -->
-    <div id="loadingIndicator" class="loading">
-        <div class="spinner"></div>
-        <div>{% trans "Processing..." %}</div>
-    </div>
-
-    <!-- Floating Input System -->
-    <div id="overlay" class="overlay"></div>
-    <input id="floatingInput" class="floating-input" placeholder="{% trans "Enter consumer number" %}" maxlength="12">
-    <div id="keyboard" class="keyboard"></div>
-
-    <script src="{% static 'js/voice.js' %}"></script>
-
-    <script>
+{% block extra_scripts %}
+<script>
         // ================= SECURITY ENHANCEMENTS =================
-
-        // Disable keyboard shortcuts
-        document.addEventListener('keydown', function(e) {
-            // F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
-            if (e.key === 'F12' || 
-                (e.ctrlKey && e.shiftKey && e.key === 'I') ||
-                (e.ctrlKey && e.shiftKey && e.key === 'J') ||
-                (e.ctrlKey && e.key === 'U')) {
-                e.preventDefault();
-                return false;
-            }
-            
-            // Prevent backspace from navigating back
-            if (e.key === 'Backspace' && !e.target.matches('input, textarea, [contenteditable], button')) {
-                e.preventDefault();
-            }
-        });
-
-        // Disable right-click
-        document.addEventListener('contextmenu', event => event.preventDefault());
-
         // Auto-hide cursor on touch devices
         let cursorTimeout;
         document.addEventListener('touchstart', function() {
@@ -502,7 +348,6 @@
                 document.body.style.cursor = 'none';
             }, 3000);
         });
-
         // Prevent page zoom on double tap
         let lastTouchEnd = 0;
         document.addEventListener('touchend', function(event) {
@@ -512,7 +357,6 @@
             }
             lastTouchEnd = now;
         }, false);
-
         // ================= LANGUAGE MAP =================
         const languageMap = {
             "en": "en-IN",
@@ -522,18 +366,15 @@
             "bn": "bn-IN",
             "or": "or-IN"
         };
-
         function getCurrentLang() {
             let path = window.location.pathname.split('/');
             const langCode = path[1] || "en";
             return languageMap[langCode] || "en-IN";
         }
-
         function getCurrentLangCode() {
             let path = window.location.pathname.split('/');
             return path[1] || "en";
         }
-
         function speak(text) {
             if(!('speechSynthesis' in window)) return;
             speechSynthesis.cancel();
@@ -542,58 +383,19 @@
             u.rate = 1;
             speechSynthesis.speak(u);
         }
-
         // ================= SESSION TIMER =================
-        let sessionTimer;
-        let timeoutWarningTimer;
-        const SESSION_DURATION = 240000; // 4 minutes
-        const WARNING_TIME = 60000; // Show warning 1 minute before expiry
-
-        function startSessionTimer() {
-            clearTimeout(sessionTimer);
-            clearTimeout(timeoutWarningTimer);
-            
-            sessionTimer = setTimeout(() => {
-                showTimeoutWarning();
-            }, SESSION_DURATION - WARNING_TIME);
-        }
-
-        function showTimeoutWarning() {
-            const warning = document.getElementById('timeoutWarning');
-            if (warning) {
-                warning.style.display = 'block';
-                
-                timeoutWarningTimer = setTimeout(() => {
-                    window.location.href = "{% url 'index' %}";
-                }, WARNING_TIME);
-            }
-        }
-
-        function extendSession() {
-            const warning = document.getElementById('timeoutWarning');
-            if (warning) {
-                warning.style.display = 'none';
-            }
-            clearTimeout(sessionTimer);
-            clearTimeout(timeoutWarningTimer);
-            startSessionTimer();
-        }
-
         function resetSessionTimer() {
             clearTimeout(sessionTimer);
             clearTimeout(timeoutWarningTimer);
             startSessionTimer();
         }
-
         // ================= FLOATING KEYBOARD =================
         let activeInput = null;
         let isSubmitting = false;
         const overlay = document.getElementById("overlay");
         const floatingInput = document.getElementById("floatingInput");
         const keyboard = document.getElementById("keyboard");
-
         const keys = ["1","2","3","4","5","6","7","8","9","0"];
-
         function createKeyboard(){
             keyboard.innerHTML = "";
             let row = document.createElement("div");
@@ -609,7 +411,6 @@
                 row.appendChild(btn);
             });
             keyboard.appendChild(row);
-
             let last = document.createElement("div");
             last.className = "keyboard-row";
             last.innerHTML = `
@@ -619,7 +420,6 @@
             `;
             keyboard.appendChild(last);
         }
-
         function openKeyboard(input) {
             if (isSubmitting) return;
             activeInput = input;
@@ -633,7 +433,6 @@
                 floatingInput.focus();
             }, 10);
         }
-
         function finish() {
             if (activeInput && !isSubmitting) {
                 let value = floatingInput.value.replace(/\D/g, '').substring(0, 12);
@@ -646,7 +445,6 @@
             }
             closeKeyboard();
         }
-
         function closeKeyboard() {
             floatingInput.classList.remove("show");
             setTimeout(() => {
@@ -655,7 +453,6 @@
                 keyboard.style.display = "none";
             }, 200);
         }
-
         document.querySelectorAll(".text-input").forEach(i => {
             i.addEventListener("click", e => {
                 e.stopPropagation();
@@ -664,33 +461,27 @@
                 openKeyboard(i);
             });
         });
-
         floatingInput.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 finish();
             }
         });
-
         overlay.addEventListener("click", closeKeyboard);
         createKeyboard();
-
         // ================= METER REPLACEMENT FUNCTIONS =================
         let selectedMeterPrice = 1200;
         let selectedTimeSlot = '09:00-12:00';
         let additionalServicesTotal = 0;
-
         function selectMeter(el, type, price) {
             resetSessionTimer();
             if (isSubmitting) return;
-            
             document.querySelectorAll('.meter-option').forEach(o => o.classList.remove('selected'));
             el.classList.add('selected');
             selectedMeterPrice = price;
             document.getElementById('meterType').value = type;
             document.getElementById('meterPrice').value = price;
             updateTotalDisplay();
-            
             const langCode = getCurrentLangCode();
             if (langCode === 'hi') {
                 speak(type + " चयनित, कीमत " + price + " रुपये");
@@ -700,16 +491,13 @@
                 speak(type + " selected, price " + price + " rupees");
             }
         }
-
         function selectTimeSlot(slot) {
             resetSessionTimer();
             if (isSubmitting) return;
-            
             selectedTimeSlot = slot;
             document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
             event.target.classList.add('selected');
             document.getElementById('prefTimeValue').value = slot;
-            
             const langCode = getCurrentLangCode();
             if (langCode === 'hi') {
                 speak(slot + " समय स्लॉट चयनित");
@@ -719,7 +507,6 @@
                 speak(slot + " time slot selected");
             }
         }
-
         function updateDateTime() {
             resetSessionTimer();
             const date = document.getElementById('prefDate').value;
@@ -735,12 +522,10 @@
                 }
             }
         }
-
         function updateAdditionalServices() {
             resetSessionTimer();
             additionalServicesTotal = 0;
             let services = [];
-            
             if (document.getElementById('serviceCalibration').checked) {
                 additionalServicesTotal += 300;
                 services.push('calibration');
@@ -753,44 +538,34 @@
                 additionalServicesTotal += 100;
                 services.push('seal');
             }
-            
             document.getElementById('additionalServices').value = services.join(',');
             document.getElementById('additionalServicesCost').innerText = '₹' + additionalServicesTotal;
             document.getElementById('additionalServicesRow').style.display = additionalServicesTotal > 0 ? 'flex' : 'none';
-            
             updateTotalDisplay();
         }
-
         function updateTotalDisplay() {
             const meterCost = selectedMeterPrice;
             const installationFee = 500;
             const subtotal = meterCost + installationFee + additionalServicesTotal;
             const gst = Math.round(subtotal * 0.18);
             const total = Math.round(subtotal + gst);
-            
             document.getElementById('meterCost').innerText = '₹' + meterCost;
             document.getElementById('gstAmount').innerText = '₹' + gst;
             document.getElementById('totalAmount').innerText = '₹' + total;
             document.getElementById('totalDisplay').innerHTML = '₹ ' + total;
         }
-
         function updateReason() {
             resetSessionTimer();
             document.getElementById('reasonValue').value = document.getElementById('reason').value;
         }
-
         function validateAndSubmit() {
             return false; // Prevent default form submission
         }
-
         function submitRequest() {
             resetSessionTimer();
-            
             if (isSubmitting) return;
-            
             const date = document.getElementById('prefDate').value;
             const consumerNo = document.getElementById('consumerNumber').value;
-            
             if (!date) {
                 const langCode = getCurrentLangCode();
                 if (langCode === 'hi') {
@@ -802,12 +577,10 @@
                 }
                 return;
             }
-            
             // Validate date is not in past
             const selectedDate = new Date(date);
             const today = new Date();
             today.setHours(0, 0, 0, 0);
-            
             if (selectedDate < today) {
                 const langCode = getCurrentLangCode();
                 if (langCode === 'hi') {
@@ -819,7 +592,6 @@
                 }
                 return;
             }
-            
             if (!consumerNo || consumerNo.length < 6) {
                 const langCode = getCurrentLangCode();
                 if (langCode === 'hi') {
@@ -831,15 +603,12 @@
                 }
                 return;
             }
-            
             updateReason();
             updateDateTime();
             document.getElementById('prefTimeValue').value = selectedTimeSlot;
-            
             isSubmitting = true;
             document.getElementById('submitBtn').disabled = true;
             document.getElementById('loadingIndicator').classList.add('show');
-            
             const langCode = getCurrentLangCode();
             if (langCode === 'hi') {
                 speak("मीटर बदलने का अनुरोध भेजा जा रहा है");
@@ -848,48 +617,39 @@
             } else {
                 speak("Submitting meter replacement request");
             }
-            
             setTimeout(() => {
                 document.getElementById('replacementForm').submit();
             }, 500);
         }
-
         // ================= VOICE INPUT =================
         let recognition;
         let isListening = false;
         let voiceRestartTimeout = null;
-
         function toggleVoiceInput() {
             resetSessionTimer();
-            
             if(isListening) {
                 stopVoiceInput();
                 return;
             }
-
             const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
             if(!SR) {
                 alert("{% trans 'Speech not supported' %}");
                 return;
             }
-
             if (recognition) {
                 try {
                     recognition.stop();
                 } catch(e) {}
             }
-
             recognition = new SR();
             recognition.lang = getCurrentLang();
             recognition.continuous = true;
             recognition.interimResults = true;
             recognition.maxAlternatives = 1;
-
             recognition.onstart = function() {
                 isListening = true;
                 document.getElementById("voiceBtn").classList.add("listening");
                 document.getElementById("voiceStatus").innerText = "{% trans 'Listening...' %}";
-                
                 const langCode = getCurrentLangCode();
                 if (langCode === 'hi') {
                     speak("कृपया आदेश बोलें... मीटर प्रकार, कारण, तारीख, समय, या जमा करें");
@@ -899,13 +659,10 @@
                     speak("Please say a command... meter type, reason, date, time, or submit");
                 }
             };
-
             recognition.onresult = function(e) {
                 resetSessionTimer();
-                
                 let finalTranscript = '';
                 let interimTranscript = '';
-                
                 for (let i = 0; i < e.results.length; i++) {
                     const result = e.results[i];
                     if (result.isFinal) {
@@ -914,11 +671,9 @@
                         interimTranscript += result[0].transcript;
                     }
                 }
-                
                 const transcript = finalTranscript || interimTranscript;
                 const command = transcript.toLowerCase();
                 console.log("Meter replacement command:", command);
-                
                 // Consumer number command
                 const numberMatch = command.match(/\d+/g);
                 if(numberMatch && (command.includes("consumer") || command.includes("number") || command.includes("उपभोक्ता") || command.includes("ଗ୍ରାହକ"))) {
@@ -938,7 +693,6 @@
                     }
                     return;
                 }
-                
                 // Meter type selection
                 if (command.includes("single") || command.includes("1 phase") || command.includes("सिंगल") || command.includes("ସିଙ୍ଗଲ")) {
                     document.querySelectorAll('.meter-option')[0].click();
@@ -956,7 +710,6 @@
                     document.querySelectorAll('.meter-option')[3].click();
                     return;
                 }
-                
                 // Reason selection
                 const reasons = {
                     "faulty": "Meter faulty/not working",
@@ -966,7 +719,6 @@
                     "stolen": "Meter stolen",
                     "other": "Other"
                 };
-                
                 for (let [key, value] of Object.entries(reasons)) {
                     if (command.includes(key) || command.includes(value.toLowerCase())) {
                         document.getElementById('reason').value = value;
@@ -982,7 +734,6 @@
                         return;
                     }
                 }
-                
                 // Date commands
                 if (command.includes("today") || command.includes("आज") || command.includes("ଆଜି")) {
                     const today = new Date().toISOString().split('T')[0];
@@ -997,7 +748,6 @@
                     updateDateTime();
                     return;
                 }
-                
                 // Time slot commands
                 if (command.includes("9") || command.includes("nine") || command.includes("सुबह") || command.includes("ସକାଳ")) {
                     selectTimeSlot('09:00-12:00');
@@ -1011,7 +761,6 @@
                     selectTimeSlot('15:00-18:00');
                     return;
                 }
-                
                 // Additional services
                 if (command.includes("calibration") || command.includes("कैलिब्रेशन") || command.includes("କ୍ୟାଲିବ୍ରେସନ୍")) {
                     document.getElementById('serviceCalibration').click();
@@ -1025,7 +774,6 @@
                     document.getElementById('serviceSeal').click();
                     return;
                 }
-                
                 // Submit command
                 if (command.includes("submit") || command.includes("request") || command.includes("जमा") || command.includes("अनुरोध") || command.includes("ଦାଖଲ")) {
                     submitRequest();
@@ -1044,13 +792,11 @@
                     return;
                 }
             };
-
             recognition.onerror = function(event) {
                 console.error("Recognition error:", event.error);
                 if (event.error === 'no-speech') return;
                 stopVoiceInput();
             };
-
             recognition.onend = function() {
                 if (isListening) {
                     if (voiceRestartTimeout) clearTimeout(voiceRestartTimeout);
@@ -1067,7 +813,6 @@
                     document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
                 }
             };
-
             try {
                 recognition.start();
             } catch(e) {
@@ -1075,7 +820,6 @@
                 stopVoiceInput();
             }
         }
-
         function stopVoiceInput() {
             isListening = false;
             if (recognition) {
@@ -1089,13 +833,11 @@
                 clearTimeout(voiceRestartTimeout);
             }
         }
-
         // ================= OVERRIDE VOICE COMMANDS =================
         const originalHandleCommand = window.handleCommand;
         window.handleCommand = function(command) {
             command = command.toLowerCase();
             console.log("Meter replacement command:", command);
-            
             // Consumer number command
             const numberMatch = command.match(/\d+/g);
             if(numberMatch && (command.includes("consumer") || command.includes("number") || command.includes("उपभोक्ता") || command.includes("ଗ୍ରାହକ"))) {
@@ -1108,7 +850,6 @@
                 }
                 return;
             }
-            
             // Meter type selection
             if (command.includes("single") || command.includes("1 phase")) {
                 document.querySelectorAll('.meter-option')[0].click();
@@ -1126,7 +867,6 @@
                 document.querySelectorAll('.meter-option')[3].click();
                 return;
             }
-            
             // Reason selection
             const reasons = ["faulty", "damaged", "upgrade", "error", "stolen", "other"];
             for (let reason of reasons) {
@@ -1142,7 +882,6 @@
                     }
                 }
             }
-            
             // Date commands
             if (command.includes("today")) {
                 const today = new Date().toISOString().split('T')[0];
@@ -1157,7 +896,6 @@
                 updateDateTime();
                 return;
             }
-            
             // Submit command
             if (command.includes("submit") || command.includes("request")) {
                 submitRequest();
@@ -1175,12 +913,10 @@
                 stopVoiceInput();
                 return;
             }
-            
             if (originalHandleCommand) {
                 originalHandleCommand(command);
             }
         };
-
         // Override autoReadPage to read meter replacement instructions
         const originalAutoRead = window.autoReadPage;
         window.autoReadPage = function() {
@@ -1198,17 +934,14 @@
                 }
             }, 2000);
         };
-
         // ================= INIT =================
         document.addEventListener('DOMContentLoaded', function() {
             startSessionTimer();
-            
             // Add activity listeners
             document.addEventListener('click', resetSessionTimer);
             document.addEventListener('keypress', resetSessionTimer);
             document.addEventListener('touchstart', resetSessionTimer);
             document.addEventListener('mousemove', resetSessionTimer);
-            
             // Set default date to tomorrow
             const tomorrow = new Date();
             tomorrow.setDate(tomorrow.getDate() + 1);
@@ -1218,15 +951,12 @@
             const tomorrowStr = `${year}-${month}-${day}`;
             document.getElementById('prefDate').value = tomorrowStr;
             updateDateTime();
-            
             // Set min date to today
             const today = new Date();
             const todayStr = today.toISOString().split('T')[0];
             document.getElementById('prefDate').min = todayStr;
-            
             setTimeout(autoReadPage, 2000);
         });
-
         window.addEventListener('beforeunload', function() {
             if (sessionTimer) {
                 clearTimeout(sessionTimer);
@@ -1236,14 +966,12 @@
             }
             stopVoiceInput();
         });
-
         // Auto-hide messages after 5 seconds
         setTimeout(function() {
             document.querySelectorAll('.message').forEach(function(message) {
                 message.style.display = 'none';
             });
         }, 5000);
-
         // Auto-hide success messages after 3 seconds
         setTimeout(function() {
             const successMsg = document.querySelector('.success-message');
@@ -1254,7 +982,7 @@
                 }, 300);
             }
         }, 3000);
-    </script>
 
-</body>
-</html>
+
+</script>
+{% endblock %}

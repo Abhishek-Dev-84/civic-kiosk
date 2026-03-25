@@ -10,6 +10,9 @@ urlpatterns = [
     path('set-language/', set_language, name='set_language'),
 ]
 
+handler404 = 'display.views.custom_404'
+# We don't have custom_500 yet, we will just use Django's default for 500 which automatically renders 500.html
+
 urlpatterns += i18n_patterns(
     path('admin/', admin.site.urls),
     path('', include('display.urls')),

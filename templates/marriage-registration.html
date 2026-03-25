@@ -1,117 +1,28 @@
-<!DOCTYPE html>
-{% load i18n %}
-{% load static %}
-<html>
-<head>
-<title>{% trans "Marriage Registration - Kiosk" %}</title>
+{% extends 'base.html' %}
+{% load i18n static %}
 
+{% block title %}{% trans "Marriage Registration - Kiosk" %}{% endblock %}
+
+{% block extra_head %}
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;user-select:none;}
-body{width:100vw;height:100vh;overflow:hidden;background:#f0f7ff;}
-
 /* Header */
-.header{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:60px;
-background:white;
-display:flex;
-align-items:center;
-justify-content:space-between;
-padding:0 15px;
-border-bottom:2px solid #1e5fbf;
-z-index:1000;
-}
-.header-left{display:flex;align-items:center;gap:8px;}
 .header-left img{height:35px;}
 .header-left div{font-size:11px;font-weight:600;color:#1e5fbf;line-height:1.2;}
 .header-right img{height:30px;}
-
 /* Voice corner */
-.voice-corner{
-position:fixed;
-top:65px;
-right:15px;
-display:flex;
-flex-direction:column;
-align-items:center;
-gap:4px;
-z-index:1001;
-}
-.voice-corner-btn{
-background:#ff9933;
-width:45px;
-height:45px;
-border-radius:50%;
-border:3px solid white;
-display:flex;
-align-items:center;
-justify-content:center;
-font-size:24px;
-cursor:pointer;
-box-shadow:0 3px 8px rgba(0,0,0,0.2);
-transition:all 0.2s;
-}
 .voice-corner-btn:hover{background:#ffaa44;}
 .voice-corner-btn.listening{
 background:#28a745;
 animation:pulse 1s infinite;
 transform:scale(1.1);
 }
-@keyframes pulse{
-0%{transform:scale(1);}
 50%{transform:scale(1.1);}
 100%{transform:scale(1);}
 }
-.voice-corner-text{
-background:white;
-padding:4px 8px;
-border-radius:20px;
-font-size:10px;
-font-weight:600;
-color:#ff9933;
-border:1px solid #ff9933;
-}
-
 /* Back button */
-.back-btn{
-position:fixed;
-top:65px;
-left:12px;
-background:white;
-border:2px solid #1e5fbf;
-border-radius:40px;
-padding:5px 16px;
-font-size:16px;
-font-weight:700;
-cursor:pointer;
-color:#1e5fbf;
-box-shadow:0 4px 0 #0a3d7a;
-z-index:1001;
-text-decoration:none;
-transition:all 0.1s;
-}
 .back-btn:hover{background:#1e5fbf;color:white;}
 .back-btn:active{transform:translateY(4px);box-shadow:0 1px 0 #0a3d7a;}
-
 /* TIMEOUT WARNING */
-.timeout-warning{
-position:fixed;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-background:white;
-border:4px solid #ff9933;
-border-radius:40px;
-padding:30px;
-text-align:center;
-z-index:2000;
-box-shadow:0 10px 30px rgba(0,0,0,0.3);
-max-width:500px;
-display:none;
-}
 .timeout-warning p{
 font-size:28px;
 color:#1e5fbf;
@@ -133,37 +44,12 @@ box-shadow:0 5px 0 #1e7e34;
 }
 .timeout-warning button:active{transform:translateY(5px);box-shadow:0 1px 0 #1e7e34;}
 .timeout-warning .logout-btn{background:#dc3545;box-shadow:0 5px 0 #a71d2a;}
-
 /* SUCCESS MESSAGE */
-.success-message{
-position:fixed;
-top:65px;
-left:12px;
-background:#4CAF50;
-color:white;
-padding:8px 20px;
-border-radius:50px;
-font-size:16px;
-font-weight:600;
-z-index:1002;
-border:3px solid white;
-box-shadow:0 4px 15px rgba(76,175,80,0.3);
-animation:slideInLeft 0.3s ease;
-display:flex;
-align-items:center;
-gap:8px;
-max-width:calc(100% - 130px);
-}
 .success-message::before{content:"✅";font-size:18px;}
-@keyframes slideInLeft{
-from{transform:translateX(-100%);opacity:0;}
 to{transform:translateX(0);opacity:1;}
 }
-@keyframes slideOutLeft{
-from{transform:translateX(0);opacity:1;}
 to{transform:translateX(-100%);opacity:0;}
 }
-
 /* Container */
 .container{
 position:fixed;
@@ -178,17 +64,7 @@ padding:15px 8px 8px 8px;
 overflow-y:auto;
 z-index:1;
 }
-.content-wrapper{
-width:100%;
-max-width:1000px;
-display:flex;
-flex-direction:column;
-gap:12px;
-padding:10px 0 20px 0;
-}
-
 h1{color:#1e5fbf; font-size:24px; text-align:center; margin-bottom:8px;}
-
 /* Message styles */
 .messages{
 position:fixed;
@@ -208,7 +84,6 @@ font-size:14px;
 .message.success{background:#d4edda;color:#155724;border:1px solid #c3e6cb;}
 .message.error{background:#f8d7da;color:#721c24;border:1px solid #f5c6cb;}
 .message.info{background:#d1ecf1;color:#0c5460;border:1px solid #bee5eb;}
-
 /* Grid form layout */
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px; flex:1;}
 .section{background:white; padding:10px; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.08); display:flex; flex-direction:column;}
@@ -217,7 +92,6 @@ font-size:14px;
 label{font-size:13px; color:#1e5fbf; margin-bottom:2px; display:block;}
 .large-input{height:36px; font-size:15px; border-radius:8px; border:2px solid #1e5fbf; padding:0 6px; cursor:pointer; width:100%;}
 .large-input[readonly]{background:#f9f9f9;}
-
 /* Submit button */
 .submit-btn{
 height:42px;
@@ -233,7 +107,6 @@ box-shadow:0 4px 0 #1e7e34;
 transition:all 0.1s;
 }
 .submit-btn:active{transform:translateY(4px);box-shadow:0 1px 0 #1e7e34;}
-
 /* Overlay */
 .overlay{
 position:fixed;
@@ -243,7 +116,6 @@ backdrop-filter:blur(3px);
 display:none;
 z-index:1400;
 }
-
 /* Floating Input */
 .floating-input{
 position:fixed;
@@ -263,7 +135,6 @@ box-shadow:0 15px 35px rgba(0,0,0,0.4);
 }
 .floating-input.show{transform:translate(-50%,-50%) scale(1);}
 .floating-input:focus{outline:none;}
-
 /* Keyboard */
 .keyboard{
 position:fixed;
@@ -292,7 +163,6 @@ transition:all 0.2s;
 }
 .keyboard button:hover{background:#1e5fbf;color:white;}
 .keyboard .ok-btn{background:#28a745;color:white;border:none;}
-
 /* LOADING INDICATOR */
 .loading{
 display:none;
@@ -319,185 +189,119 @@ animation:spin 1s linear infinite;
 margin-right:10px;
 }
 @keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
-
 /* MOBILE RESPONSIVE */
 @media (max-width: 768px){
 .form-grid{grid-template-columns:1fr;}
 }
 @media (max-width: 480px){
-.voice-corner{top:65px;right:10px;}
-.voice-corner-btn{width:40px;height:40px;font-size:22px;}
-.back-btn{top:65px;left:10px;padding:4px 12px;font-size:15px;}
-.success-message{
-top:65px;
-left:10px;
-right:60px;
-width:auto;
-padding:6px 12px;
-font-size:12px;
-}
 h1{font-size:20px;}
 }
+
+
 </style>
-</head>
-<body>
+{% endblock %}
 
-<!-- Header -->
-<div class="header">
-    <div class="header-left">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India">
-        <div>{% trans "Ministry of Electronics &" %}<br>{% trans "Information Technology" %}<br>{% trans "Government of India" %}</div>
-    </div>
-    <div class="header-right">
-        <img src="https://www.cdac.in/img/cdac-logo.png" alt="CDAC Logo">
-    </div>
+{% block content %}
+ Loading Indicator 
+<div class="loading" id="loadingIndicator">
+<div class="spinner"></div>
+<div>{% trans "Processing..." %}</div>
 </div>
-
-<!-- Messages -->
-{% if messages %}
-<div class="messages">
-    {% for message in messages %}
-    <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
-        {{ message }}
-    </div>
-    {% endfor %}
-</div>
-{% endif %}
-
-<!-- Voice Button -->
-<div class="voice-corner">
-    <div class="voice-corner-btn" id="voiceBtn" onclick="toggleVoiceInput()">🎤</div>
-    <div class="voice-corner-text" id="voiceStatus">{% trans "Click" %}</div>
-</div>
-
-<!-- Back button -->
-<a href="{% url 'municipal-services' %}" class="back-btn">← {% trans "Back" %}</a>
-
-<!-- Timeout Warning -->
-<div id="timeoutWarning" class="timeout-warning">
-    <p>⏰ {% trans "Session about to expire!" %}</p>
-    <button onclick="extendSession()">{% trans "Continue" %}</button>
-    <button class="logout-btn" onclick="window.location='{% url 'index' %}'">{% trans "Logout" %}</button>
-</div>
-
-<!-- Success Messages -->
-{% if messages %}
-    {% for message in messages %}
-        {% if message.tags == 'success' %}
-            <div class="success-message">
-                {{ message }}
-            </div>
-        {% endif %}
-    {% endfor %}
-{% endif %}
-
-<!-- Loading Indicator -->
-<div id="loadingIndicator" class="loading">
-    <div class="spinner"></div>
-    <div>{% trans "Processing..." %}</div>
-</div>
-
-<!-- Form Container -->
+ Form Container 
 <div class="container">
-    <div class="content-wrapper">
-        <h1>💑 {% trans "Marriage Registration" %}</h1>
-        
-        <form method="POST" action="{% url 'marriage-registration' %}" id="marriageForm">
-            {% csrf_token %}
+<div class="content-wrapper">
+<h1>💑 {% trans "Marriage Registration" %}</h1>
+<form action="{% url 'marriage-registration' %}" id="marriageForm" method="POST">
+    {% csrf_token %}
             <div class="form-grid">
-
-                <!-- Groom Details -->
-                <div class="section">
-                    <div class="section-title">👨 {% trans "Groom Details" %}</div>
-                    <div class="form-group">
-                        <label>{% trans "Full Name" %} *</label>
-                        <input class="large-input text-input" type="text" name="groom_name" id="groom_name" value="{{ form_data.groom_name|default:'' }}" readonly required>
-                    </div>
-                    <div class="form-group">
-                        <label>{% trans "Date of Birth" %} *</label>
-                        <input type="date" class="large-input date-input" name="groom_dob" id="groom_dob" value="{{ form_data.groom_dob|default:'' }}" required>
-                    </div>
-                    <div class="form-group">
-                        <label>{% trans "Aadhaar" %} *</label>
-                        <input class="large-input text-input" type="text" name="groom_aadhaar" id="groom_aadhaar" value="{{ form_data.groom_aadhaar|default:'' }}" maxlength="12" pattern="\d{12}" title="{% trans "Please enter 12-digit Aadhaar number" %}" readonly required>
-                    </div>
-                    <div class="form-group">
-                        <label>{% trans "Father's Name" %}</label>
-                        <input class="large-input text-input" type="text" name="groom_father_name" id="groom_father_name" value="{{ form_data.groom_father_name|default:'' }}" readonly>
-                    </div>
-                </div>
-
-                <!-- Bride Details -->
-                <div class="section">
-                    <div class="section-title">👩 {% trans "Bride Details" %}</div>
-                    <div class="form-group">
-                        <label>{% trans "Full Name" %} *</label>
-                        <input class="large-input text-input" type="text" name="bride_name" id="bride_name" value="{{ form_data.bride_name|default:'' }}" readonly required>
-                    </div>
-                    <div class="form-group">
-                        <label>{% trans "Date of Birth" %} *</label>
-                        <input type="date" class="large-input date-input" name="bride_dob" id="bride_dob" value="{{ form_data.bride_dob|default:'' }}" required>
-                    </div>
-                    <div class="form-group">
-                        <label>{% trans "Aadhaar" %} *</label>
-                        <input class="large-input text-input" type="text" name="bride_aadhaar" id="bride_aadhaar" value="{{ form_data.bride_aadhaar|default:'' }}" maxlength="12" pattern="\d{12}" title="{% trans "Please enter 12-digit Aadhaar number" %}" readonly required>
-                    </div>
-                    <div class="form-group">
-                        <label>{% trans "Father's Name" %}</label>
-                        <input class="large-input text-input" type="text" name="bride_father_name" id="bride_father_name" value="{{ form_data.bride_father_name|default:'' }}" readonly>
-                    </div>
-                </div>
-
-                <!-- Marriage Details Full width -->
-                <div class="section" style="grid-column:1 / span 2;">
-                    <div class="section-title">📅 {% trans "Marriage Details" %}</div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
-                        <div>
-                            <label>{% trans "Date" %} *</label>
-                            <input type="date" class="large-input date-input" name="marriage_date" id="marriage_date" value="{{ form_data.marriage_date|default:'' }}" required>
-                        </div>
-                        <div>
-                            <label>{% trans "Place" %} *</label>
-                            <input class="large-input text-input" type="text" name="marriage_place" id="marriage_place" value="{{ form_data.marriage_place|default:'' }}" readonly required>
-                        </div>
-                        <div>
-                            <label>{% trans "Type" %} *</label>
-                            <select class="large-input" name="marriage_type" id="marriage_type" required>
-                                <option value="" {% if not form_data.marriage_type %}selected{% endif %}>{% trans "Select Type" %}</option>
-                                <option value="Hindu Marriage Act" {% if form_data.marriage_type == 'Hindu Marriage Act' %}selected{% endif %}>{% trans "Hindu Marriage Act" %}</option>
-                                <option value="Special Marriage Act" {% if form_data.marriage_type == 'Special Marriage Act' %}selected{% endif %}>{% trans "Special Marriage Act" %}</option>
-                                <option value="Muslim Personal Law" {% if form_data.marriage_type == 'Muslim Personal Law' %}selected{% endif %}>{% trans "Muslim Personal Law" %}</option>
-                                <option value="Christian Marriage Act" {% if form_data.marriage_type == 'Christian Marriage Act' %}selected{% endif %}>{% trans "Christian Marriage Act" %}</option>
-                                <option value="Other" {% if form_data.marriage_type == 'Other' %}selected{% endif %}>{% trans "Other" %}</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px; margin-top:8px;">
-                        <div>
-                            <label>{% trans "Witness 1 Name" %}</label>
-                            <input class="large-input text-input" type="text" name="witness1_name" id="witness1_name" value="{{ form_data.witness1_name|default:'' }}" readonly>
-                        </div>
-                        <div>
-                            <label>{% trans "Witness 2 Name" %}</label>
-                            <input class="large-input text-input" type="text" name="witness2_name" id="witness2_name" value="{{ form_data.witness2_name|default:'' }}" readonly>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <button type="submit" class="submit-btn" name="register_marriage" onclick="return validateForm(event)" id="submitBtn">{% trans "Register Marriage" %}</button>
-        </form>
-    </div>
+<!-- Groom Details -->
+<div class="section">
+<div class="section-title">👨 {% trans "Groom Details" %}</div>
+<div class="form-group">
+<label>{% trans "Full Name" %} *</label>
+<input class="large-input text-input" id="groom_name" name="groom_name" readonly="" required="" type="text" value="{{ form_data.groom_name|default:'' }}"/>
 </div>
-
-<!-- Overlay and Floating Input -->
-<div id="overlay" class="overlay"></div>
-<input id="floatingInput" class="floating-input" placeholder="{% trans "Type here..." %}">
-<div id="keyboard" class="keyboard"></div>
-
+<div class="form-group">
+<label>{% trans "Date of Birth" %} *</label>
+<input class="large-input date-input" id="groom_dob" name="groom_dob" required="" type="date" value="{{ form_data.groom_dob|default:'' }}"/>
+</div>
+<div class="form-group">
+<label>{% trans "Aadhaar" %} *</label>
+<input class="large-input text-input" id="groom_aadhaar" maxlength="12" name="groom_aadhaar" pattern="\\d{12}" aria-label="{% trans 'Groom Aadhaar' %}" placeholder="{% trans 'Enter 12-digit Aadhaar' %}" value="{{ form_data.groom_aadhaar|default:'' }}" required readonly onclick="openKeyboard('groom_aadhaar')" onkeypress="if(event.key==='Enter') openKeyboard('groom_aadhaar')"/>
+</div>
+<div class="form-group">
+<label>{% trans "Father's Name" %}</label>
+<input class="large-input text-input" id="groom_father_name" name="groom_father_name" readonly="" type="text" value="{{ form_data.groom_father_name|default:'' }}"/>
+</div>
+</div>
+<!-- Bride Details -->
+<div class="section">
+<div class="section-title">👩 {% trans "Bride Details" %}</div>
+<div class="form-group">
+<label>{% trans "Full Name" %} *</label>
+<input class="large-input text-input" id="bride_name" name="bride_name" readonly="" required="" type="text" value="{{ form_data.bride_name|default:'' }}"/>
+</div>
+<div class="form-group">
+<label>{% trans "Date of Birth" %} *</label>
+<input class="large-input date-input" id="bride_dob" name="bride_dob" required="" type="date" value="{{ form_data.bride_dob|default:'' }}"/>
+</div>
+<div class="form-group">
+<label>{% trans "Aadhaar" %} *</label>
+<input class="large-input text-input" id="bride_aadhaar" maxlength="12" name="bride_aadhaar" pattern="\\d{12}" aria-label="{% trans 'Bride Aadhaar' %}" placeholder="{% trans 'Enter 12-digit Aadhaar' %}" value="{{ form_data.bride_aadhaar|default:'' }}" required readonly onclick="openKeyboard('bride_aadhaar')" onkeypress="if(event.key==='Enter') openKeyboard('bride_aadhaar')"/>
+</div>
+<div class="form-group">
+<label>{% trans "Father's Name" %}</label>
+<input class="large-input text-input" id="bride_father_name" name="bride_father_name" readonly="" type="text" value="{{ form_data.bride_father_name|default:'' }}"/>
+</div>
+</div>
+<!-- Marriage Details Full width -->
+<div class="section" style="grid-column:1 / span 2;">
+<div class="section-title">📅 {% trans "Marriage Details" %}</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+<div>
+<label>{% trans "Date" %} *</label>
+<input class="large-input date-input" id="marriage_date" name="marriage_date" required="" type="date" value="{{ form_data.marriage_date|default:'' }}"/>
+</div>
+<div>
+<label>{% trans "Place" %} *</label>
+<input class="large-input text-input" id="marriage_place" name="marriage_place" readonly="" required="" type="text" value="{{ form_data.marriage_place|default:'' }}"/>
+</div>
+<div>
+<label>{% trans "Type" %} *</label>
+<select class="large-input" id="marriage_type" name="marriage_type" required="">
+<option value="">{% trans "Select Type" %}</option>
+<option value="Hindu Marriage Act" {% if form_data.marriage_type == "Hindu Marriage Act" %}selected{% endif %}>{% trans "Hindu Marriage Act" %}</option>
+<option value="Special Marriage Act" {% if form_data.marriage_type == "Special Marriage Act" %}selected{% endif %}>{% trans "Special Marriage Act" %}</option>
+<option value="Muslim Personal Law" {% if form_data.marriage_type == "Muslim Personal Law" %}selected{% endif %}>{% trans "Muslim Personal Law" %}</option>
+<option value="Christian Marriage Act" {% if form_data.marriage_type == "Christian Marriage Act" %}selected{% endif %}>{% trans "Christian Marriage Act" %}</option>
+<option value="Other" {% if form_data.marriage_type == "Other" %}selected{% endif %}>{% trans "Other" %}</option>
+</select>
+</div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px; margin-top:8px;">
+<div>
+<label>{% trans "Witness 1 Name" %}</label>
+<input class="large-input text-input" id="witness1_name" name="witness1_name" readonly="" type="text" value="{{ form_data.witness1_name|default:'' }}"/>
+</div>
+<div>
+<label>{% trans "Witness 2 Name" %}</label>
+<input class="large-input text-input" id="witness2_name" name="witness2_name" readonly="" type="text" value="{{ form_data.witness2_name|default:'' }}"/>
+</div>
+</div>
+</div>
+</div>
+<button class="submit-btn" id="submitBtn" name="register_marriage" onclick="return validateForm(event)" type="submit">{% trans "Register Marriage" %}</button>
+</form>
+</div>
+</div>
+ Overlay and Floating Input 
+<div class="overlay" id="overlay"></div>
+<input class="floating-input" id="floatingInput" placeholder="{% trans 'Type here...' %}" type="text"/>
+<div class="keyboard" id="keyboard"></div>
 <script src="{% static 'js/voice.js' %}"></script>
+{% endblock %}
 
+{% block extra_scripts %}
 <script>
 /* ================= LANGUAGE MAP ================= */
 const languageMap = {
@@ -508,18 +312,15 @@ const languageMap = {
     "bn": "bn-IN",
     "or": "or-IN"
 };
-
 function getCurrentLang() {
     let path = window.location.pathname.split('/');
     const langCode = path[1] || "en";
     return languageMap[langCode] || "en-IN";
 }
-
 function getCurrentLangCode() {
     let path = window.location.pathname.split('/');
     return path[1] || "en";
 }
-
 function speak(text) {
     if(!('speechSynthesis' in window)) return;
     speechSynthesis.cancel();
@@ -528,45 +329,12 @@ function speak(text) {
     u.rate = 1;
     speechSynthesis.speak(u);
 }
-
 /* ================= SESSION TIMER ================= */
-let sessionTimer;
-let timeoutWarningTimer;
-const SESSION_DURATION = 120000;
-const WARNING_TIME = 10000;
-
-function startSessionTimer() {
-    sessionTimer = setTimeout(() => {
-        showTimeoutWarning();
-    }, SESSION_DURATION - WARNING_TIME);
-}
-
-function showTimeoutWarning() {
-    const warning = document.getElementById('timeoutWarning');
-    if (warning) {
-        warning.style.display = 'block';
-        timeoutWarningTimer = setTimeout(() => {
-            window.location.href = "{% url 'index' %}";
-        }, WARNING_TIME);
-    }
-}
-
-function extendSession() {
-    const warning = document.getElementById('timeoutWarning');
-    if (warning) {
-        warning.style.display = 'none';
-    }
-    clearTimeout(sessionTimer);
-    clearTimeout(timeoutWarningTimer);
-    startSessionTimer();
-}
-
 function resetSessionTimer() {
     clearTimeout(sessionTimer);
     clearTimeout(timeoutWarningTimer);
     startSessionTimer();
 }
-
 /* ================= FLOATING KEYBOARD ================= */
 let activeInput = null;
 let isUpperCase = true;
@@ -574,12 +342,10 @@ const keyboard = document.getElementById("keyboard");
 const overlay = document.getElementById("overlay");
 const floatingInput = document.getElementById("floatingInput");
 const loadingIndicator = document.getElementById("loadingIndicator");
-
 const keys = ["1","2","3","4","5","6","7","8","9","0",
 "Q","W","E","R","T","Y","U","I","O","P",
 "A","S","D","F","G","H","J","K","L",
 "Z","X","C","V","B","N","M"];
-
 function createKeyboard(){
     keyboard.innerHTML="";
     let row=document.createElement("div");
@@ -597,7 +363,6 @@ function createKeyboard(){
         row.appendChild(btn);
     });
     keyboard.appendChild(row);
-
     const lastRow=document.createElement("div");
     lastRow.className="keyboard-row";
     lastRow.innerHTML=`
@@ -609,13 +374,11 @@ function createKeyboard(){
     `;
     keyboard.appendChild(lastRow);
 }
-
 function toggleCase(){
     isUpperCase = !isUpperCase;
     // Recreate keyboard with new case
     createKeyboard();
 }
-
 function openKeyboard(input){
     if(input.type === "date" || input.tagName.toLowerCase() === "select") return;
     activeInput = input;
@@ -628,14 +391,12 @@ function openKeyboard(input){
         keyboard.classList.add("show");
     },10);
 }
-
 function finishInput(){
     if(activeInput){
         activeInput.value = floatingInput.value;
     }
     closeKeyboard();
 }
-
 function closeKeyboard(){
     floatingInput.classList.remove("show");
     keyboard.classList.remove("show");
@@ -645,17 +406,14 @@ function closeKeyboard(){
         keyboard.style.display = "none";
     },250);
 }
-
 document.querySelectorAll(".text-input").forEach(input=>{
     input.addEventListener("click",function(e){
         e.preventDefault();
         openKeyboard(this);
     });
 });
-
 overlay.addEventListener("click",closeKeyboard);
 createKeyboard();
-
 // Auto-hide messages after 5 seconds
 setTimeout(function() {
     const messages = document.querySelectorAll('.message');
@@ -663,7 +421,6 @@ setTimeout(function() {
         message.style.display = 'none';
     });
 }, 5000);
-
 // Auto-hide success messages after 3 seconds
 setTimeout(function() {
     const successMsg = document.querySelector('.success-message');
@@ -674,22 +431,18 @@ setTimeout(function() {
         }, 300);
     }
 }, 3000);
-
 /* ================= FORM VALIDATION ================= */
 function validateForm(e) {
     e.preventDefault();
     resetSessionTimer();
-    
     const requiredFields = ['groom_name', 'groom_dob', 'groom_aadhaar', 'bride_name', 'bride_dob', 'bride_aadhaar', 'marriage_date', 'marriage_place', 'marriage_type'];
     let missingFields = [];
-    
     for(let field of requiredFields) {
         const element = document.getElementById(field);
         if(!element || !element.value) {
             missingFields.push(field);
         }
     }
-    
     if(missingFields.length > 0) {
         const langCode = getCurrentLangCode();
         if (langCode === 'hi') {
@@ -701,11 +454,9 @@ function validateForm(e) {
         }
         return false;
     }
-    
     // Validate Aadhaar numbers (12 digits)
     const groomAadhaar = document.getElementById('groom_aadhaar').value;
     const brideAadhaar = document.getElementById('bride_aadhaar').value;
-    
     if(!/^\d{12}$/.test(groomAadhaar) || !/^\d{12}$/.test(brideAadhaar)) {
         const langCode = getCurrentLangCode();
         if (langCode === 'hi') {
@@ -717,9 +468,7 @@ function validateForm(e) {
         }
         return false;
     }
-    
     loadingIndicator.classList.add('show');
-    
     const langCode = getCurrentLangCode();
     if (langCode === 'hi') {
         speak("विवाह पंजीकरण जमा किया जा रहा है");
@@ -728,48 +477,39 @@ function validateForm(e) {
     } else {
         if(typeof speak === 'function') speak("{% trans 'Submitting marriage registration' %}");
     }
-    
     setTimeout(() => {
         document.getElementById('marriageForm').submit();
     }, 500);
     return false;
 }
-
 /* ================= VOICE INPUT ================= */
 let recognition;
 let isListening = false;
-
 function toggleVoiceInput() {
     resetSessionTimer();
-    
     if(isListening) {
         stopVoiceInput();
         return;
     }
-
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if(!SR) {
         alert("{% trans 'Speech not supported' %}");
         return;
     }
-
     if (recognition) {
         try {
             recognition.stop();
         } catch(e) {}
     }
-
     recognition = new SR();
     recognition.lang = getCurrentLang();
     recognition.continuous = true;
     recognition.interimResults = true;
     recognition.maxAlternatives = 1;
-
     recognition.onstart = function() {
         isListening = true;
         document.getElementById("voiceBtn").classList.add("listening");
         document.getElementById("voiceStatus").innerText = "{% trans 'Listening...' %}";
-        
         const langCode = getCurrentLangCode();
         if (langCode === 'hi') {
             speak("कृपया आदेश बोलें... दूल्हे का नाम, दुल्हन का नाम, आधार, स्थान, गवाह, या जमा करें");
@@ -779,13 +519,10 @@ function toggleVoiceInput() {
             speak("{% trans 'Please say a command... groom name, bride name, aadhaar, place, witness, or submit' %}");
         }
     };
-
     recognition.onresult = function(e) {
         resetSessionTimer();
-        
         let finalTranscript = '';
         let interimTranscript = '';
-        
         for (let i = 0; i < e.results.length; i++) {
             const result = e.results[i];
             if (result.isFinal) {
@@ -794,11 +531,9 @@ function toggleVoiceInput() {
                 interimTranscript += result[0].transcript;
             }
         }
-        
         const transcript = finalTranscript || interimTranscript;
         const command = transcript.toLowerCase();
         console.log("Marriage registration command:", command);
-        
         // Check for numbers (Aadhaar)
         const numberMatch = command.match(/\d+/g);
         if(numberMatch && (command.includes("aadhaar") || command.includes("आधार") || command.includes("ଆଧାର"))) {
@@ -828,7 +563,6 @@ function toggleVoiceInput() {
             }
             return;
         }
-        
         // Name inputs
         if((command.includes("groom name") || command.includes("दूल्हे का नाम") || command.includes("ବରଙ୍କ ନାମ")) && command.length > 15) {
             let name = command.replace("groom name", "").replace("दूल्हे का नाम", "").replace("ବରଙ୍କ ନାମ", "").trim();
@@ -846,7 +580,6 @@ function toggleVoiceInput() {
             }
             return;
         }
-        
         if((command.includes("bride name") || command.includes("दुल्हन का नाम") || command.includes("କନ୍ୟାଙ୍କ ନାମ")) && command.length > 15) {
             let name = command.replace("bride name", "").replace("दुल्हन का नाम", "").replace("କନ୍ୟାଙ୍କ ନାମ", "").trim();
             if(name) {
@@ -863,7 +596,6 @@ function toggleVoiceInput() {
             }
             return;
         }
-        
         if((command.includes("father") || command.includes("पिता") || command.includes("ପିତା"))) {
             let name = command.replace("father", "").replace("name", "").replace("पिता", "").replace("ପିତା", "").trim();
             if(name && (command.includes("groom") || command.includes("bride") || command.includes("दूल्हा") || command.includes("बर") || command.includes("दुल्हन") || command.includes("କନ୍ୟା"))) {
@@ -891,7 +623,6 @@ function toggleVoiceInput() {
             }
             return;
         }
-        
         // Place input
         if((command.includes("place") || command.includes("स्थान") || command.includes("ସ୍ଥାନ")) && command.length > 10) {
             let place = command.replace("place", "").replace("स्थान", "").replace("ସ୍ଥାନ", "").trim();
@@ -908,7 +639,6 @@ function toggleVoiceInput() {
             }
             return;
         }
-        
         // Witness names
         if((command.includes("witness") || command.includes("गवाह") || command.includes("ସାକ୍ଷୀ")) && command.length > 15) {
             let name = command.replace("witness", "").replace("name", "").replace("गवाह", "").replace("ସାକ୍ଷୀ", "").trim();
@@ -937,7 +667,6 @@ function toggleVoiceInput() {
             }
             return;
         }
-        
         // Marriage type selection
         if(command.includes("hindu") || command.includes("हिंदू") || command.includes("ହିନ୍ଦୁ")) {
             document.getElementById('marriage_type').value = "Hindu Marriage Act";
@@ -987,7 +716,6 @@ function toggleVoiceInput() {
             }
             return;
         }
-        
         // Submit command
         if(command.includes("submit") || command.includes("register") || command.includes("जमा") || command.includes("ଦାଖଲ")) {
             validateForm(event);
@@ -1006,13 +734,11 @@ function toggleVoiceInput() {
             return;
         }
     };
-
     recognition.onerror = function(event) {
         console.error("Recognition error:", event.error);
         if (event.error === 'no-speech') return;
         stopVoiceInput();
     };
-
     recognition.onend = function() {
         if (isListening) {
             try {
@@ -1026,7 +752,6 @@ function toggleVoiceInput() {
             document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
         }
     };
-
     try {
         recognition.start();
     } catch(e) {
@@ -1034,7 +759,6 @@ function toggleVoiceInput() {
         stopVoiceInput();
     }
 }
-
 function stopVoiceInput() {
     isListening = false;
     if (recognition) {
@@ -1045,13 +769,11 @@ function stopVoiceInput() {
     document.getElementById("voiceBtn").classList.remove("listening");
     document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
 }
-
 /* ================= OVERRIDE VOICE COMMANDS ================= */
 const originalHandleCommand = window.handleCommand;
 window.handleCommand = function(command) {
     command = command.toLowerCase();
     console.log("Marriage registration command:", command);
-    
     // Check for numbers (Aadhaar)
     const numberMatch = command.match(/\d+/g);
     if(numberMatch && (command.includes("aadhaar") || command.includes("आधार") || command.includes("ଆଧାର"))) {
@@ -1067,7 +789,6 @@ window.handleCommand = function(command) {
         }
         return;
     }
-    
     // Name inputs
     if((command.includes("groom name") || command.includes("दूल्हे का नाम") || command.includes("ବରଙ୍କ ନାମ")) && command.length > 15) {
         let name = command.replace("groom name", "").replace("दूल्हे का नाम", "").replace("ବରଙ୍କ ନାମ", "").trim();
@@ -1078,7 +799,6 @@ window.handleCommand = function(command) {
         }
         return;
     }
-    
     if((command.includes("bride name") || command.includes("दुल्हन का नाम") || command.includes("କନ୍ୟାଙ୍କ ନାମ")) && command.length > 15) {
         let name = command.replace("bride name", "").replace("दुल्हन का नाम", "").replace("କନ୍ୟାଙ୍କ ନାମ", "").trim();
         if(name) {
@@ -1088,7 +808,6 @@ window.handleCommand = function(command) {
         }
         return;
     }
-    
     if((command.includes("father") || command.includes("पिता") || command.includes("ପିତା"))) {
         let name = command.replace("father", "").replace("name", "").replace("पिता", "").replace("ପିତା", "").trim();
         if(name && (command.includes("groom") || command.includes("bride") || command.includes("दूल्हा") || command.includes("ବର") || command.includes("दुल्हन") || command.includes("କନ୍ୟା"))) {
@@ -1102,7 +821,6 @@ window.handleCommand = function(command) {
         }
         return;
     }
-    
     // Place input
     if((command.includes("place") || command.includes("स्थान") || command.includes("ସ୍ଥାନ")) && command.length > 10) {
         let place = command.replace("place", "").replace("स्थान", "").replace("ସ୍ଥାନ", "").trim();
@@ -1112,7 +830,6 @@ window.handleCommand = function(command) {
         }
         return;
     }
-    
     // Witness names
     if((command.includes("witness") || command.includes("गवाह") || command.includes("ସାକ୍ଷୀ")) && command.length > 15) {
         let name = command.replace("witness", "").replace("name", "").replace("गवाह", "").replace("ସାକ୍ଷୀ", "").trim();
@@ -1127,7 +844,6 @@ window.handleCommand = function(command) {
         }
         return;
     }
-    
     // Marriage type selection
     if(command.includes("hindu") || command.includes("हिंदू") || command.includes("ହିନ୍ଦୁ")) {
         document.getElementById('marriage_type').value = "Hindu Marriage Act";
@@ -1149,7 +865,6 @@ window.handleCommand = function(command) {
         if(typeof speak === 'function') speak("Christian Marriage Act selected");
         return;
     }
-    
     // Submit command
     if(command.includes("submit") || command.includes("register") || command.includes("जमा") || command.includes("ଦାଖଲ")) {
         validateForm(event);
@@ -1167,12 +882,10 @@ window.handleCommand = function(command) {
         stopVoiceInput();
         return;
     }
-    
     if(originalHandleCommand) {
         originalHandleCommand(command);
     }
 };
-
 // Override autoReadPage to read marriage registration instructions
 const originalAutoRead = window.autoReadPage;
 window.autoReadPage = function() {
@@ -1190,26 +903,22 @@ window.autoReadPage = function() {
         }
     }, 2000);
 };
-
 /* ================= INIT ================= */
 document.addEventListener('DOMContentLoaded', function() {
     startSessionTimer();
-    
     document.addEventListener('click', resetSessionTimer);
     document.addEventListener('keypress', resetSessionTimer);
     document.addEventListener('touchstart', resetSessionTimer);
-    
     setTimeout(autoReadPage, 2000);
 });
-
 window.addEventListener('beforeunload', function() {
     if (sessionTimer) {
         clearTimeout(sessionTimer);
     }
     stopVoiceInput();
 });
-
 createKeyboard();
+
+
 </script>
-</body>
-</html>
+{% endblock %}

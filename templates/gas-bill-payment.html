@@ -1,9 +1,10 @@
-<!DOCTYPE html>
-{% load i18n %}
-{% load static %}
-<html lang="en">
-<head>
-    <style>
+{% extends 'base.html' %}
+{% load i18n static %}
+
+{% block title %}{% trans "Gas Bill Payment - Civic Kiosk" %}{% endblock %}
+
+{% block extra_head %}
+<style>
         /* Hide Google Translate elements */
         .goog-te-banner-frame.skiptranslate,
         .goog-te-gadget-icon,
@@ -14,48 +15,21 @@
         .goog-te-spinner-pos {
             display: none !important;
         }
-        
-        body {
-            top: 0px !important;
-            position: static !important;
-            overflow: hidden !important;
-            height: 100vh;
-            width: 100vw;
-        }
-        
         .goog-te-combo {
             display: none !important;
         }
-        
         .goog-te-gadget {
             color: transparent !important;
             height: 0 !important;
             overflow: hidden !important;
         }
-
         /* Timeout warning popup */
-        .timeout-warning {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            border: 4px solid #ff9933;
-            border-radius: 40px;
-            padding: 30px;
-            text-align: center;
-            z-index: 2000;
-            display: none;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-        
         .timeout-warning p {
             font-size: 24px;
             font-weight: 700;
             color: #333;
             margin-bottom: 20px;
         }
-
         .timeout-warning button {
             background: #28a745;
             color: white;
@@ -68,15 +42,12 @@
             margin: 10px;
             min-width: 150px;
         }
-
         .timeout-warning .logout-btn {
             background: #dc3545;
         }
-        
         .timeout-warning button:active {
             transform: translateY(3px);
         }
-
         /* Voice status indicator */
         .voice-status-indicator {
             position: fixed;
@@ -95,11 +66,9 @@
             gap: 10px;
             border: 2px solid #ff9933;
         }
-
         .voice-status-indicator.active {
             display: flex;
         }
-
         .voice-pulse {
             width: 12px;
             height: 12px;
@@ -107,20 +76,17 @@
             border-radius: 50%;
             animation: voicePulse 1.5s infinite;
         }
-
         @keyframes voicePulse {
             0% { transform: scale(1); opacity: 1; }
             50% { transform: scale(1.5); opacity: 0.7; }
             100% { transform: scale(1); opacity: 1; }
         }
-
         /* Payment method selector styles */
         .payment-methods {
             display: flex;
             gap: 10px;
             margin: 20px 0;
         }
-        
         .payment-method-btn {
             flex: 1;
             padding: 15px;
@@ -134,14 +100,12 @@
             transition: all 0.2s;
             box-shadow: 0 3px 0 #0a3d7a;
         }
-        
         .payment-method-btn.active {
             background: #1e5fbf;
             color: white;
             transform: translateY(2px);
             box-shadow: 0 1px 0 #0a3d7a;
         }
-        
         .payment-section {
             background: white;
             border: 3px solid #1e5fbf;
@@ -150,17 +114,14 @@
             margin-top: 15px;
             display: none;
         }
-        
         .payment-section.active {
             display: block;
         }
-        
         /* QR Code styling */
         .qr-container {
             text-align: center;
             padding: 20px;
         }
-        
         .qr-code {
             width: 200px;
             height: 200px;
@@ -173,19 +134,16 @@
             border-radius: 20px;
             font-size: 120px;
         }
-        
         /* Card input fields */
         .card-input-group {
             margin: 15px 0;
         }
-        
         .card-input-group label {
             display: block;
             font-size: 16px;
             color: #1e5fbf;
             margin-bottom: 5px;
         }
-        
         .card-input {
             width: 100%;
             height: 50px;
@@ -196,27 +154,22 @@
             background: #f9f9f9;
             cursor: pointer;
         }
-        
         .card-input[readonly] {
             background: #f9f9f9;
         }
-        
         .card-row {
             display: flex;
             gap: 10px;
         }
-        
         .card-row .card-input-group {
             flex: 1;
         }
-        
         .validation-message {
             color: #dc3545;
             font-size: 14px;
             margin-top: 5px;
             display: none;
         }
-        
         /* Pay button disabled state */
         .pay-btn:disabled {
             background: #6c757d;
@@ -224,12 +177,10 @@
             cursor: not-allowed;
             opacity: 0.7;
         }
-        
         .pay-btn:disabled:active {
             transform: none;
             box-shadow: 0 6px 0 #545b62;
         }
-        
         /* Loading overlay */
         .payment-loading {
             position: fixed;
@@ -247,11 +198,9 @@
             flex-direction: column;
             gap: 20px;
         }
-        
         .payment-loading.show {
             display: flex;
         }
-        
         .payment-spinner {
             border: 5px solid rgba(255,255,255,0.3);
             border-radius: 50%;
@@ -260,107 +209,28 @@
             height: 60px;
             animation: spin 1s linear infinite;
         }
-        
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-    </style>
 
-    <meta charset="UTF-8">
-    <title>{% trans "Gas Bill Payment - Civic Kiosk" %}</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <style>
-        * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif; user-select:none; }
-        body { width:100vw; height:100vh; overflow:hidden; background:#f0f7ff; }
-        
         /* HEADER */
-        .header { 
-            height:70px; 
-            background:white; 
-            display:flex; 
-            align-items:center; 
-            justify-content:space-between; 
-            padding:0 20px; 
-            border-bottom:2px solid #1e5fbf;
-            position:fixed;
-            top:0;
-            left:0;
-            right:0;
-            z-index:1000;
-        }
-        .header-left { display:flex; align-items:center; gap:10px; }
         .header-left img { height:40px; }
         .header-left div { font-size:12px; font-weight:600; color:#1e5fbf; line-height:1.2; }
         .header-right img { height:35px; }
-        
         /* VOICE CORNER */
-        .voice-corner { 
-            position:fixed; 
-            top:80px; 
-            right:15px; 
-            z-index:1000; 
-            display:flex; 
-            flex-direction:column; 
-            align-items:center; 
-            gap:3px; 
-        }
-        .voice-corner-btn { 
-            background:#ff9933; 
-            width:45px; 
-            height:45px; 
-            border-radius:50%; 
-            border:2px solid white; 
-            cursor:pointer; 
-            display:flex; 
-            align-items:center; 
-            justify-content:center; 
-            font-size:24px; 
-            box-shadow:0 2px 5px rgba(0,0,0,0.2);
-            transition: all 0.2s;
-        }
         .voice-corner-btn:hover { background:#ffaa44; }
         .voice-corner-btn.listening { 
             background:#28a745; 
             transform:scale(1.1);
             animation: pulse 1s infinite;
         }
-        @keyframes pulse {
-            0% { transform: scale(1); }
             50% { transform: scale(1.1); }
             100% { transform: scale(1); }
         }
-        .voice-corner-text { 
-            background:white; 
-            padding:2px 8px; 
-            border-radius:12px; 
-            font-size:10px; 
-            color:#ff9933; 
-            border:1px solid #ff9933; 
-        }
-        
         /* BACK BUTTON */
-        .back-btn { 
-            position:fixed; 
-            top:80px; 
-            left:15px; 
-            background:white; 
-            border:2px solid #1e5fbf; 
-            border-radius:30px; 
-            padding:5px 15px; 
-            font-size:18px; 
-            font-weight:700; 
-            cursor:pointer; 
-            color:#1e5fbf; 
-            box-shadow:0 3px 0 #0a3d7a; 
-            z-index:1000; 
-            text-decoration:none;
-            display:inline-block;
-        }
         .back-btn:hover { background:#1e5fbf; color:white; }
         .back-btn:active { transform:translateY(3px); box-shadow:0 1px 0 #0a3d7a; }
-        
         /* MAIN CONTAINER */
         .container { 
             position:fixed; 
@@ -375,21 +245,13 @@
             padding:10px; 
             overflow-y:auto; 
         }
-        .content-wrapper { 
-            width:100%; 
-            max-width:600px; 
-            padding:20px 0;
-        }
-        
         /* Message styles */
         .messages { width:100%; margin-bottom:15px; }
         .message { padding:10px; border-radius:10px; margin-bottom:5px; text-align:center; }
         .message.success { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
         .message.error { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
         .message.info { background:#d1ecf1; color:#0c5460; border:1px solid #bee5eb; }
-        
         h1 { color:#1e5fbf; font-size:36px; font-weight:800; text-align:center; margin-bottom:20px; }
-        
         /* BILL CARD */
         .bill-card { 
             background:white; 
@@ -418,7 +280,6 @@
             color:#dc3545; 
             font-weight:600; 
         }
-        
         /* FLOATING KEYBOARD FOR CARD INPUTS */
         .overlay{
             position:fixed;
@@ -448,7 +309,6 @@
             transform:translate(-50%,-50%) scale(1);
         }
         .floating-input:focus{outline:none;}
-        
         .keyboard{
             position:fixed;
             bottom:15px;
@@ -480,166 +340,119 @@
             border:none;
         }
         .keyboard .ok-btn:hover{background:#218838;}
-        
         /* Utility */
         .hidden{display:none !important;}
-    </style>
-</head>
-<body>
-    <!-- Timeout Warning Popup -->
-    <div id="timeoutWarning" class="timeout-warning">
-        <p>⏰ {% trans "Session about to expire!" %}</p>
-        <button onclick="extendSession()">{% trans "Continue" %}</button>
-        <button class="logout-btn" onclick="window.location='{% url 'index' %}'">{% trans "Logout" %}</button>
-    </div>
 
-    <!-- Voice Status Indicator -->
-    <div id="voiceStatusIndicator" class="voice-status-indicator">
-        <div class="voice-pulse"></div>
-        <span id="voiceStatusText">{% trans "Listening..." %}</span>
-    </div>
 
-    <!-- Payment Loading Overlay -->
-    <div id="paymentLoading" class="payment-loading">
-        <div class="payment-spinner"></div>
-        <div>{% trans "Processing Payment..." %}</div>
-    </div>
+</style>
+{% endblock %}
 
-    <!-- HEADER -->
-    <div class="header">
-        <div class="header-left">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India">
-            <div>{% trans "Ministry of Electronics &" %}<br>{% trans "Information Technology" %}<br>{% trans "Government of India" %}</div>
-        </div>
-        <div class="header-right">
-            <img src="https://www.cdac.in/img/cdac-logo.png" alt="CDAC Logo">
-        </div>
-    </div>
-
-    <!-- Voice Button -->
-    <div class="voice-corner">
-        <div class="voice-corner-btn" id="voiceBtn" onclick="toggleVoiceInput()">🎤</div>
-        <div class="voice-corner-text" id="voiceStatus">{% trans "Click" %}</div>
-    </div>
-
-    <!-- Back Button -->
-    <div class="back-btn" onclick="goBack()">← {% trans "Back" %}</div>
-
-    <!-- Main Container -->
-    <div class="container">
-        <div class="content-wrapper">
-            
-            <!-- Display Django messages -->
-            {% if messages %}
-            <div class="messages">
-                {% for message in messages %}
-                <div class="message {{ message.tags }}">{{ message }}</div>
-                {% endfor %}
-            </div>
-            {% endif %}
-            
+{% block content %}
+ Timeout Warning Popup 
+ Voice Status Indicator 
+<div class="voice-status-indicator" id="voiceStatusIndicator">
+<div class="voice-pulse"></div>
+<span id="voiceStatusText">{% trans "Listening..." %}</span>
+</div>
+ Payment Loading Overlay 
+<div class="payment-loading" id="paymentLoading">
+<div class="payment-spinner"></div>
+<div>{% trans "Processing Payment..." %}</div>
+</div>
+ HEADER 
+ Voice Button 
+ Back Button 
+ Main Container 
+<div class="container">
+<div class="content-wrapper">
+<!-- Display Django messages -->
             <h1>🧾 {% trans "Gas Bill Payment" %}</h1>
+<!-- Bill Details Card -->
+<div class="bill-card">
+<div class="bill-row">
+<span>{% trans "Consumer Number:" %}</span>
+<span><strong>1234 5678 9012</strong></span>
+</div>
+<div class="bill-row">
+<span>{% trans "Bill Number:" %}</span>
+<span><strong>GAS/2026/0215</strong></span>
+</div>
+<div class="bill-row">
+<span>{% trans "Bill Date:" %}</span>
+<span><strong>15 Feb 2026</strong></span>
+</div>
+<div class="bill-row">
+<span>{% trans "Due Date:" %}</span>
+<span class="due-date"><strong>05 Mar 2026</strong></span>
+</div>
+<div class="bill-row">
+<span>{% trans "Period:" %}</span>
+<span><strong>{% trans "Jan 2026" %}</strong></span>
+</div>
+<div class="bill-amount" id="billAmount">₹ 856.00</div>
+</div>
+<!-- Payment Method Selector -->
+<div class="payment-methods">
+<button class="payment-method-btn active" id="upiBtn" onclick="selectPaymentMethod('upi')">📱 {% trans "UPI" %}</button>
+<button class="payment-method-btn" id="atmBtn" onclick="selectPaymentMethod('atm')">💳 {% trans "ATM Card" %}</button>
+</div>
+<!-- UPI Payment Section -->
+<div class="payment-section active" id="upiSection">
+<div class="qr-container">
+<div class="qr-code">📱</div>
+<p style="font-size: 18px; margin-bottom: 10px;">{% trans "Scan QR code with any UPI app" %}</p>
+<p style="font-size: 16px; color: #1e5fbf;">UPI ID: gasbill@okhdfcbank</p>
+</div>
+</div>
+<!-- ATM Card Payment Section -->
+<div class="payment-section" id="atmSection">
+<div class="card-input-group">
+<label>{% trans "Card Number" %}</label>
+<input %}"="" 15-16="" card="" class="card-input" digit="" enter="" id="cardNumber" number"="" placeholder="{% trans " readonly="" type="text"/>
+<div class="validation-message" id="cardNumberError">{% trans "Card number must be at least 15 digits" %}</div>
+</div>
+<div class="card-row">
+<div class="card-input-group">
+<label>{% trans "CVV" %}</label>
+<input %}"="" 3="" class="card-input" digits"="" id="cvv" maxlength="3" placeholder="{% trans " readonly="" type="text"/>
+<div class="validation-message" id="cvvError">{% trans "CVV must be 3 digits" %}</div>
+</div>
+<div class="card-input-group">
+<label>{% trans "PIN" %}</label>
+<input %}"="" 4="" class="card-input" digits"="" id="pin" maxlength="4" placeholder="{% trans " readonly="" type="text"/>
+<div class="validation-message" id="pinError">{% trans "PIN must be 4 digits" %}</div>
+</div>
+</div>
+</div>
+<!-- Payment Form -->
+<form action="{% url 'gas-bill-payment' %}" id="paymentForm" method="POST">
+    {% csrf_token %}
+                <input name="consumer_number" type="hidden" value="123456789012"/>
+<input name="bill_number" type="hidden" value="GAS/2026/0215"/>
+<input name="amount" type="hidden" value="856.00"/>
+<input id="paymentMethod" name="payment_method" type="hidden" value="upi"/>
+<input id="hiddenCardNumber" name="card_number" type="hidden"/>
+<input id="hiddenCVV" name="cvv" type="hidden"/>
+<input id="hiddenPIN" name="pin" type="hidden"/>
+<button class="pay-btn" id="payBtn" onclick="validateAndPay()" type="button">{% trans "Pay Now" %}</button>
+</form>
+</div>
+</div>
+ Floating Keyboard Elements 
+<div class="overlay" id="overlay"></div>
+<textarea %}"="" class="floating-input" here..."="" id="floatingInput" placeholder="{% trans " type=""></textarea>
+<div class="keyboard" id="keyboard"></div>
+ Load voice.js - must be at bottom 
+<script src="{% static 'js/voice.js' %}"></script>
+{% endblock %}
 
-            <!-- Bill Details Card -->
-            <div class="bill-card">
-                <div class="bill-row">
-                    <span>{% trans "Consumer Number:" %}</span>
-                    <span><strong>1234 5678 9012</strong></span>
-                </div>
-
-                <div class="bill-row">
-                    <span>{% trans "Bill Number:" %}</span>
-                    <span><strong>GAS/2026/0215</strong></span>
-                </div>
-
-                <div class="bill-row">
-                    <span>{% trans "Bill Date:" %}</span>
-                    <span><strong>15 Feb 2026</strong></span>
-                </div>
-
-                <div class="bill-row">
-                    <span>{% trans "Due Date:" %}</span>
-                    <span class="due-date"><strong>05 Mar 2026</strong></span>
-                </div>
-
-                <div class="bill-row">
-                    <span>{% trans "Period:" %}</span>
-                    <span><strong>{% trans "Jan 2026" %}</strong></span>
-                </div>
-
-                <div class="bill-amount" id="billAmount">₹ 856.00</div>
-            </div>
-
-            <!-- Payment Method Selector -->
-            <div class="payment-methods">
-                <button class="payment-method-btn active" id="upiBtn" onclick="selectPaymentMethod('upi')">📱 {% trans "UPI" %}</button>
-                <button class="payment-method-btn" id="atmBtn" onclick="selectPaymentMethod('atm')">💳 {% trans "ATM Card" %}</button>
-            </div>
-
-            <!-- UPI Payment Section -->
-            <div class="payment-section active" id="upiSection">
-                <div class="qr-container">
-                    <div class="qr-code">📱</div>
-                    <p style="font-size: 18px; margin-bottom: 10px;">{% trans "Scan QR code with any UPI app" %}</p>
-                    <p style="font-size: 16px; color: #1e5fbf;">UPI ID: gasbill@okhdfcbank</p>
-                </div>
-            </div>
-
-            <!-- ATM Card Payment Section -->
-            <div class="payment-section" id="atmSection">
-                <div class="card-input-group">
-                    <label>{% trans "Card Number" %}</label>
-                    <input type="text" class="card-input" id="cardNumber" readonly placeholder="{% trans "Enter 15-16 digit card number" %}">
-                    <div class="validation-message" id="cardNumberError">{% trans "Card number must be at least 15 digits" %}</div>
-                </div>
-                
-                <div class="card-row">
-                    <div class="card-input-group">
-                        <label>{% trans "CVV" %}</label>
-                        <input type="text" class="card-input" id="cvv" readonly placeholder="{% trans "3 digits" %}" maxlength="3">
-                        <div class="validation-message" id="cvvError">{% trans "CVV must be 3 digits" %}</div>
-                    </div>
-                    
-                    <div class="card-input-group">
-                        <label>{% trans "PIN" %}</label>
-                        <input type="text" class="card-input" id="pin" readonly placeholder="{% trans "4 digits" %}" maxlength="4">
-                        <div class="validation-message" id="pinError">{% trans "PIN must be 4 digits" %}</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Payment Form -->
-            <form method="POST" action="{% url 'gas-bill-payment' %}" id="paymentForm">
-                {% csrf_token %}
-                <input type="hidden" name="consumer_number" value="123456789012">
-                <input type="hidden" name="bill_number" value="GAS/2026/0215">
-                <input type="hidden" name="amount" value="856.00">
-                <input type="hidden" name="payment_method" id="paymentMethod" value="upi">
-                <input type="hidden" name="card_number" id="hiddenCardNumber">
-                <input type="hidden" name="cvv" id="hiddenCVV">
-                <input type="hidden" name="pin" id="hiddenPIN">
-                
-                <button type="button" class="pay-btn" id="payBtn" onclick="validateAndPay()">{% trans "Pay Now" %}</button>
-            </form>
-
-        </div>
-    </div>
-
-    <!-- Floating Keyboard Elements -->
-    <div id="overlay" class="overlay"></div>
-    <textarea id="floatingInput" class="floating-input" placeholder="{% trans "Type here..." %}"></textarea>
-    <div id="keyboard" class="keyboard"></div>
-
-    <!-- Load voice.js - must be at bottom -->
-    <script src="{% static 'js/voice.js' %}"></script>
-
-    <script>
+{% block extra_scripts %}
+<script>
         /* ================= LANGUAGE UTILITIES ================= */
         function getCurrentLangCode() {
             const path = window.location.pathname.split('/');
             return path[1] || "en";
         }
-
         function speak(text) {
             if (!('speechSynthesis' in window)) return;
             speechSynthesis.cancel();
@@ -648,93 +461,26 @@
             utterance.rate = 1;
             speechSynthesis.speak(utterance);
         }
-
         /* ================= SESSION TIMER ================= */
-        let sessionTimer;
-        let timeoutWarningTimer;
-        const SESSION_DURATION = 120000; // 2 minutes
-        const WARNING_TIME = 30000; // Warn 30 seconds before
-
-        function startSessionTimer() {
-            sessionTimer = setTimeout(() => {
-                showTimeoutWarning();
-            }, SESSION_DURATION - WARNING_TIME);
-        }
-
-        function showTimeoutWarning() {
-            const warning = document.getElementById('timeoutWarning');
-            if (warning) {
-                warning.style.display = 'block';
-                
-                const langCode = getCurrentLangCode();
-                const warnings = {
-                    'en': 'Your session is about to expire. Please continue to stay logged in.',
-                    'hi': 'आपका सत्र समाप्त होने वाला है। कृपया जारी रखें।',
-                    'or': 'ଆପଣଙ୍କର ସତ୍ର ସମାପ୍ତ ହେବାକୁ ଯାଉଛି। ଦୟାକରି ଜାରି ରଖନ୍ତୁ।',
-                    'bn': 'আপনার সেশন শেষ হতে চলেছে। অনুগ্রহ করে চালিয়ে যান।',
-                    'ta': 'உங்கள் அமர்வு காலாவதியாகிறது. தயவுசெய்து தொடரவும்.',
-                    'te': 'మీ సెషన్ ముగియబోతోంది. దయచేసి కొనసాగించండి.'
-                };
-                speak(warnings[langCode] || warnings['en']);
-                
-                timeoutWarningTimer = setTimeout(() => {
-                    window.location.href = "/" + langCode + "/";
-                }, WARNING_TIME);
-            }
-        }
-
-        function extendSession() {
-            const warning = document.getElementById('timeoutWarning');
-            if (warning) {
-                warning.style.display = 'none';
-            }
-            clearTimeout(sessionTimer);
-            clearTimeout(timeoutWarningTimer);
-            startSessionTimer();
-            
-            const langCode = getCurrentLangCode();
-            const messages = {
-                'en': 'Session extended. You may continue.',
-                'hi': 'सत्र बढ़ा दिया गया। आप जारी रख सकते हैं।',
-                'or': 'ସତ୍ର ବୃଦ୍ଧି କରାଯାଇଛି। ଆପଣ ଜାରି ରଖିପାରିବେ।',
-                'bn': 'সেশন বাড়ানো হয়েছে। আপনি চালিয়ে যেতে পারেন।',
-                'ta': 'அமர்வு நீட்டிக்கப்பட்டது. நீங்கள் தொடரலாம்.',
-                'te': 'సెషన్ పొడిగించబడింది. మీరు కొనసాగించవచ్చు.'
-            };
-            speak(messages[langCode] || messages['en']);
-        }
-
-        function resetSessionTimer() {
-            clearTimeout(sessionTimer);
-            clearTimeout(timeoutWarningTimer);
-            startSessionTimer();
-        }
-
         function goBack() {
             resetSessionTimer();
             window.location.href = "/" + getCurrentLangCode() + "/gas-services/";
         }
-
         /* ================= PAYMENT METHOD SELECTION ================= */
         let currentPaymentMethod = 'upi';
         let activeInput = null;
         let isUpperCase = true;
         let activeFieldId = null;
-
         function selectPaymentMethod(method) {
             resetSessionTimer();
-            
             currentPaymentMethod = method;
             document.getElementById('paymentMethod').value = method;
-            
             // Update button states
             document.getElementById('upiBtn').classList.remove('active');
             document.getElementById('atmBtn').classList.remove('active');
-            
             // Update sections
             document.getElementById('upiSection').classList.remove('active');
             document.getElementById('atmSection').classList.remove('active');
-            
             if (method === 'upi') {
                 document.getElementById('upiBtn').classList.add('active');
                 document.getElementById('upiSection').classList.add('active');
@@ -742,9 +488,7 @@
                 document.getElementById('atmBtn').classList.add('active');
                 document.getElementById('atmSection').classList.add('active');
             }
-            
             validatePaymentFields();
-            
             const langCode = getCurrentLangCode();
             const messages = {
                 'en': method === 'upi' ? 'UPI payment selected' : 'ATM card payment selected',
@@ -753,21 +497,17 @@
             };
             speak(messages[langCode] || messages['en']);
         }
-
         /* ================= FLOATING KEYBOARD ================= */
         const overlay = document.getElementById("overlay");
         const floatingInput = document.getElementById("floatingInput");
         const keyboard = document.getElementById("keyboard");
-
         function createKeyboard() {
             keyboard.innerHTML = "";
             let letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
             if (!isUpperCase) { letters = letters.toLowerCase(); }
             let keys = (letters + "0123456789 ").split("");
-            
             let row = document.createElement("div");
             row.className = "keyboard-row";
-            
             keys.forEach((k, i) => {
                 if (i % 10 === 0 && i !== 0) {
                     keyboard.appendChild(row);
@@ -781,7 +521,6 @@
                 row.appendChild(btn);
             });
             keyboard.appendChild(row);
-            
             let last = document.createElement("div");
             last.className = "keyboard-row";
             last.innerHTML = `
@@ -792,12 +531,10 @@
             `;
             keyboard.appendChild(last);
         }
-
         function toggleCase() {
             isUpperCase = !isUpperCase;
             createKeyboard();
         }
-
         function openKeyboard(fieldId, fieldType = 'text') {
             resetSessionTimer();
             activeFieldId = fieldId;
@@ -809,11 +546,9 @@
             setTimeout(() => floatingInput.classList.add("show"), 10);
             floatingInput.focus();
         }
-
         function finish() {
             if (activeInput) {
                 activeInput.value = floatingInput.value;
-                
                 // Update hidden fields for card data
                 if (activeFieldId === 'cardNumber') {
                     document.getElementById('hiddenCardNumber').value = floatingInput.value;
@@ -822,12 +557,10 @@
                 } else if (activeFieldId === 'pin') {
                     document.getElementById('hiddenPIN').value = floatingInput.value;
                 }
-                
                 validatePaymentFields();
             }
             closeKeyboard();
         }
-
         function closeKeyboard() {
             floatingInput.classList.remove("show");
             setTimeout(() => {
@@ -836,7 +569,6 @@
                 keyboard.style.display = "none";
             }, 200);
         }
-
         // Handle Enter key on floating input
         floatingInput.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
@@ -844,29 +576,23 @@
                 finish();
             }
         });
-
         // Add click handlers for card inputs
         document.getElementById("cardNumber").addEventListener("click", () => openKeyboard("cardNumber", 'number'));
         document.getElementById("cvv").addEventListener("click", () => openKeyboard("cvv", 'number'));
         document.getElementById("pin").addEventListener("click", () => openKeyboard("pin", 'number'));
         overlay.addEventListener("click", closeKeyboard);
-
         /* ================= PAYMENT VALIDATION ================= */
         function validatePaymentFields() {
             const payBtn = document.getElementById('payBtn');
-            
             if (currentPaymentMethod === 'upi') {
                 payBtn.disabled = false;
                 return true;
             }
-            
             // ATM card validation
             const cardNumber = document.getElementById('cardNumber').value.replace(/\s/g, '');
             const cvv = document.getElementById('cvv').value;
             const pin = document.getElementById('pin').value;
-            
             let isValid = true;
-            
             // Validate card number (at least 15 digits)
             if (cardNumber.length < 15 || !/^\d+$/.test(cardNumber)) {
                 document.getElementById('cardNumberError').style.display = 'block';
@@ -874,7 +600,6 @@
             } else {
                 document.getElementById('cardNumberError').style.display = 'none';
             }
-            
             // Validate CVV (exactly 3 digits)
             if (!/^\d{3}$/.test(cvv)) {
                 document.getElementById('cvvError').style.display = 'block';
@@ -882,7 +607,6 @@
             } else {
                 document.getElementById('cvvError').style.display = 'none';
             }
-            
             // Validate PIN (exactly 4 digits)
             if (!/^\d{4}$/.test(pin)) {
                 document.getElementById('pinError').style.display = 'block';
@@ -890,14 +614,11 @@
             } else {
                 document.getElementById('pinError').style.display = 'none';
             }
-            
             payBtn.disabled = !isValid;
             return isValid;
         }
-
         function validateAndPay() {
             resetSessionTimer();
-            
             if (currentPaymentMethod === 'atm' && !validatePaymentFields()) {
                 const langCode = getCurrentLangCode();
                 const messages = {
@@ -908,16 +629,12 @@
                 speak(messages[langCode] || messages['en']);
                 return;
             }
-            
             processPayment();
         }
-
         function processPayment() {
             resetSessionTimer();
-            
             // Show loading overlay
             document.getElementById('paymentLoading').classList.add('show');
-            
             const langCode = getCurrentLangCode();
             const messages = {
                 'en': 'Processing payment of 856 rupees',
@@ -925,48 +642,39 @@
                 'or': '856 ଟଙ୍କାର ଭୁକତାନ ପ୍ରକ୍ରିୟାକରଣ ହେଉଛି'
             };
             speak(messages[langCode] || messages['en']);
-            
             // Submit form after delay
             setTimeout(() => {
                 document.getElementById('paymentForm').submit();
             }, 2000);
         }
-
         /* ================= VOICE INPUT ================= */
         let recognition;
         let isListening = false;
-
         function toggleVoiceInput() {
             resetSessionTimer();
-            
             if (isListening) {
                 stopVoiceInput();
                 return;
             }
-
             const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SR) {
                 alert("{% trans 'Speech not supported' %}");
                 return;
             }
-
             if (recognition) {
                 try {
                     recognition.stop();
                 } catch (e) {}
             }
-
             recognition = new SR();
             recognition.lang = window.getCurrentLang ? window.getCurrentLang() : 'en-IN';
             recognition.continuous = true;
             recognition.interimResults = true;
-
             recognition.onstart = function() {
                 isListening = true;
                 document.getElementById("voiceBtn").classList.add("listening");
                 document.getElementById("voiceStatus").innerText = "{% trans 'Listening...' %}";
                 document.getElementById('voiceStatusIndicator').classList.add('active');
-                
                 const langCode = getCurrentLangCode();
                 const messages = {
                     'en': 'Say UPI for QR payment, ATM for card payment, or say pay to complete payment.',
@@ -975,13 +683,10 @@
                 };
                 speak(messages[langCode] || messages['en']);
             };
-
             recognition.onresult = function(e) {
                 resetSessionTimer();
-                
                 let finalTranscript = '';
                 let interimTranscript = '';
-                
                 for (let i = 0; i < e.results.length; i++) {
                     const result = e.results[i];
                     if (result.isFinal) {
@@ -990,13 +695,10 @@
                         interimTranscript += result[0].transcript;
                     }
                 }
-                
                 const transcript = finalTranscript || interimTranscript;
                 const command = transcript.toLowerCase();
                 console.log("Gas bill command:", command);
-                
                 const langCode = getCurrentLangCode();
-                
                 // Payment method selection
                 if (command.includes("upi") || command.includes("यूपीआई") || command.includes("ୟୁପିଆଇ")) {
                     selectPaymentMethod('upi');
@@ -1006,12 +708,10 @@
                     selectPaymentMethod('atm');
                     return;
                 }
-                
                 // Card number entry
                 const numberMatch = command.match(/\d+/g);
                 if (numberMatch && currentPaymentMethod === 'atm') {
                     const digits = numberMatch.join('');
-                    
                     if (command.includes("card") || command.includes("number") || command.includes("कार्ड")) {
                         document.getElementById('cardNumber').value = digits;
                         document.getElementById('hiddenCardNumber').value = digits;
@@ -1033,7 +733,6 @@
                         return;
                     }
                 }
-                
                 // Payment commands
                 if (command.includes("pay") || command.includes("payment") || command.includes("submit") || 
                     command.includes("भुगतान") || command.includes("ଭୁକତାନ") || command.includes("जमा") || command.includes("ଦାଖଲ")) {
@@ -1071,13 +770,11 @@
                     return;
                 }
             };
-
             recognition.onerror = function(event) {
                 console.error("Recognition error:", event.error);
                 if (event.error === 'no-speech') return;
                 stopVoiceInput();
             };
-
             recognition.onend = function() {
                 if (isListening) {
                     try {
@@ -1092,7 +789,6 @@
                     document.getElementById('voiceStatusIndicator').classList.remove('active');
                 }
             };
-
             try {
                 recognition.start();
             } catch (e) {
@@ -1100,7 +796,6 @@
                 stopVoiceInput();
             }
         }
-
         function stopVoiceInput() {
             isListening = false;
             if (recognition) {
@@ -1112,7 +807,6 @@
             document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
             document.getElementById('voiceStatusIndicator').classList.remove('active');
         }
-
         // Auto-read page instructions
         function autoReadPage() {
             setTimeout(() => {
@@ -1125,22 +819,18 @@
                 speak(messages[langCode] || messages['en']);
             }, 2000);
         }
-
         // Auto-hide messages after 5 seconds
         setTimeout(function() {
             document.querySelectorAll('.message').forEach(function(message) {
                 message.style.display = 'none';
             });
         }, 5000);
-
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             startSessionTimer();
-            
             document.addEventListener('click', resetSessionTimer);
             document.addEventListener('keypress', resetSessionTimer);
             document.addEventListener('touchstart', resetSessionTimer);
-            
             // Check if voice should auto-start
             const autoStartVoice = sessionStorage.getItem('autoStartVoice');
             if (autoStartVoice === 'true') {
@@ -1149,23 +839,20 @@
                     toggleVoiceInput();
                 }, 1000);
             }
-            
             // Auto-read page
             setTimeout(autoReadPage, 2000);
-            
             // Initialize keyboard
             createKeyboard();
         });
-
         window.addEventListener('beforeunload', function() {
             if (sessionTimer) {
                 clearTimeout(sessionTimer);
             }
             stopVoiceInput();
         });
-
         // Override voice.js autoReadPage
         window.autoReadPage = autoReadPage;
-    </script>
-</body>
-</html>
+
+
+</script>
+{% endblock %}

@@ -1,9 +1,10 @@
-<!DOCTYPE html>
-{% load i18n %}
-{% load static %}
-<html lang="en">
-<head>
-    <style>
+{% extends 'base.html' %}
+{% load i18n static %}
+
+{% block title %}{% trans "Gas Services - Civic Kiosk" %}{% endblock %}
+
+{% block extra_head %}
+<style>
         /* Hide Google Translate elements */
         .goog-te-banner-frame.skiptranslate,
         .goog-te-gadget-icon,
@@ -14,48 +15,21 @@
         .goog-te-spinner-pos {
             display: none !important;
         }
-        
-        body {
-            top: 0px !important;
-            position: static !important;
-            overflow: hidden !important;
-            height: 100vh;
-            width: 100vw;
-        }
-        
         .goog-te-combo {
             display: none !important;
         }
-        
         .goog-te-gadget {
             color: transparent !important;
             height: 0 !important;
             overflow: hidden !important;
         }
-
         /* Timeout warning popup */
-        .timeout-warning {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            border: 4px solid #ff9933;
-            border-radius: 40px;
-            padding: 30px;
-            text-align: center;
-            z-index: 2000;
-            display: none;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-        
         .timeout-warning p {
             font-size: 24px;
             font-weight: 700;
             color: #333;
             margin-bottom: 20px;
         }
-
         .timeout-warning button {
             background: #28a745;
             color: white;
@@ -68,15 +42,12 @@
             margin: 10px;
             min-width: 150px;
         }
-
         .timeout-warning .logout-btn {
             background: #dc3545;
         }
-        
         .timeout-warning button:active {
             transform: translateY(3px);
         }
-
         /* Voice status indicator */
         .voice-status-indicator {
             position: fixed;
@@ -95,11 +66,9 @@
             gap: 10px;
             border: 2px solid #ff9933;
         }
-
         .voice-status-indicator.active {
             display: flex;
         }
-
         .voice-pulse {
             width: 12px;
             height: 12px;
@@ -107,108 +76,29 @@
             border-radius: 50%;
             animation: voicePulse 1.5s infinite;
         }
-
         @keyframes voicePulse {
             0% { transform: scale(1); opacity: 1; }
             50% { transform: scale(1.5); opacity: 0.7; }
             100% { transform: scale(1); opacity: 1; }
         }
-    </style>
 
-    <meta charset="UTF-8">
-    <title>{% trans "Gas Services - Civic Kiosk" %}</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <style>
-        * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif; user-select:none; }
-        body { width:100vw; height:100vh; overflow:hidden; background:#f0f7ff; }
-        
         /* HEADER */
-        .header { 
-            height:70px; 
-            background:white; 
-            display:flex; 
-            align-items:center; 
-            justify-content:space-between; 
-            padding:0 20px; 
-            border-bottom:2px solid #1e5fbf;
-            position:fixed;
-            top:0;
-            left:0;
-            right:0;
-            z-index:1000;
-        }
-        .header-left { display:flex; align-items:center; gap:10px; }
         .header-left img { height:40px; }
         .header-left div { font-size:12px; font-weight:600; color:#1e5fbf; line-height:1.2; }
         .header-right img { height:35px; }
-        
         /* VOICE CORNER */
-        .voice-corner { 
-            position:fixed; 
-            top:80px; 
-            right:15px; 
-            z-index:1000; 
-            display:flex; 
-            flex-direction:column; 
-            align-items:center; 
-            gap:3px; 
-        }
-        .voice-corner-btn { 
-            background:#ff9933; 
-            width:45px; 
-            height:45px; 
-            border-radius:50%; 
-            border:2px solid white; 
-            cursor:pointer; 
-            display:flex; 
-            align-items:center; 
-            justify-content:center; 
-            font-size:24px; 
-            box-shadow:0 2px 5px rgba(0,0,0,0.2);
-            transition: all 0.2s;
-        }
         .voice-corner-btn:hover { background:#ffaa44; }
         .voice-corner-btn.listening { 
             background:#28a745; 
             transform:scale(1.1);
             animation: pulse 1s infinite;
         }
-        @keyframes pulse {
-            0% { transform: scale(1); }
             50% { transform: scale(1.1); }
             100% { transform: scale(1); }
         }
-        .voice-corner-text { 
-            background:white; 
-            padding:2px 8px; 
-            border-radius:12px; 
-            font-size:10px; 
-            color:#ff9933; 
-            border:1px solid #ff9933; 
-        }
-        
         /* BACK BUTTON */
-        .back-btn { 
-            position:fixed; 
-            top:80px; 
-            left:15px; 
-            background:white; 
-            border:2px solid #1e5fbf; 
-            border-radius:30px; 
-            padding:5px 15px; 
-            font-size:18px; 
-            font-weight:700; 
-            cursor:pointer; 
-            color:#1e5fbf; 
-            box-shadow:0 3px 0 #0a3d7a; 
-            z-index:1000; 
-            text-decoration:none;
-            display:inline-block;
-        }
         .back-btn:hover { background:#1e5fbf; color:white; }
         .back-btn:active { transform:translateY(3px); box-shadow:0 1px 0 #0a3d7a; }
-        
         /* MAIN CONTAINER */
         /* MAIN CONTAINER */
 .container { 
@@ -223,12 +113,6 @@
     padding: 10px; 
     overflow-y: auto; 
 }
-.content-wrapper { 
-    width: 100%; 
-    max-width: 800px; 
-    margin: auto;  /* This helps with centering */
-}
-        
         /* Message styles */
         .messages { 
             position: fixed; 
@@ -259,14 +143,12 @@
             color: #0c5460; 
             border: 1px solid #bee5eb; 
         }
-        
         h1 { 
             color:#1e5fbf; 
             font-size:42px; 
             text-align:center; 
             margin-bottom:30px; 
         }
-        
         /* MENU GRID */
         .menu-grid { 
             display:grid; 
@@ -295,7 +177,6 @@
             transform:translateY(6px); 
             box-shadow:0 2px 0 #0a3d7a; 
         }
-        
         /* Consumer Info Card */
         .consumer-info {
             margin-top: 20px; 
@@ -314,99 +195,56 @@
             color: #28a745; 
             font-weight: bold;
         }
-        
         @media (max-width:768px) {
             .menu-grid { grid-template-columns:1fr; }
             h1 { font-size:32px; }
             .menu-card { font-size:20px; padding:20px; }
         }
-    </style>
-</head>
-<body>
-    <!-- Timeout Warning Popup -->
-    <div id="timeoutWarning" class="timeout-warning">
-        <p>⏰ {% trans "Session about to expire!" %}</p>
-        <button onclick="extendSession()">{% trans "Continue" %}</button>
-        <button class="logout-btn" onclick="window.location='{% url 'index' %}'">{% trans "Logout" %}</button>
-    </div>
 
-    <!-- Voice Status Indicator -->
-    <div id="voiceStatusIndicator" class="voice-status-indicator">
-        <div class="voice-pulse"></div>
-        <span id="voiceStatusText">{% trans "Listening..." %}</span>
-    </div>
 
-    <!-- HEADER -->
-    <div class="header">
-        <div class="header-left">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India">
-            <div>{% trans "Ministry of Electronics &" %}<br>{% trans "Information Technology" %}<br>{% trans "Government of India" %}</div>
-        </div>
-        <div class="header-right">
-            <img src="https://www.cdac.in/img/cdac-logo.png" alt="CDAC Logo">
-        </div>
-    </div>
-    
-    <!-- Django Messages -->
-    {% if messages %}
-    <div class="messages">
-        {% for message in messages %}
-        <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
-            {{ message }}
-        </div>
-        {% endfor %}
-    </div>
-    {% endif %}
-    
-    <!-- Voice Button -->
-    <div class="voice-corner">
-        <div class="voice-corner-btn" id="voiceBtn" onclick="toggleVoiceInput()">🎤</div>
-        <div class="voice-corner-text" id="voiceStatus">{% trans "Click" %}</div>
-    </div>
-    
-    <!-- Back Button -->
-    <div class="back-btn" onclick="goBack()">← {% trans "Back" %}</div>
-    
-    <!-- Main Container -->
-    <div class="container">
-        <div class="content-wrapper">
-            <h1>🔥 {% trans "Gas Services" %}</h1>
-            
-            <div class="menu-grid">
-                <div class="menu-card" onclick="navigateTo('{% url 'gas-new-connection' %}')">🆕 {% trans "New Connection" %}</div>
-                <div class="menu-card" onclick="navigateTo('{% url 'gas-subsidy' %}')">💰 {% trans "Subsidy" %}</div>
-                <div class="menu-card" onclick="navigateTo('{% url 'gas-bill-payment' %}')">🧾 {% trans "Bill Payment" %}</div>
-                <div class="menu-card" onclick="navigateTo('{% url 'gas-complaint' %}')">⚠️ {% trans "Complaint" %}</div>
-                <div class="menu-card" onclick="navigateTo('{% url 'gas-cylinder-booking' %}')">🔄 {% trans "Cylinder Booking" %}</div>
-                <div class="menu-card" onclick="navigateTo('{% url 'gas-booking-status' %}')">📦 {% trans "Booking Status" %}</div>
-                <div class="menu-card" onclick="navigateTo('{% url 'gas-consumer-lookup' %}')">🔍 {% trans "Consumer Lookup" %}</div>
-                
+</style>
+{% endblock %}
+
+{% block content %}
+     Voice Button 
+ Back Button 
+ Main Container 
+<div class="container">
+<div class="content-wrapper">
+<h1>🔥 {% trans "Gas Services" %}</h1>
+<div class="menu-grid">
+<div class="menu-card" onclick="navigateTo('{% url 'gas-new-connection' %}')">🆕 {% trans "New Connection" %}</div>
+<div class="menu-card" onclick="navigateTo('{% url 'gas-subsidy' %}')">💰 {% trans "Subsidy" %}</div>
+<div class="menu-card" onclick="navigateTo('{% url 'gas-bill-payment' %}')">🧾 {% trans "Bill Payment" %}</div>
+<div class="menu-card" onclick="navigateTo('{% url 'gas-complaint' %}')">⚠️ {% trans "Complaint" %}</div>
+<div class="menu-card" onclick="navigateTo('{% url 'gas-cylinder-booking' %}')">🔄 {% trans "Cylinder Booking" %}</div>
+<div class="menu-card" onclick="navigateTo('{% url 'gas-booking-status' %}')">📦 {% trans "Booking Status" %}</div>
+<div class="menu-card" onclick="navigateTo('{% url 'gas-consumer-lookup' %}')">🔍 {% trans "Consumer Lookup" %}</div>
                 {% if additional_services %}
                     {% for service in additional_services %}
                     <div class="menu-card" onclick="navigateTo('{% url service.url_name %}')">{{ service.name }}</div>
                     {% endfor %}
                 {% endif %}
             </div>
-            
             {% if user_consumer_info %}
             <div class="consumer-info">
-                <span class="consumer-label">{% trans "Active Consumer:" %} </span>
-                <span class="consumer-value">{{ user_consumer_info }}</span>
-            </div>
+<span class="consumer-label">{% trans "Active Consumer:" %} </span>
+<span class="consumer-value">{{ user_consumer_info }}</span>
+</div>
             {% endif %}
         </div>
-    </div>
-    
-    <!-- Load voice.js - must be at bottom -->
-    <script src="{% static 'js/voice.js' %}"></script>
-    
-    <script>
+</div>
+ Load voice.js - must be at bottom 
+<script src="{% static 'js/voice.js' %}"></script>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
         /* ================= LANGUAGE UTILITIES ================= */
         function getCurrentLangCode() {
             const path = window.location.pathname.split('/');
             return path[1] || "en";
         }
-
         function speak(text) {
             if (!('speechSynthesis' in window)) return;
             speechSynthesis.cancel();
@@ -415,76 +253,13 @@
             utterance.rate = 1;
             speechSynthesis.speak(utterance);
         }
-
         /* ================= SESSION TIMER ================= */
-        let sessionTimer;
-        let timeoutWarningTimer;
-        const SESSION_DURATION = 120000; // 2 minutes
-        const WARNING_TIME = 30000; // Warn 30 seconds before
-
-        function startSessionTimer() {
-            sessionTimer = setTimeout(() => {
-                showTimeoutWarning();
-            }, SESSION_DURATION - WARNING_TIME);
-        }
-
-        function showTimeoutWarning() {
-            const warning = document.getElementById('timeoutWarning');
-            if (warning) {
-                warning.style.display = 'block';
-                
-                const langCode = getCurrentLangCode();
-                const warnings = {
-                    'en': 'Your session is about to expire. Please continue to stay logged in.',
-                    'hi': 'आपका सत्र समाप्त होने वाला है। कृपया जारी रखें।',
-                    'or': 'ଆପଣଙ୍କର ସତ୍ର ସମାପ୍ତ ହେବାକୁ ଯାଉଛି। ଦୟାକରି ଜାରି ରଖନ୍ତୁ।',
-                    'bn': 'আপনার সেশন শেষ হতে চলেছে। অনুগ্রহ করে চালিয়ে যান।',
-                    'ta': 'உங்கள் அமர்வு காலாவதியாகிறது. தயவுசெய்து தொடரவும்.',
-                    'te': 'మీ సెషన్ ముగియబోతోంది. దయచేసి కొనసాగించండి.'
-                };
-                speak(warnings[langCode] || warnings['en']);
-                
-                timeoutWarningTimer = setTimeout(() => {
-                    window.location.href = "/" + langCode + "/";
-                }, WARNING_TIME);
-            }
-        }
-
-        function extendSession() {
-            const warning = document.getElementById('timeoutWarning');
-            if (warning) {
-                warning.style.display = 'none';
-            }
-            clearTimeout(sessionTimer);
-            clearTimeout(timeoutWarningTimer);
-            startSessionTimer();
-            
-            const langCode = getCurrentLangCode();
-            const messages = {
-                'en': 'Session extended. You may continue.',
-                'hi': 'सत्र बढ़ा दिया गया। आप जारी रख सकते हैं।',
-                'or': 'ସତ୍ର ବୃଦ୍ଧି କରାଯାଇଛି। ଆପଣ ଜାରି ରଖିପାରିବେ।',
-                'bn': 'সেশন বাড়ানো হয়েছে। আপনি চালিয়ে যেতে পারেন।',
-                'ta': 'அமர்வு நீட்டிக்கப்பட்டது. நீங்கள் தொடரலாம்.',
-                'te': 'సెషన్ పొడిగించబడింది. మీరు కొనసాగించవచ్చు.'
-            };
-            speak(messages[langCode] || messages['en']);
-        }
-
-        function resetSessionTimer() {
-            clearTimeout(sessionTimer);
-            clearTimeout(timeoutWarningTimer);
-            startSessionTimer();
-        }
-
         function goBack() {
             resetSessionTimer();
             window.location.href = "/" + getCurrentLangCode() + "/menu/";
         }
-
         function navigateTo(url) {
             resetSessionTimer();
-            
             const langCode = getCurrentLangCode();
             const navMessages = {
                 'en': 'Loading service',
@@ -492,45 +267,36 @@
                 'or': 'ସେବା ଲୋଡ୍ ହେଉଛି'
             };
             speak(navMessages[langCode] || navMessages['en']);
-            
             window.location.href = url;
         }
-
         /* ================= VOICE INPUT ================= */
         let recognition;
         let isListening = false;
-
         function toggleVoiceInput() {
             resetSessionTimer();
-            
             if (isListening) {
                 stopVoiceInput();
                 return;
             }
-
             const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SR) {
                 alert("{% trans 'Speech not supported' %}");
                 return;
             }
-
             if (recognition) {
                 try {
                     recognition.stop();
                 } catch (e) {}
             }
-
             recognition = new SR();
             recognition.lang = window.getCurrentLang ? window.getCurrentLang() : 'en-IN';
             recognition.continuous = true;
             recognition.interimResults = true;
-
             recognition.onstart = function() {
                 isListening = true;
                 document.getElementById("voiceBtn").classList.add("listening");
                 document.getElementById("voiceStatus").innerText = "{% trans 'Listening...' %}";
                 document.getElementById('voiceStatusIndicator').classList.add('active');
-                
                 const langCode = getCurrentLangCode();
                 const messages = {
                     'en': 'Please say the name of the gas service you want to use, or say home to return to main menu.',
@@ -539,13 +305,10 @@
                 };
                 speak(messages[langCode] || messages['en']);
             };
-
             recognition.onresult = function(e) {
                 resetSessionTimer();
-                
                 let finalTranscript = '';
                 let interimTranscript = '';
-                
                 for (let i = 0; i < e.results.length; i++) {
                     const result = e.results[i];
                     if (result.isFinal) {
@@ -554,13 +317,10 @@
                         interimTranscript += result[0].transcript;
                     }
                 }
-                
                 const transcript = finalTranscript || interimTranscript;
                 const command = transcript.toLowerCase();
                 console.log("Gas services menu command:", command);
-                
                 const langCode = getCurrentLangCode();
-                
                 // Menu navigation commands - English
                 if (command.includes("new connection") || command.includes("new gas")) {
                     navigateTo("{% url 'gas-new-connection' %}");
@@ -590,7 +350,6 @@
                     navigateTo("{% url 'gas-consumer-lookup' %}");
                     return;
                 }
-                
                 // Hindi commands
                 if (command.includes("नया कनेक्शन") || command.includes("नया गैस")) {
                     navigateTo("{% url 'gas-new-connection' %}");
@@ -620,7 +379,6 @@
                     navigateTo("{% url 'gas-consumer-lookup' %}");
                     return;
                 }
-                
                 // Odia commands
                 if (command.includes("ନୂତନ ସଂଯୋଗ") || command.includes("ନୂଆ ଗ୍ୟାସ୍")) {
                     navigateTo("{% url 'gas-new-connection' %}");
@@ -650,7 +408,6 @@
                     navigateTo("{% url 'gas-consumer-lookup' %}");
                     return;
                 }
-                
                 // Bengali commands
                 if (command.includes("নতুন সংযোগ") || command.includes("নতুন গ্যাস")) {
                     navigateTo("{% url 'gas-new-connection' %}");
@@ -664,7 +421,6 @@
                     navigateTo("{% url 'gas-bill-payment' %}");
                     return;
                 }
-                
                 // Tamil commands
                 if (command.includes("புதிய இணைப்பு") || command.includes("புதிய எரிவாயு")) {
                     navigateTo("{% url 'gas-new-connection' %}");
@@ -678,7 +434,6 @@
                     navigateTo("{% url 'gas-bill-payment' %}");
                     return;
                 }
-                
                 // Telugu commands
                 if (command.includes("కొత్త కనెక్షన్") || command.includes("కొత్త గ్యాస్")) {
                     navigateTo("{% url 'gas-new-connection' %}");
@@ -692,7 +447,6 @@
                     navigateTo("{% url 'gas-bill-payment' %}");
                     return;
                 }
-                
                 // Universal commands
                 if (command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ") || 
                     command.includes("পিছনে") || command.includes("பின்") || command.includes("వెనుకకు")) {
@@ -709,13 +463,11 @@
                     return;
                 }
             };
-
             recognition.onerror = function(event) {
                 console.error("Recognition error:", event.error);
                 if (event.error === 'no-speech') return;
                 stopVoiceInput();
             };
-
             recognition.onend = function() {
                 if (isListening) {
                     try {
@@ -730,7 +482,6 @@
                     document.getElementById('voiceStatusIndicator').classList.remove('active');
                 }
             };
-
             try {
                 recognition.start();
             } catch (e) {
@@ -738,7 +489,6 @@
                 stopVoiceInput();
             }
         }
-
         function stopVoiceInput() {
             isListening = false;
             if (recognition) {
@@ -750,7 +500,6 @@
             document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
             document.getElementById('voiceStatusIndicator').classList.remove('active');
         }
-
         // Auto-read page instructions
         function autoReadPage() {
             setTimeout(() => {
@@ -766,7 +515,6 @@
                 speak(messages[langCode] || messages['en']);
             }, 2000);
         }
-
         // Auto-hide messages after 5 seconds
         setTimeout(function() {
             const messages = document.querySelectorAll('.message');
@@ -774,22 +522,18 @@
                 message.style.display = 'none';
             });
         }, 5000);
-
         // Optional: Add keyboard navigation
         document.addEventListener('keydown', function(e) {
             if(e.key === 'Escape') {
                 goBack();
             }
         });
-
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             startSessionTimer();
-            
             document.addEventListener('click', resetSessionTimer);
             document.addEventListener('keypress', resetSessionTimer);
             document.addEventListener('touchstart', resetSessionTimer);
-            
             // Check if voice should auto-start
             const autoStartVoice = sessionStorage.getItem('autoStartVoice');
             if (autoStartVoice === 'true') {
@@ -798,23 +542,20 @@
                     toggleVoiceInput();
                 }, 1000);
             }
-            
             // Auto-read page
             setTimeout(autoReadPage, 2000);
-            
             // Log page view
             console.log('Gas Services page loaded with voice support');
         });
-
         window.addEventListener('beforeunload', function() {
             if (sessionTimer) {
                 clearTimeout(sessionTimer);
             }
             stopVoiceInput();
         });
-
         // Override voice.js autoReadPage
         window.autoReadPage = autoReadPage;
-    </script>
-</body>
-</html>
+
+
+</script>
+{% endblock %}

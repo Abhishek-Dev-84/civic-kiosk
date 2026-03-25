@@ -1,20 +1,10 @@
-{% load i18n %}
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <!-- Security Meta Tags -->
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://upload.wikimedia.org https://www.cdac.in; font-src 'self';">
-    <meta name="referrer" content="same-origin">
-    <meta name="robots" content="noindex, nofollow">
-    
-    <!-- Cache Control -->
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
+{% extends 'base.html' %}
+{% load i18n static %}
 
-    <style>
+{% block title %}{% trans "New Electricity Connection - Civic Kiosk" %}{% endblock %}
+
+{% block extra_head %}
+<style>
         /* Hide Google Translate elements */
         .goog-te-banner-frame.skiptranslate,
         .goog-te-gadget-icon,
@@ -25,48 +15,21 @@
         .goog-te-spinner-pos {
             display: none !important;
         }
-        
-        body {
-            top: 0px !important;
-            position: static !important;
-            overflow: hidden !important;
-            height: 100vh;
-            width: 100vw;
-        }
-        
         .goog-te-combo {
             display: none !important;
         }
-        
         .goog-te-gadget {
             color: transparent !important;
             height: 0 !important;
             overflow: hidden !important;
         }
-
         /* Timeout warning popup */
-        .timeout-warning {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            border: 4px solid #ff9933;
-            border-radius: 40px;
-            padding: 30px;
-            text-align: center;
-            z-index: 2000;
-            display: none;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-        
         .timeout-warning p {
             font-size: 24px;
             font-weight: 700;
             color: #333;
             margin-bottom: 20px;
         }
-
         .timeout-warning button {
             background: #28a745;
             color: white;
@@ -79,15 +42,12 @@
             margin: 10px;
             min-width: 150px;
         }
-
         .timeout-warning .logout-btn {
             background: #dc3545;
         }
-        
         .timeout-warning button:active {
             transform: translateY(3px);
         }
-
         /* Voice status indicator */
         .voice-status-indicator {
             position: fixed;
@@ -106,11 +66,9 @@
             gap: 10px;
             border: 2px solid #ff9933;
         }
-
         .voice-status-indicator.active {
             display: flex;
         }
-
         .voice-pulse {
             width: 12px;
             height: 12px;
@@ -118,18 +76,12 @@
             border-radius: 50%;
             animation: voicePulse 1.5s infinite;
         }
-
         @keyframes voicePulse {
             0% { transform: scale(1); opacity: 1; }
             50% { transform: scale(1.5); opacity: 0.7; }
             100% { transform: scale(1); opacity: 1; }
         }
-
         /* CSRF Token (hidden) */
-        #csrf_token {
-            display: none;
-        }
-
         /* Security Note */
         .security-note-bottom {
             position: fixed;
@@ -142,7 +94,6 @@
             border-radius: 12px;
             z-index: 999;
         }
-
         /* Loading Overlay */
         .loading-overlay {
             position: fixed;
@@ -156,7 +107,6 @@
             justify-content: center;
             z-index: 9999;
         }
-        
         .loading-spinner {
             border: 4px solid #f3f3f3;
             border-top: 4px solid #1e5fbf;
@@ -165,105 +115,28 @@
             height: 50px;
             animation: spin 1s linear infinite;
         }
-        
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-    </style>
-
-    <meta charset="UTF-8">
-    <title>{% trans "New Electricity Connection - Civic Kiosk" %}</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;user-select:none;-webkit-tap-highlight-color:transparent;}
-        body{width:100vw;height:100vh;overflow:hidden;background:#f0f7ff;}
 
         /* HEADER */
-        .header{
-            height:70px;
-            background:white;
-            display:flex;
-            align-items:center;
-            justify-content:space-between;
-            padding:0 20px;
-            border-bottom:2px solid #1e5fbf;
-            position:fixed;
-            top:0;
-            left:0;
-            right:0;
-            z-index:1000;
-        }
-        .header-left{display:flex;align-items:center;gap:10px;}
         .header-left img{height:40px;}
         .header-left div{font-size:12px;font-weight:600;color:#1e5fbf;line-height:1.2;}
         .header-right img{height:35px;}
-
         /* VOICE CORNER */
-        .voice-corner{
-            position:fixed;
-            top:80px;
-            right:15px;
-            display:flex;
-            flex-direction:column;
-            align-items:center;
-            gap:3px;
-            z-index:1000;
-        }
-        .voice-corner-btn{
-            background:#ff9933;
-            width:45px;
-            height:45px;
-            border-radius:50%;
-            border:2px solid white;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            font-size:24px;
-            cursor:pointer;
-            transition:all 0.2s;
-        }
         .voice-corner-btn:hover{background:#ffaa44;}
         .voice-corner-btn.listening{
             background:#28a745;
             transform:scale(1.1);
             animation:pulse 1s infinite;
         }
-        @keyframes pulse{
-            0%{transform:scale(1);}
             50%{transform:scale(1.1);}
             100%{transform:scale(1);}
         }
-        .voice-corner-text{
-            background:white;
-            padding:2px 8px;
-            border-radius:12px;
-            font-size:10px;
-            color:#ff9933;
-            border:1px solid #ff9933;
-        }
-
         /* BACK BUTTON */
-        .back-btn{
-            position:fixed;
-            top:80px;
-            left:15px;
-            background:white;
-            border:2px solid #1e5fbf;
-            border-radius:30px;
-            padding:5px 15px;
-            font-size:18px;
-            font-weight:700;
-            color:#1e5fbf;
-            text-decoration:none;
-            z-index:1000;
-            display:inline-block;
-            box-shadow:0 3px 0 #0a3d7a;
-            cursor:pointer;
-        }
         .back-btn:hover{background:#1e5fbf;color:white;}
         .back-btn:active{transform:translateY(3px);box-shadow:0 1px 0 #0a3d7a;}
-
         /* MAIN CONTAINER */
         .container{
             position:fixed;
@@ -277,22 +150,12 @@
             padding:15px;
             overflow-y:auto;
         }
-        .content-wrapper{
-            width:100%;
-            max-width:620px;
-            display:flex;
-            flex-direction:column;
-            gap:12px;
-            padding:20px 0;
-        }
-
         /* Message styles */
         .messages{width:100%;margin-bottom:10px;}
         .message{padding:10px;border-radius:10px;margin-bottom:5px;text-align:center;}
         .message.success{background:#d4edda;color:#155724;border:1px solid #c3e6cb;}
         .message.error{background:#f8d7da;color:#721c24;border:1px solid #f5c6cb;}
         .message.info{background:#d1ecf1;color:#0c5460;border:1px solid #bee5eb;}
-
         /* TITLE */
         h1{
             color:#1e5fbf;
@@ -300,17 +163,6 @@
             font-weight:800;
             text-align:center;
         }
-
-        .security-note{
-            background:#e8f5e9;
-            border:1px solid #28a745;
-            border-radius:18px;
-            padding:6px 12px;
-            font-size:14px;
-            color:#1e5fbf;
-            text-align:center;
-        }
-
         /* FORM */
         .form-group{margin:8px 0;}
         label{
@@ -331,7 +183,6 @@
         }
         .large-input:focus{outline:none;border-color:#ff9933;}
         .large-input[readonly]{background:#f9f9f9;}
-
         select.large-input{
             appearance:none;
             background-image:url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
@@ -340,7 +191,6 @@
             background-size:20px;
             padding-right:45px;
         }
-
         .submit-btn{
             background:#28a745;
             color:white;
@@ -362,7 +212,6 @@
             cursor:not-allowed;
             opacity:0.7;
         }
-
         /* Loading indicator */
         .loading{
             display:none;
@@ -390,7 +239,6 @@
             animation:spin 1s linear infinite;
         }
         @keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
-
         /* FLOATING INPUT */
         .overlay{
             position:fixed;
@@ -400,7 +248,6 @@
             display:none;
             z-index:900;
         }
-
         .floating-input{
             position:fixed;
             left:50%;
@@ -419,7 +266,6 @@
         }
         .floating-input.show{transform:translate(-50%,-50%) scale(1);}
         .floating-input:focus{outline:none;}
-
         /* KEYBOARD */
         .keyboard{
             position:fixed;
@@ -452,171 +298,90 @@
             border:none;
         }
         .keyboard .ok-btn:hover{background:#218838;}
-
         /* Utility */
         .hidden{display:none !important;}
-
         @media (max-width:480px) {
-            .voice-corner { top:75px; right:10px; }
-            .back-btn { top:75px; left:10px; padding:4px 12px; font-size:16px; }
             h1 { font-size:28px; }
         }
-    </style>
-</head>
-<body>
-    <!-- CSRF Token for JavaScript -->
-    {% csrf_token %}
-    <input type="hidden" id="csrf_token" value="{{ csrf_token }}">
 
-    <!-- Loading Overlay -->
-    <div id="loadingOverlay" class="loading-overlay">
-        <div class="loading-spinner"></div>
-    </div>
 
-    <!-- Timeout Warning Popup -->
-    <div id="timeoutWarning" class="timeout-warning">
-        <p>⏰ {% trans "Session about to expire!" %}</p>
-        <button onclick="extendSession()">{% trans "Continue" %}</button>
-        <button class="logout-btn" onclick="window.location='{% url 'index' %}'">{% trans "Logout" %}</button>
-    </div>
+</style>
+{% endblock %}
 
-    <!-- Voice Status Indicator -->
-    <div id="voiceStatusIndicator" class="voice-status-indicator">
-        <div class="voice-pulse"></div>
-        <span id="voiceStatusText">{% trans "Listening..." %}</span>
-    </div>
-
-    <!-- Security Note Bottom -->
-    <div class="security-note-bottom">
+{% block content %}
+ CSRF Token for JavaScript 
+ Loading Overlay 
+ Timeout Warning Popup 
+ Voice Status Indicator 
+<div class="voice-status-indicator" id="voiceStatusIndicator">
+<div class="voice-pulse"></div>
+<span id="voiceStatusText">{% trans "Listening..." %}</span>
+</div>
+ Security Note Bottom 
+<div class="security-note-bottom">
         🔒 {% trans "Secured by Government of India" %}
     </div>
-
-    <!-- HEADER -->
-    <div class="header">
-        <div class="header-left">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India">
-            <div>
-                {% trans "Ministry of Electronics &" %}<br>
-                {% trans "Information Technology" %}<br>
-                {% trans "Government of India" %}
-            </div>
-        </div>
-        <div class="header-right">
-            <img src="https://www.cdac.in/img/cdac-logo.png" alt="CDAC Logo">
-        </div>
-    </div>
-
-    <!-- Voice Button -->
-    <div class="voice-corner">
-        <div class="voice-corner-btn" id="voiceBtn" onclick="toggleVoiceInput()" aria-label="{% trans 'Voice input' %}">🎤</div>
-        <div class="voice-corner-text" id="voiceStatus">{% trans "Click" %}</div>
-    </div>
-
-    <!-- Back Button -->
-    <div class="back-btn" onclick="goBack()" aria-label="{% trans 'Go back' %}">← {% trans "Back" %}</div>
-
-    <!-- Main Container -->
-    <div class="container">
-        <div class="content-wrapper">
-
-            <!-- Display Django messages -->
-            {% if messages %}
-            <div class="messages">
-                {% for message in messages %}
-                <div class="message {{ message.tags }}">{{ message }}</div>
-                {% endfor %}
-            </div>
-            {% endif %}
-
+ HEADER 
+ Voice Button 
+ Back Button 
+ Main Container 
+<div class="container">
+<div class="content-wrapper">
+<!-- Display Django messages -->
             <h1>{% trans "New Electricity Connection" %}</h1>
-            <div class="security-note">🔒 {% trans "Your data is secure" %}</div>
+<!-- Django form for new connection -->
+<form action="{% url 'electricity-new-connection' %}" id="connectionForm" method="post" onsubmit="return validateAndSubmit()">
+    {% csrf_token %}
+                <input id="fullName" name="full_name" type="hidden" value="{{ request.POST.full_name }}"/>
+<input id="addressField" name="address" type="hidden" value="{{ request.POST.address }}"/>
+<input id="propertyTypeField" name="property_type" type="hidden" value="{% if request.POST.property_type %}{{ request.POST.property_type }}{% else %}Residential{% endif %}"/>
+<input id="loadField" name="load_required" type="hidden" value="{{ request.POST.load_required }}"/>
+<input id="mobileField" name="mobile_number" type="hidden" value="{{ request.POST.mobile_number }}"/>
+</form>
+<div class="form-group">
+<label for="name">{% trans "Full Name" %} *</label>
+<input aria-label="{% trans 'Full name' %}" autocomplete="off" class="large-input" id="name" maxlength="100" name="full_name" placeholder="{% trans 'Enter your full name' %}" value="{{ request.POST.full_name|default:'' }}" readonly onclick="openKeyboard(document.getElementById('floatingInput'), 'name')" onkeypress="if(event.key==='Enter') openKeyboard(document.getElementById('floatingInput'), 'name')"/>
+</div>
+<div class="form-group">
+<label for="address">{% trans "Address" %} *</label>
+<input aria-label="{% trans 'Address' %}" autocomplete="off" class="large-input" id="address" maxlength="200" name="address" placeholder="{% trans 'Enter your address' %}" value="{{ request.POST.address|default:'' }}" readonly onclick="openKeyboard(document.getElementById('floatingInput'), 'address')" onkeypress="if(event.key==='Enter') openKeyboard(document.getElementById('floatingInput'), 'address')"/>
+</div>
+<div class="form-group">
+<label for="propertyType">{% trans "Property Type" %} *</label>
+<select aria-label="{% trans 'Property type' %}" class="large-input" id="propertyType" onchange="updatePropertyType()">
+<option value="Residential" {% if not request.POST.property_type or request.POST.property_type == "Residential" %}selected{% endif %}>{% trans "Residential" %}</option>
+<option value="Commercial" {% if request.POST.property_type == "Commercial" %}selected{% endif %}>{% trans "Commercial" %}</option>
+<option value="Industrial" {% if request.POST.property_type == "Industrial" %}selected{% endif %}>{% trans "Industrial" %}</option>
+<option value="Agricultural" {% if request.POST.property_type == "Agricultural" %}selected{% endif %}>{% trans "Agricultural" %}</option>
+</select>
+</div>
+<div class="form-group">
+<label for="load">{% trans "Load Required (kW)" %} *</label>
+<input aria-label="{% trans 'Load required in kilowatts' %}" autocomplete="off" class="large-input" id="load" maxlength="10" name="load_required" placeholder="{% trans 'Enter required load e.g., 5' %}" value="{{ request.POST.load_required|default:'' }}" readonly onclick="openKeyboard(document.getElementById('floatingInput'), 'load')" onkeypress="if(event.key==='Enter') openKeyboard(document.getElementById('floatingInput'), 'load')"/>
+</div>
+<div class="form-group">
+<label for="mobile">{% trans "Mobile Number" %} *</label>
+<input aria-label="{% trans 'Mobile number' %}" autocomplete="off" class="large-input" id="mobile" maxlength="10" name="mobile_number" placeholder="{% trans 'Enter 10-digit mobile number' %}" value="{{ request.POST.mobile_number|default:'' }}" readonly onclick="openKeyboard(document.getElementById('floatingInput'), 'mobile')" onkeypress="if(event.key==='Enter') openKeyboard(document.getElementById('floatingInput'), 'mobile')"/>
+</div>
+<button aria-label="{% trans 'Submit application' %}" class="submit-btn" id="submitBtn" onclick="submitForm()">{% trans "Submit Application" %}</button>
+</div>
+</div>
+ Loading indicator 
+<div class="loading" id="loadingIndicator">
+<div class="spinner"></div>
+<div>{% trans "Processing..." %}</div>
+</div>
+ Floating Keyboard Elements 
+<div class="overlay" id="overlay"></div>
+<textarea class="floating-input" id="floatingInput" maxlength="200" placeholder="{% trans 'Type here...' %}"></textarea>
+<div class="keyboard" id="keyboard"></div>
+ Load voice.js - must be at bottom 
+<script src="{% static 'js/voice.js' %}"></script>
+{% endblock %}
 
-            <!-- Django form for new connection -->
-            <form id="connectionForm" method="post" action="{% url 'electricity-new-connection' %}" onsubmit="return validateAndSubmit()">
-                {% csrf_token %}
-                <input type="hidden" name="full_name" id="fullName" value="{{ request.POST.full_name }}">
-                <input type="hidden" name="address" id="addressField" value="{{ request.POST.address }}">
-                <input type="hidden" name="property_type" id="propertyTypeField" value="{% if request.POST.property_type %}{{ request.POST.property_type }}{% else %}Residential{% endif %}">
-                <input type="hidden" name="load_required" id="loadField" value="{{ request.POST.load_required }}">
-                <input type="hidden" name="mobile_number" id="mobileField" value="{{ request.POST.mobile_number }}">
-            </form>
-
-            <div class="form-group">
-                <label for="name">{% trans "Full Name" %} *</label>
-                <input class="large-input" id="name" readonly placeholder="{% trans "Enter your full name" %}" 
-                       value="{{ request.POST.full_name }}" maxlength="100" autocomplete="off" aria-label="{% trans 'Full name' %}">
-            </div>
-
-            <div class="form-group">
-                <label for="address">{% trans "Address" %} *</label>
-                <input class="large-input" id="address" readonly placeholder="{% trans "Enter complete address" %}" 
-                       value="{{ request.POST.address }}" maxlength="200" autocomplete="off" aria-label="{% trans 'Address' %}">
-            </div>
-
-            <div class="form-group">
-                <label for="propertyType">{% trans "Property Type" %} *</label>
-                <select class="large-input" id="propertyType" onchange="updatePropertyType()" aria-label="{% trans 'Property type' %}">
-                    <option value="Residential" {% if request.POST.property_type == 'Residential' or not request.POST.property_type %}selected{% endif %}>{% trans "Residential" %}</option>
-                    <option value="Commercial" {% if request.POST.property_type == 'Commercial' %}selected{% endif %}>{% trans "Commercial" %}</option>
-                    <option value="Industrial" {% if request.POST.property_type == 'Industrial' %}selected{% endif %}>{% trans "Industrial" %}</option>
-                    <option value="Agricultural" {% if request.POST.property_type == 'Agricultural' %}selected{% endif %}>{% trans "Agricultural" %}</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="load">{% trans "Load Required (kW)" %} *</label>
-                <input class="large-input" id="load" readonly placeholder="{% trans "e.g., 5" %}" 
-                       value="{{ request.POST.load_required }}" maxlength="10" autocomplete="off" aria-label="{% trans 'Load required in kilowatts' %}">
-            </div>
-
-            <div class="form-group">
-                <label for="mobile">{% trans "Mobile Number" %} *</label>
-                <input class="large-input" id="mobile" readonly placeholder="{% trans "10 digit mobile" %}" maxlength="10"
-                       value="{{ request.POST.mobile_number }}" autocomplete="off" aria-label="{% trans 'Mobile number' %}">
-            </div>
-
-            <button class="submit-btn" onclick="submitForm()" id="submitBtn" aria-label="{% trans 'Submit application' %}">{% trans "Submit Application" %}</button>
-
-        </div>
-    </div>
-
-    <!-- Loading indicator -->
-    <div id="loadingIndicator" class="loading">
-        <div class="spinner"></div>
-        <div>{% trans "Processing..." %}</div>
-    </div>
-
-    <!-- Floating Keyboard Elements -->
-    <div id="overlay" class="overlay"></div>
-    <textarea id="floatingInput" class="floating-input" placeholder="{% trans "Type here..." %}" maxlength="200"></textarea>
-    <div id="keyboard" class="keyboard"></div>
-
-    <!-- Load voice.js - must be at bottom -->
-    <script src="{% static 'js/voice.js' %}"></script>
-
-    <script>
+{% block extra_scripts %}
+<script>
         // ================= SECURITY ENHANCEMENTS =================
-
-        // Disable keyboard shortcuts
-        document.addEventListener('keydown', function(e) {
-            // F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
-            if (e.key === 'F12' || 
-                (e.ctrlKey && e.shiftKey && e.key === 'I') ||
-                (e.ctrlKey && e.shiftKey && e.key === 'J') ||
-                (e.ctrlKey && e.key === 'U')) {
-                e.preventDefault();
-                return false;
-            }
-            
-            // Prevent backspace from navigating back
-            if (e.key === 'Backspace' && !e.target.matches('input, textarea, [contenteditable], button')) {
-                e.preventDefault();
-            }
-        });
-
-        // Disable right-click
-        document.addEventListener('contextmenu', event => event.preventDefault());
-
         // Auto-hide cursor on touch devices
         let cursorTimeout;
         document.addEventListener('touchstart', function() {
@@ -626,7 +391,6 @@
                 document.body.style.cursor = 'none';
             }, 3000);
         });
-
         // Prevent page zoom on double tap
         let lastTouchEnd = 0;
         document.addEventListener('touchend', function(event) {
@@ -636,13 +400,11 @@
             }
             lastTouchEnd = now;
         }, false);
-
         // ================= LANGUAGE UTILITIES =================
         function getCurrentLangCode() {
             const path = window.location.pathname.split('/');
             return path[1] || "en";
         }
-
         function speak(text) {
             if (!('speechSynthesis' in window)) return;
             speechSynthesis.cancel();
@@ -651,96 +413,27 @@
             utterance.rate = 1;
             speechSynthesis.speak(utterance);
         }
-
         // ================= SESSION TIMER =================
-        let sessionTimer;
-        let timeoutWarningTimer;
-        const SESSION_DURATION = 240000; // 4 minutes
-        const WARNING_TIME = 60000; // Show warning 1 minute before expiry
-
-        function startSessionTimer() {
-            clearTimeout(sessionTimer);
-            clearTimeout(timeoutWarningTimer);
-            
-            sessionTimer = setTimeout(() => {
-                showTimeoutWarning();
-            }, SESSION_DURATION - WARNING_TIME);
-        }
-
-        function showTimeoutWarning() {
-            const warning = document.getElementById('timeoutWarning');
-            if (warning) {
-                warning.style.display = 'block';
-                
-                const langCode = getCurrentLangCode();
-                const warnings = {
-                    'en': 'Your session is about to expire. Please continue to stay logged in.',
-                    'hi': 'आपका सत्र समाप्त होने वाला है। कृपया जारी रखें।',
-                    'or': 'ଆପଣଙ୍କର ସତ୍ର ସମାପ୍ତ ହେବାକୁ ଯାଉଛି। ଦୟାକରି ଜାରି ରଖନ୍ତୁ।',
-                    'bn': 'আপনার সেশন শেষ হতে চলেছে। অনুগ্রহ করে চালিয়ে যান।',
-                    'ta': 'உங்கள் அமர்வு காலாவதியாகிறது. தயவுசெய்து தொடரவும்.',
-                    'te': 'మీ సెషన్ ముగియబోతోంది. దయచేసి కొనసాగించండి.'
-                };
-                speak(warnings[langCode] || warnings['en']);
-                
-                timeoutWarningTimer = setTimeout(() => {
-                    window.location.href = "/" + langCode + "/";
-                }, WARNING_TIME);
-            }
-        }
-
-        function extendSession() {
-            const warning = document.getElementById('timeoutWarning');
-            if (warning) {
-                warning.style.display = 'none';
-            }
-            clearTimeout(sessionTimer);
-            clearTimeout(timeoutWarningTimer);
-            startSessionTimer();
-            
-            const langCode = getCurrentLangCode();
-            const messages = {
-                'en': 'Session extended. You may continue.',
-                'hi': 'सत्र बढ़ा दिया गया। आप जारी रख सकते हैं।',
-                'or': 'ସତ୍ର ବୃଦ୍ଧି କରାଯାଇଛି। ଆପଣ ଜାରି ରଖିପାରିବେ।',
-                'bn': 'সেশন বাড়ানো হয়েছে। আপনি চালিয়ে যেতে পারেন।',
-                'ta': 'அமர்வு நீட்டிக்கப்பட்டது. நீங்கள் தொடரலாம்.',
-                'te': 'సెషన్ పొడిగించబడింది. మీరు కొనసాగించవచ్చు.'
-            };
-            speak(messages[langCode] || messages['en']);
-        }
-
-        function resetSessionTimer() {
-            clearTimeout(sessionTimer);
-            clearTimeout(timeoutWarningTimer);
-            startSessionTimer();
-        }
-
         function goBack() {
             resetSessionTimer();
             window.location.href = "/" + getCurrentLangCode() + "/electricity-services/";
         }
-
         // ================= FLOATING KEYBOARD =================
         let activeInput = null;
         let activeFieldType = null;
         let isUpperCase = true;
         let isSubmitting = false;
-
         const overlay = document.getElementById("overlay");
         const floatingInput = document.getElementById("floatingInput");
         const keyboard = document.getElementById("keyboard");
         const loadingIndicator = document.getElementById("loadingIndicator");
-
         function createKeyboard() {
             keyboard.innerHTML = "";
             let letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
             if (!isUpperCase) { letters = letters.toLowerCase(); }
             let keys = (letters + "0123456789 .-,").split("");
-
             let row = document.createElement("div");
             row.className = "keyboard-row";
-
             keys.forEach((k, i) => {
                 if (i % 10 === 0 && i !== 0) {
                     keyboard.appendChild(row);
@@ -757,7 +450,6 @@
                 row.appendChild(btn);
             });
             keyboard.appendChild(row);
-
             let last = document.createElement("div");
             last.className = "keyboard-row";
             last.innerHTML = `
@@ -768,12 +460,10 @@
             `;
             keyboard.appendChild(last);
         }
-
         function toggleCase() {
             isUpperCase = !isUpperCase;
             createKeyboard();
         }
-
         function openKeyboard(id, fieldType = 'text') {
             if (isSubmitting) return;
             resetSessionTimer();
@@ -789,11 +479,9 @@
                 floatingInput.focus();
             }, 10);
         }
-
         function finish() {
             if (activeInput && !isSubmitting) {
                 let value = floatingInput.value;
-                
                 if (activeFieldType === 'mobile') {
                     value = value.replace(/\D/g, '').slice(0, 10);
                 } else if (activeFieldType === 'load') {
@@ -810,9 +498,7 @@
                     // Sanitize text input
                     value = value.replace(/[<>]/g, '').substring(0, activeInput.maxLength || 200);
                 }
-                
                 activeInput.value = value;
-                
                 // Update hidden field based on which input was active
                 if (activeInput.id === 'name') {
                     document.getElementById('fullName').value = value;
@@ -826,7 +512,6 @@
             }
             closeKeyboard();
         }
-
         function closeKeyboard() {
             floatingInput.classList.remove("show");
             setTimeout(() => {
@@ -835,7 +520,6 @@
                 keyboard.style.display = "none";
             }, 200);
         }
-
         // Handle Enter key on floating input
         floatingInput.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
@@ -843,36 +527,27 @@
                 finish();
             }
         });
-
         document.getElementById("name").addEventListener("click", () => openKeyboard("name", 'text'));
         document.getElementById("address").addEventListener("click", () => openKeyboard("address", 'text'));
         document.getElementById("load").addEventListener("click", () => openKeyboard("load", 'load'));
         document.getElementById("mobile").addEventListener("click", () => openKeyboard("mobile", 'mobile'));
         overlay.addEventListener("click", closeKeyboard);
-
         createKeyboard();
-
         function updatePropertyType() {
             const propertyType = document.getElementById('propertyType').value;
             document.getElementById('propertyTypeField').value = propertyType;
         }
-
         function validateAndSubmit() {
             return false; // Prevent default form submission
         }
-
         function submitForm() {
             resetSessionTimer();
-            
             if (isSubmitting) return;
-            
             const name = document.getElementById('name').value.trim();
             const address = document.getElementById('address').value.trim();
             const load = document.getElementById('load').value.trim();
             const mobile = document.getElementById('mobile').value.trim();
-
             const langCode = getCurrentLangCode();
-
             if (!name) {
                 const messages = {
                     'en': 'Please enter your full name',
@@ -885,7 +560,6 @@
                 speak(messages[langCode] || messages['en']);
                 return;
             }
-
             if (!address) {
                 const messages = {
                     'en': 'Please enter your address',
@@ -895,7 +569,6 @@
                 speak(messages[langCode] || messages['en']);
                 return;
             }
-
             if (!load) {
                 const messages = {
                     'en': 'Please enter load required',
@@ -905,7 +578,6 @@
                 speak(messages[langCode] || messages['en']);
                 return;
             }
-
             // Validate load (should be a positive number)
             if (isNaN(load) || parseFloat(load) <= 0) {
                 const messages = {
@@ -916,7 +588,6 @@
                 speak(messages[langCode] || messages['en']);
                 return;
             }
-
             // Validate load maximum (100 kW for residential)
             if (parseFloat(load) > 100) {
                 const messages = {
@@ -927,7 +598,6 @@
                 speak(messages[langCode] || messages['en']);
                 return;
             }
-
             if (!mobile) {
                 const messages = {
                     'en': 'Please enter mobile number',
@@ -937,7 +607,6 @@
                 speak(messages[langCode] || messages['en']);
                 return;
             }
-
             // Validate mobile (10 digits)
             if (!/^\d{10}$/.test(mobile)) {
                 const messages = {
@@ -948,65 +617,53 @@
                 speak(messages[langCode] || messages['en']);
                 return;
             }
-
             // Update property type before submission
             updatePropertyType();
-
             // Show loading
             isSubmitting = true;
             document.getElementById('submitBtn').disabled = true;
             document.getElementById('loadingIndicator').classList.add('show');
             document.getElementById('loadingOverlay').style.display = 'flex';
-            
             const messages = {
                 'en': 'Submitting application',
                 'hi': 'आवेदन भेजा जा रहा है',
                 'or': 'ଆବେଦନ ପଠାଯାଉଛି'
             };
             speak(messages[langCode] || messages['en']);
-
             // Submit form
             setTimeout(() => {
                 document.getElementById('connectionForm').submit();
             }, 500);
         }
-
         // ================= VOICE INPUT =================
         let recognition;
         let isListening = false;
         let voiceRestartTimeout = null;
-
         function toggleVoiceInput() {
             resetSessionTimer();
-            
             if (isListening) {
                 stopVoiceInput();
                 return;
             }
-
             const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SR) {
                 alert("{% trans 'Speech not supported' %}");
                 return;
             }
-
             if (recognition) {
                 try {
                     recognition.stop();
                 } catch (e) {}
             }
-
             recognition = new SR();
             recognition.lang = window.getCurrentLang ? window.getCurrentLang() : 'en-IN';
             recognition.continuous = true;
             recognition.interimResults = true;
-
             recognition.onstart = function() {
                 isListening = true;
                 document.getElementById("voiceBtn").classList.add("listening");
                 document.getElementById("voiceStatus").innerText = "{% trans 'Listening...' %}";
                 document.getElementById('voiceStatusIndicator').classList.add('active');
-                
                 const langCode = getCurrentLangCode();
                 const messages = {
                     'en': 'Please say your name, address, property type, load, mobile number, or say submit',
@@ -1015,13 +672,10 @@
                 };
                 speak(messages[langCode] || messages['en']);
             };
-
             recognition.onresult = function(e) {
                 resetSessionTimer();
-                
                 let finalTranscript = '';
                 let interimTranscript = '';
-                
                 for (let i = 0; i < e.results.length; i++) {
                     const result = e.results[i];
                     if (result.isFinal) {
@@ -1030,16 +684,12 @@
                         interimTranscript += result[0].transcript;
                     }
                 }
-                
                 const transcript = finalTranscript || interimTranscript;
                 const command = transcript.toLowerCase();
                 console.log("New connection command:", command);
-                
                 const langCode = getCurrentLangCode();
-                
                 // Check for numbers in command (mobile or load)
                 const numberMatch = command.match(/\d+/g);
-                
                 // Mobile number detection
                 if (numberMatch && (command.includes("mobile") || command.includes("phone") || 
                     command.includes("मोबाइल") || command.includes("ମୋବାଇଲ୍"))) {
@@ -1056,7 +706,6 @@
                     }
                     return;
                 }
-                
                 // Load value detection
                 if (numberMatch && (command.includes("load") || command.includes("kilowatt") || command.includes("kw") ||
                     command.includes("लोड") || command.includes("କିଲୋୱାଟ"))) {
@@ -1071,7 +720,6 @@
                     speak(messages[langCode] || messages['en']);
                     return;
                 }
-                
                 // Name input
                 if ((command.includes("name") || command.includes("my name") || command.includes("नाम") || command.includes("ନାମ")) && command.length > 10) {
                     // Extract name part
@@ -1092,7 +740,6 @@
                     }
                     return;
                 }
-                
                 // Address input
                 if ((command.includes("address") || command.includes("पता") || command.includes("ଠିକଣା")) && command.length > 15) {
                     let address = command.replace("address", "").replace("पता", "").replace("ଠିକଣା", "").trim();
@@ -1112,7 +759,6 @@
                     }
                     return;
                 }
-                
                 // Property type selection
                 if (command.includes("residential") || command.includes("आवासीय") || command.includes("ଆବାସିକ")) {
                     document.getElementById('propertyType').value = "Residential";
@@ -1158,7 +804,6 @@
                     speak(messages[langCode] || messages['en']);
                     return;
                 }
-                
                 // Submit command
                 if (command.includes("submit") || command.includes("apply") || command.includes("जमा") || command.includes("ଦାଖଲ") || command.includes("आवेदन")) {
                     submitForm();
@@ -1189,13 +834,11 @@
                     return;
                 }
             };
-
             recognition.onerror = function(event) {
                 console.error("Recognition error:", event.error);
                 if (event.error === 'no-speech') return;
                 stopVoiceInput();
             };
-
             recognition.onend = function() {
                 if (isListening) {
                     if (voiceRestartTimeout) clearTimeout(voiceRestartTimeout);
@@ -1213,7 +856,6 @@
                     document.getElementById('voiceStatusIndicator').classList.remove('active');
                 }
             };
-
             try {
                 recognition.start();
             } catch (e) {
@@ -1221,7 +863,6 @@
                 stopVoiceInput();
             }
         }
-
         function stopVoiceInput() {
             isListening = false;
             if (recognition) {
@@ -1236,7 +877,6 @@
                 clearTimeout(voiceRestartTimeout);
             }
         }
-
         // Auto-read page instructions
         function autoReadPage() {
             setTimeout(() => {
@@ -1249,14 +889,12 @@
                 speak(messages[langCode] || messages['en']);
             }, 2000);
         }
-
         // Auto-hide messages after 5 seconds
         setTimeout(function() {
             document.querySelectorAll('.message').forEach(function(message) {
                 message.style.display = 'none';
             });
         }, 5000);
-
         // Auto-hide success messages after 3 seconds
         setTimeout(function() {
             const successMsg = document.querySelector('.success-message');
@@ -1267,24 +905,20 @@
                 }, 300);
             }
         }, 3000);
-
         // Prevent form submission on Enter key
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
                 e.preventDefault();
             }
         });
-
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             startSessionTimer();
-            
             // Add activity listeners
             document.addEventListener('click', resetSessionTimer);
             document.addEventListener('keypress', resetSessionTimer);
             document.addEventListener('touchstart', resetSessionTimer);
             document.addEventListener('mousemove', resetSessionTimer);
-            
             // Check if voice should auto-start
             const autoStartVoice = sessionStorage.getItem('autoStartVoice');
             if (autoStartVoice === 'true') {
@@ -1293,10 +927,8 @@
                     toggleVoiceInput();
                 }, 1000);
             }
-            
             // Auto-read page
             setTimeout(autoReadPage, 2000);
-            
             // Add input validation for name fields (no numbers)
             const nameInput = document.getElementById('name');
             if (nameInput) {
@@ -1305,7 +937,6 @@
                 });
             }
         });
-
         window.addEventListener('beforeunload', function() {
             if (sessionTimer) {
                 clearTimeout(sessionTimer);
@@ -1315,10 +946,9 @@
             }
             stopVoiceInput();
         });
-
         // Override voice.js autoReadPage if needed
         window.autoReadPage = autoReadPage;
-    </script>
 
-</body>
-</html>
+
+</script>
+{% endblock %}

@@ -1,117 +1,28 @@
-<!DOCTYPE html>
-{% load i18n %}
-{% load static %}
-<html>
-<head>
-    <title>{% trans "Professional Tax - Civic Kiosk" %}</title>
-    
-    <style>
-        * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif; user-select:none; }
-        body { width:100vw; height:100vh; overflow:hidden; background:#f0f7ff; }
-        
+{% extends 'base.html' %}
+{% load i18n static %}
+
+{% block title %}{% trans "Professional Tax - Civic Kiosk" %}{% endblock %}
+
+{% block extra_head %}
+<style>
         /* HEADER */
-        .header {
-            position:fixed;
-            top:0;
-            left:0;
-            width:100%;
-            height:70px;
-            background:white;
-            display:flex;
-            align-items:center;
-            justify-content:space-between;
-            padding:0 20px;
-            border-bottom:2px solid #1e5fbf;
-            z-index:1000;
-        }
-        .header-left { display:flex; align-items:center; gap:10px; }
         .header-left img { height:40px; }
         .header-left div { font-size:12px; font-weight:600; color:#1e5fbf; line-height:1.2; }
         .header-right img { height:35px; }
-
         /* VOICE BUTTON */
-        .voice-corner {
-            position:fixed;
-            top:75px;
-            right:15px;
-            z-index:1001;
-            display:flex;
-            flex-direction:column;
-            align-items:center;
-            gap:4px;
-        }
-        .voice-corner-btn {
-            background:#ff9933;
-            width:50px;
-            height:50px;
-            border-radius:50%;
-            border:3px solid white;
-            cursor:pointer;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            font-size:26px;
-            box-shadow:0 3px 8px rgba(0,0,0,0.2);
-            transition:all 0.2s;
-        }
         .voice-corner-btn:hover { background:#ffaa44; }
         .voice-corner-btn.listening {
             background:#28a745;
             animation:pulse 1s infinite;
             transform:scale(1.1);
         }
-        @keyframes pulse {
-            0% { transform:scale(1); }
             50% { transform:scale(1.1); }
             100% { transform:scale(1); }
         }
-        .voice-corner-text {
-            background:white;
-            padding:4px 10px;
-            border-radius:20px;
-            font-size:11px;
-            font-weight:600;
-            color:#ff9933;
-            border:1px solid #ff9933;
-        }
-
         /* BACK BUTTON */
-        .back-btn {
-            position:fixed;
-            top:75px;
-            left:15px;
-            background:white;
-            border:2px solid #1e5fbf;
-            border-radius:40px;
-            padding:6px 20px;
-            font-size:20px;
-            font-weight:700;
-            cursor:pointer;
-            color:#1e5fbf;
-            box-shadow:0 4px 0 #0a3d7a;
-            z-index:1001;
-            transition:all 0.1s;
-            text-decoration:none;
-        }
         .back-btn:hover { background:#1e5fbf; color:white; }
         .back-btn:active { transform:translateY(4px); box-shadow:0 1px 0 #0a3d7a; }
-
         /* TIMEOUT WARNING */
-        .timeout-warning {
-            position:fixed;
-            top:50%;
-            left:50%;
-            transform:translate(-50%,-50%);
-            background:white;
-            border:4px solid #ff9933;
-            border-radius:40px;
-            padding:30px;
-            text-align:center;
-            z-index:2000;
-            box-shadow:0 10px 30px rgba(0,0,0,0.3);
-            max-width:500px;
-            display:none;
-        }
         .timeout-warning p {
             font-size:28px;
             color:#1e5fbf;
@@ -133,37 +44,12 @@
         }
         .timeout-warning button:active { transform:translateY(5px); box-shadow:0 1px 0 #1e7e34; }
         .timeout-warning .logout-btn { background:#dc3545; box-shadow:0 5px 0 #a71d2a; }
-
         /* SUCCESS MESSAGE */
-        .success-message {
-            position:fixed;
-            top:75px;
-            left:15px;
-            background:#4CAF50;
-            color:white;
-            padding:12px 25px;
-            border-radius:50px;
-            font-size:18px;
-            font-weight:600;
-            z-index:1002;
-            border:3px solid white;
-            box-shadow:0 4px 15px rgba(76,175,80,0.3);
-            animation:slideInLeft 0.3s ease;
-            display:flex;
-            align-items:center;
-            gap:8px;
-            max-width:calc(100% - 130px);
-        }
         .success-message::before { content:"✅"; font-size:20px; }
-        @keyframes slideInLeft {
-            from { transform:translateX(-100%); opacity:0; }
             to { transform:translateX(0); opacity:1; }
         }
-        @keyframes slideOutLeft {
-            from { transform:translateX(0); opacity:1; }
             to { transform:translateX(-100%); opacity:0; }
         }
-
         /* MAIN CONTAINER */
         .container {
             position:fixed;
@@ -179,15 +65,6 @@
             overflow-y:auto;
             z-index:1;
         }
-        .content-wrapper {
-            width:100%;
-            max-width:600px;
-            display:flex;
-            flex-direction:column;
-            gap:15px;
-            padding:10px 0 20px 0;
-        }
-
         h1 {
             color:#1e5fbf;
             font-size:36px;
@@ -195,7 +72,6 @@
             text-align:center;
             margin:0 0 10px 0;
         }
-
         /* Message styles */
         .messages {
             position:fixed;
@@ -215,7 +91,6 @@
         .message.success { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
         .message.error { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
         .message.info { background:#d1ecf1; color:#0c5460; border:1px solid #bee5eb; }
-
         /* Search box */
         .search-box {
             display:flex;
@@ -245,7 +120,6 @@
             transition:all 0.1s;
         }
         .search-btn:active { transform:translateY(5px); box-shadow:0 1px 0 #0a3d7a; }
-
         /* Tax card */
         .tax-card {
             background:white;
@@ -270,7 +144,6 @@
             margin:20px 0;
             text-align:center;
         }
-
         /* PAYMENT METHOD SELECTOR */
         .payment-method-section {
             margin:20px 0;
@@ -306,7 +179,6 @@
             color:white;
         }
         .payment-option:active { transform:translateY(4px); box-shadow:0 1px 0 #0a3d7a; }
-
         /* UPI SECTION */
         .upi-section {
             width:100%;
@@ -343,7 +215,6 @@
             color:#666;
             margin-top:10px;
         }
-
         /* ATM SECTION */
         .atm-section {
             width:100%;
@@ -382,7 +253,6 @@
             gap:15px;
         }
         .atm-row .atm-input-group { flex:1; }
-
         /* PAY NOW BUTTON */
         .pay-now-btn {
             background:#28a745;
@@ -403,9 +273,7 @@
             box-shadow:0 5px 0 #545b62;
             cursor:not-allowed;
         }
-
         .hidden { display:none !important; }
-
         /* FLOATING INPUT SYSTEM */
         .overlay {
             position:fixed;
@@ -433,7 +301,6 @@
         }
         .floating-input.show { transform:translate(-50%,-50%) scale(1); }
         .floating-input:focus { outline:none; }
-
         .keyboard {
             position:fixed;
             bottom:15px;
@@ -465,7 +332,6 @@
             border:none;
         }
         .keyboard .ok-btn:hover { background:#218838; }
-
         /* LOADING INDICATOR */
         .loading {
             display:none;
@@ -492,7 +358,6 @@
             margin-right:10px;
         }
         @keyframes spin { 0%{transform:rotate(0deg);} 100%{transform:rotate(360deg);} }
-
         /* MOBILE RESPONSIVE */
         @media (max-width: 768px) {
             .payment-options { flex-direction:column; }
@@ -501,174 +366,110 @@
             .search-btn { padding:15px; }
         }
         @media (max-width: 480px) {
-            .voice-corner { top:75px; right:10px; }
-            .voice-corner-btn { width:45px; height:45px; font-size:24px; }
-            .back-btn { top:75px; left:10px; padding:4px 12px; font-size:16px; }
-            .success-message {
-                top:75px;
-                left:10px;
-                right:70px;
-                width:auto;
-                padding:8px 15px;
-                font-size:14px;
-                max-width:none;
-            }
             h1 { font-size:28px; }
             .search-input { height:60px; font-size:24px; }
             .search-btn { font-size:24px; padding:12px; }
             .tax-amount { font-size:36px; }
         }
-    </style>
-</head>
-<body>
-    <div class="header">
-        <div class="header-left">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India">
-            <div>{% trans "Ministry of Electronics &" %}<br>{% trans "Information Technology" %}<br>{% trans "Government of India" %}</div>
-        </div>
-        <div class="header-right">
-            <img src="https://www.cdac.in/img/cdac-logo.png" alt="CDAC Logo">
-        </div>
-    </div>
-    
-    <!-- Messages -->
-    {% if messages %}
-    <div class="messages">
-        {% for message in messages %}
-        <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
-            {{ message }}
-        </div>
-        {% endfor %}
-    </div>
-    {% endif %}
-    
-    <!-- Voice Button -->
-    <div class="voice-corner">
-        <div class="voice-corner-btn" id="voiceBtn" onclick="toggleVoiceInput()">🎤</div>
-        <div class="voice-corner-text" id="voiceStatus">{% trans "Click" %}</div>
-    </div>
-    
-    <!-- Back Button -->
-    <a href="{% url 'municipal-services' %}" class="back-btn">← {% trans "Back" %}</a>
-    
-    <!-- Timeout Warning -->
-    <div id="timeoutWarning" class="timeout-warning">
-        <p>⏰ {% trans "Session about to expire!" %}</p>
-        <button onclick="extendSession()">{% trans "Continue" %}</button>
-        <button class="logout-btn" onclick="window.location='{% url 'index' %}'">{% trans "Logout" %}</button>
-    </div>
-    
-    <!-- Success Messages -->
-    {% if messages %}
-        {% for message in messages %}
-            {% if message.tags == 'success' %}
-                <div class="success-message">
-                    {{ message }}
-                </div>
-            {% endif %}
-        {% endfor %}
-    {% endif %}
-    
-    <!-- Loading Indicator -->
-    <div id="loadingIndicator" class="loading">
-        <div class="spinner"></div>
-        <div>{% trans "Processing..." %}</div>
-    </div>
-    
-    <div class="container">
-        <div class="content-wrapper">
-            <h1>💼 {% trans "Professional Tax" %}</h1>
-            
-            <form method="POST" action="{% url 'professional-tax' %}" id="taxForm">
-                {% csrf_token %}
+
+
+</style>
+{% endblock %}
+
+{% block content %}
+     Loading Indicator 
+<div class="loading" id="loadingIndicator">
+<div class="spinner"></div>
+<div>{% trans "Processing..." %}</div>
+</div>
+<div class="container">
+<div class="content-wrapper">
+<h1>💼 {% trans "Professional Tax" %}</h1>
+<form action="{% url 'professional-tax' %}" id="taxForm" method="POST">
+    {% csrf_token %}
                 <div class="search-box">
-                    <input class="search-input text-input" id="ptin" name="ptin" placeholder="{% trans "Enter PTIN" %}" value="{{ ptin|default:'PTIN123456' }}" readonly>
-                    <button type="submit" class="search-btn" name="fetch_tax" onclick="return validateFetch(event)">{% trans "Search" %}</button>
-                </div>
-            </form>
-            
-            <div id="taxCard" class="tax-card {% if not show_tax %}hidden{% endif %}">
-                <div class="tax-row">
-                    <span>{% trans "PTIN:" %}</span>
-                    <span><strong id="displayPtin">{{ tax_details.ptin|default:'PTIN123456' }}</strong></span>
-                </div>
-                <div class="tax-row">
-                    <span>{% trans "Name:" %}</span>
-                    <span><strong>{{ tax_details.name|default:'Rajesh Kumar' }}</strong></span>
-                </div>
-                <div class="tax-row">
-                    <span>{% trans "Profession:" %}</span>
-                    <span><strong>{{ tax_details.profession|default:'Self Employed' }}</strong></span>
-                </div>
-                <div class="tax-row">
-                    <span>{% trans "Assessment Year:" %}</span>
-                    <span><strong>{{ tax_details.assessment_year|default:'2025-26' }}</strong></span>
-                </div>
-                <div class="tax-row">
-                    <span>{% trans "Due Date:" %}</span>
-                    <span style="color:#dc3545;"><strong>{{ tax_details.due_date|default:'31 Mar 2026' }}</strong></span>
-                </div>
-                <div class="tax-row">
-                    <span>{% trans "Half-yearly Tax:" %}</span>
-                    <span><strong>{% trans "₹" %}{{ tax_details.half_yearly_tax|default:'1,250' }}</strong></span>
-                </div>
-                <div class="tax-row">
-                    <span>{% trans "Penalty (if any):" %}</span>
-                    <span><strong>{% trans "₹" %}{{ tax_details.penalty|default:'0' }}</strong></span>
-                </div>
-                <div class="tax-amount" id="taxAmount">{% trans "₹" %} {{ tax_details.amount|default:'1,250.00' }}</div>
-                
-                <!-- Payment Method Selection -->
-                <div class="payment-method-section">
-                    <div class="payment-method-title">{% trans "Select Payment Method" %}</div>
-                    <div class="payment-options">
-                        <div class="payment-option selected" id="upiOption" onclick="selectPaymentMethod('upi')">{% trans "UPI" %}</div>
-                        <div class="payment-option" id="atmOption" onclick="selectPaymentMethod('atm')">{% trans "ATM Card" %}</div>
-                    </div>
-                </div>
+<input %}"="" class="search-input text-input" enter="" id="ptin" name="ptin" placeholder="{% trans " ptin"="" readonly="" value="{{ ptin|default:'PTIN123456' }}"/>
+<button class="search-btn" name="fetch_tax" onclick="return validateFetch(event)" type="submit">{% trans "Search" %}</button>
+</div>
+</form>
+<div class="tax-card {% if not show_tax %}hidden{% endif %}" id="taxCard">
+<div class="tax-row">
+<span>{% trans "PTIN:" %}</span>
+<span><strong id="displayPtin">{{ tax_details.ptin|default:'PTIN123456' }}</strong></span>
+</div>
+<div class="tax-row">
+<span>{% trans "Name:" %}</span>
+<span><strong>{{ tax_details.name|default:'Rajesh Kumar' }}</strong></span>
+</div>
+<div class="tax-row">
+<span>{% trans "Profession:" %}</span>
+<span><strong>{{ tax_details.profession|default:'Self Employed' }}</strong></span>
+</div>
+<div class="tax-row">
+<span>{% trans "Assessment Year:" %}</span>
+<span><strong>{{ tax_details.assessment_year|default:'2025-26' }}</strong></span>
+</div>
+<div class="tax-row">
+<span>{% trans "Due Date:" %}</span>
+<span style="color:#dc3545;"><strong>{{ tax_details.due_date|default:'31 Mar 2026' }}</strong></span>
+</div>
+<div class="tax-row">
+<span>{% trans "Half-yearly Tax:" %}</span>
+<span><strong>{% trans "₹" %}{{ tax_details.half_yearly_tax|default:'1,250' }}</strong></span>
+</div>
+<div class="tax-row">
+<span>{% trans "Penalty (if any):" %}</span>
+<span><strong>{% trans "₹" %}{{ tax_details.penalty|default:'0' }}</strong></span>
+</div>
+<div class="tax-amount" id="taxAmount">{% trans "₹" %} {{ tax_details.amount|default:'1,250.00' }}</div>
+<!-- Payment Method Selection -->
+<div class="payment-method-section">
+<div class="payment-method-title">{% trans "Select Payment Method" %}</div>
+<div class="payment-options">
+<div class="payment-option selected" id="upiOption" onclick="selectPaymentMethod('upi')">{% trans "UPI" %}</div>
+<div class="payment-option" id="atmOption" onclick="selectPaymentMethod('atm')">{% trans "ATM Card" %}</div>
+</div>
+</div>
+<!-- UPI Payment Section -->
+<div class="upi-section" id="upiSection">
+<div class="upi-qr-container">
+<div class="qr-code">📱</div>
+<div class="upi-id">protax@okhdfcbank</div>
+<div class="upi-note">{% trans "Scan this QR code with any UPI app to pay" %}</div>
+</div>
+</div>
+<!-- ATM Payment Section -->
+<div class="atm-section" id="atmSection">
+<div class="atm-card">
+<div class="atm-input-group">
+<label class="atm-label">{% trans "Card Number" %}</label>
+<input class="atm-input atm-text-input" id="cardNumberInput" placeholder="XXXX XXXX XXXX XXXX" readonly=""/>
+</div>
+<div class="atm-row">
+<div class="atm-input-group">
+<label class="atm-label">{% trans "CVV" %}</label>
+<input class="atm-input atm-text-input" id="cvvInput" maxlength="3" placeholder="XXX" readonly=""/>
+</div>
+<div class="atm-input-group">
+<label class="atm-label">{% trans "PIN" %}</label>
+<input class="atm-input atm-text-input" id="pinInput" maxlength="4" placeholder="XXXX" readonly=""/>
+</div>
+</div>
+</div>
+</div>
+<button class="pay-now-btn" disabled="" id="payNowBtn" onclick="processPayment()">{% trans "Pay Now" %}</button>
+</div>
+</div>
+</div>
+ Floating input system 
+<div class="overlay" id="overlay"></div>
+<input %}"="" class="floating-input" enter="" id="floatingInput" placeholder="{% trans " value"=""/>
+<div class="keyboard" id="keyboard"></div>
+<script src="{% static 'js/voice.js' %}"></script>
+{% endblock %}
 
-                <!-- UPI Payment Section -->
-                <div id="upiSection" class="upi-section">
-                    <div class="upi-qr-container">
-                        <div class="qr-code">📱</div>
-                        <div class="upi-id">protax@okhdfcbank</div>
-                        <div class="upi-note">{% trans "Scan this QR code with any UPI app to pay" %}</div>
-                    </div>
-                </div>
-
-                <!-- ATM Payment Section -->
-                <div id="atmSection" class="atm-section">
-                    <div class="atm-card">
-                        <div class="atm-input-group">
-                            <label class="atm-label">{% trans "Card Number" %}</label>
-                            <input class="atm-input atm-text-input" id="cardNumberInput" placeholder="XXXX XXXX XXXX XXXX" readonly>
-                        </div>
-                        <div class="atm-row">
-                            <div class="atm-input-group">
-                                <label class="atm-label">{% trans "CVV" %}</label>
-                                <input class="atm-input atm-text-input" id="cvvInput" placeholder="XXX" maxlength="3" readonly>
-                            </div>
-                            <div class="atm-input-group">
-                                <label class="atm-label">{% trans "PIN" %}</label>
-                                <input class="atm-input atm-text-input" id="pinInput" placeholder="XXXX" maxlength="4" readonly>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <button class="pay-now-btn" id="payNowBtn" onclick="processPayment()" disabled>{% trans "Pay Now" %}</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Floating input system -->
-    <div id="overlay" class="overlay"></div>
-    <input id="floatingInput" class="floating-input" placeholder="{% trans "Enter value" %}">
-    <div id="keyboard" class="keyboard"></div>
-    
-    <script src="{% static 'js/voice.js' %}"></script>
-    
-    <script>
+{% block extra_scripts %}
+<script>
         /* ================= LANGUAGE MAP ================= */
         const languageMap = {
             "en": "en-IN",
@@ -678,18 +479,15 @@
             "bn": "bn-IN",
             "or": "or-IN"
         };
-
         function getCurrentLang() {
             let path = window.location.pathname.split('/');
             const langCode = path[1] || "en";
             return languageMap[langCode] || "en-IN";
         }
-
         function getCurrentLangCode() {
             let path = window.location.pathname.split('/');
             return path[1] || "en";
         }
-
         function speak(text) {
             if(!('speechSynthesis' in window)) return;
             speechSynthesis.cancel();
@@ -698,45 +496,12 @@
             u.rate = 1;
             speechSynthesis.speak(u);
         }
-
         /* ================= SESSION TIMER ================= */
-        let sessionTimer;
-        let timeoutWarningTimer;
-        const SESSION_DURATION = 120000;
-        const WARNING_TIME = 10000;
-
-        function startSessionTimer() {
-            sessionTimer = setTimeout(() => {
-                showTimeoutWarning();
-            }, SESSION_DURATION - WARNING_TIME);
-        }
-
-        function showTimeoutWarning() {
-            const warning = document.getElementById('timeoutWarning');
-            if (warning) {
-                warning.style.display = 'block';
-                timeoutWarningTimer = setTimeout(() => {
-                    window.location.href = "{% url 'index' %}";
-                }, WARNING_TIME);
-            }
-        }
-
-        function extendSession() {
-            const warning = document.getElementById('timeoutWarning');
-            if (warning) {
-                warning.style.display = 'none';
-            }
-            clearTimeout(sessionTimer);
-            clearTimeout(timeoutWarningTimer);
-            startSessionTimer();
-        }
-
         function resetSessionTimer() {
             clearTimeout(sessionTimer);
             clearTimeout(timeoutWarningTimer);
             startSessionTimer();
         }
-
         /* ================= FLOATING KEYBOARD ================= */
         let activeInput = null;
         let currentFieldType = null;
@@ -744,9 +509,7 @@
         const floatingInput = document.getElementById("floatingInput");
         const keyboard = document.getElementById("keyboard");
         const loadingIndicator = document.getElementById("loadingIndicator");
-        
         const keys = ["P","T","I","N","1","2","3","4","5","6","7","8","9","0"];
-
         function createKeyboard(){
             keyboard.innerHTML = "";
             let row = document.createElement("div");
@@ -764,7 +527,6 @@
                 row.appendChild(btn);
             });
             keyboard.appendChild(row);
-
             let last = document.createElement("div");
             last.className = "keyboard-row";
             last.innerHTML = `
@@ -774,7 +536,6 @@
             `;
             keyboard.appendChild(last);
         }
-
         function openKeyboard(input, fieldType = 'ptin'){
             activeInput = input;
             currentFieldType = fieldType;
@@ -787,7 +548,6 @@
                 floatingInput.focus();
             },10);
         }
-
         function finish(){
             if(activeInput){
                 activeInput.value = floatingInput.value;
@@ -802,7 +562,6 @@
             }
             closeKeyboard();
         }
-
         function closeKeyboard(){
             floatingInput.classList.remove("show");
             setTimeout(()=>{
@@ -811,7 +570,6 @@
                 keyboard.style.display = "none";
             },200);
         }
-
         document.querySelectorAll(".text-input").forEach(i=>{
             i.addEventListener("click",e=>{
                 e.stopPropagation();
@@ -819,7 +577,6 @@
                 openKeyboard(i, 'ptin');
             });
         });
-
         document.querySelectorAll(".atm-text-input").forEach(i=>{
             i.addEventListener("click",e=>{
                 e.stopPropagation();
@@ -833,17 +590,14 @@
                 }
             });
         });
-
         floatingInput.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 finish();
             }
         });
-
         overlay.addEventListener("click", closeKeyboard);
         createKeyboard();
-
         // Auto-hide messages after 5 seconds
         setTimeout(function() {
             const messages = document.querySelectorAll('.message');
@@ -851,7 +605,6 @@
                 message.style.display = 'none';
             });
         }, 5000);
-        
         // Auto-hide success messages after 3 seconds
         setTimeout(function() {
             const successMsg = document.querySelector('.success-message');
@@ -862,14 +615,11 @@
                 }, 300);
             }
         }, 3000);
-
         /* ================= PAYMENT METHOD ================= */
         let selectedPaymentMethod = 'upi';
-
         function selectPaymentMethod(method) {
             resetSessionTimer();
             selectedPaymentMethod = method;
-            
             if (method === 'upi') {
                 document.getElementById('upiOption').classList.add('selected');
                 document.getElementById('atmOption').classList.remove('selected');
@@ -899,7 +649,6 @@
             }
             checkPaymentReady();
         }
-
         function checkPaymentReady() {
             const payBtn = document.getElementById('payNowBtn');
             if (selectedPaymentMethod === 'upi') {
@@ -911,7 +660,6 @@
                 payBtn.disabled = !(cardNumber.length >= 15 && cvv.length === 3 && pin.length === 4);
             }
         }
-
         /* ================= TAX FUNCTIONS ================= */
         function validateFetch(e) {
             e.preventDefault();
@@ -928,7 +676,6 @@
                 }
                 return false;
             }
-            
             const langCode = getCurrentLangCode();
             if (langCode === 'hi') {
                 speak("कर विवरण खोजा जा रहा है");
@@ -940,11 +687,9 @@
             document.getElementById('taxForm').submit();
             return false;
         }
-        
         function processPayment() {
             resetSessionTimer();
             const amount = document.getElementById('taxAmount').innerText;
-            
             if(confirm('{% trans "Pay " %}' + amount + '?')) {
                 loadingIndicator.classList.add('show');
                 const langCode = getCurrentLangCode();
@@ -955,49 +700,40 @@
                 } else {
                     speak("{% trans 'Processing payment' %}");
                 }
-                
                 setTimeout(() => {
                     document.getElementById('payForm').submit();
                 }, 500);
             }
             return false;
         }
-        
         /* ================= VOICE INPUT ================= */
         let recognition;
         let isListening = false;
-
         function toggleVoiceInput() {
             resetSessionTimer();
-            
             if(isListening) {
                 stopVoiceInput();
                 return;
             }
-
             const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
             if(!SR) {
                 alert("{% trans 'Speech not supported' %}");
                 return;
             }
-
             if (recognition) {
                 try {
                     recognition.stop();
                 } catch(e) {}
             }
-
             recognition = new SR();
             recognition.lang = getCurrentLang();
             recognition.continuous = true;
             recognition.interimResults = true;
             recognition.maxAlternatives = 1;
-
             recognition.onstart = function() {
                 isListening = true;
                 document.getElementById("voiceBtn").classList.add("listening");
                 document.getElementById("voiceStatus").innerText = "{% trans 'Listening...' %}";
-                
                 const langCode = getCurrentLangCode();
                 if (langCode === 'hi') {
                     speak("कृपया आदेश बोलें... पीटीआईएन, कर खोजें, यूपीआई, एटीएम, या भुगतान करें");
@@ -1007,13 +743,10 @@
                     speak("{% trans 'Please say a command... PTIN, search tax, UPI, ATM, or pay' %}");
                 }
             };
-
             recognition.onresult = function(e) {
                 resetSessionTimer();
-                
                 let finalTranscript = '';
                 let interimTranscript = '';
-                
                 for (let i = 0; i < e.results.length; i++) {
                     const result = e.results[i];
                     if (result.isFinal) {
@@ -1022,11 +755,9 @@
                         interimTranscript += result[0].transcript;
                     }
                 }
-                
                 const transcript = finalTranscript || interimTranscript;
                 const command = transcript.toLowerCase();
                 console.log("Professional tax command:", command);
-                
                 // Check for PTIN pattern
                 const numberMatch = command.match(/\d+/g);
                 if(numberMatch && (command.includes("ptin") || command.includes("पीटीआईएन") || command.includes("ପିଟିଆଇଏନ୍"))) {
@@ -1042,7 +773,6 @@
                     }
                     return;
                 }
-                
                 // Payment method selection
                 if (command.includes("upi") || command.includes("यूपीआई") || command.includes("ୟୁପିଆଇ")) {
                     selectPaymentMethod('upi');
@@ -1052,7 +782,6 @@
                     selectPaymentMethod('atm');
                     return;
                 }
-                
                 // Search command
                 if(command.includes("search") || command.includes("fetch") || command.includes("find") ||
                    command.includes("खोजें") || command.includes("ଖୋଜନ୍ତୁ")) {
@@ -1065,7 +794,6 @@
                     }
                     return;
                 }
-                
                 // Pay command
                 if(command.includes("pay") || command.includes("payment") || command.includes("भुगतान") || command.includes("ଦେୟ")) {
                     if(document.getElementById('taxCard').classList.contains('hidden')) {
@@ -1075,7 +803,6 @@
                     }
                     return;
                 }
-                
                 // Back and home commands
                 if(command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
                     window.location.href = "/" + getCurrentLangCode() + "/municipal-services/";
@@ -1090,13 +817,11 @@
                     return;
                 }
             };
-
             recognition.onerror = function(event) {
                 console.error("Recognition error:", event.error);
                 if (event.error === 'no-speech') return;
                 stopVoiceInput();
             };
-
             recognition.onend = function() {
                 if (isListening) {
                     try {
@@ -1110,7 +835,6 @@
                     document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
                 }
             };
-
             try {
                 recognition.start();
             } catch(e) {
@@ -1118,7 +842,6 @@
                 stopVoiceInput();
             }
         }
-
         function stopVoiceInput() {
             isListening = false;
             if (recognition) {
@@ -1129,13 +852,11 @@
             document.getElementById("voiceBtn").classList.remove("listening");
             document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
         }
-
         /* ================= OVERRIDE VOICE COMMANDS ================= */
         const originalHandleCommand = window.handleCommand;
         window.handleCommand = function(command) {
             command = command.toLowerCase();
             console.log("Professional tax command:", command);
-            
             // Check for PTIN pattern
             const numberMatch = command.match(/\d+/g);
             if(numberMatch && (command.includes("ptin") || command.includes("पीटीआईएन") || command.includes("ପିଟିଆଇଏନ୍"))) {
@@ -1144,7 +865,6 @@
                 if(typeof speak === 'function') speak("PTIN " + ptin + " entered");
                 return;
             }
-            
             // Payment method selection
             if (command.includes("upi") || command.includes("यूपीआई") || command.includes("ୟୁପିଆଇ")) {
                 selectPaymentMethod('upi');
@@ -1154,7 +874,6 @@
                 selectPaymentMethod('atm');
                 return;
             }
-            
             // Search command
             if(command.includes("search") || command.includes("fetch") || command.includes("find") ||
                command.includes("खोजें") || command.includes("ଖୋଜନ୍ତୁ")) {
@@ -1167,7 +886,6 @@
                 }
                 return;
             }
-            
             // Pay command
             if(command.includes("pay") || command.includes("payment") || command.includes("भुगतान") || command.includes("ଦେୟ")) {
                 if(document.getElementById('taxCard').classList.contains('hidden')) {
@@ -1177,7 +895,6 @@
                 }
                 return;
             }
-            
             // Back and home commands
             if(command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ")) {
                 window.location.href = "/" + getCurrentLangCode() + "/municipal-services/";
@@ -1191,12 +908,10 @@
                 stopVoiceInput();
                 return;
             }
-            
             if(originalHandleCommand) {
                 originalHandleCommand(command);
             }
         };
-
         // Override autoReadPage to read professional tax instructions
         const originalAutoRead = window.autoReadPage;
         window.autoReadPage = function() {
@@ -1225,24 +940,21 @@
                 }
             }, 2000);
         };
-
         /* ================= INIT ================= */
         document.addEventListener('DOMContentLoaded', function() {
             startSessionTimer();
-            
             document.addEventListener('click', resetSessionTimer);
             document.addEventListener('keypress', resetSessionTimer);
             document.addEventListener('touchstart', resetSessionTimer);
-            
             setTimeout(autoReadPage, 2000);
         });
-
         window.addEventListener('beforeunload', function() {
             if (sessionTimer) {
                 clearTimeout(sessionTimer);
             }
             stopVoiceInput();
         });
-    </script>
-</body>
-</html>
+
+
+</script>
+{% endblock %}

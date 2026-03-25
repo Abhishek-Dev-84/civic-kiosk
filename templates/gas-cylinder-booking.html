@@ -1,9 +1,10 @@
-<!DOCTYPE html>
-{% load i18n %}
-{% load static %}
-<html lang="en">
-<head>
-    <style>
+{% extends 'base.html' %}
+{% load i18n static %}
+
+{% block title %}{% trans "Cylinder Booking - Civic Kiosk" %}{% endblock %}
+
+{% block extra_head %}
+<style>
         /* Hide Google Translate elements */
         .goog-te-banner-frame.skiptranslate,
         .goog-te-gadget-icon,
@@ -14,48 +15,21 @@
         .goog-te-spinner-pos {
             display: none !important;
         }
-        
-        body {
-            top: 0px !important;
-            position: static !important;
-            overflow: hidden !important;
-            height: 100vh;
-            width: 100vw;
-        }
-        
         .goog-te-combo {
             display: none !important;
         }
-        
         .goog-te-gadget {
             color: transparent !important;
             height: 0 !important;
             overflow: hidden !important;
         }
-
         /* Timeout warning popup */
-        .timeout-warning {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            border: 4px solid #ff9933;
-            border-radius: 40px;
-            padding: 30px;
-            text-align: center;
-            z-index: 2000;
-            display: none;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-        
         .timeout-warning p {
             font-size: 24px;
             font-weight: 700;
             color: #333;
             margin-bottom: 20px;
         }
-
         .timeout-warning button {
             background: #28a745;
             color: white;
@@ -68,15 +42,12 @@
             margin: 10px;
             min-width: 150px;
         }
-
         .timeout-warning .logout-btn {
             background: #dc3545;
         }
-        
         .timeout-warning button:active {
             transform: translateY(3px);
         }
-
         /* Voice status indicator */
         .voice-status-indicator {
             position: fixed;
@@ -95,11 +66,9 @@
             gap: 10px;
             border: 2px solid #ff9933;
         }
-
         .voice-status-indicator.active {
             display: flex;
         }
-
         .voice-pulse {
             width: 12px;
             height: 12px;
@@ -107,13 +76,11 @@
             border-radius: 50%;
             animation: voicePulse 1.5s infinite;
         }
-
         @keyframes voicePulse {
             0% { transform: scale(1); opacity: 1; }
             50% { transform: scale(1.5); opacity: 0.7; }
             100% { transform: scale(1); opacity: 1; }
         }
-
         /* Loading indicator */
         .loading{
             display:none;
@@ -140,50 +107,8 @@
             margin-right:10px;
         }
         @keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
-    </style>
-
-    <meta charset="UTF-8">
-    <title>{% trans "Cylinder Booking - Civic Kiosk" %}</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <style>
-        *{
-            margin:0;
-            padding:0;
-            box-sizing:border-box;
-            font-family:'Segoe UI',sans-serif;
-            user-select:none;
-        }
-
-        body{
-            width:100vw;
-            height:100vh;
-            overflow:hidden;
-            background:#f0f7ff;
-            display:flex;
-            flex-direction:column;
-        }
 
         /* HEADER */
-        .header{
-            height:80px;
-            background:white;
-            display:flex;
-            align-items:center;
-            justify-content:space-between;
-            padding:0 30px;
-            border-bottom:3px solid #1e5fbf;
-            position:fixed;
-            top:0;
-            left:0;
-            right:0;
-            z-index:1000;
-        }
-        .header-left{
-            display:flex;
-            align-items:center;
-            gap:15px;
-        }
         .header-left img{height:45px;}
         .header-left div{
             font-size:13px;
@@ -192,73 +117,21 @@
             line-height:1.2;
         }
         .header-right img{height:40px;}
-
         /* BACK + VOICE */
-        .voice-corner{
-            position:fixed;
-            top:95px;
-            right:25px;
-            display:flex;
-            flex-direction:column;
-            align-items:center;
-            gap:5px;
-            z-index:1000;
-        }
-        .voice-corner-btn{
-            background:#ff9933;
-            width:55px;
-            height:55px;
-            border-radius:50%;
-            border:3px solid white;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            font-size:26px;
-            cursor:pointer;
-            transition:all 0.2s;
-        }
         .voice-corner-btn:hover{background:#ffaa44;}
         .voice-corner-btn.listening{
             background:#28a745;
             transform:scale(1.1);
             animation:pulse 1s infinite;
         }
-        @keyframes pulse{
-            0%{transform:scale(1);}
             50%{transform:scale(1.1);}
             100%{transform:scale(1);}
-        }
-        .voice-corner-text{
-            background:white;
-            padding:4px 10px;
-            border-radius:15px;
-            font-size:12px;
-            color:#ff9933;
-            border:1px solid #ff9933;
-        }
-
-        .back-btn{
-            position:fixed;
-            top:95px;
-            left:25px;
-            background:white;
-            border:3px solid #1e5fbf;
-            border-radius:35px;
-            padding:8px 22px;
-            font-size:20px;
-            font-weight:700;
-            color:#1e5fbf;
-            box-shadow:0 4px 0 #0a3d7a;
-            cursor:pointer;
-            z-index:1000;
-            text-decoration:none;
         }
         .back-btn:hover{background:#1e5fbf;color:white;}
         .back-btn:active{
             transform:translateY(4px);
             box-shadow:0 1px 0 #0a3d7a;
         }
-
         /* MAIN CONTAINER */
         .container{
             position:fixed;
@@ -272,16 +145,6 @@
             padding:20px;
             overflow-y:auto;
         }
-
-        .content-wrapper{
-            width:100%;
-            max-width:750px;
-            display:flex;
-            flex-direction:column;
-            gap:20px;
-            padding:20px 0;
-        }
-
         /* TITLE */
         h1{
             color:#1e5fbf;
@@ -289,7 +152,6 @@
             font-weight:800;
             text-align:center;
         }
-
         /* INFO CARD */
         .info-card{
             background:white;
@@ -302,7 +164,6 @@
             flex-direction:column;
             gap:12px;
         }
-
         /* SECTION LABEL */
         .section-title{
             font-size:24px;
@@ -310,14 +171,12 @@
             font-weight:700;
             text-align:center;
         }
-
         /* CYLINDER OPTIONS */
         .options-wrapper{
             display:flex;
             flex-direction:column;
             gap:15px;
         }
-
         .cylinder-option{
             background:white;
             border:3px solid #1e5fbf;
@@ -329,28 +188,23 @@
             transition:0.2s ease;
             cursor:pointer;
         }
-
         .cylinder-option:hover{background:#e3f2fd;}
         .cylinder-option.selected{
             background:#1e5fbf;
             color:white;
         }
-
         .cylinder-name{
             font-size:26px;
             font-weight:600;
         }
-
         .price{
             font-size:24px;
             color:#28a745;
             font-weight:700;
         }
-
         .cylinder-option.selected .price{
             color:white;
         }
-
         /* BUTTON */
         .book-btn{
             background:#28a745;
@@ -365,12 +219,10 @@
             cursor:pointer;
             transition:all 0.1s;
         }
-
         .book-btn:active{
             transform:translateY(6px);
             box-shadow:0 1px 0 #1e7e34;
         }
-
         /* Messages */
         .messages{
             position:fixed;
@@ -402,136 +254,90 @@
             color:#0c5460;
             border:1px solid #bee5eb;
         }
-    </style>
-</head>
 
-<body>
-    <!-- Timeout Warning Popup -->
-    <div id="timeoutWarning" class="timeout-warning">
-        <p>⏰ {% trans "Session about to expire!" %}</p>
-        <button onclick="extendSession()">{% trans "Continue" %}</button>
-        <button class="logout-btn" onclick="window.location='{% url 'index' %}'">{% trans "Logout" %}</button>
-    </div>
 
-    <!-- Voice Status Indicator -->
-    <div id="voiceStatusIndicator" class="voice-status-indicator">
-        <div class="voice-pulse"></div>
-        <span id="voiceStatusText">{% trans "Listening..." %}</span>
-    </div>
+</style>
+{% endblock %}
 
-    <!-- Loading Indicator -->
-    <div id="loadingIndicator" class="loading">
-        <div class="spinner"></div>
-        <div>{% trans "Processing..." %}</div>
-    </div>
-
-    <!-- HEADER -->
-    <div class="header">
-        <div class="header-left">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India">
-            <div>
-                {% trans "Ministry of Electronics &" %}<br>
-                {% trans "Information Technology" %}<br>
-                {% trans "Government of India" %}
-            </div>
-        </div>
-        <div class="header-right">
-            <img src="https://www.cdac.in/img/cdac-logo.png" alt="CDAC Logo">
-        </div>
-    </div>
-
-    <!-- Messages -->
-    {% if messages %}
-    <div class="messages">
-        {% for message in messages %}
-        <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
-            {{ message }}
-        </div>
-        {% endfor %}
-    </div>
-    {% endif %}
-
-    <!-- Voice Button -->
-    <div class="voice-corner">
-        <div class="voice-corner-btn" id="voiceBtn" onclick="toggleVoiceInput()">🎤</div>
-        <div class="voice-corner-text" id="voiceStatus">{% trans "Click" %}</div>
-    </div>
-
-    <!-- Back Button -->
-    <div class="back-btn" onclick="goBack()">← {% trans "Back" %}</div>
-
-    <!-- Main Container -->
-    <div class="container">
-        <div class="content-wrapper">
-            <h1>🔄 {% trans "Book Cylinder" %}</h1>
-
-            <form method="POST" action="{% url 'gas-cylinder-booking' %}" id="bookingForm">
-                {% csrf_token %}
-                
+{% block content %}
+<div class="voice-status-indicator" id="voiceStatusIndicator">
+<div class="voice-pulse"></div>
+<span id="voiceStatusText">{% trans "Listening..." %}</span>
+</div>
+<div class="loading" id="loadingIndicator">
+<div class="spinner"></div>
+<div>{% trans "Processing..." %}</div>
+</div>
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+        <div class="message {{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+<div class="container">
+<div class="content-wrapper">
+<h1>🔄 {% trans "Book Cylinder" %}</h1>
+<form action="{% url 'gas-cylinder-booking' %}" id="bookingForm" method="POST">
+    {% csrf_token %}
                 <div class="info-card">
-                    <div style="display:flex; justify-content:space-between;">
-                        <span>{% trans "Consumer No:" %}</span>
-                        <strong>{{ consumer.consumer_no|default:'1234 5678 9012' }}</strong>
-                    </div>
-                    <div style="display:flex; justify-content:space-between;">
-                        <span>{% trans "Subsidy Status:" %}</span>
-                        <strong style="color:{% if consumer.subsidy_active %}#28a745{% else %}#dc3545{% endif %};">
+<div style="display:flex; justify-content:space-between;">
+<span>{% trans "Consumer No:" %}</span>
+<strong>{{ consumer.consumer_no|default:'1234 5678 9012' }}</strong>
+</div>
+<div style="display:flex; justify-content:space-between;">
+<span>{% trans "Subsidy Status:" %}</span>
+<strong style="color:{% if consumer.subsidy_active %}#28a745{% else %}#dc3545{% endif %};">
                             {% if consumer.subsidy_active %}{% trans "Active" %}{% else %}{% trans "Inactive" %}{% endif %}
                         </strong>
-                    </div>
+</div>
                     {% if consumer.remaining_subsidies %}
                     <div style="display:flex; justify-content:space-between;">
-                        <span>{% trans "Remaining Subsidies:" %}</span>
-                        <strong>{{ consumer.remaining_subsidies }} {% trans "cylinders" %}</strong>
-                    </div>
+<span>{% trans "Remaining Subsidies:" %}</span>
+<strong>{{ consumer.remaining_subsidies }} {% trans "cylinders" %}</strong>
+</div>
                     {% endif %}
                 </div>
-
-                <div class="section-title">{% trans "Select Cylinder Type" %}</div>
-
-                <div class="options-wrapper">
+<div class="section-title">{% trans "Select Cylinder Type" %}</div>
+<div class="options-wrapper">
                     {% for cylinder in cylinders %}
-                    <div class="cylinder-option {% if cylinder.selected %}selected{% endif %}" 
-                         id="opt{{ forloop.counter }}" 
-                         onclick="selectCylinder('opt{{ forloop.counter }}', '{{ cylinder.type }}', {{ cylinder.price }})">
-                        <span class="cylinder-name">{{ cylinder.name }}</span>
-                        <span class="price">₹{{ cylinder.price|floatformat:0 }} {% if cylinder.subsidized %}({% trans "Subsidized" %}){% endif %}</span>
-                        <input type="hidden" name="cylinder_price" value="{{ cylinder.price }}" class="price-input" disabled>
-                    </div>
+                    <div class="cylinder-option {% if cylinder.selected %}selected{% endif %}" id="opt{{ forloop.counter }}" onclick="selectCylinder('opt{{ forloop.counter }}', '{{ cylinder.type }}', {{ cylinder.price }})">
+<span class="cylinder-name">{{ cylinder.name }}</span>
+<span class="price">₹{{ cylinder.price|floatformat:0 }} {% if cylinder.subsidized %}({% trans "Subsidized" %}){% endif %}</span>
+<input class="price-input" disabled="" name="cylinder_price" type="hidden" value="{{ cylinder.price }}"/>
+</div>
                     {% empty %}
                     <div class="cylinder-option selected" id="opt1" onclick="selectCylinder('opt1','14.2kg', 856)">
-                        <span class="cylinder-name">14.2 kg {% trans "Domestic" %}</span>
-                        <span class="price">₹856 ({% trans "Subsidized" %})</span>
-                    </div>
-                    <div class="cylinder-option" id="opt2" onclick="selectCylinder('opt2','5kg', 425)">
-                        <span class="cylinder-name">5 kg {% trans "Domestic" %}</span>
-                        <span class="price">₹425</span>
-                    </div>
-                    <div class="cylinder-option" id="opt3" onclick="selectCylinder('opt3','19kg', 1850)">
-                        <span class="cylinder-name">19 kg {% trans "Commercial" %}</span>
-                        <span class="price">₹1,850</span>
-                    </div>
+<span class="cylinder-name">14.2 kg {% trans "Domestic" %}</span>
+<span class="price">₹856 ({% trans "Subsidized" %})</span>
+</div>
+<div class="cylinder-option" id="opt2" onclick="selectCylinder('opt2','5kg', 425)">
+<span class="cylinder-name">5 kg {% trans "Domestic" %}</span>
+<span class="price">₹425</span>
+</div>
+<div class="cylinder-option" id="opt3" onclick="selectCylinder('opt3','19kg', 1850)">
+<span class="cylinder-name">19 kg {% trans "Commercial" %}</span>
+<span class="price">₹1,850</span>
+</div>
                     {% endfor %}
                 </div>
+<input id="selectedCylinder" name="cylinder_type" type="hidden" value="{{ selected_type|default:'14.2kg' }}"/>
+<input id="selectedPrice" name="cylinder_price_hidden" type="hidden" value="{{ selected_price|default:'856' }}"/>
+<button class="book-btn" onclick="bookCylinder()" type="button">{% trans "Book Now" %}</button>
+</form>
+</div>
+</div>
+ Load voice.js - must be at bottom 
+<script src="{% static 'js/voice.js' %}"></script>
+{% endblock %}
 
-                <input type="hidden" name="cylinder_type" id="selectedCylinder" value="{{ selected_type|default:'14.2kg' }}">
-                <input type="hidden" name="cylinder_price_hidden" id="selectedPrice" value="{{ selected_price|default:'856' }}">
-
-                <button type="button" class="book-btn" onclick="bookCylinder()">{% trans "Book Now" %}</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Load voice.js - must be at bottom -->
-    <script src="{% static 'js/voice.js' %}"></script>
-
-    <script>
+{% block extra_scripts %}
+<script>
         /* ================= LANGUAGE UTILITIES ================= */
         function getCurrentLangCode() {
             const path = window.location.pathname.split('/');
             return path[1] || "en";
         }
-
         function speak(text) {
             if (!('speechSynthesis' in window)) return;
             speechSynthesis.cancel();
@@ -540,82 +346,18 @@
             utterance.rate = 1;
             speechSynthesis.speak(utterance);
         }
-
         /* ================= SESSION TIMER ================= */
-        let sessionTimer;
-        let timeoutWarningTimer;
-        const SESSION_DURATION = 120000; // 2 minutes
-        const WARNING_TIME = 30000; // Warn 30 seconds before
-
-        function startSessionTimer() {
-            sessionTimer = setTimeout(() => {
-                showTimeoutWarning();
-            }, SESSION_DURATION - WARNING_TIME);
-        }
-
-        function showTimeoutWarning() {
-            const warning = document.getElementById('timeoutWarning');
-            if (warning) {
-                warning.style.display = 'block';
-                
-                const langCode = getCurrentLangCode();
-                const warnings = {
-                    'en': 'Your session is about to expire. Please continue to stay logged in.',
-                    'hi': 'आपका सत्र समाप्त होने वाला है। कृपया जारी रखें।',
-                    'or': 'ଆପଣଙ୍କର ସତ୍ର ସମାପ୍ତ ହେବାକୁ ଯାଉଛି। ଦୟାକରି ଜାରି ରଖନ୍ତୁ।',
-                    'bn': 'আপনার সেশন শেষ হতে চলেছে। অনুগ্রহ করে চালিয়ে যান।',
-                    'ta': 'உங்கள் அமர்வு காலாவதியாகிறது. தயவுசெய்து தொடரவும்.',
-                    'te': 'మీ సెషన్ ముగియబోతోంది. దయచేసి కొనసాగించండి.'
-                };
-                speak(warnings[langCode] || warnings['en']);
-                
-                timeoutWarningTimer = setTimeout(() => {
-                    window.location.href = "/" + langCode + "/";
-                }, WARNING_TIME);
-            }
-        }
-
-        function extendSession() {
-            const warning = document.getElementById('timeoutWarning');
-            if (warning) {
-                warning.style.display = 'none';
-            }
-            clearTimeout(sessionTimer);
-            clearTimeout(timeoutWarningTimer);
-            startSessionTimer();
-            
-            const langCode = getCurrentLangCode();
-            const messages = {
-                'en': 'Session extended. You may continue.',
-                'hi': 'सत्र बढ़ा दिया गया। आप जारी रख सकते हैं।',
-                'or': 'ସତ୍ର ବୃଦ୍ଧି କରାଯାଇଛି। ଆପଣ ଜାରି ରଖିପାରିବେ।',
-                'bn': 'সেশন বাড়ানো হয়েছে। আপনি চালিয়ে যেতে পারেন।',
-                'ta': 'அமர்வு நீட்டிக்கப்பட்டது. நீங்கள் தொடரலாம்.',
-                'te': 'సెషన్ పొడిగించబడింది. మీరు కొనసాగించవచ్చు.'
-            };
-            speak(messages[langCode] || messages['en']);
-        }
-
-        function resetSessionTimer() {
-            clearTimeout(sessionTimer);
-            clearTimeout(timeoutWarningTimer);
-            startSessionTimer();
-        }
-
         function goBack() {
             resetSessionTimer();
             window.location.href = "/" + getCurrentLangCode() + "/gas-services/";
         }
-
         /* ================= CYLINDER BOOKING FUNCTIONS ================= */
         function selectCylinder(id, type, price) {
             resetSessionTimer();
-            
             document.querySelectorAll('.cylinder-option').forEach(opt => opt.classList.remove('selected'));
             document.getElementById(id).classList.add('selected');
             document.getElementById('selectedCylinder').value = type;
             document.getElementById('selectedPrice').value = price;
-            
             const langCode = getCurrentLangCode();
             const messages = {
                 'en': type + ' selected, price ' + price + ' rupees',
@@ -624,65 +366,52 @@
             };
             speak(messages[langCode] || messages['en']);
         }
-
         function bookCylinder() {
             resetSessionTimer();
-            
             const type = document.getElementById('selectedCylinder').value;
             const price = document.getElementById('selectedPrice').value;
             const langCode = getCurrentLangCode();
-
             const bookingMessages = {
                 'en': 'Booking ' + type + ' cylinder for ' + price + ' rupees',
                 'hi': type + ' सिलेंडर ' + price + ' रुपये में बुक हो रहा है',
                 'or': type + ' ସିଲିଣ୍ଡର ' + price + ' ଟଙ୍କାରେ ବୁକ୍ ହେଉଛି'
             };
             speak(bookingMessages[langCode] || bookingMessages['en']);
-
             // Show loading
             document.getElementById('loadingIndicator').classList.add('show');
-
             // Simulate processing
             setTimeout(() => {
                 document.getElementById('bookingForm').submit();
             }, 1000);
         }
-
         /* ================= VOICE INPUT ================= */
         let recognition;
         let isListening = false;
-
         function toggleVoiceInput() {
             resetSessionTimer();
-            
             if (isListening) {
                 stopVoiceInput();
                 return;
             }
-
             const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SR) {
                 alert("{% trans 'Speech not supported' %}");
                 return;
             }
-
             if (recognition) {
                 try {
                     recognition.stop();
                 } catch (e) {}
             }
-
             recognition = new SR();
             recognition.lang = window.getCurrentLang ? window.getCurrentLang() : 'en-IN';
             recognition.continuous = true;
             recognition.interimResults = true;
-
             recognition.onstart = function() {
                 isListening = true;
                 document.getElementById("voiceBtn").classList.add("listening");
                 document.getElementById("voiceStatus").innerText = "{% trans 'Listening...' %}";
                 document.getElementById('voiceStatusIndicator').classList.add('active');
-                
                 const langCode = getCurrentLangCode();
                 const messages = {
                     'en': 'Say domestic, small, or commercial to select cylinder type, then say book to confirm',
@@ -691,13 +420,10 @@
                 };
                 speak(messages[langCode] || messages['en']);
             };
-
             recognition.onresult = function(e) {
                 resetSessionTimer();
-                
                 let finalTranscript = '';
                 let interimTranscript = '';
-                
                 for (let i = 0; i < e.results.length; i++) {
                     const result = e.results[i];
                     if (result.isFinal) {
@@ -706,13 +432,10 @@
                         interimTranscript += result[0].transcript;
                     }
                 }
-                
                 const transcript = finalTranscript || interimTranscript;
                 const command = transcript.toLowerCase();
                 console.log("Cylinder booking command:", command);
-                
                 const langCode = getCurrentLangCode();
-                
                 // Cylinder type selection - English
                 if (command.includes("14.2") || command.includes("14 point 2") || 
                     command.includes("domestic") || command.includes("full") || 
@@ -731,7 +454,6 @@
                     selectCylinder('opt3', '19kg', 1850);
                     return;
                 }
-                
                 // Hindi commands
                 if (command.includes("डोमेस्टिक") || command.includes("घरेलू") || command.includes("बड़ा")) {
                     selectCylinder('opt1', '14.2kg', 856);
@@ -745,7 +467,6 @@
                     selectCylinder('opt3', '19kg', 1850);
                     return;
                 }
-                
                 // Odia commands
                 if (command.includes("ଡୋମେଷ୍ଟିକ୍") || command.includes("ଘରୋଇ") || command.includes("ଚଉଦ")) {
                     selectCylinder('opt1', '14.2kg', 856);
@@ -759,7 +480,6 @@
                     selectCylinder('opt3', '19kg', 1850);
                     return;
                 }
-                
                 // Booking commands
                 if (command.includes("book") || command.includes("order") || command.includes("buy") ||
                     command.includes("बुक") || command.includes("आर्डर") || command.includes("खरीद") ||
@@ -794,13 +514,11 @@
                     return;
                 }
             };
-
             recognition.onerror = function(event) {
                 console.error("Recognition error:", event.error);
                 if (event.error === 'no-speech') return;
                 stopVoiceInput();
             };
-
             recognition.onend = function() {
                 if (isListening) {
                     try {
@@ -815,7 +533,6 @@
                     document.getElementById('voiceStatusIndicator').classList.remove('active');
                 }
             };
-
             try {
                 recognition.start();
             } catch (e) {
@@ -823,7 +540,6 @@
                 stopVoiceInput();
             }
         }
-
         function stopVoiceInput() {
             isListening = false;
             if (recognition) {
@@ -835,7 +551,6 @@
             document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
             document.getElementById('voiceStatusIndicator').classList.remove('active');
         }
-
         // Auto-read page instructions
         function autoReadPage() {
             setTimeout(() => {
@@ -848,7 +563,6 @@
                 speak(messages[langCode] || messages['en']);
             }, 2000);
         }
-
         // Auto-hide messages after 5 seconds
         setTimeout(function() {
             const messages = document.querySelectorAll('.message');
@@ -856,15 +570,12 @@
                 message.style.display = 'none';
             });
         }, 5000);
-
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             startSessionTimer();
-            
             document.addEventListener('click', resetSessionTimer);
             document.addEventListener('keypress', resetSessionTimer);
             document.addEventListener('touchstart', resetSessionTimer);
-            
             // Check if voice should auto-start
             const autoStartVoice = sessionStorage.getItem('autoStartVoice');
             if (autoStartVoice === 'true') {
@@ -873,20 +584,18 @@
                     toggleVoiceInput();
                 }, 1000);
             }
-            
             // Auto-read page
             setTimeout(autoReadPage, 2000);
         });
-
         window.addEventListener('beforeunload', function() {
             if (sessionTimer) {
                 clearTimeout(sessionTimer);
             }
             stopVoiceInput();
         });
-
         // Override voice.js autoReadPage
         window.autoReadPage = autoReadPage;
-    </script>
-</body>
-</html>
+
+
+</script>
+{% endblock %}

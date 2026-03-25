@@ -715,23 +715,10 @@ def electricity_duplicate_bill(request):
                             'status': bill.status
                         })
                 else:
-                    # Fallback to sample data
+                    messages.error(request, 'Record not found. Please verify your details.')
+                    context['show_results'] = False
                     bills = []
-                    today = datetime.now().date()
-                    for i in range(3):
-                        bill_date = today - relativedelta(months=i)
-                        due_date = bill_date + relativedelta(days=15)
-                        
-                        bills.append({
-                            'id': f'bill_{i+1}',
-                            'month': bill_date.strftime('%B'),
-                            'year': bill_date.year,
-                            'bill_date': bill_date.strftime('%d %b %Y'),
-                            'due_date': due_date.strftime('%d %b %Y'),
-                            'amount': f"{1200 + (i * 70)}",
-                            'bill_number': f"EB/{bill_date.year}/{random.randint(1000, 9999)}",
-                            'units': 200 + (i * 25)
-                        })
+                    data = []
             except Exception as e:
                 logger.error(f"Error fetching bills: {e}")
                 bills = []
@@ -1356,19 +1343,10 @@ def water_bill(request):
             except Exception as e:
                 logger.error(f"Error fetching water bill: {e}")
             
-            # Fallback to sample data
-            context = {
-                'show_bill': True,
-                'consumer_no': consumer_no,
-                'consumer_name': 'Rajesh Kumar',
-                'bill_number': f'WATER/{datetime.now().year}/{random.randint(1000, 9999)}',
-                'bill_date': datetime.now().strftime('%d %b %Y'),
-                'due_date': (datetime.now() + timedelta(days=15)).strftime('%d %b %Y'),
-                'units_consumed': random.randint(20, 30),
-                'bill_amount': random.randint(400, 600)
-            }
-            return render(request, 'water-bill.html', context)
-    
+            messages.error(request, 'Record not found. Please verify your details.')
+            context['show_results'] = False
+            bills = []
+            data = []
     return render(request, 'water-bill.html')
 
 
@@ -1524,19 +1502,10 @@ def property_tax(request):
             except Exception as e:
                 logger.error(f"Error fetching property tax: {e}")
             
-            # Fallback to sample data
-            context = {
-                'show_tax': True,
-                'property_id': property_id,
-                'owner_name': 'Rajesh Kumar',
-                'property_type': 'Residential',
-                'area': '1,200',
-                'assessment_year': '2025-26',
-                'due_date': '31 Mar 2026',
-                'amount': '3,450.00'
-            }
-            return render(request, 'property-tax.html', context)
-    
+            messages.error(request, 'Record not found. Please verify your details.')
+            context['show_results'] = False
+            bills = []
+            data = []
     return render(request, 'property-tax.html')
 
 
@@ -1600,20 +1569,10 @@ def professional_tax(request):
             except Exception as e:
                 logger.error(f"Error fetching professional tax: {e}")
             
-            # Fallback to sample data
-            context = {
-                'show_tax': True,
-                'ptin': ptin,
-                'name': 'Rajesh Kumar',
-                'profession': 'Self Employed',
-                'assessment_year': '2025-26',
-                'due_date': '31 Mar 2026',
-                'half_yearly_tax': '1,250',
-                'penalty': '0',
-                'amount': '1,250.00'
-            }
-            return render(request, 'professional-tax.html', context)
-    
+            messages.error(request, 'Record not found. Please verify your details.')
+            context['show_results'] = False
+            bills = []
+            data = []
     return render(request, 'professional-tax.html')
 
 
@@ -2276,54 +2235,10 @@ def gas_bookings_status(request):
         except Exception as e:
             logger.error(f"Error fetching booking: {e}")
         
-        # Fallback to sample data
-        today = datetime.now().date()
-        
-        # Simulate different booking statuses
-        if reference_number.upper() == 'CYL251234':
-            booking = {
-                'reference_number': 'CYL251234',
-                'consumer_name': 'Rajesh Kumar',
-                'booked_date': '22 Feb 2026, 10:30 AM',
-                'expected_delivery': 'Today (25 Feb) by 6 PM',
-                'delivery_person': 'Ramesh (98765 43210)',
-                'cylinder_type': '14.2 kg Domestic Cylinder',
-                'status': 'out_for_delivery'
-            }
-        elif reference_number.upper() == 'CYL251235':
-            booking = {
-                'reference_number': 'CYL251235',
-                'consumer_name': 'Priya Sharma',
-                'booked_date': '20 Feb 2026, 9:15 AM',
-                'expected_delivery': '23 Feb 2026',
-                'actual_delivery': '23 Feb 2026, 11:30 AM',
-                'delivery_person': 'Suresh (98765 43211)',
-                'cylinder_type': '19 kg Commercial Cylinder',
-                'status': 'delivered'
-            }
-        elif reference_number.upper() == 'CYL251236':
-            booking = {
-                'reference_number': 'CYL251236',
-                'consumer_name': 'Amit Patel',
-                'booked_date': '24 Feb 2026, 2:45 PM',
-                'expected_delivery': '26 Feb 2026 by 6 PM',
-                'cylinder_type': '5 kg Domestic Cylinder',
-                'status': 'processed'
-            }
-        else:
-            # Generate random booking for any reference
-            booking = {
-                'reference_number': reference_number,
-                'consumer_name': 'Customer',
-                'booked_date': today.strftime('%d %b %Y') + ', 10:30 AM',
-                'expected_delivery': (today + timedelta(days=2)).strftime('%d %b %Y') + ' by 6 PM',
-                'delivery_person': 'Delivery team will be assigned soon',
-                'cylinder_type': '14.2 kg Domestic Cylinder',
-                'status': random.choice(['pending', 'processed', 'out_for_delivery'])
-            }
-        
-        context['booking'] = booking
-    
+        messages.error(request, 'Record not found. Please verify your details.')
+        context['show_results'] = False
+        bills = []
+        data = []
     return render(request, 'gas-booking-status.html', context)
 
 

@@ -1,0 +1,311 @@
+{% load i18n %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE|default:'en' }}">
+<head>
+    <!-- Security Meta Tags -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://upload.wikimedia.org https://www.cdac.in; font-src 'self';">
+    <meta name="referrer" content="same-origin">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Cache Control -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
+    <meta charset="UTF-8">
+    <title>{% block title %}Civic Services Kiosk{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Global Styles -->
+    <style>
+        /* CSS Reset & Defaults */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background: #f0f7ff;
+            top: 0px !important;
+            position: static !important;
+        }
+
+        /* Hide Google Translate elements */
+        .goog-te-banner-frame.skiptranslate,
+        .goog-te-gadget-icon,
+        .goog-te-gadget-simple,
+        #goog-gt-tt,
+        .goog-te-balloon-frame,
+        .goog-te-menu-frame,
+        .goog-te-spinner-pos,
+        .goog-te-combo { display: none !important; }
+        .goog-te-gadget { color: transparent !important; height: 0 !important; overflow: hidden !important; }
+
+        /* HEADER */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 70px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            border-bottom: 2px solid #1e5fbf;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-left { display: flex; align-items: center; gap: 10px; }
+        .header-left img { height: 35px; }
+        .header-left div { font-size: 12px; font-weight: 600; color: #1e5fbf; line-height: 1.1; }
+        .header-right img { height: 30px; }
+
+        /* UI Elements (Back, Voice) */
+        .back-btn {
+            position: fixed;
+            top: 80px;
+            left: 15px;
+            background: white;
+            border: 2px solid #1e5fbf;
+            border-radius: 30px;
+            padding: 5px 15px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            color: #1e5fbf;
+            box-shadow: 0 3px 0 #0a3d7a;
+            z-index: 1000;
+        }
+        .back-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #0a3d7a; }
+
+        .voice-corner {
+            position: fixed;
+            top: 80px;
+            right: 15px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+        }
+        .voice-corner-btn {
+            background: #ff9933;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        .voice-corner-btn.listening { background: #28a745; animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        .voice-corner-text { background: white; padding: 2px 8px; border-radius: 15px; font-size: 10px; font-weight: 600; color: #ff9933; border: 1px solid #ff9933; }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255,255,255,0.85);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        .loading-overlay.active { display: flex; }
+        .loading-spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #1e5fbf;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .loading-text { margin-top: 15px; font-weight: bold; color: #1e5fbf; font-size: 18px; }
+
+        /* Timeout Warning */
+        .timeout-warning {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border: 4px solid #ff9933;
+            border-radius: 40px;
+            padding: 40px;
+            text-align: center;
+            z-index: 10000;
+            display: none;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            max-width: 500px;
+            width: 90%;
+        }
+        .timeout-warning.active { display: block; }
+        .timeout-warning p { font-size: 26px; font-weight: 700; color: #333; margin-bottom: 25px; }
+        .timeout-warning button {
+            border: none; border-radius: 40px; padding: 15px 30px;
+            font-size: 22px; font-weight: 700; cursor: pointer;
+            margin: 10px; min-width: 160px; color: white;
+        }
+        .timeout-warning .btn-continue { background: #28a745; box-shadow: 0 4px 0 #1e7e34; }
+        .timeout-warning .btn-logout { background: #dc3545; box-shadow: 0 4px 0 #a71d2a; }
+        .timeout-warning button:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(0,0,0,0.2) !important; }
+
+        /* Security Note */
+        .security-note {
+            position: fixed; bottom: 10px; right: 10px;
+            font-size: 11px; color: #666; background: rgba(255,255,255,0.9);
+            padding: 4px 10px; border-radius: 12px; z-index: 999;
+            border: 1px solid #ccc;
+        }
+
+        /* Messages */
+        .message-container {
+            position: fixed; top: 80px; left: 50%;
+            transform: translateX(-50%);
+            width: 90%; max-width: 600px;
+            z-index: 1500; pointer-events: none;
+        }
+        .message {
+            pointer-events: auto;
+            margin-bottom: 15px;
+            padding: 15px 25px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 18px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+            transition: opacity 0.5s ease;
+        }
+        .message.error { color: #dc3545; background: #ffe6e6; border: 2px solid #dc3545; }
+        .message.success { color: #28a745; background: #e8f5e9; border: 2px solid #28a745; }
+        .message.warning { color: #ff9933; background: #fff3e6; border: 2px solid #ff9933; }
+        .message.info { color: #1e5fbf; background: #e6f2ff; border: 2px solid #1e5fbf; }
+
+        /* Base Kiosk Container */
+        .kiosk-container {
+            position: fixed;
+            top: 70px; left: 0; right: 0; bottom: 0;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 20px;
+            overflow-y: auto;
+            padding-bottom: 50px;
+        }
+        .content-wrapper {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding-top: 10px;
+        }
+
+        /* Skeleton Loaders */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+            border-radius: 10px;
+        }
+        @keyframes skeleton-loading { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+    </style>
+    
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <!-- CSRF Token -->
+    {% csrf_token %}
+    <input type="hidden" id="csrf_token" value="{{ csrf_token }}">
+
+    <!-- Loading Overlay -->
+    <div id="globalLoadingOverlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text" id="globalLoadingText">{% trans "Processing Request..." %}</div>
+    </div>
+
+    <!-- Timeout Warning -->
+    <div id="timeoutWarning" class="timeout-warning">
+        <p>⏰ {% trans "Session about to expire due to inactivity!" %}</p>
+        <button class="btn-continue" id="btnExtendSession">{% trans "Continue" %}</button>
+        <button class="btn-logout" id="btnLogoutSession">{% trans "Logout" %}</button>
+    </div>
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-left">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India">
+            <div>
+                {% trans "Ministry of Electronics &" %}<br>
+                {% trans "Information Technology" %}<br>
+                {% trans "Government of India" %}
+            </div>
+        </div>
+        <div class="header-right">
+            <img src="https://www.cdac.in/img/cdac-logo.png" alt="CDAC Logo">
+        </div>
+    </div>
+
+    <!-- UI Controls -->
+    {% block ui_controls %}
+    <div class="back-btn" id="globalBackBtn">← {% trans "Back" %}</div>
+    <div class="voice-corner">
+        <div class="voice-corner-btn" id="voiceBtn">🎤</div>
+        <div class="voice-corner-text" id="voiceStatus">{% trans "Click" %}</div>
+    </div>
+    {% endblock %}
+
+    <!-- Messages -->
+    <div id="messageContainer" class="message-container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="message {{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <!-- Main Content -->
+    <div class="kiosk-container">
+        <div class="content-wrapper">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+    <!-- Security Note -->
+    <div class="security-note">
+        🔒 {% trans "Secured by Government of India" %}
+    </div>
+
+    <!-- Core Javascript -->
+    <script src="{% static 'js/kiosk_core.js' %}"></script>
+    
+    <script>
+        // Init properties if passed from context
+        KioskCore.init({
+            csrfToken: document.querySelector('#csrf_token').value,
+            logoutUrl: "{% url 'index' %}",  // Replace with actual logout if exists
+            languageCode: "{{ LANGUAGE_CODE|default:'en' }}"
+        });
+    </script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

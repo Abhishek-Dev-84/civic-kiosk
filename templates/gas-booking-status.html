@@ -1,9 +1,10 @@
-{% load i18n %}
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <style>
+{% extends 'base.html' %}
+{% load i18n static %}
+
+{% block title %}{% trans "Gas Booking Status - Civic Kiosk" %}{% endblock %}
+
+{% block extra_head %}
+<style>
         /* Hide Google Translate elements */
         .goog-te-banner-frame.skiptranslate,
         .goog-te-gadget-icon,
@@ -14,48 +15,21 @@
         .goog-te-spinner-pos {
             display: none !important;
         }
-        
-        body {
-            top: 0px !important;
-            position: static !important;
-            overflow: hidden !important;
-            height: 100vh;
-            width: 100vw;
-        }
-        
         .goog-te-combo {
             display: none !important;
         }
-        
         .goog-te-gadget {
             color: transparent !important;
             height: 0 !important;
             overflow: hidden !important;
         }
-
         /* Timeout warning popup */
-        .timeout-warning {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            border: 4px solid #ff9933;
-            border-radius: 40px;
-            padding: 30px;
-            text-align: center;
-            z-index: 2000;
-            display: none;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-        
         .timeout-warning p {
             font-size: 24px;
             font-weight: 700;
             color: #333;
             margin-bottom: 20px;
         }
-
         .timeout-warning button {
             background: #28a745;
             color: white;
@@ -68,15 +42,12 @@
             margin: 10px;
             min-width: 150px;
         }
-
         .timeout-warning .logout-btn {
             background: #dc3545;
         }
-        
         .timeout-warning button:active {
             transform: translateY(3px);
         }
-
         /* Voice status indicator */
         .voice-status-indicator {
             position: fixed;
@@ -95,11 +66,9 @@
             gap: 10px;
             border: 2px solid #ff9933;
         }
-
         .voice-status-indicator.active {
             display: flex;
         }
-
         .voice-pulse {
             width: 12px;
             height: 12px;
@@ -107,105 +76,28 @@
             border-radius: 50%;
             animation: voicePulse 1.5s infinite;
         }
-
         @keyframes voicePulse {
             0% { transform: scale(1); opacity: 1; }
             50% { transform: scale(1.5); opacity: 0.7; }
             100% { transform: scale(1); opacity: 1; }
         }
-    </style>
-
-    <meta charset="UTF-8">
-    <title>{% trans "Gas Booking Status - Civic Kiosk" %}</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <style>
-        *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;user-select:none;}
-        body{width:100vw;height:100vh;overflow:hidden;background:#f0f7ff;}
 
         /* HEADER */
-        .header{
-            height:70px;
-            background:white;
-            display:flex;
-            align-items:center;
-            justify-content:space-between;
-            padding:0 20px;
-            border-bottom:2px solid #1e5fbf;
-            position:fixed;
-            top:0;
-            left:0;
-            right:0;
-            z-index:1000;
-        }
-        .header-left{display:flex;align-items:center;gap:10px;}
         .header-left img{height:40px;}
         .header-left div{font-size:12px;font-weight:600;color:#1e5fbf;line-height:1.2;}
         .header-right img{height:35px;}
-
         /* VOICE + BACK */
-        .voice-corner{
-            position:fixed;
-            top:80px;
-            right:15px;
-            display:flex;
-            flex-direction:column;
-            align-items:center;
-            gap:3px;
-            z-index:1000;
-        }
-        .voice-corner-btn{
-            background:#ff9933;
-            width:45px;
-            height:45px;
-            border-radius:50%;
-            border:2px solid white;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            font-size:24px;
-            cursor:pointer;
-            transition:all 0.2s;
-        }
         .voice-corner-btn:hover{background:#ffaa44;}
         .voice-corner-btn.listening{
             background:#28a745;
             transform:scale(1.1);
             animation:pulse 1s infinite;
         }
-        @keyframes pulse{
-            0%{transform:scale(1);}
             50%{transform:scale(1.1);}
             100%{transform:scale(1);}
         }
-        .voice-corner-text{
-            background:white;
-            padding:2px 8px;
-            border-radius:12px;
-            font-size:10px;
-            color:#ff9933;
-            border:1px solid #ff9933;
-        }
-        .back-btn{
-            position:fixed;
-            top:80px;
-            left:15px;
-            background:white;
-            border:2px solid #1e5fbf;
-            border-radius:30px;
-            padding:5px 15px;
-            font-size:18px;
-            font-weight:700;
-            color:#1e5fbf;
-            text-decoration:none;
-            z-index:1000;
-            display:inline-block;
-            box-shadow:0 3px 0 #0a3d7a;
-            cursor:pointer;
-        }
         .back-btn:hover{background:#1e5fbf;color:white;}
         .back-btn:active{transform:translateY(3px);box-shadow:0 1px 0 #0a3d7a;}
-
         /* MAIN */
         .container{
             position:fixed;
@@ -219,19 +111,12 @@
             padding:15px;
             overflow-y:auto;
         }
-        .content-wrapper{
-            width:100%;
-            max-width:650px;
-            padding:20px 0;
-        }
-
         /* Message styles */
         .messages{width:100%;margin-bottom:15px;}
         .message{padding:10px;border-radius:10px;margin-bottom:5px;text-align:center;}
         .message.success{background:#d4edda;color:#155724;border:1px solid #c3e6cb;}
         .message.error{background:#f8d7da;color:#721c24;border:1px solid #f5c6cb;}
         .message.info{background:#d1ecf1;color:#0c5460;border:1px solid #bee5eb;}
-
         h1{
             color:#1e5fbf;
             font-size:32px;
@@ -239,7 +124,6 @@
             text-align:center;
             margin-bottom:15px;
         }
-
         .search-box{
             display:flex;
             gap:10px;
@@ -257,7 +141,6 @@
         }
         .search-input:focus{outline:none;border-color:#ff9933;}
         .search-input[readonly]{background:#f9f9f9;}
-
         .search-btn{
             background:#1e5fbf;
             color:white;
@@ -271,7 +154,6 @@
         }
         .search-btn:active{transform:translateY(4px);box-shadow:0 1px 0 #0a3d7a;}
         .search-btn:hover{background:#2f6fcf;}
-
         .status-card{
             background:white;
             border:3px solid #1e5fbf;
@@ -279,7 +161,6 @@
             padding:20px;
             margin-top:15px;
         }
-
         .timeline{
             display:flex;
             justify-content:space-between;
@@ -325,7 +206,6 @@
             font-size:16px;
         }
         .hidden{display:none;}
-
         /* Loading indicator */
         .loading{
             display:none;
@@ -352,7 +232,6 @@
             margin-right:10px;
         }
         @keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
-
         /* FLOATING INPUT */
         .overlay{
             position:fixed;
@@ -382,7 +261,6 @@
             transform:translate(-50%,-50%) scale(1);
         }
         .floating-input:focus{outline:none;}
-
         /* KEYBOARD */
         .keyboard{
             position:fixed;
@@ -415,98 +293,61 @@
             border:none;
         }
         .keyboard .ok-btn:hover{background:#218838;}
-
         /* Utility */
         .hidden{display:none !important;}
-    </style>
-</head>
-<body>
-    <!-- Timeout Warning Popup -->
-    <div id="timeoutWarning" class="timeout-warning">
-        <p>⏰ {% trans "Session about to expire!" %}</p>
-        <button onclick="extendSession()">{% trans "Continue" %}</button>
-        <button class="logout-btn" onclick="window.location='{% url 'index' %}'">{% trans "Logout" %}</button>
-    </div>
 
-    <!-- Voice Status Indicator -->
-    <div id="voiceStatusIndicator" class="voice-status-indicator">
-        <div class="voice-pulse"></div>
-        <span id="voiceStatusText">{% trans "Listening..." %}</span>
-    </div>
 
-    <!-- HEADER -->
-    <div class="header">
-        <div class="header-left">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India">
-            <div>{% trans "Ministry of Electronics &" %}<br>{% trans "Information Technology" %}<br>{% trans "Government of India" %}</div>
-        </div>
-        <div class="header-right">
-            <img src="https://www.cdac.in/img/cdac-logo.png" alt="CDAC Logo">
-        </div>
-    </div>
+</style>
+{% endblock %}
 
-    <!-- Voice Button -->
-    <div class="voice-corner">
-        <div class="voice-corner-btn" id="voiceBtn" onclick="toggleVoiceInput()">🎤</div>
-        <div class="voice-corner-text" id="voiceStatus">{% trans "Click" %}</div>
-    </div>
-
-    <!-- Back Button -->
-    <div class="back-btn" onclick="goBack()">← {% trans "Back" %}</div>
-
-    <!-- Main Container -->
-    <div class="container">
-        <div class="content-wrapper">
-
-            <!-- Display Django messages -->
-            {% if messages %}
-            <div class="messages">
-                {% for message in messages %}
-                <div class="message {{ message.tags }}">{{ message }}</div>
-                {% endfor %}
-            </div>
-            {% endif %}
-
+{% block content %}
+ Timeout Warning Popup 
+ Voice Status Indicator 
+<div class="voice-status-indicator" id="voiceStatusIndicator">
+<div class="voice-pulse"></div>
+<span id="voiceStatusText">{% trans "Listening..." %}</span>
+</div>
+ HEADER 
+ Voice Button 
+ Back Button 
+ Main Container 
+<div class="container">
+<div class="content-wrapper">
+<!-- Display Django messages -->
             <h1>📦 {% trans "Booking Status" %}</h1>
-
-            <!-- Django form for status check -->
-            <form id="statusForm" method="post" action="{% url 'gas-booking-status' %}">
-                {% csrf_token %}
-                <input type="hidden" name="reference_number" id="referenceNumber" value="{{ request.POST.reference_number }}">
-            </form>
-
-            <div class="search-box">
-                <input class="search-input" id="refNo" readonly placeholder="{% trans "Enter Reference No. (e.g., CYL251234)" %}" 
-                       value="{{ request.POST.reference_number }}">
-                <button class="search-btn" onclick="checkStatus()">{% trans "Search" %}</button>
-            </div>
-
-            <div id="statusDisplay" class="status-card {% if not booking %}hidden{% endif %}">
+<!-- Django form for status check -->
+<form action="{% url 'gas-booking-status' %}" id="statusForm" method="post">
+    {% csrf_token %}
+                <input id="referenceNumber" name="reference_number" type="hidden" value="{{ request.POST.reference_number }}"/>
+</form>
+<div class="search-box">
+<input %}"="" (e.g.,="" class="search-input" cyl251234)"="" enter="" id="refNo" no.="" placeholder="{% trans " readonly="" reference="" value="{{ request.POST.reference_number }}"/>
+<button class="search-btn" onclick="checkStatus()">{% trans "Search" %}</button>
+</div>
+<div class="status-card {% if not booking %}hidden{% endif %}" id="statusDisplay">
                 {% if booking %}
                 <div style="font-size:20px;font-weight:700;color:#1e5fbf;margin-bottom:10px;">{% trans "Booking #" %}{{ booking.reference_number }}</div>
-
-                <div class="timeline">
-                    <div class="step {% if booking.status != 'pending' %}completed{% endif %}">
-                        <div class="dot">✓</div>
-                        <div class="step-label">{% trans "Booked" %}</div>
-                    </div>
-                    <div class="step {% if booking.status == 'processed' or booking.status == 'out_for_delivery' or booking.status == 'delivered' %}completed{% endif %}">
-                        <div class="dot">✓</div>
-                        <div class="step-label">{% trans "Processed" %}</div>
-                    </div>
-                    <div class="step {% if booking.status == 'out_for_delivery' or booking.status == 'delivered' %}completed{% endif %} {% if booking.status == 'out_for_delivery' %}active{% endif %}">
-                        <div class="dot">{% if booking.status == 'out_for_delivery' %}⏳{% else %}○{% endif %}</div>
-                        <div class="step-label">{% trans "Out for Delivery" %}</div>
-                    </div>
-                    <div class="step {% if booking.status == 'delivered' %}completed{% endif %}">
-                        <div class="dot">{% if booking.status == 'delivered' %}✓{% else %}○{% endif %}</div>
-                        <div class="step-label">{% trans "Delivered" %}</div>
-                    </div>
-                </div>
-
-                <div class="delivery-info">
-                    <div>📅 {% trans "Booked on:" %} {{ booking.booked_date }}</div>
-                    <div>🚚 {% trans "Expected delivery:" %} {{ booking.expected_delivery }}</div>
+<div class="timeline">
+<div class="step {% if booking.status != 'pending' %}completed{% endif %}">
+<div class="dot">✓</div>
+<div class="step-label">{% trans "Booked" %}</div>
+</div>
+<div class="step {% if booking.status == 'processed' or booking.status == 'out_for_delivery' or booking.status == 'delivered' %}completed{% endif %}">
+<div class="dot">✓</div>
+<div class="step-label">{% trans "Processed" %}</div>
+</div>
+<div class="step {% if booking.status == 'out_for_delivery' or booking.status == 'delivered' %}completed{% endif %} {% if booking.status == 'out_for_delivery' %}active{% endif %}">
+<div class="dot">{% if booking.status == 'out_for_delivery' %}⏳{% else %}○{% endif %}</div>
+<div class="step-label">{% trans "Out for Delivery" %}</div>
+</div>
+<div class="step {% if booking.status == 'delivered' %}completed{% endif %}">
+<div class="dot">{% if booking.status == 'delivered' %}✓{% else %}○{% endif %}</div>
+<div class="step-label">{% trans "Delivered" %}</div>
+</div>
+</div>
+<div class="delivery-info">
+<div>📅 {% trans "Booked on:" %} {{ booking.booked_date }}</div>
+<div>🚚 {% trans "Expected delivery:" %} {{ booking.expected_delivery }}</div>
                     {% if booking.delivery_person %}
                     <div>👤 {% trans "Delivery person:" %} {{ booking.delivery_person }}</div>
                     {% endif %}
@@ -514,57 +355,50 @@
                     <div>✅ {% trans "Delivered on:" %} {{ booking.actual_delivery }}</div>
                     {% endif %}
                 </div>
-
-                <div style="text-align:center;font-size:18px;color:#1e5fbf;">
+<div style="text-align:center;font-size:18px;color:#1e5fbf;">
                     {{ booking.cylinder_type }}
                 </div>
                 {% else %}
                 <!-- Default demo status -->
-                <div style="font-size:20px;font-weight:700;color:#1e5fbf;margin-bottom:10px;">{% trans "Booking #CYL251234" %}</div>
-
-                <div class="timeline">
-                    <div class="step completed"><div class="dot">✓</div><div class="step-label">{% trans "Booked" %}</div></div>
-                    <div class="step completed"><div class="dot">✓</div><div class="step-label">{% trans "Processed" %}</div></div>
-                    <div class="step active"><div class="dot">⏳</div><div class="step-label">{% trans "Out for Delivery" %}</div></div>
-                    <div class="step"><div class="dot">○</div><div class="step-label">{% trans "Delivered" %}</div></div>
-                </div>
-
-                <div class="delivery-info">
-                    <div>📅 {% trans "Booked on:" %} 22 Feb 2026, 10:30 AM</div>
-                    <div>🚚 {% trans "Expected delivery:" %} {% trans "Today (25 Feb) by 6 PM" %}</div>
-                    <div>👤 {% trans "Delivery person:" %} Ramesh (98765 43210)</div>
-                </div>
-
-                <div style="text-align:center;font-size:18px;color:#1e5fbf;">
+<div style="font-size:20px;font-weight:700;color:#1e5fbf;margin-bottom:10px;">{% trans "Booking #CYL251234" %}</div>
+<div class="timeline">
+<div class="step completed"><div class="dot">✓</div><div class="step-label">{% trans "Booked" %}</div></div>
+<div class="step completed"><div class="dot">✓</div><div class="step-label">{% trans "Processed" %}</div></div>
+<div class="step active"><div class="dot">⏳</div><div class="step-label">{% trans "Out for Delivery" %}</div></div>
+<div class="step"><div class="dot">○</div><div class="step-label">{% trans "Delivered" %}</div></div>
+</div>
+<div class="delivery-info">
+<div>📅 {% trans "Booked on:" %} 22 Feb 2026, 10:30 AM</div>
+<div>🚚 {% trans "Expected delivery:" %} {% trans "Today (25 Feb) by 6 PM" %}</div>
+<div>👤 {% trans "Delivery person:" %} Ramesh (98765 43210)</div>
+</div>
+<div style="text-align:center;font-size:18px;color:#1e5fbf;">
                     14.2 kg {% trans "Domestic Cylinder" %}
                 </div>
                 {% endif %}
             </div>
+</div>
+</div>
+ Loading indicator 
+<div class="loading" id="loadingIndicator">
+<div class="spinner"></div>
+<div>{% trans "Searching..." %}</div>
+</div>
+ Floating Keyboard Elements 
+<div class="overlay" id="overlay"></div>
+<input %}"="" class="floating-input" enter="" id="floatingInput" number"="" placeholder="{% trans " reference=""/>
+<div class="keyboard" id="keyboard"></div>
+ Load voice.js - must be at bottom 
+<script src="{% static 'js/voice.js' %}"></script>
+{% endblock %}
 
-        </div>
-    </div>
-
-    <!-- Loading indicator -->
-    <div id="loadingIndicator" class="loading">
-        <div class="spinner"></div>
-        <div>{% trans "Searching..." %}</div>
-    </div>
-
-    <!-- Floating Keyboard Elements -->
-    <div id="overlay" class="overlay"></div>
-    <input id="floatingInput" class="floating-input" placeholder="{% trans "Enter reference number" %}">
-    <div id="keyboard" class="keyboard"></div>
-
-    <!-- Load voice.js - must be at bottom -->
-    <script src="{% static 'js/voice.js' %}"></script>
-
-    <script>
+{% block extra_scripts %}
+<script>
         /* ================= LANGUAGE UTILITIES ================= */
         function getCurrentLangCode() {
             const path = window.location.pathname.split('/');
             return path[1] || "en";
         }
-
         function speak(text) {
             if (!('speechSynthesis' in window)) return;
             speechSynthesis.cancel();
@@ -573,91 +407,25 @@
             utterance.rate = 1;
             speechSynthesis.speak(utterance);
         }
-
         /* ================= SESSION TIMER ================= */
-        let sessionTimer;
-        let timeoutWarningTimer;
-        const SESSION_DURATION = 120000; // 2 minutes
-        const WARNING_TIME = 30000; // Warn 30 seconds before
-
-        function startSessionTimer() {
-            sessionTimer = setTimeout(() => {
-                showTimeoutWarning();
-            }, SESSION_DURATION - WARNING_TIME);
-        }
-
-        function showTimeoutWarning() {
-            const warning = document.getElementById('timeoutWarning');
-            if (warning) {
-                warning.style.display = 'block';
-                
-                const langCode = getCurrentLangCode();
-                const warnings = {
-                    'en': 'Your session is about to expire. Please continue to stay logged in.',
-                    'hi': 'आपका सत्र समाप्त होने वाला है। कृपया जारी रखें।',
-                    'or': 'ଆପଣଙ୍କର ସତ୍ର ସମାପ୍ତ ହେବାକୁ ଯାଉଛି। ଦୟାକରି ଜାରି ରଖନ୍ତୁ।',
-                    'bn': 'আপনার সেশন শেষ হতে চলেছে। অনুগ্রহ করে চালিয়ে যান।',
-                    'ta': 'உங்கள் அமர்வு காலாவதியாகிறது. தயவுசெய்து தொடரவும்.',
-                    'te': 'మీ సెషన్ ముగియబోతోంది. దయచేసి కొనసాగించండి.'
-                };
-                speak(warnings[langCode] || warnings['en']);
-                
-                timeoutWarningTimer = setTimeout(() => {
-                    window.location.href = "/" + langCode + "/";
-                }, WARNING_TIME);
-            }
-        }
-
-        function extendSession() {
-            const warning = document.getElementById('timeoutWarning');
-            if (warning) {
-                warning.style.display = 'none';
-            }
-            clearTimeout(sessionTimer);
-            clearTimeout(timeoutWarningTimer);
-            startSessionTimer();
-            
-            const langCode = getCurrentLangCode();
-            const messages = {
-                'en': 'Session extended. You may continue.',
-                'hi': 'सत्र बढ़ा दिया गया। आप जारी रख सकते हैं।',
-                'or': 'ସତ୍ର ବୃଦ୍ଧି କରାଯାଇଛି। ଆପଣ ଜାରି ରଖିପାରିବେ।',
-                'bn': 'সেশন বাড়ানো হয়েছে। আপনি চালিয়ে যেতে পারেন।',
-                'ta': 'அமர்வு நீட்டிக்கப்பட்டது. நீங்கள் தொடரலாம்.',
-                'te': 'సెషన్ పొడిగించబడింది. మీరు కొనసాగించవచ్చు.'
-            };
-            speak(messages[langCode] || messages['en']);
-        }
-
-        function resetSessionTimer() {
-            clearTimeout(sessionTimer);
-            clearTimeout(timeoutWarningTimer);
-            startSessionTimer();
-        }
-
         function goBack() {
             resetSessionTimer();
             window.location.href = "/" + getCurrentLangCode() + "/gas-services/";
         }
-
         /* ================= FLOATING KEYBOARD ================= */
         let activeInput = null;
         let isUpperCase = true;
-
         const overlay = document.getElementById("overlay");
         const floatingInput = document.getElementById("floatingInput");
         const keyboard = document.getElementById("keyboard");
         const loadingIndicator = document.getElementById("loadingIndicator");
-
         function createKeyboard() {
             keyboard.innerHTML = "";
             let letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
             if (!isUpperCase) { letters = letters.toLowerCase(); }
             let keys = (letters + "0123456789").split("");
-
             let row = document.createElement("div");
             row.className = "keyboard-row";
-            
             keys.forEach((k, i) => {
                 if (i % 10 === 0 && i !== 0) {
                     keyboard.appendChild(row);
@@ -671,7 +439,6 @@
                 row.appendChild(btn);
             });
             keyboard.appendChild(row);
-
             let last = document.createElement("div");
             last.className = "keyboard-row";
             last.innerHTML = `
@@ -682,12 +449,10 @@
             `;
             keyboard.appendChild(last);
         }
-
         function toggleCase() {
             isUpperCase = !isUpperCase;
             createKeyboard();
         }
-
         function openKeyboard(id) {
             resetSessionTimer();
             activeInput = document.getElementById(id);
@@ -700,7 +465,6 @@
                 floatingInput.focus();
             }, 10);
         }
-
         function finish() {
             if (activeInput) {
                 activeInput.value = floatingInput.value;
@@ -708,7 +472,6 @@
             }
             closeKeyboard();
         }
-
         function closeKeyboard() {
             floatingInput.classList.remove("show");
             setTimeout(() => {
@@ -717,7 +480,6 @@
                 keyboard.style.display = "none";
             }, 200);
         }
-
         // Handle Enter key on floating input
         floatingInput.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
@@ -725,18 +487,13 @@
                 finish();
             }
         });
-
         document.getElementById("refNo").addEventListener("click", () => openKeyboard("refNo"));
         overlay.addEventListener("click", closeKeyboard);
-
         createKeyboard();
-
         function checkStatus() {
             resetSessionTimer();
-            
             const ref = document.getElementById('refNo').value;
             const langCode = getCurrentLangCode();
-            
             if (!ref) {
                 const messages = {
                     'en': 'Please enter reference number',
@@ -749,10 +506,8 @@
                 speak(messages[langCode] || messages['en']);
                 return;
             }
-
             // Show loading
             loadingIndicator.classList.add('show');
-            
             const messages = {
                 'en': 'Searching for booking status',
                 'hi': 'बुकिंग स्थिति खोज रहा है',
@@ -762,48 +517,39 @@
                 'te': 'బుకింగ్ స్థితి కోసం శోధిస్తోంది'
             };
             speak(messages[langCode] || messages['en']);
-
             // Submit form
             setTimeout(() => {
                 document.getElementById('statusForm').submit();
             }, 500);
         }
-
         /* ================= VOICE INPUT ================= */
         let recognition;
         let isListening = false;
-
         function toggleVoiceInput() {
             resetSessionTimer();
-            
             if (isListening) {
                 stopVoiceInput();
                 return;
             }
-
             const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SR) {
                 alert("{% trans 'Speech not supported' %}");
                 return;
             }
-
             if (recognition) {
                 try {
                     recognition.stop();
                 } catch (e) {}
             }
-
             recognition = new SR();
             recognition.lang = window.getCurrentLang ? window.getCurrentLang() : 'en-IN';
             recognition.continuous = true;
             recognition.interimResults = true;
-
             recognition.onstart = function() {
                 isListening = true;
                 document.getElementById("voiceBtn").classList.add("listening");
                 document.getElementById("voiceStatus").innerText = "{% trans 'Listening...' %}";
                 document.getElementById('voiceStatusIndicator').classList.add('active');
-                
                 const langCode = getCurrentLangCode();
                 const messages = {
                     'en': 'Say your reference number starting with CYL, or say search to check status.',
@@ -812,13 +558,10 @@
                 };
                 speak(messages[langCode] || messages['en']);
             };
-
             recognition.onresult = function(e) {
                 resetSessionTimer();
-                
                 let finalTranscript = '';
                 let interimTranscript = '';
-                
                 for (let i = 0; i < e.results.length; i++) {
                     const result = e.results[i];
                     if (result.isFinal) {
@@ -827,13 +570,10 @@
                         interimTranscript += result[0].transcript;
                     }
                 }
-                
                 const transcript = finalTranscript || interimTranscript;
                 const command = transcript.toLowerCase();
                 console.log("Gas booking command:", command);
-                
                 const langCode = getCurrentLangCode();
-                
                 // Check for reference number pattern (CYL followed by numbers)
                 const cylMatch = command.match(/cyl[-\s]?(\d+)/i) || command.match(/cylinder[-\s]?(\d+)/i);
                 if (cylMatch) {
@@ -848,7 +588,6 @@
                     speak(messages[langCode] || messages['en']);
                     return;
                 }
-                
                 // Check for just numbers (assume CYL prefix if it sounds like a reference)
                 const numberMatch = command.match(/\d+/g);
                 if (numberMatch && (command.includes("ref") || command.includes("reference") || 
@@ -864,52 +603,44 @@
                     speak(messages[langCode] || messages['en']);
                     return;
                 }
-                
                 // Search command - English
                 if (command.includes("search") || command.includes("check") || command.includes("status")) {
                     checkStatus();
                     return;
                 }
-                
                 // Search command - Hindi
                 if (command.includes("खोज") || command.includes("स्थिति") || command.includes("चेक")) {
                     checkStatus();
                     return;
                 }
-                
                 // Search command - Odia
                 if (command.includes("ଖୋଜ") || command.includes("ସ୍ଥିତି")) {
                     checkStatus();
                     return;
                 }
-                
                 // Back command - all languages
                 if (command.includes("back") || command.includes("वापस") || command.includes("ପଛକୁ") || 
                     command.includes("পিছনে") || command.includes("பின்") || command.includes("వెనుకకు")) {
                     goBack();
                     return;
                 }
-                
                 // Home command - all languages
                 if (command.includes("home") || command.includes("होम") || command.includes("ଘର") || 
                     command.includes("হোম") || command.includes("முகப்பு") || command.includes("హోమ్")) {
                     window.location.href = "/" + langCode + "/";
                     return;
                 }
-                
                 // Stop listening
                 if (command.includes("stop listening") || command.includes("stop voice")) {
                     stopVoiceInput();
                     return;
                 }
             };
-
             recognition.onerror = function(event) {
                 console.error("Recognition error:", event.error);
                 if (event.error === 'no-speech') return;
                 stopVoiceInput();
             };
-
             recognition.onend = function() {
                 if (isListening) {
                     try {
@@ -924,7 +655,6 @@
                     document.getElementById('voiceStatusIndicator').classList.remove('active');
                 }
             };
-
             try {
                 recognition.start();
             } catch (e) {
@@ -932,7 +662,6 @@
                 stopVoiceInput();
             }
         }
-
         function stopVoiceInput() {
             isListening = false;
             if (recognition) {
@@ -944,7 +673,6 @@
             document.getElementById("voiceStatus").innerText = "{% trans 'Click' %}";
             document.getElementById('voiceStatusIndicator').classList.remove('active');
         }
-
         // Auto-read page instructions
         function autoReadPage() {
             setTimeout(() => {
@@ -957,29 +685,24 @@
                 speak(messages[langCode] || messages['en']);
             }, 2000);
         }
-
         // Auto-hide messages after 5 seconds
         setTimeout(function() {
             document.querySelectorAll('.message').forEach(function(message) {
                 message.style.display = 'none';
             });
         }, 5000);
-
         // Prevent form submission on Enter key
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'INPUT') {
                 e.preventDefault();
             }
         });
-
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             startSessionTimer();
-            
             document.addEventListener('click', resetSessionTimer);
             document.addEventListener('keypress', resetSessionTimer);
             document.addEventListener('touchstart', resetSessionTimer);
-            
             // Check if voice should auto-start
             const autoStartVoice = sessionStorage.getItem('autoStartVoice');
             if (autoStartVoice === 'true') {
@@ -988,25 +711,22 @@
                     toggleVoiceInput();
                 }, 1000);
             }
-            
             // Auto-read page
             setTimeout(autoReadPage, 2000);
         });
-
         window.addEventListener('beforeunload', function() {
             if (sessionTimer) {
                 clearTimeout(sessionTimer);
             }
             stopVoiceInput();
         });
-
         // If booking exists, make sure it's visible
         {% if booking %}
         document.getElementById('statusDisplay').classList.remove('hidden');
         {% endif %}
-
         // Override voice.js autoReadPage
         window.autoReadPage = autoReadPage;
-    </script>
-</body>
-</html>
+
+
+</script>
+{% endblock %}
