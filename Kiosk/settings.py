@@ -170,7 +170,10 @@ STATICFILES_DIRS = [
 
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+# Vercel serves raw files from the repo's `static/` directory.
+# A manifest-based staticfiles storage (staticfiles.json) can be missing at runtime,
+# which would cause `{% static %}` to raise during template rendering.
+STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 
 
 # -------------------------------------------------

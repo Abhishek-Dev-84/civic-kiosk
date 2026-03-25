@@ -184,9 +184,10 @@ def verify_otp(stored_hash, entered_otp, otp_timestamp):
 def index(request):
     """
     Language selection page.
-    Emergency recovery mode: keep site available even if templates break.
     """
-    return HttpResponse("Site is recovering")
+    # `templates/index.html` references `LANGUAGE_CODE` directly; keep it safe.
+    language_code = getattr(request, "LANGUAGE_CODE", None) or "en"
+    return render(request, "index.html", {"LANGUAGE_CODE": language_code})
 
 
 def auth(request):
