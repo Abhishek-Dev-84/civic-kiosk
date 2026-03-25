@@ -320,7 +320,7 @@ def otp(request):
             request.session.pop('otp_hash', None)
             request.session.pop('otp_timestamp', None)
             
-            messages.success(request, 'OTP verified successfully!')
+            messages.success(request, f'Welcome {consumer.name}! Login successful.')
             
         except Consumer.DoesNotExist:
             messages.error(request, 'Consumer record not found.')
