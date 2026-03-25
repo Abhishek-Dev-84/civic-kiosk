@@ -191,7 +191,7 @@ def index(request):
 
 
 def auth(request):
-    """Aadhaar authentication page"""
+    """Aadhaar authentication page - OTP bypass mode"""
     # Clear any existing messages
     storage = messages.get_messages(request)
     storage.used = True
@@ -216,33 +216,49 @@ def auth(request):
             request.session['aadhaar_number'] = aadhaar_number
             request.session['consumer_id'] = consumer.id
             
-            # Generate and hash OTP
-            otp = generate_secure_otp(6)
-            otp_hash = hash_otp(otp)
+            # OTP BYPASS: No OTP generation or sending
+            # Set OTP as verified directly
+            request.session['aadhaar_verified'] = True
+            request.session['otp_verified'] = True
             
-            # Store hash instead of plain OTP
-            request.session['otp_hash'] = otp_hash
-            request.session['otp_attempts'] = 0
-            request.session['otp_timestamp'] = datetime.now().isoformat()
-            
-            # Send OTP via CircuitDigest
-            print(f"\n🔐 Generated OTP for {consumer.name}: {otp}")
-            print(f"📱 Sending to: {consumer.mobile}")
-            
-            success, message = send_otp_via_circuitdigest(
-                consumer.mobile,
-                otp,
-                aadhaar_number
-            )
-            
-            if success:
-                messages.success(request, 'OTP sent successfully to your registered mobile number')
+            # Create user session immediately
+            try:
+                consumer.last_login = datetime.now()
+                consumer.save()
                 
-                # Create audit log (don't fail if this errors)
+                # Create user session
+                session_key = request.session.session_key
+                
+                # Deactivate any existing active sessions for this consumer
+                UserSession.objects.filter(
+                    consumer=consumer,
+                    is_active=True
+                ).update(is_active=False)
+                
+                # Create new session record
+                UserSession.objects.create(
+                    consumer=consumer,
+                    session_key=session_key,
+                    ip_address=get_client_ip(request),
+                    user_agent=request.META.get('HTTP_USER_AGENT', '')[:255]
+                )
+                
+                # Create notification
+                try:
+                    Notification.objects.create(
+                        consumer=consumer,
+                        notification_type='GENERAL',
+                        title='Login Successful',
+                        message=f'You have successfully logged in to Civic Kiosk at {datetime.now().strftime("%d %b %Y %I:%M %p")}'
+                    )
+                except Exception as e:
+                    logger.error(f"Failed to create notification: {e}")
+                
+                # Create audit log
                 try:
                     AuditLog.objects.create(
                         consumer=consumer,
-                        action='OTP_SENT',
+                        action='LOGIN_BYPASS',
                         model_name='Consumer',
                         object_id=consumer.id,
                         changes={'aadhaar': aadhaar_number[-4:]},
@@ -252,13 +268,13 @@ def auth(request):
                 except Exception as e:
                     logger.error(f"Failed to create audit log: {e}")
                 
-                return redirect('otp')
-            else:
-                messages.error(request, f'Failed to send OTP: {message}')
-                # Fallback - show OTP in console for testing
-                messages.info(request, f'OTP for testing: {otp} (Check console)')
-                print(f"\n⚠️ FALLBACK OTP: {otp}")
-                return redirect('otp')
+                messages.success(request, f'Welcome {consumer.name}! Login successful.')
+                return redirect('menu')
+                
+            except Exception as e:
+                logger.error(f"Error creating session: {e}")
+                messages.error(request, 'An error occurred. Please try again.')
+                return render(request, 'auth.html')
                 
         except Consumer.DoesNotExist:
             messages.error(request, 'Aadhaar number not found in our records. Please contact support.')
@@ -273,7 +289,7 @@ def auth(request):
 
 
 def otp(request):
-    """OTP verification page - BYPASS MODE: any OTP works"""
+    """OTP verification page - ANY OTP works"""
     # Check if aadhaar is in session
     aadhaar_number = request.session.get('aadhaar_number')
     consumer_id = request.session.get('consumer_id')
@@ -284,21 +300,11 @@ def otp(request):
         messages.error(request, 'Session expired. Please enter Aadhaar again.')
         return redirect('auth')
     
-    # Parse timestamp
-    try:
-        otp_timestamp = datetime.fromisoformat(otp_timestamp_str)
-    except:
-        otp_timestamp = datetime.now() - timedelta(minutes=6)  # Force expiry
-    
     if request.method == 'POST':
         entered_otp = sanitize_input(request.POST.get('otp'), 6)
         
-        # Get attempt count (just for display)
-        attempts = request.session.get('otp_attempts', 0)
-        request.session['otp_attempts'] = attempts + 1
-        
-        # BYPASS MODE: Skip OTP verification completely
-        # Any OTP (or even empty) will work
+        # ANY OTP works - no verification needed
+        # Just proceed to menu
         
         # OTP bypassed successfully
         request.session['aadhaar_verified'] = True
@@ -349,6 +355,7 @@ def otp(request):
         
         return redirect('menu')
     
+    # GET request - show OTP page
     # Mask Aadhaar for display
     masked_aadhaar = 'XXXX XXXX ' + aadhaar_number[-4:]
     
@@ -357,7 +364,6 @@ def otp(request):
         consumer = Consumer.objects.get(id=consumer_id)
         consumer_name = consumer.name
         consumer_phone = consumer.mobile
-        # Mask phone number for display (show only last 4 digits)
         masked_phone = consumer_phone[-4:] if consumer_phone else ''
     except:
         consumer_name = ''
@@ -372,8 +378,9 @@ def otp(request):
     
     return render(request, 'otp.html', context)
 
+
 def resend_otp(request):
-    """Resend OTP - Bypass mode still generates OTP but doesn't verify"""
+    """Resend OTP - Still generates OTP but doesn't send SMS"""
     if request.method == 'POST':
         aadhaar_number = request.session.get('aadhaar_number')
         consumer_id = request.session.get('consumer_id')
@@ -385,24 +392,18 @@ def resend_otp(request):
         try:
             consumer = Consumer.objects.get(id=consumer_id, aadhaar_number=aadhaar_number)
             
-            # Generate new OTP (for logging purposes only)
+            # Generate new OTP (but won't be verified)
             otp = generate_secure_otp(6)
             otp_hash = hash_otp(otp)
             request.session['otp_hash'] = otp_hash
             request.session['otp_attempts'] = 0
             request.session['otp_timestamp'] = datetime.now().isoformat()
             
-            # Log the OTP to console for reference (since verification is bypassed)
+            # Log OTP to console for reference (optional)
             print(f"\n🔐 [BYPASS MODE] OTP generated for {consumer.name}: {otp}")
-            print(f"📱 Registered mobile: {consumer.mobile}")
             print(f"⚠️ NOTE: ANY OTP will work for login!\n")
             
-            # Still attempt to send SMS (optional)
-            try:
-                send_otp_via_circuitdigest(consumer.mobile, otp, aadhaar_number)
-            except:
-                pass
-            
+            # DO NOT send SMS - just show success message
             messages.success(request, 'OTP sent successfully! (Any OTP will work)')
             
         except Consumer.DoesNotExist:
