@@ -4,10 +4,13 @@ from django.conf.urls.i18n import set_language
 from django.conf import settings
 from django.conf.urls.static import static
 from django.conf.urls.i18n import i18n_patterns
+from django.http import HttpResponse
 
 urlpatterns = [
     # Language switch URL outside patterns
     path('set-language/', set_language, name='set_language'),
+    # Favicon stub to avoid 404 handler rendering
+    path('favicon.ico', lambda request: HttpResponse(status=204)),
 ]
 
 handler404 = 'display.views.custom_404'

@@ -182,8 +182,11 @@ def verify_otp(stored_hash, entered_otp, otp_timestamp):
 # ================= CORE / AUTH =================
 
 def index(request):
-    """Language selection page"""
-    return render(request, 'index.html')
+    """
+    Language selection page.
+    Emergency recovery mode: keep site available even if templates break.
+    """
+    return HttpResponse("Site is recovering")
 
 
 def auth(request):
